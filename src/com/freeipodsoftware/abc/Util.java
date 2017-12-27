@@ -1,9 +1,19 @@
-    package com.freeipodsoftware.abc;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+package com.freeipodsoftware.abc;
 
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+/*
+import org.blinkenlights.jid3.ID3Exception;
+import org.blinkenlights.jid3.MP3File;
+import org.blinkenlights.jid3.v1.ID3V1Tag;
+import org.blinkenlights.jid3.v2.ID3V2Tag;
+*/
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -17,11 +27,11 @@ public class Util {
     }
 
     public static String nullToEmptyString(String string) {
-        return string == null?"":string;
+        return string == null ? "" : string;
     }
 
     public static boolean hasText(String text) {
-        return text == null?false:text.trim().length() > 0;
+        return text == null ? false : text.trim().length() > 0;
     }
 
     public static void centerDialog(Shell parent, Shell shell) {
@@ -35,14 +45,14 @@ public class Util {
     public static String makeFilenameUnique(String filename) {
         Pattern extPattern = Pattern.compile("\\.(\\w+)$");
         Matcher extMatcher = extPattern.matcher(filename);
-        if(extMatcher.find()) {
+        if (extMatcher.find()) {
             try {
                 String extension = extMatcher.group(1);
 
-                for(File outputFile = new File(filename); outputFile.exists(); outputFile = new File(filename)) {
+                for (File outputFile = new File(filename); outputFile.exists(); outputFile = new File(filename)) {
                     Pattern pattern = Pattern.compile("(?i)(.*)\\((\\d+)\\)\\." + extension + "$");
                     Matcher matcher = pattern.matcher(filename);
-                    if(matcher.find()) {
+                    if (matcher.find()) {
                         filename = matcher.group(1) + "(" + (Integer.parseInt(matcher.group(2)) + 1) + ")." + extension;
                     } else {
                         filename = filename.replaceAll("." + extension + "$", "(1)." + extension);
@@ -64,11 +74,11 @@ public class Util {
         try {
             MP3File file = new MP3File(new File(filename));
             AbstractID3v2 v2Tag = file.getID3v2Tag();
-            if(v2Tag != null) {
+            if (v2Tag != null) {
                 importV2Tags(tags, v2Tag);
             } else {
                 ID3v1 v1Tag = file.getID3v1Tag();
-                if(v1Tag != null) {
+                if (v1Tag != null) {
                     importV1Tags(tags, v1Tag);
                 }
             }
@@ -88,16 +98,21 @@ public class Util {
         tags.setComment(filterTag(v1Tag.getComment()));
     }
 
-    private static void importV2Tags(Mp4Tags tags, AbstractID3v2 v2Tag){
+    private static void importV2Tags(Mp4Tags tags, AbstractID3v2 v2Tag) {
         tags.setArtist(filterTag(v2Tag.getLeadArtist()));
         tags.setTitle(filterTag(v2Tag.getSongTitle()));
         tags.setAlbum(filterTag(v2Tag.getAlbumTitle()));
         tags.setGenre(filterTag(v2Tag.getSongTitle()));
         tags.setYear(String.valueOf(v2Tag.getYearReleased()));
-        if(!StringUtils.isEmpty(v2Tag.getTrackNumberOnAlbum()) && !StringUtils.isEmpty(v2Tag.getTrackNumberOnAlbum())){
+
+/*
+        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum()) && StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum())) {
             tags.setTrack(v2Tag.getTrackNumberOnAlbum() + "/" + v2Tag.getTrackNumberOnAlbum());
-        } else if(!StringUtils.isEmpty(v2Tag.getTrackNumberOnAlbum())) {
-            tags.setTrack(v2Tag.getTrackNumberOnAlbum());
+
+        } else
+*/
+        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum())) {
+            tags.setTrack("" + v2Tag.getTrackNumberOnAlbum());
         } else {
             tags.setTrack("");
         }
@@ -106,6 +121,6 @@ public class Util {
     }
 
     private static String filterTag(String tag) {
-        return tag == null?"":tag.trim();
+        return tag == null ? "" : tag.trim();
     }
 }

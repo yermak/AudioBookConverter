@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,8 +21,8 @@ public class AboutDialog extends Dialog {
         this.sShell.open();
         Display display = parent.getDisplay();
 
-        while(!this.sShell.isDisposed()) {
-            if(!display.readAndDispatch()) {
+        while (!this.sShell.isDisposed()) {
+            if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }

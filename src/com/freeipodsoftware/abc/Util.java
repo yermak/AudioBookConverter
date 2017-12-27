@@ -1,19 +1,5 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-/*
-import org.blinkenlights.jid3.ID3Exception;
-import org.blinkenlights.jid3.MP3File;
-import org.blinkenlights.jid3.v1.ID3V1Tag;
-import org.blinkenlights.jid3.v2.ID3V2Tag;
-*/
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -21,6 +7,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.id3.AbstractID3v2;
 import org.farng.mp3.id3.ID3v1;
+
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/*
+import org.blinkenlights.jid3.ID3Exception;
+import org.blinkenlights.jid3.MP3File;
+import org.blinkenlights.jid3.v1.ID3V1Tag;
+import org.blinkenlights.jid3.v2.ID3V2Tag;
+*/
 
 public class Util {
     public Util() {

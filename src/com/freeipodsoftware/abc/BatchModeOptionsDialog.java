@@ -1,11 +1,5 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
-import java.io.File;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -15,6 +9,8 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import java.io.File;
 
 public class BatchModeOptionsDialog extends Dialog {
     private boolean canceled;
@@ -38,8 +34,8 @@ public class BatchModeOptionsDialog extends Dialog {
         this.shell.open();
         Display display = parent.getDisplay();
 
-        while(!this.shell.isDisposed()) {
-            if(!display.readAndDispatch()) {
+        while (!this.shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
@@ -78,7 +74,7 @@ public class BatchModeOptionsDialog extends Dialog {
                 }
 
                 String result = dialog.open();
-                if(result != null) {
+                if (result != null) {
                     BatchModeOptionsDialog.this.gui.folderText.setText(result);
                     BatchModeOptionsDialog.this.validateControls();
                 }
@@ -107,7 +103,7 @@ public class BatchModeOptionsDialog extends Dialog {
     private void validateControls() {
         this.gui.folderText.setEnabled(this.gui.differentFolderRadioButton.getSelection());
         this.gui.chooseButton.setEnabled(this.gui.differentFolderRadioButton.getSelection());
-        if(this.gui.differentFolderRadioButton.getSelection()) {
+        if (this.gui.differentFolderRadioButton.getSelection()) {
             try {
                 File dir = new File(this.gui.folderText.getText());
                 this.gui.okButton.setEnabled(dir.exists() && dir.isDirectory());

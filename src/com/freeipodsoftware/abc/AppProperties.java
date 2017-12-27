@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import java.io.File;
@@ -12,8 +7,8 @@ import java.util.Date;
 import java.util.Properties;
 
 public class AppProperties {
-    public static final String WEBSITE_URL = "http://www.freeipodsoftware.com/";
-    public static final String HELP_URL = "http://www.freeipodsoftware.com/converterhelp.php";
+    public static final String WEBSITE_URL = "https://github.com/yermak/AudioBookConverter";
+    public static final String HELP_URL = "https://github.com/yermak/AudioBookConverter";
     private static final String APP_PROPERTIES = "app.properties";
     private static final String APPDATA = "APPDATA";
     private static final String MP3TOI_POD_AUDIO_BOOK_CONVERTER = "MP3toiPodAudioBookConverter";
@@ -51,7 +46,7 @@ public class AppProperties {
 
         try {
             File appDir = new File(new File(System.getenv("APPDATA")), "MP3toiPodAudioBookConverter");
-            if(!appDir.exists()) {
+            if (!appDir.exists()) {
                 boolean succ = appDir.mkdir();
                 System.out.println(succ);
             }

@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.graphics.Point;
@@ -14,7 +9,7 @@ public class TagEditor extends TagEditorGui {
     }
 
     public Point computeSize(int wHint, int hHint, boolean changed) {
-        return this.isVisible()?super.computeSize(wHint, hHint, changed):new Point(0, 0);
+        return this.isVisible() ? super.computeSize(wHint, hHint, changed) : new Point(0, 0);
     }
 
     public void setArtist(String artist) {

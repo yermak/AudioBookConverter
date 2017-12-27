@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.events.SelectionAdapter;
@@ -59,7 +54,7 @@ public class ToggleableTagEditorGui extends Composite {
     }
 
     private void setTagEditorVisible(boolean visible) {
-        if(visible) {
+        if (visible) {
             this.tagEditor.setVisible(true);
         } else {
             this.tagEditor.setVisible(false);
@@ -85,13 +80,13 @@ public class ToggleableTagEditorGui extends Composite {
     }
 
     private void updateToggleLinkText() {
-        if(this.isEnabled()) {
+        if (this.isEnabled()) {
             this.infoLabel.setText("");
         } else {
             this.infoLabel.setText("(" + Messages.getString("ToggleableTagEditorGui.onlyAvailableWhenConvertingToOneFile") + ")");
         }
 
-        if(this.tagEditor.isVisible()) {
+        if (this.tagEditor.isVisible()) {
             this.toggleLink.setText("<a>" + HIDE_TAG_EDITOR + "</a>");
         } else {
             this.toggleLink.setText("<a>" + SHOW_TAG_EDITOR + "</a>");

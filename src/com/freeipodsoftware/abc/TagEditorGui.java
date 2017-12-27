@@ -1,19 +1,10 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 
 public class TagEditorGui extends Composite {
     private static final String[] genres = new String[]{"Alternative", "Blues", "Books & Spoken", "Children's Music", "Classical", "Comedy", "Country", "Dance", "Easy Listening", "Electronic", "Folk", "Funk", "House", "Hip Hop", "Indie", "Industrial", "Jazz", "Metal", "Misc", "New Age", "Poscast", "Pop", "Punk", "Religious", "Rock", "Reggae", "Soft Rock", "Soundtrack", "Techno", "Trance", "Unclassifiable", "World"};
@@ -186,7 +177,7 @@ public class TagEditorGui extends Composite {
     }
 
     private void fillGenres() {
-        for(int i = 0; i < genres.length; ++i) {
+        for (int i = 0; i < genres.length; ++i) {
             this.genreCombo.add(genres[i]);
         }
 

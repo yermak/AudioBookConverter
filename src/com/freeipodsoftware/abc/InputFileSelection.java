@@ -1,21 +1,7 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
-import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.dnd.*;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 
@@ -61,10 +47,10 @@ public class InputFileSelection extends InputFileSelectionGui {
         target.setTransfer(new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
         target.addDropListener(new DropTargetAdapter() {
             public void drop(DropTargetEvent event) {
-                if(FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
-                    String[] files = (String[])event.data;
+                if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
+                    String[] files = (String[]) event.data;
 
-                    for(int i = 0; i < files.length; ++i) {
+                    for (int i = 0; i < files.length; ++i) {
                         InputFileSelection.this.list.add(files[i]);
                     }
 
@@ -86,18 +72,18 @@ public class InputFileSelection extends InputFileSelectionGui {
 
     private void addInputFile() {
         FileDialog fileDialog = new FileDialog(this.getShell(), 4098);
-        if(this.lastFolder != null) {
+        if (this.lastFolder != null) {
             fileDialog.setFileName(this.lastFolder);
         }
 
         fileDialog.setFilterNames(new String[]{Messages.getString("InputFileSelection.mp3Files"), Messages.getString("InputFileSelection.allFiles")});
         fileDialog.setFilterExtensions(new String[]{"*.mp3", "*.*"});
         String firstFile = fileDialog.open();
-        if(firstFile != null) {
+        if (firstFile != null) {
             this.lastFolder = firstFile;
             String[] fileNames = fileDialog.getFileNames();
 
-            for(int i = 0; i < fileNames.length; ++i) {
+            for (int i = 0; i < fileNames.length; ++i) {
                 String filterPath = fileDialog.getFilterPath();
                 this.list.add(filterPath + System.getProperty("file.separator") + fileNames[i]);
             }
@@ -113,9 +99,9 @@ public class InputFileSelection extends InputFileSelectionGui {
     }
 
     private void moveDown() {
-        if(this.list.getSelectionCount() == 1) {
+        if (this.list.getSelectionCount() == 1) {
             int selectionIndex = this.list.getSelectionIndex();
-            if(selectionIndex < this.list.getItemCount() - 1) {
+            if (selectionIndex < this.list.getItemCount() - 1) {
                 this.list.add(this.list.getItem(selectionIndex), selectionIndex + 2);
                 this.list.remove(selectionIndex);
                 this.list.setSelection(selectionIndex + 1);
@@ -126,9 +112,9 @@ public class InputFileSelection extends InputFileSelectionGui {
     }
 
     private void moveUp() {
-        if(this.list.getSelectionCount() == 1) {
+        if (this.list.getSelectionCount() == 1) {
             int selectionIndex = this.list.getSelectionIndex();
-            if(selectionIndex > 0) {
+            if (selectionIndex > 0) {
                 this.list.add(this.list.getItem(selectionIndex), selectionIndex - 1);
                 this.list.remove(selectionIndex + 1);
                 this.list.setSelection(selectionIndex - 1);
@@ -152,9 +138,9 @@ public class InputFileSelection extends InputFileSelectionGui {
 
         public void keyPressed(KeyEvent e) {
             super.keyPressed(e);
-            if(e.keyCode == 127) {
+            if (e.keyCode == 127) {
                 InputFileSelection.this.removeInputFiles();
-            } else if(e.keyCode == 97 && e.stateMask == 262144) {
+            } else if (e.keyCode == 97 && e.stateMask == 262144) {
                 InputFileSelection.this.list.selectAll();
             }
 

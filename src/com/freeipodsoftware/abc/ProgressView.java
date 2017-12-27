@@ -1,17 +1,13 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
-import java.text.DecimalFormat;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.MessageBox;
+
+import java.text.DecimalFormat;
 
 public class ProgressView extends ProgressViewGui {
     public ProgressView(Composite parent, int style) {
@@ -23,7 +19,7 @@ public class ProgressView extends ProgressViewGui {
                 msgbox.setText(Messages.getString("ProgressView.confirmation"));
                 msgbox.setMessage(Messages.getString("ProgressView.cancelConfirmText"));
                 int result = msgbox.open();
-                if(result == 64) {
+                if (result == 64) {
                     ProgressView.this.canceled = true;
                     ProgressView.this.cancelButton.setEnabled(false);
                     ProgressView.this.pauseButton.setSelection(false);
@@ -40,7 +36,7 @@ public class ProgressView extends ProgressViewGui {
     }
 
     private void setWidthHintForControl(int buttonWidthHint, Control widget) {
-        GridData gridData = (GridData)widget.getLayoutData();
+        GridData gridData = (GridData) widget.getLayoutData();
         gridData.widthHint = buttonWidthHint;
     }
 
@@ -61,11 +57,11 @@ public class ProgressView extends ProgressViewGui {
     }
 
     public void setEstimatedFinalOutputSize(long bytes) {
-        if(bytes == -1L) {
+        if (bytes == -1L) {
             this.outputFileSizeValueLabel.setText("---");
         } else {
             DecimalFormat mbFormat = new DecimalFormat("0.0");
-            this.outputFileSizeValueLabel.setText(mbFormat.format((double)bytes / 1048576.0D) + " MB");
+            this.outputFileSizeValueLabel.setText(mbFormat.format((double) bytes / 1048576.0D) + " MB");
         }
 
     }

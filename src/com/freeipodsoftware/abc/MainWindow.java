@@ -1,19 +1,8 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import com.freeipodsoftware.abc.conversionstrategy.BatchConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.ConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.JoiningConversionStrategy;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Calendar;
-import java.util.Date;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -22,6 +11,13 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainWindow extends MainWindowGui implements FinishListener {
     private EventDispatcher eventDispatcher = new EventDispatcher();
@@ -35,12 +31,12 @@ public class MainWindow extends MainWindowGui implements FinishListener {
         MainWindow thisClass = new MainWindow();
         thisClass.create();
         thisClass.sShell.open();
-        if(AppProperties.getBooleanProperty("stayUpdated") && !isUpdateCheckSuspended()) {
+        if (AppProperties.getBooleanProperty("stayUpdated") && !isUpdateCheckSuspended()) {
             checkForUpdates(thisClass.sShell);
         }
 
-        while(!thisClass.sShell.isDisposed()) {
-            if(!display.readAndDispatch()) {
+        while (!thisClass.sShell.isDisposed()) {
+            if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
@@ -71,17 +67,17 @@ public class MainWindow extends MainWindowGui implements FinishListener {
         });
         this.updateLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Program.launch("http://www.freeipodsoftware.com//checkversion.php?major=0&minor=18");
+                Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
         this.websiteLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Program.launch("http://www.freeipodsoftware.com/");
+                Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
         this.helpLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Program.launch("http://www.freeipodsoftware.com/converterhelp.php");
+                Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
         this.optionPanel.addOptionChangedListener(new OptionChangedListener() {
@@ -114,9 +110,9 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private ConversionStrategy getConversionStrategy() {
-        if(this.conversionStrategy == null || !this.conversionStrategy.getClass().equals(this.getConversionStrategyClass())) {
+        if (this.conversionStrategy == null || !this.conversionStrategy.getClass().equals(this.getConversionStrategyClass())) {
             try {
-                this.conversionStrategy = (ConversionStrategy)this.getConversionStrategyClass().newInstance();
+                this.conversionStrategy = (ConversionStrategy) this.getConversionStrategyClass().newInstance();
             } catch (Exception var2) {
                 Display.getCurrent().syncExec(new Runnable() {
                     public void run() {
@@ -133,7 +129,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private Class<? extends ConversionStrategy> getConversionStrategyClass() {
-        return this.isBatchMode()?BatchConversionStrategy.class:JoiningConversionStrategy.class;
+        return this.isBatchMode() ? BatchConversionStrategy.class : JoiningConversionStrategy.class;
     }
 
     private boolean isBatchMode() {
@@ -146,9 +142,9 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private void startConversion() {
-        if(this.inputFileSelection.getFileList().length != 0) {
+        if (this.inputFileSelection.getFileList().length != 0) {
             this.getConversionStrategy().setInputFileList(this.inputFileSelection.getFileList());
-            if(this.getConversionStrategy().makeUserInterview(this.sShell)) {
+            if (this.getConversionStrategy().makeUserInterview(this.sShell)) {
                 this.createProgressView();
                 this.setUIEnabled(false);
                 this.getConversionStrategy().setFinishListener(this);
@@ -162,7 +158,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private void createProgressView() {
-        if(this.progressView == null) {
+        if (this.progressView == null) {
             GridData gridData = new GridData();
             gridData.grabExcessHorizontalSpace = true;
             gridData.horizontalAlignment = 4;
@@ -181,7 +177,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     private void setUIEnabled(boolean enabled) {
         this.startButton.setEnabled(enabled);
         this.inputFileSelection.setEnabled(enabled);
-        if(enabled) {
+        if (enabled) {
             this.toggleableTagEditor.setEnabled(this.getConversionStrategy().supportsTagEditor());
         } else {
             this.toggleableTagEditor.setEnabled(false);
@@ -230,18 +226,18 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             this.setDaemon(true);
 
             try {
-                URL updateUrl = new URL("http://www.freeipodsoftware.com//checkversion_auto.php?major=0&minor=18");
+                URL updateUrl = new URL("https://github.com/yermak/AudioBookConverter");
                 URLConnection yc = updateUrl.openConnection();
                 BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
                 String inputLine = in.readLine();
                 in.close();
-                if("true".equals(inputLine)) {
+                if ("true".equals(inputLine)) {
                     MessageBox msg = new MessageBox(shell, 194);
                     msg.setText(Messages.getString("MainWindow2.newVersion"));
                     msg.setMessage(Messages.getString("MainWindow2.aNewVersionIsAvailable"));
                     int result = msg.open();
-                    if(result == 64) {
-                        Program.launch("http://www.freeipodsoftware.com/");
+                    if (result == 64) {
+                        Program.launch("https://github.com/yermak/AudioBookConverter");
                     } else {
                         Calendar calendar = Calendar.getInstance();
                         calendar.add(5, 7);

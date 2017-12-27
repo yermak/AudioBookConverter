@@ -1,20 +1,10 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.*;
 
 public class MainWindowGui {
     protected Shell sShell = null;
@@ -59,8 +49,8 @@ public class MainWindowGui {
         thisClass.createSShell();
         thisClass.sShell.open();
 
-        while(!thisClass.sShell.isDisposed()) {
-            if(!display.readAndDispatch()) {
+        while (!thisClass.sShell.isDisposed()) {
+            if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }

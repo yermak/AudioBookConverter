@@ -1,0 +1,253 @@
+package com.freeipodsoftware.abc.conversionstrategy;
+
+import com.freeipodsoftware.abc.ConversionException;
+import com.freeipodsoftware.abc.FinishListener;
+import com.freeipodsoftware.abc.Mp4Tags;
+import com.freeipodsoftware.abc.ResamplingOutputStream;
+import com.freeipodsoftware.abc.StreamOBuffer;
+import com.freeipodsoftware.abc.Util;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import javazoom.jl.converter.Converter.PrintWriterProgressListener;
+import javazoom.jl.decoder.Bitstream;
+import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.Header;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.decoder.Obuffer;
+import javazoom.jl.decoder.Decoder.Params;
+import org.apache.commons.io.input.CountingInputStream;
+import org.eclipse.swt.widgets.Shell;
+
+public abstract class AbstractConversionStrategy implements ConversionStrategy {
+    protected String[] inputFileList;
+    protected FinishListener finishListener;
+    protected boolean finished;
+    protected long overallInputSize;
+    protected long inputBytesProcessed;
+    protected int percentFinished;
+    protected int percentFinishedForCurrentOutputFile;
+    protected long elapsedTime;
+    protected long startTime;
+    protected long remainingTime;
+    protected boolean canceled;
+    private AbstractConversionStrategy.RemainingTimeCalculatorThread remainingTimeCalculatorThread;
+    protected Mp4Tags mp4Tags;
+    private boolean paused;
+    protected long currentInputFileSize;
+    protected long currentInputFileBytesProcessed;
+
+    public AbstractConversionStrategy() {
+    }
+
+    public void setInputFileList(String[] inputFileList) {
+        this.inputFileList = inputFileList;
+    }
+
+    public abstract int calcPercentFinishedForCurrentOutputFile();
+
+    public void setFinishListener(FinishListener finishListener) {
+        this.finishListener = finishListener;
+    }
+
+    public void setMp4Tags(Mp4Tags mp4Tags) {
+        this.mp4Tags = mp4Tags;
+    }
+
+    public long getElapsedTime() {
+        return this.elapsedTime;
+    }
+
+    public String getInfoText() {
+        return "";
+    }
+
+    public int getProgress() {
+        return this.percentFinished;
+    }
+
+    public int getProgressForCurrentOutputFile() {
+        return this.percentFinishedForCurrentOutputFile;
+    }
+
+    public long getRemainingTime() {
+        return this.remainingTime;
+    }
+
+    public boolean isFinished() {
+        return this.finished;
+    }
+
+    public void start(Shell shell) {
+        this.overallInputSize = this.determineInputSize();
+        this.canceled = false;
+        this.finished = false;
+        this.inputBytesProcessed = 0L;
+        this.startTime = System.currentTimeMillis();
+        this.startConversion();
+        this.remainingTimeCalculatorThread = new AbstractConversionStrategy.RemainingTimeCalculatorThread();
+        this.remainingTimeCalculatorThread.start();
+    }
+
+    protected abstract void startConversion();
+
+    public void cancel() {
+        this.canceled = true;
+    }
+
+    protected long determineInputSize() {
+        long size = 0L;
+
+        for(int i = 0; i < this.inputFileList.length; ++i) {
+            File file = new File(this.inputFileList[i]);
+            if(!file.exists()) {
+                throw new ConversionException(Messages.getString("AbstractConversionStrategy.fileNotFound") + ": " + this.inputFileList[i]);
+            }
+
+            size += file.length();
+        }
+
+        return size;
+    }
+
+    protected String getMp4TagsFaacOptions() {
+        if(this.mp4Tags == null) {
+            return "";
+        } else {
+            StringBuffer buffer = new StringBuffer();
+            this.appendFaacOptionIfNotEmpty(buffer, "--artist", this.mp4Tags.getArtist());
+            this.appendFaacOptionIfNotEmpty(buffer, "--writer", this.mp4Tags.getWriter());
+            this.appendFaacOptionIfNotEmpty(buffer, "--title", this.mp4Tags.getTitle());
+            this.appendFaacOptionIfNotEmpty(buffer, "--album", this.mp4Tags.getAlbum());
+            this.appendFaacOptionIfNotEmpty(buffer, "--genre", this.mp4Tags.getGenre());
+            this.appendFaacOptionIfNotEmpty(buffer, "--year", this.mp4Tags.getYear());
+            this.appendFaacOptionIfNotEmpty(buffer, "--track", this.mp4Tags.getTrack());
+            this.appendFaacOptionIfNotEmpty(buffer, "--disc", this.mp4Tags.getDisc());
+            this.appendFaacOptionIfNotEmpty(buffer, "--comment", this.mp4Tags.getComment());
+            return buffer.toString();
+        }
+    }
+
+    private void appendFaacOptionIfNotEmpty(StringBuffer buffer, String option, String text) {
+        if(Util.hasText(text)) {
+            buffer.append(option);
+            buffer.append(" \"");
+            buffer.append(this.filterEscapeChars(text));
+            buffer.append("\" ");
+        }
+
+    }
+
+    private String filterEscapeChars(String text) {
+        return text == null?null:text.replace("\"", "\\\"");
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    protected void decodeInputFile(String filename, OutputStream destination, int channels, int frequency) throws Exception {
+        long processedSoFar = this.inputBytesProcessed;
+        this.currentInputFileSize = this.getFileSize(filename);
+        PrintWriterProgressListener progressListener = PrintWriterProgressListener.newStdOut(0);
+        CountingInputStream countingInputStream = new CountingInputStream(new FileInputStream(filename));
+        BufferedInputStream sourceStream = new BufferedInputStream(countingInputStream);
+        progressListener.converterUpdate(1, -1, 0);
+        Obuffer output = null;
+        Decoder decoder = new Decoder((Params)null);
+        Bitstream stream = new Bitstream(sourceStream);
+        ResamplingOutputStream resamplingOutputStream = null;
+        int frame = 0;
+        int frameCount = -1;
+        if(frameCount == -1) {
+            frameCount = 2147483647;
+        }
+
+        for(; frame < frameCount && !this.canceled; ++frame) {
+            while(this.paused) {
+                Thread.sleep(100L);
+                if(this.canceled) {
+                    break;
+                }
+            }
+
+            this.currentInputFileBytesProcessed = (long)countingInputStream.getCount();
+            this.inputBytesProcessed = processedSoFar + this.currentInputFileBytesProcessed;
+
+            try {
+                Header header = stream.readFrame();
+                if(header == null) {
+                    break;
+                }
+
+                progressListener.readFrame(frame, header);
+                if(output == null) {
+                    int fileChannels = header.mode() == 3?1:2;
+                    int fileFrequency = header.frequency();
+                    resamplingOutputStream = new ResamplingOutputStream(destination, fileChannels, channels, fileFrequency, frequency);
+                    output = new StreamOBuffer(resamplingOutputStream, fileChannels);
+                    decoder.setOutputBuffer(output);
+                }
+
+                Obuffer decoderOutput = decoder.decodeFrame(header, stream);
+                if(decoderOutput != output) {
+                    throw new InternalError("Output buffers are different.");
+                }
+
+                progressListener.decodedFrame(frame, header, output);
+                stream.closeFrame();
+                resamplingOutputStream.close();
+            } catch (Exception var19) {
+                boolean stop = !progressListener.converterException(var19);
+                if(stop) {
+                    throw new JavaLayerException(var19.getLocalizedMessage(), var19);
+                }
+            }
+        }
+
+    }
+
+    private long getFileSize(String filename) {
+        File file = new File(filename);
+        return file.exists()?file.length():0L;
+    }
+
+    public String getAdditionalFinishedMessage() {
+        return "";
+    }
+
+    public class RemainingTimeCalculatorThread extends Thread {
+        public RemainingTimeCalculatorThread() {
+        }
+
+        public void run() {
+            long lastTimeStamp = AbstractConversionStrategy.this.startTime;
+
+            while(!AbstractConversionStrategy.this.finished) {
+                double percentFinishedDouble = (double)AbstractConversionStrategy.this.inputBytesProcessed / (double)AbstractConversionStrategy.this.overallInputSize * 100.0D;
+                AbstractConversionStrategy.this.percentFinished = (int)percentFinishedDouble;
+                AbstractConversionStrategy.this.percentFinishedForCurrentOutputFile = AbstractConversionStrategy.this.calcPercentFinishedForCurrentOutputFile();
+                long currentTimeStamp = System.currentTimeMillis();
+                if(!AbstractConversionStrategy.this.paused) {
+                    AbstractConversionStrategy.this.elapsedTime += currentTimeStamp - lastTimeStamp;
+                }
+
+                lastTimeStamp = currentTimeStamp;
+
+                try {
+                    AbstractConversionStrategy.this.remainingTime = (new Double((double)AbstractConversionStrategy.this.elapsedTime / percentFinishedDouble * (100.0D - percentFinishedDouble))).longValue();
+                } catch (Exception var9) {
+                    ;
+                }
+
+                try {
+                    Thread.sleep(500L);
+                } catch (Exception var8) {
+                    ;
+                }
+            }
+
+        }
+    }
+}

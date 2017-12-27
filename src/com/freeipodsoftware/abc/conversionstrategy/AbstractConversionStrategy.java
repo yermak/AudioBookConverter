@@ -1,24 +1,15 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.ConversionException;
-import com.freeipodsoftware.abc.FinishListener;
-import com.freeipodsoftware.abc.Mp4Tags;
-import com.freeipodsoftware.abc.ResamplingOutputStream;
-import com.freeipodsoftware.abc.StreamOBuffer;
-import com.freeipodsoftware.abc.Util;
+import com.freeipodsoftware.abc.*;
+import javazoom.jl.converter.Converter.PrintWriterProgressListener;
+import javazoom.jl.decoder.*;
+import org.apache.commons.io.input.CountingInputStream;
+import org.eclipse.swt.widgets.Shell;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import javazoom.jl.converter.Converter.PrintWriterProgressListener;
-import javazoom.jl.decoder.Bitstream;
-import javazoom.jl.decoder.Decoder;
-import javazoom.jl.decoder.Header;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.decoder.Obuffer;
-import javazoom.jl.decoder.Decoder.Params;
-import org.apache.commons.io.input.CountingInputStream;
-import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractConversionStrategy implements ConversionStrategy {
     protected String[] inputFileList;
@@ -99,9 +90,9 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     protected long determineInputSize() {
         long size = 0L;
 
-        for(int i = 0; i < this.inputFileList.length; ++i) {
+        for (int i = 0; i < this.inputFileList.length; ++i) {
             File file = new File(this.inputFileList[i]);
-            if(!file.exists()) {
+            if (!file.exists()) {
                 throw new ConversionException(Messages.getString("AbstractConversionStrategy.fileNotFound") + ": " + this.inputFileList[i]);
             }
 
@@ -112,7 +103,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     }
 
     protected String getMp4TagsFaacOptions() {
-        if(this.mp4Tags == null) {
+        if (this.mp4Tags == null) {
             return "";
         } else {
             StringBuffer buffer = new StringBuffer();
@@ -130,7 +121,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     }
 
     private void appendFaacOptionIfNotEmpty(StringBuffer buffer, String option, String text) {
-        if(Util.hasText(text)) {
+        if (Util.hasText(text)) {
             buffer.append(option);
             buffer.append(" \"");
             buffer.append(this.filterEscapeChars(text));
@@ -140,7 +131,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     }
 
     private String filterEscapeChars(String text) {
-        return text == null?null:text.replace("\"", "\\\"");
+        return text == null ? null : text.replace("\"", "\\\"");
     }
 
     public void setPaused(boolean paused) {
@@ -152,65 +143,62 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         this.currentInputFileSize = this.getFileSize(filename);
         PrintWriterProgressListener progressListener = PrintWriterProgressListener.newStdOut(0);
         CountingInputStream countingInputStream = new CountingInputStream(new FileInputStream(filename));
-        BufferedInputStream sourceStream = new BufferedInputStream(countingInputStream);
+        BufferedInputStream sourceStream = new BufferedInputStream(countingInputStream, 1024 * 1024);
         progressListener.converterUpdate(1, -1, 0);
-        Obuffer output = null;
-        Decoder decoder = new Decoder((Params)null);
+        Decoder decoder = new Decoder();
         Bitstream stream = new Bitstream(sourceStream);
-        ResamplingOutputStream resamplingOutputStream = null;
         int frame = 0;
-        int frameCount = -1;
-        if(frameCount == -1) {
-            frameCount = 2147483647;
-        }
+        int frameCount = 2147483647;
 
-        for(; frame < frameCount && !this.canceled; ++frame) {
-            while(this.paused) {
-                Thread.sleep(100L);
-                if(this.canceled) {
-                    break;
+        StreamOBuffer output = null;
+        try {
+            for (; frame < frameCount && !this.canceled; ++frame) {
+                while (this.paused) {
+                    Thread.sleep(100L);
+                    if (this.canceled) {
+                        break;
+                    }
                 }
-            }
+                this.currentInputFileBytesProcessed = (long) countingInputStream.getCount();
+                this.inputBytesProcessed = processedSoFar + this.currentInputFileBytesProcessed;
 
-            this.currentInputFileBytesProcessed = (long)countingInputStream.getCount();
-            this.inputBytesProcessed = processedSoFar + this.currentInputFileBytesProcessed;
-
-            try {
                 Header header = stream.readFrame();
-                if(header == null) {
+                if (header == null) {
                     break;
                 }
-
-                progressListener.readFrame(frame, header);
-                if(output == null) {
-                    int fileChannels = header.mode() == 3?1:2;
+                if (output == null) {
+                    int fileChannels = header.mode() == 3 ? 1 : 2;
                     int fileFrequency = header.frequency();
-                    resamplingOutputStream = new ResamplingOutputStream(destination, fileChannels, channels, fileFrequency, frequency);
-                    output = new StreamOBuffer(resamplingOutputStream, fileChannels);
+//                    resamplingOutputStream = new ResamplingOutputStream(destination, fileChannels, channels, fileFrequency, frequency);
+
+
+                    output = new StreamOBuffer(destination, fileChannels);
                     decoder.setOutputBuffer(output);
                 }
+//                WaveFileObuffer output = new StreamOBuffer(channels, frequency, tempFileName);
 
+                progressListener.readFrame(frame, header);
                 Obuffer decoderOutput = decoder.decodeFrame(header, stream);
-                if(decoderOutput != output) {
+                if (decoderOutput != output) {
                     throw new InternalError("Output buffers are different.");
                 }
-
                 progressListener.decodedFrame(frame, header, output);
                 stream.closeFrame();
-                resamplingOutputStream.close();
-            } catch (Exception var19) {
-                boolean stop = !progressListener.converterException(var19);
-                if(stop) {
-                    throw new JavaLayerException(var19.getLocalizedMessage(), var19);
-                }
             }
+            output.close();
+        } catch (Exception e) {
+            boolean stop = !progressListener.converterException(e);
+            if (stop) {
+                throw new JavaLayerException(e.getLocalizedMessage(), e);
+            }
+        } finally {
+            destination.flush();
         }
-
     }
 
     private long getFileSize(String filename) {
         File file = new File(filename);
-        return file.exists()?file.length():0L;
+        return file.exists() ? file.length() : 0L;
     }
 
     public String getAdditionalFinishedMessage() {
@@ -224,19 +212,19 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         public void run() {
             long lastTimeStamp = AbstractConversionStrategy.this.startTime;
 
-            while(!AbstractConversionStrategy.this.finished) {
-                double percentFinishedDouble = (double)AbstractConversionStrategy.this.inputBytesProcessed / (double)AbstractConversionStrategy.this.overallInputSize * 100.0D;
-                AbstractConversionStrategy.this.percentFinished = (int)percentFinishedDouble;
+            while (!AbstractConversionStrategy.this.finished) {
+                double percentFinishedDouble = (double) AbstractConversionStrategy.this.inputBytesProcessed / (double) AbstractConversionStrategy.this.overallInputSize * 100.0D;
+                AbstractConversionStrategy.this.percentFinished = (int) percentFinishedDouble;
                 AbstractConversionStrategy.this.percentFinishedForCurrentOutputFile = AbstractConversionStrategy.this.calcPercentFinishedForCurrentOutputFile();
                 long currentTimeStamp = System.currentTimeMillis();
-                if(!AbstractConversionStrategy.this.paused) {
+                if (!AbstractConversionStrategy.this.paused) {
                     AbstractConversionStrategy.this.elapsedTime += currentTimeStamp - lastTimeStamp;
                 }
 
                 lastTimeStamp = currentTimeStamp;
 
                 try {
-                    AbstractConversionStrategy.this.remainingTime = (new Double((double)AbstractConversionStrategy.this.elapsedTime / percentFinishedDouble * (100.0D - percentFinishedDouble))).longValue();
+                    AbstractConversionStrategy.this.remainingTime = (new Double((double) AbstractConversionStrategy.this.elapsedTime / percentFinishedDouble * (100.0D - percentFinishedDouble))).longValue();
                 } catch (Exception var9) {
                     ;
                 }

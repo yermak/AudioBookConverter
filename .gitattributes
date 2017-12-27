@@ -1,0 +1,12 @@
+*.exe !text !filter !merge !diff
+*.dll !text !filter !merge !diff
+*.zip !text !filter !merge !diff
+*.so !text !filter !merge !diff
+*.dylib !text !filter !merge !diff
+*.jmod !text !filter !merge !diff
+*.7z !text !filter !merge !diff
+ffmpeg !text !filter !merge !diff
+ffplay !text !filter !merge !diff
+ffprobe !text !filter !merge !diff
+mp4art !text !filter !merge !diff
+mp4info !text !filter !merge !diff

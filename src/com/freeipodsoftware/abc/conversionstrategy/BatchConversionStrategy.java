@@ -6,8 +6,14 @@ import com.freeipodsoftware.abc.Util;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.Converter;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private boolean intoSameFolder;
@@ -15,6 +21,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     private int currentFileNumber;
     private int channels;
     private int frequency;
+    private int bitrate;
     private String outputFileName;
 
     public BatchConversionStrategy() {
@@ -61,30 +68,30 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public void run() {
+        List<Future> futures = new ArrayList<>();
+
         for (int i = 0; i < this.inputFileList.length; ++i) {
             this.currentFileNumber = i + 1;
             this.outputFileName = this.determineOutputFilename(this.inputFileList[i]);
             this.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
-            String commandLine = "external/faac.exe -P -C " + this.channels + " -R " + this.frequency + " " + this.getMp4TagsFaacOptions() + " -o \"" + this.outputFileName + "\" -";
 
-            try {
-                Process proc = Runtime.getRuntime().exec(commandLine);
-                StreamDumper streamDumper = new StreamDumper(proc.getInputStream());
-                OutputStream faacOutput = proc.getOutputStream();
-                this.decodeInputFile(this.inputFileList[i], faacOutput, this.channels, this.frequency);
-                streamDumper.stop();
-                faacOutput.close();
-            } catch (Exception var6) {
-                StringWriter sw = new StringWriter();
-                var6.printStackTrace(new PrintWriter(sw));
-                this.finishListener.finishedWithError(var6.getMessage() + "; " + sw.getBuffer().toString());
-                break;
-            }
+            Converter converter = new Converter(bitrate, channels, frequency, outputFileName, inputFileList[i]);
+            Future converterFuture = Executors.newWorkStealingPool().submit(converter);
+            futures.add(converterFuture);
         }
-
-        this.finished = true;
-        this.finishListener.finished();
+        try {
+            for (Future future : futures) {
+                future.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+        } finally {
+            this.finished = true;
+            this.finishListener.finished();
+        }
     }
 
     private String determineOutputFilename(String inputFilename) {
@@ -118,9 +125,10 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             Header header = stream.readFrame();
             this.channels = header.mode() == 3 ? 1 : 2;
             this.frequency = header.frequency();
+            this.bitrate = header.bitrate();
             stream.close();
-        } catch (Exception var5) {
-            throw new RuntimeException(var5);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

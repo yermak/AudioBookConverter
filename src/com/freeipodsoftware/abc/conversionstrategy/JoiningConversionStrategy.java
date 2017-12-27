@@ -1,20 +1,15 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
-import com.freeipodsoftware.abc.StreamDumper;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
-import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.StreamCopier;
+import uk.yermak.audiobookconverter.Converter;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private String outputFileName;
@@ -77,71 +72,17 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         try {
             this.determineMaxChannelsAndFrequency();
 
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
-                    "-protocol_whitelist", "file,pipe",
-                    "-f", "concat",
-                    "-safe", "0",
-                    "-i", "-",
-                    "-f", "s16le",
-                    "-acodec", "pcm_s16le",
-                    "-");
+            int bitrate = this.bitrate;
+            int channels = this.channels;
+            int frequency = this.frequency;
+            String outputFileName = this.outputFileName;
+            String[] inputFileList = this.inputFileList;
 
+            Converter converter = new Converter(bitrate, channels, frequency, outputFileName, inputFileList);
+            Future converterFuture = Executors.newWorkStealingPool().submit(converter);
 
-            Process ffmpegProcess = ffmpegProcessBuilder.start();
-            InputStream ffmpegIn = ffmpegProcess.getInputStream();
-            InputStream ffmpegErr = ffmpegProcess.getErrorStream();
-            PrintWriter ffmpegOut = new PrintWriter(new OutputStreamWriter(ffmpegProcess.getOutputStream()));
+            converterFuture.get();
 
-            ProcessBuilder faacProcessBuilder = new ProcessBuilder("external/faac.exe",
-                    "-b", String.valueOf(this.bitrate / 1024),
-                    "-P",
-                    "-C", String.valueOf(this.channels),
-                    "-R", String.valueOf(this.frequency),
-                    "-X",
-                    this.getMp4TagsFaacOptions(),
-                    "-o", this.outputFileName,
-                    "-");
-
-            Process faacProcess = faacProcessBuilder.start();
-            InputStream faacIn = faacProcess.getInputStream();
-            OutputStream faacOut = faacProcess.getOutputStream();
-            InputStream faacErr = faacProcess.getErrorStream();
-
-            StreamCopier ffmpegToFaac = new StreamCopier(ffmpegIn, faacOut);
-            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToFaac);
-            StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, NullOutputStream.NULL_OUTPUT_STREAM);
-            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
-
-            StreamCopier faacToConsole = new StreamCopier(faacIn, NullOutputStream.NULL_OUTPUT_STREAM);
-            Future<Long> faacFuture = Executors.newWorkStealingPool().submit(faacToConsole);
-            StreamCopier faacToErr = new StreamCopier(faacErr, NullOutputStream.NULL_OUTPUT_STREAM);
-            Future<Long> faacErrFuture = Executors.newWorkStealingPool().submit(faacToErr);
-
-
-            for (int i = 0; i < this.inputFileList.length; ++i) {
-                ffmpegOut.println("file '" + this.inputFileList[i] + "'");
-            }
-            ffmpegOut.close();
-
-
-            while (!ffmpegFuture.isDone() || !faacFuture.isDone()) {
-                if (this.canceled) {
-                    this.finishListener.canceled();
-                    this.overallInputSize = 0L;
-                    this.inputBytesProcessed = 0L;
-                    this.percentFinished = 0;
-
-                    ffmpegProcess.destroy();
-                    faacProcess.destroy();
-                    ffmpegFuture.cancel(true);
-                    faacFuture.cancel(true);
-                }
-            }
-
-
-            Long totalBytes = ffmpegFuture.get();
-            this.overallInputSize = totalBytes;
-            this.inputBytesProcessed = totalBytes;
             this.percentFinished = 100;
             this.finished = true;
             this.finishListener.finished();

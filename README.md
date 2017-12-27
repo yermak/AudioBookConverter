@@ -1,6 +1,16 @@
+This project is based on freeipodsoftware release of AudioBookConverter.
+It includes updated to recent version of software and performance improvements.
+
+
 MP3 to iPod/iPhone Audio Book Converter
 =============
 
+
+
+
+
+Legacy
+=============
 Author
 ---------
 Florian Fankhauser

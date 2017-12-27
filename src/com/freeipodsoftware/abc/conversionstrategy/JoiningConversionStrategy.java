@@ -4,10 +4,17 @@ import com.freeipodsoftware.abc.Messages;
 import com.freeipodsoftware.abc.StreamDumper;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
+import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.StreamCopier;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private String outputFileName;
@@ -69,38 +76,76 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     public void run() {
         try {
             this.determineMaxChannelsAndFrequency();
-            String commandLine = "external/faac.exe " +
-                    "-b " + this.bitrate / 1024 + " " +
-                    "-c " + this.frequency + " " +
-                    "-P " +
-                    "-C " + this.channels + " " +
-                    "-R " + this.frequency + " " +
-//                    " -X " +
-                    this.getMp4TagsFaacOptions() +
-                    " -o \"" + this.outputFileName + "\" -";
-            Process proc = Runtime.getRuntime().exec(commandLine);
-            StreamDumper streamDumper = new StreamDumper(proc.getInputStream());
-            OutputStream faacOutput = new BufferedOutputStream(proc.getOutputStream(), 1024 * 1024);
+
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
+                    "-protocol_whitelist", "file,pipe",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", "-",
+                    "-f", "s16le",
+                    "-acodec", "pcm_s16le",
+                    "-");
+
+
+            Process ffmpegProcess = ffmpegProcessBuilder.start();
+            InputStream ffmpegIn = ffmpegProcess.getInputStream();
+            InputStream ffmpegErr = ffmpegProcess.getErrorStream();
+            PrintWriter ffmpegOut = new PrintWriter(new OutputStreamWriter(ffmpegProcess.getOutputStream()));
+
+            ProcessBuilder faacProcessBuilder = new ProcessBuilder("external/faac.exe",
+                    "-b", String.valueOf(this.bitrate / 1024),
+                    "-P",
+                    "-C", String.valueOf(this.channels),
+                    "-R", String.valueOf(this.frequency),
+                    "-X",
+                    this.getMp4TagsFaacOptions(),
+                    "-o", this.outputFileName,
+                    "-");
+
+            Process faacProcess = faacProcessBuilder.start();
+            InputStream faacIn = faacProcess.getInputStream();
+            OutputStream faacOut = faacProcess.getOutputStream();
+            InputStream faacErr = faacProcess.getErrorStream();
+
+            StreamCopier ffmpegToFaac = new StreamCopier(ffmpegIn, faacOut);
+            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToFaac);
+            StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, NullOutputStream.NULL_OUTPUT_STREAM);
+            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+
+            StreamCopier faacToConsole = new StreamCopier(faacIn, NullOutputStream.NULL_OUTPUT_STREAM);
+            Future<Long> faacFuture = Executors.newWorkStealingPool().submit(faacToConsole);
+            StreamCopier faacToErr = new StreamCopier(faacErr, NullOutputStream.NULL_OUTPUT_STREAM);
+            Future<Long> faacErrFuture = Executors.newWorkStealingPool().submit(faacToErr);
+
 
             for (int i = 0; i < this.inputFileList.length; ++i) {
-                if (!this.canceled) {
-                    this.currentFileNumber = i + 1;
-                    this.decodeInputFile(this.inputFileList[i], faacOutput, this.channels, this.frequency);
+                ffmpegOut.println("file '" + this.inputFileList[i] + "'");
+            }
+            ffmpegOut.close();
+
+
+            while (!ffmpegFuture.isDone() || !faacFuture.isDone()) {
+                if (this.canceled) {
+                    this.finishListener.canceled();
+                    this.overallInputSize = 0L;
+                    this.inputBytesProcessed = 0L;
+                    this.percentFinished = 0;
+
+                    ffmpegProcess.destroy();
+                    faacProcess.destroy();
+                    ffmpegFuture.cancel(true);
+                    faacFuture.cancel(true);
                 }
             }
 
-            streamDumper.stop();
-            faacOutput.close();
+
+            Long totalBytes = ffmpegFuture.get();
+            this.overallInputSize = totalBytes;
+            this.inputBytesProcessed = totalBytes;
             this.percentFinished = 100;
             this.finished = true;
-            if (this.canceled) {
-                this.finishListener.canceled();
-                this.overallInputSize = 0L;
-                this.inputBytesProcessed = 0L;
-                this.percentFinished = 0;
-            } else {
-                this.finishListener.finished();
-            }
+            this.finishListener.finished();
+
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -108,7 +153,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         } finally {
             this.finished = true;
         }
-
     }
 
     private void determineMaxChannelsAndFrequency() {

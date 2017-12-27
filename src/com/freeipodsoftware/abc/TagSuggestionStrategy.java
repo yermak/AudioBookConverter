@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 public class TagSuggestionStrategy implements EventListener {
@@ -26,14 +21,14 @@ public class TagSuggestionStrategy implements EventListener {
     }
 
     public void onEvent(String eventId) {
-        if(eventId.equals("fileListChangedEvent")) {
+        if (eventId.equals("fileListChangedEvent")) {
             this.suggestTags();
         }
 
     }
 
     private void suggestTags() {
-        if(this.inputFileSelection.getFileList().length > 0 && !this.inputFileSelection.getFileList()[0].equals(this.firstInputFileName)) {
+        if (this.inputFileSelection.getFileList().length > 0 && !this.inputFileSelection.getFileList()[0].equals(this.firstInputFileName)) {
             this.firstInputFileName = this.inputFileSelection.getFileList()[0];
             this.tagEditor.clear();
             Mp4Tags tags = Util.readTagsFromInputFile(this.firstInputFileName);

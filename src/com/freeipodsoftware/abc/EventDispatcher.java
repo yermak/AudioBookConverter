@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import java.util.HashSet;
@@ -24,11 +19,11 @@ public class EventDispatcher {
     }
 
     public void raiseEvent(String eventId) {
-        if(eventId != null) {
+        if (eventId != null) {
             Iterator var3 = this.listenerSet.iterator();
 
-            while(var3.hasNext()) {
-                EventListener listener = (EventListener)var3.next();
+            while (var3.hasNext()) {
+                EventListener listener = (EventListener) var3.next();
                 listener.onEvent(eventId);
             }
         }

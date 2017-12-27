@@ -8,7 +8,6 @@ public class Version {
     }
 
     public static String getVersionString() {
-        return MAJOR + "." + MINOR
-                ;
+        return MAJOR + "." + MINOR;
     }
 }

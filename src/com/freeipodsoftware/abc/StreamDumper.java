@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
 import java.io.BufferedInputStream;
@@ -21,7 +16,7 @@ public class StreamDumper {
                 this.bufferedIS = new BufferedInputStream(inputStream);
 
                 try {
-                    while(!StreamDumper.this.cancel) {
+                    while (!StreamDumper.this.cancel) {
                         this.bufferedIS.read(buffer);
                     }
                 } catch (IOException e) {

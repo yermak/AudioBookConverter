@@ -1,9 +1,10 @@
 package com.freeipodsoftware.abc;
 
+import javazoom.jl.decoder.Obuffer;
+
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import javazoom.jl.decoder.Obuffer;
 
 public class StreamOBuffer extends Obuffer {
     private OutputStream output;
@@ -26,13 +27,13 @@ public class StreamOBuffer extends Obuffer {
         this.buffers[arg0][this.bufferPointerNext[arg0]] = arg1;
         ++this.bufferPointerNext[arg0];
 
-        while(this.bufferPointerNext[this.pointer] > this.bufferPointerFirst[this.pointer]) {
+        while (this.bufferPointerNext[this.pointer] > this.bufferPointerFirst[this.pointer]) {
             short value = this.buffers[this.pointer][this.bufferPointerFirst[this.pointer]];
             ++this.bufferPointerFirst[this.pointer];
 
             try {
-                this.output.write((byte)(value >> 8 & 255));
-                this.output.write((byte)(value & 255));
+                this.output.write((byte) (value >> 8 & 255));
+                this.output.write((byte) (value & 255));
             } catch (Exception var6) {
                 StringWriter stackTrace = new StringWriter();
                 var6.printStackTrace(new PrintWriter(stackTrace));
@@ -40,7 +41,7 @@ public class StreamOBuffer extends Obuffer {
             }
 
             ++this.pointer;
-            if(this.pointer >= this.channels) {
+            if (this.pointer >= this.channels) {
                 this.pointer = 0;
             }
         }

@@ -3,15 +3,11 @@ package com.freeipodsoftware.abc.conversionstrategy;
 import com.freeipodsoftware.abc.BatchModeOptionsDialog;
 import com.freeipodsoftware.abc.StreamDumper;
 import com.freeipodsoftware.abc.Util;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
+
+import java.io.*;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private boolean intoSameFolder;
@@ -25,17 +21,17 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public long getOutputSize() {
-        return this.canceled?0L:(new File(this.outputFileName)).length();
+        return this.canceled ? 0L : (new File(this.outputFileName)).length();
     }
 
     public int calcPercentFinishedForCurrentOutputFile() {
-        return this.currentInputFileSize > 0L?(int)((double)this.currentInputFileBytesProcessed / (double)this.currentInputFileSize * 100.0D):0;
+        return this.currentInputFileSize > 0L ? (int) ((double) this.currentInputFileBytesProcessed / (double) this.currentInputFileSize * 100.0D) : 0;
     }
 
     public boolean makeUserInterview(Shell shell) {
         BatchModeOptionsDialog options = new BatchModeOptionsDialog(shell);
         options.setFolder(this.getSuggestedFolder());
-        if(options.open()) {
+        if (options.open()) {
             this.intoSameFolder = options.isIntoSameFolder();
             this.folder = options.getFolder();
             return true;
@@ -45,7 +41,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     private String getSuggestedFolder() {
-        if(this.inputFileList != null && this.inputFileList.length > 0) {
+        if (this.inputFileList != null && this.inputFileList.length > 0) {
             try {
                 return (new File(this.inputFileList[0])).getParentFile().getAbsolutePath();
             } catch (Exception var2) {
@@ -65,7 +61,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public void run() {
-        for(int i = 0; i < this.inputFileList.length; ++i) {
+        for (int i = 0; i < this.inputFileList.length; ++i) {
             this.currentFileNumber = i + 1;
             this.outputFileName = this.determineOutputFilename(this.inputFileList[i]);
             this.determineChannelsAndFrequency(this.inputFileList[i]);
@@ -93,7 +89,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
 
     private String determineOutputFilename(String inputFilename) {
         String outputFilename;
-        if(this.intoSameFolder) {
+        if (this.intoSameFolder) {
             outputFilename = inputFilename.replaceAll("(?i)\\.mp3", ".m4b");
         } else {
             File file = new File(inputFilename);
@@ -101,7 +97,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             outputFilename = outFile.getAbsolutePath().replaceAll("(?i)\\.mp3", ".m4b");
         }
 
-        if(!outputFilename.endsWith(".m4b")) {
+        if (!outputFilename.endsWith(".m4b")) {
             outputFilename = outputFilename + ".m4b";
         }
 
@@ -120,7 +116,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             BufferedInputStream sourceStream = new BufferedInputStream(new FileInputStream(filename));
             Bitstream stream = new Bitstream(sourceStream);
             Header header = stream.readFrame();
-            this.channels = header.mode() == 3?1:2;
+            this.channels = header.mode() == 3 ? 1 : 2;
             this.frequency = header.frequency();
             stream.close();
         } catch (Exception var5) {

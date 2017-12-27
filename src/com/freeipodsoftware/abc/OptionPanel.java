@@ -1,17 +1,13 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.freeipodsoftware.abc;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class OptionPanel extends OptionPanelGui {
     public static final String OPTION_PANEL_SINGLE_OUTPUT_FILE_MODE = "optionPanel.singleOutputFileMode";
@@ -37,8 +33,8 @@ public class OptionPanel extends OptionPanelGui {
     protected void fireOptionChanged() {
         Iterator var2 = this.optionChangedListenerSet.iterator();
 
-        while(var2.hasNext()) {
-            OptionChangedListener optionChangedListener = (OptionChangedListener)var2.next();
+        while (var2.hasNext()) {
+            OptionChangedListener optionChangedListener = (OptionChangedListener) var2.next();
             optionChangedListener.optionChanged();
         }
 
@@ -49,7 +45,7 @@ public class OptionPanel extends OptionPanelGui {
     }
 
     private void setSingleOutputFileMode(boolean singleOuputFileMode) {
-        if(singleOuputFileMode) {
+        if (singleOuputFileMode) {
             this.oneOutputFileOption.setSelection(true);
         } else {
             this.oneOutputFilePerInputFileOption.setSelection(true);

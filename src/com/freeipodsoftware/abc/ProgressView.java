@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import java.text.DecimalFormat;
 
 public class ProgressView extends ProgressViewGui {
-    public ProgressView(Composite parent, int style) {
-        super(parent, style);
+    public ProgressView(Composite parent) {
+        super(parent, 0);
         this.infoLabel.setText("");
         this.cancelButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {

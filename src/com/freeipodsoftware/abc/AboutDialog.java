@@ -7,9 +7,9 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-public class AboutDialog extends Dialog {
-    protected Shell sShell = null;
-    protected AboutDialogGui aboutComposite;
+class AboutDialog extends Dialog {
+    private Shell sShell = null;
+    private AboutDialogGui aboutComposite;
 
     public AboutDialog(Shell parent) {
         super(parent);

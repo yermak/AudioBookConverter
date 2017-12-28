@@ -14,15 +14,6 @@ public class StreamOBuffer extends Obuffer {
     private int[] bufferPointerFirst;
     private int pointer;
 
-    public StreamOBuffer(OutputStream output, int channels) {
-        this.output = output;
-        this.channels = channels;
-        this.buffers = new short[channels]['\uffff'];
-        this.bufferPointerNext = new int[channels];
-        this.bufferPointerFirst = new int[channels];
-        this.pointer = 0;
-    }
-
     public void append(int arg0, short arg1) {
         this.buffers[arg0][this.bufferPointerNext[arg0]] = arg1;
         ++this.bufferPointerNext[arg0];

@@ -78,8 +78,8 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         this.frequency = 0;
 
         try {
-            for (int i = 0; i < this.inputFileList.length; ++i) {
-                BufferedInputStream sourceStream = new BufferedInputStream(new FileInputStream(this.inputFileList[i]));
+            for (String inputFile : this.inputFileList) {
+                BufferedInputStream sourceStream = new BufferedInputStream(new FileInputStream(inputFile));
                 Bitstream stream = new Bitstream(sourceStream);
                 Header header = stream.readFrame();
                 int fileChannels = header.mode() == 3 ? 1 : 2;

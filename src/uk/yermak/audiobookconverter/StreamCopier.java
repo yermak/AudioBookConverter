@@ -23,16 +23,10 @@ public class StreamCopier implements Callable<Long> {
 
     @Override
     public Long call() throws Exception {
-        System.out.println("StreamCopier.call");
         long count = 0L;
         byte[] buffer = new byte[4096];
-        for (int n = -1; -1 != (n = in.read(buffer)); count += (long) n) {
+        for (int n; -1 != (n = in.read(buffer)); count += (long) n) {
             out.write(buffer, 0, n);
-/*
-            if (count / (1024 * 1024) % 100 == 0 && count / (1024 * 1024) != 0) {
-                System.out.println("count = " + count / (1024 * 1024) + "MB");
-            }
-*/
         }
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);

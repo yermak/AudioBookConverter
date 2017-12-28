@@ -41,7 +41,6 @@ public class ProgressUpdateThread extends Thread {
             try {
                 Thread.sleep(500L);
             } catch (Exception var2) {
-                ;
             }
         }
 

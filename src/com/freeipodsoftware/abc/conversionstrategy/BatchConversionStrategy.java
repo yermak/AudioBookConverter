@@ -1,14 +1,11 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.BatchModeOptionsDialog;
-import com.freeipodsoftware.abc.StreamDumper;
 import com.freeipodsoftware.abc.Util;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
-import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.Converter;
-import uk.yermak.audiobookconverter.StreamCopier;
 
 import java.io.*;
 import java.util.ArrayList;

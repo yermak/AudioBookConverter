@@ -1,7 +1,5 @@
 package com.freeipodsoftware.abc;
 
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -44,7 +42,7 @@ public class BatchModeOptionsDialog extends Dialog {
     }
 
     private void initializeComponents(final Shell shell) {
-        this.gui = new BatchModeOptionsGui(shell, 0);
+        this.gui = new BatchModeOptionsGui(shell);
         shell.setLayout(new FillLayout());
         shell.setDefaultButton(this.gui.okButton);
         this.gui.folderText.setText(this.folder);
@@ -70,7 +68,6 @@ public class BatchModeOptionsDialog extends Dialog {
                 try {
                     dialog.setFilterPath(BatchModeOptionsDialog.this.gui.folderText.getText());
                 } catch (Exception var4) {
-                    ;
                 }
 
                 String result = dialog.open();
@@ -91,11 +88,7 @@ public class BatchModeOptionsDialog extends Dialog {
                 BatchModeOptionsDialog.this.validateControls();
             }
         });
-        this.gui.folderText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                BatchModeOptionsDialog.this.validateControls();
-            }
-        });
+        this.gui.folderText.addModifyListener(e -> BatchModeOptionsDialog.this.validateControls());
         shell.pack();
         shell.setSize(400, shell.getSize().y);
     }

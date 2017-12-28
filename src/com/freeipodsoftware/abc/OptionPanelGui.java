@@ -9,11 +9,11 @@ import org.eclipse.swt.widgets.Group;
 
 public class OptionPanelGui extends Composite {
     private Group batchModeGroup;
-    protected Button oneOutputFileOption;
-    protected Button oneOutputFilePerInputFileOption;
-    protected Button oneOutputFileParallelProcessingFileOption;
+    Button oneOutputFileOption;
+    Button oneOutputFilePerInputFileOption;
+    Button oneOutputFileParallelProcessingFileOption;
 
-    public OptionPanelGui(Composite parent, int style) {
+    OptionPanelGui(Composite parent, int style) {
         super(parent, style);
         this.initialize();
     }

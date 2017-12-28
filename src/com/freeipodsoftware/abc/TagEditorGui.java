@@ -177,8 +177,8 @@ public class TagEditorGui extends Composite {
     }
 
     private void fillGenres() {
-        for (int i = 0; i < genres.length; ++i) {
-            this.genreCombo.add(genres[i]);
+        for (String genre : genres) {
+            this.genreCombo.add(genre);
         }
 
     }

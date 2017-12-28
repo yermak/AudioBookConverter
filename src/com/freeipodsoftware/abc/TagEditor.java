@@ -4,8 +4,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 public class TagEditor extends TagEditorGui {
-    public TagEditor(Composite parent, int style) {
-        super(parent, style);
+    public TagEditor(Composite parent) {
+        super(parent, 0);
     }
 
     public Point computeSize(int wHint, int hHint, boolean changed) {

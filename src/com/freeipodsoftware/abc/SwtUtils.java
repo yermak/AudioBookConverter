@@ -10,10 +10,10 @@ public class SwtUtils {
     public static void setEnabledRecursive(Composite composite, boolean enabled) {
         Control[] children = composite.getChildren();
 
-        for(int i = 0; i < children.length; ++i) {
-            children[i].setEnabled(enabled);
-            if(children[i] instanceof Composite) {
-                Composite subComposite = (Composite)children[i];
+        for (Control child : children) {
+            child.setEnabled(enabled);
+            if (child instanceof Composite) {
+                Composite subComposite = (Composite) child;
                 setEnabledRecursive(subComposite, enabled);
             }
         }

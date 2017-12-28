@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 /**
  * Created by Yermak on 27-Dec-17.
  */
-public class Converter implements Callable {
+public class Converter implements Callable<Converter.Output> {
 
     private final int bitrate;
     private final int channels;
@@ -27,9 +27,9 @@ public class Converter implements Callable {
         this.inputFileList = inputFileList;
     }
 
-    public static Long convertMp3toM4a(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
+    public static long convertMp3toM4a(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
         ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
-                "-protocol_whitelist", "file,pipe",
+                "-protocol_whitelist", "file,pipe,concat",
                 "-f", "concat",
                 "-safe", "0",
                 "-i", "-",
@@ -89,8 +89,26 @@ public class Converter implements Callable {
     }
 
     @Override
-    public Object call() throws Exception {
-        return convertMp3toM4a(bitrate, channels, frequency, outputFileName, inputFileList);
+    public Output call() throws Exception {
+        long unpackedSize = convertMp3toM4a(bitrate, channels, frequency, outputFileName, inputFileList);
+        Output output = new Output(unpackedSize, outputFileName, inputFileList);
+        return output;
+    }
+
+    public static class Output {
+        private long unpackedSize;
+        private String outputFileName;
+        private String[] inputFileList;
+
+        public Output(long unpackedSize, String outputFileName, String... inputFileList) {
+            this.unpackedSize = unpackedSize;
+            this.outputFileName = outputFileName;
+            this.inputFileList = inputFileList;
+        }
+
+        public String getOutputFileName() {
+            return outputFileName;
+        }
     }
 
 

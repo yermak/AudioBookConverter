@@ -2,28 +2,23 @@ package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import uk.yermak.audiobookconverter.ConversionMode;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class OptionPanel extends OptionPanelGui {
-    public static final String OPTION_PANEL_SINGLE_OUTPUT_FILE_MODE = "optionPanel.singleOutputFileMode";
-    private Set<OptionChangedListener> optionChangedListenerSet = new HashSet();
-    private SelectionListener outputFileSelectionListener = new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-            OptionPanel.this.fireOptionChanged();
-            AppProperties.setBooleanProperty("optionPanel.singleOutputFileMode", OptionPanel.this.isSingleOutputFileMode());
-        }
-    };
+    public static final String OPTION_PANEL_CONVERSION_MODE = "optionPanel.conversionMode";
+    private Set<OptionChangedListener> optionChangedListenerSet = new HashSet<>();
+    private ConversionMode mode = ConversionMode.SINGLE;
 
     public OptionPanel(Composite parent, int style) {
         super(parent, style);
-        this.oneOutputFileOption.addSelectionListener(this.outputFileSelectionListener);
-        this.oneOutputFilePerInputFileOption.addSelectionListener(this.outputFileSelectionListener);
-        this.setSingleOutputFileMode(AppProperties.getBooleanProperty("optionPanel.singleOutputFileMode"));
+        this.oneOutputFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.SINGLE));
+        this.oneOutputFilePerInputFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.BATCH));
+        this.oneOutputFileParallelProcessingFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.PARALLEL));
+        this.setConversionMode(ConversionMode.valueOf(AppProperties.getProperty(OPTION_PANEL_CONVERSION_MODE, ConversionMode.SINGLE.toString())));
     }
 
     void addOptionChangedListener(OptionChangedListener listener) {
@@ -31,30 +26,46 @@ public class OptionPanel extends OptionPanelGui {
     }
 
     protected void fireOptionChanged() {
-        Iterator var2 = this.optionChangedListenerSet.iterator();
-
-        while (var2.hasNext()) {
-            OptionChangedListener optionChangedListener = (OptionChangedListener) var2.next();
+        for (OptionChangedListener optionChangedListener : optionChangedListenerSet) {
             optionChangedListener.optionChanged();
         }
-
     }
 
-    public boolean isSingleOutputFileMode() {
-        return this.oneOutputFileOption.getSelection();
+    public ConversionMode getMode() {
+        return mode;
     }
 
-    private void setSingleOutputFileMode(boolean singleOuputFileMode) {
-        if (singleOuputFileMode) {
-            this.oneOutputFileOption.setSelection(true);
-        } else {
-            this.oneOutputFilePerInputFileOption.setSelection(true);
+    private void setConversionMode(ConversionMode mode) {
+        this.mode = mode;
+        switch (mode) {
+            case SINGLE:
+                this.oneOutputFileOption.setSelection(true);
+                break;
+            case BATCH:
+                this.oneOutputFilePerInputFileOption.setSelection(true);
+                break;
+            case PARALLEL:
+                this.oneOutputFileParallelProcessingFileOption.setSelection(true);
+                break;
         }
-
     }
 
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         SwtUtils.setEnabledRecursive(this, enabled);
+    }
+
+    private class ModeSelectionAdapter extends SelectionAdapter {
+        private ConversionMode mode;
+
+        public ModeSelectionAdapter(ConversionMode mode) {
+            this.mode = mode;
+        }
+
+        public void widgetSelected(SelectionEvent e) {
+            OptionPanel.this.mode = this.mode;
+            AppProperties.setProperty(OPTION_PANEL_CONVERSION_MODE, mode.toString());
+            OptionPanel.this.fireOptionChanged();
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.freeipodsoftware.abc.conversionstrategy;
 import com.freeipodsoftware.abc.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.Converter;
 
@@ -38,34 +37,12 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
     public boolean makeUserInterview(Shell shell) {
-        FileDialog fileDialog = new FileDialog(shell, 8192);
-        fileDialog.setFilterNames(new String[]{" (*.m4b)"});
-        fileDialog.setFilterExtensions(new String[]{"*.m4b"});
-        fileDialog.setFileName(this.getOuputFilenameSuggestion());
-        this.outputFileName = fileDialog.open();
-        if (this.outputFileName != null) {
-            if (!this.outputFileName.toUpperCase().endsWith(".m4b".toUpperCase())) {
-                this.outputFileName = this.outputFileName + ".m4b";
-            }
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private String getOuputFilenameSuggestion() {
-        if (this.inputFileList.length > 0) {
-            String mp3Filename = this.inputFileList[0];
-            String m4bFilename = mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
-            return m4bFilename;
-        } else {
-            return "";
-        }
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.inputFileList));
+        return this.outputFileName != null;
     }
 
     protected void startConversion() {
-        (new Thread(this)).start();
+        Executors.newWorkStealingPool().execute(this);
     }
 
     public void run() {

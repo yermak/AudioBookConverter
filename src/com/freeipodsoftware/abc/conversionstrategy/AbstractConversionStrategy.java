@@ -4,6 +4,7 @@ import com.freeipodsoftware.abc.*;
 import javazoom.jl.converter.Converter.PrintWriterProgressListener;
 import javazoom.jl.decoder.*;
 import org.apache.commons.io.input.CountingInputStream;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.BufferedInputStream;
@@ -79,6 +80,40 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         this.startConversion();
         this.remainingTimeCalculatorThread = new AbstractConversionStrategy.RemainingTimeCalculatorThread();
         this.remainingTimeCalculatorThread.start();
+    }
+
+    protected static String selectOutputFile(Shell shell, String filenameSuggestion) {
+        FileDialog fileDialog = new FileDialog(shell, 8192);
+        fileDialog.setFilterNames(new String[]{" (*.m4b)"});
+        fileDialog.setFilterExtensions(new String[]{"*.m4b"});
+        fileDialog.setFileName(filenameSuggestion);
+        String fileName = fileDialog.open();
+        if (!fileName.toUpperCase().endsWith(".m4b".toUpperCase())) {
+            fileName = fileName + ".m4b";
+        }
+        return fileName;
+    }
+
+    protected String getSuggestedFolder() {
+        if (this.inputFileList != null && this.inputFileList.length > 0) {
+            try {
+                return (new File(this.inputFileList[0])).getParentFile().getAbsolutePath();
+            } catch (Exception var2) {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    protected String getOuputFilenameSuggestion(String... inputFileList) {
+        if (inputFileList.length > 0) {
+            String mp3Filename = this.inputFileList[0];
+            String m4bFilename = mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
+            return m4bFilename;
+        } else {
+            return "";
+        }
     }
 
     protected abstract void startConversion();

@@ -44,14 +44,14 @@ public class InputFileSelection extends InputFileSelectionGui {
 
     private void createDropTarget() {
         DropTarget target = new DropTarget(this.list, 19);
-        target.setTransfer(new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
+        target.setTransfer(FileTransfer.getInstance(), TextTransfer.getInstance());
         target.addDropListener(new DropTargetAdapter() {
             public void drop(DropTargetEvent event) {
                 if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {
                     String[] files = (String[]) event.data;
 
-                    for (int i = 0; i < files.length; ++i) {
-                        InputFileSelection.this.list.add(files[i]);
+                    for (String file : files) {
+                        InputFileSelection.this.list.add(file);
                     }
 
                     InputFileSelection.this.eventDispatcher.raiseEvent("fileListChangedEvent");
@@ -83,9 +83,9 @@ public class InputFileSelection extends InputFileSelectionGui {
             this.lastFolder = firstFile;
             String[] fileNames = fileDialog.getFileNames();
 
-            for (int i = 0; i < fileNames.length; ++i) {
+            for (String fileName : fileNames) {
                 String filterPath = fileDialog.getFilterPath();
-                this.list.add(filterPath + System.getProperty("file.separator") + fileNames[i]);
+                this.list.add(filterPath + System.getProperty("file.separator") + fileName);
             }
 
             this.eventDispatcher.raiseEvent("fileListChangedEvent");

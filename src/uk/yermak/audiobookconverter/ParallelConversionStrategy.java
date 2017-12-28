@@ -6,6 +6,7 @@ import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.swt.widgets.Shell;
 
@@ -101,6 +102,12 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 ffmpegOut.flush();
             }
             ffmpegOut.close();
+            ffmpegFuture.get();
+
+            for (Future<Converter.Output> future : futures) {
+                Converter.Output output = future.get();
+                FileUtils.deleteQuietly(new File(output.getOutputFileName()));
+            }
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();

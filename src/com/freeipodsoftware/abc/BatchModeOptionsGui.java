@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-public class BatchModeOptionsGui extends Composite {
+class BatchModeOptionsGui extends Composite {
     private Group destinationGroup = null;
     Button sameAsInputFileRadioButton = null;
     Button differentFolderRadioButton = null;
@@ -18,8 +18,8 @@ public class BatchModeOptionsGui extends Composite {
     Button okButton = null;
     Button cancelButton = null;
 
-    public BatchModeOptionsGui(Composite parent, int style) {
-        super(parent, style);
+    public BatchModeOptionsGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
     }
 

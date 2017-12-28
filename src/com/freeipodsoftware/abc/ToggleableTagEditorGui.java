@@ -19,8 +19,8 @@ public class ToggleableTagEditorGui extends Composite {
     private TagEditor tagEditor = null;
     private Label infoLabel = null;
 
-    public ToggleableTagEditorGui(Composite parent, int style) {
-        super(parent, style);
+    public ToggleableTagEditorGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
         this.setTagEditorVisible(AppProperties.getBooleanProperty("toggleableTagEditor.visible"));
         this.layout(true);
@@ -69,7 +69,7 @@ public class ToggleableTagEditorGui extends Composite {
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = 2;
         gridData.horizontalAlignment = 4;
-        this.tagEditor = new TagEditor(this, 0);
+        this.tagEditor = new TagEditor(this);
         this.tagEditor.setLayoutData(gridData);
     }
 

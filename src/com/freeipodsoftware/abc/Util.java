@@ -20,15 +20,13 @@ import org.blinkenlights.jid3.v2.ID3V2Tag;
 */
 
 public class Util {
-    public Util() {
-    }
 
     public static String nullToEmptyString(String string) {
         return string == null ? "" : string;
     }
 
     public static boolean hasText(String text) {
-        return text == null ? false : text.trim().length() > 0;
+        return text != null && text.trim().length() > 0;
     }
 
     public static void centerDialog(Shell parent, Shell shell) {
@@ -80,7 +78,6 @@ public class Util {
                 }
             }
         } catch (Exception var5) {
-            ;
         }
 
         return tags;

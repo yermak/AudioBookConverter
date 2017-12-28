@@ -29,7 +29,6 @@ public class AppProperties {
             applicationProps.load(in);
             in.close();
         } catch (Exception var3) {
-            ;
         }
 
         return applicationProps;
@@ -60,17 +59,16 @@ public class AppProperties {
             applicationProps.store(out, "");
             out.close();
         } catch (Exception var5) {
-            ;
         }
 
     }
 
     public static boolean getBooleanProperty(String key) {
-        return (new Boolean(getProperty(key))).booleanValue();
+        return Boolean.valueOf(getProperty(key));
     }
 
     public static void setBooleanProperty(String key, boolean value) {
-        setProperty(key, (new Boolean(value)).toString());
+        setProperty(key, (Boolean.valueOf(value)).toString());
     }
 
     public static Date getDateProperty(String key) {

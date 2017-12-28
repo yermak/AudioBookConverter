@@ -81,11 +81,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
                 Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
-        this.optionPanel.addOptionChangedListener(new OptionChangedListener() {
-            public void optionChanged() {
-                MainWindow.this.updateToggleableTagEditorEnablement();
-            }
-        });
+        this.optionPanel.addOptionChangedListener(MainWindow.this::updateToggleableTagEditorEnablement);
     }
 
     private void updateToggleableTagEditorEnablement() {
@@ -150,7 +146,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             gridData.grabExcessHorizontalSpace = true;
             gridData.horizontalAlignment = 4;
             gridData.verticalAlignment = 4;
-            this.progressView = new ProgressView(this.sShell, 0);
+            this.progressView = new ProgressView(this.sShell);
             this.progressView.setLayoutData(gridData);
             this.progressView.setButtonWidthHint(this.inputFileSelection.getButtonWidthHint());
             Point preferedSize = this.progressView.computeSize(-1, -1);
@@ -174,37 +170,31 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     public void finishedWithError(final String errorMessage) {
-        this.sShell.getDisplay().syncExec(new Runnable() {
-            public void run() {
-                MessageBox messageBox = new MessageBox(MainWindow.this.sShell, 1);
-                messageBox.setText(MainWindow.this.sShell.getText());
-                messageBox.setMessage(errorMessage);
-                messageBox.open();
-                MainWindow.this.setUIEnabled(true);
-                MainWindow.this.progressView.finished();
-            }
+        this.sShell.getDisplay().syncExec(() -> {
+            MessageBox messageBox = new MessageBox(MainWindow.this.sShell, 1);
+            messageBox.setText(MainWindow.this.sShell.getText());
+            messageBox.setMessage(errorMessage);
+            messageBox.open();
+            MainWindow.this.setUIEnabled(true);
+            MainWindow.this.progressView.finished();
         });
     }
 
     public void finished() {
-        this.sShell.getDisplay().syncExec(new Runnable() {
-            public void run() {
-                MessageBox messageBox = new MessageBox(MainWindow.this.sShell, 2);
-                messageBox.setText(MainWindow.this.sShell.getText());
-                messageBox.setMessage(Messages.getString("MainWindow2.finished") + ".\n\n" + MainWindow.this.getConversionStrategy().getAdditionalFinishedMessage());
-                messageBox.open();
-                MainWindow.this.setUIEnabled(true);
-                MainWindow.this.progressView.finished();
-            }
+        this.sShell.getDisplay().syncExec(() -> {
+            MessageBox messageBox = new MessageBox(MainWindow.this.sShell, 2);
+            messageBox.setText(MainWindow.this.sShell.getText());
+            messageBox.setMessage(Messages.getString("MainWindow2.finished") + ".\n\n" + MainWindow.this.getConversionStrategy().getAdditionalFinishedMessage());
+            messageBox.open();
+            MainWindow.this.setUIEnabled(true);
+            MainWindow.this.progressView.finished();
         });
     }
 
     public void canceled() {
-        this.sShell.getDisplay().syncExec(new Runnable() {
-            public void run() {
-                MainWindow.this.setUIEnabled(true);
-                MainWindow.this.progressView.finished();
-            }
+        this.sShell.getDisplay().syncExec(() -> {
+            MainWindow.this.setUIEnabled(true);
+            MainWindow.this.progressView.finished();
         });
     }
 
@@ -232,7 +222,6 @@ public class MainWindow extends MainWindowGui implements FinishListener {
                     }
                 }
             } catch (Exception var9) {
-                ;
             }
 
         }

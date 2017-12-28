@@ -27,7 +27,7 @@ public class Converter implements Callable<Converter.Output> {
         this.inputFileList = inputFileList;
     }
 
-    public static long convertMp3toM4a(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
+    private static long convertMp3toM4a(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
         ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
                 "-protocol_whitelist", "file,pipe,concat",
                 "-f", "concat",
@@ -69,12 +69,12 @@ public class Converter implements Callable<Converter.Output> {
         Future<Long> faacErrFuture = Executors.newWorkStealingPool().submit(faacToErr);
 
 
-        for (int i = 0; i < inputFileList.length; ++i) {
-            ffmpegOut.println("file '" + inputFileList[i] + "'");
+        for (String inputFile : inputFileList) {
+            ffmpegOut.println("file '" + inputFile + "'");
         }
         ffmpegOut.close();
 
-        Long totalBytes = null;
+        Long totalBytes;
         try {
             totalBytes = ffmpegFuture.get();
             faacFuture.get();
@@ -91,8 +91,7 @@ public class Converter implements Callable<Converter.Output> {
     @Override
     public Output call() throws Exception {
         long unpackedSize = convertMp3toM4a(bitrate, channels, frequency, outputFileName, inputFileList);
-        Output output = new Output(unpackedSize, outputFileName, inputFileList);
-        return output;
+        return new Output(unpackedSize, outputFileName, inputFileList);
     }
 
     public static class Output {

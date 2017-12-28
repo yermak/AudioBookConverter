@@ -39,7 +39,7 @@ public class MainWindowGui {
     private void createOptionPanel() {
         GridData gridData10 = new GridData();
         gridData10.horizontalAlignment = 4;
-        this.optionPanel = new OptionPanel(this.sShell, 0);
+        this.optionPanel = new OptionPanel(this.sShell);
         this.optionPanel.setLayoutData(gridData10);
     }
 
@@ -92,7 +92,7 @@ public class MainWindowGui {
         GridData gridData9 = new GridData();
         gridData9.grabExcessHorizontalSpace = true;
         gridData9.horizontalAlignment = 4;
-        this.toggleableTagEditor = new ToggleableTagEditorGui(this.sShell, 0);
+        this.toggleableTagEditor = new ToggleableTagEditorGui(this.sShell);
         this.toggleableTagEditor.setLayoutData(gridData9);
     }
 

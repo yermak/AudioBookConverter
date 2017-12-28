@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.BatchModeOptionsDialog;
 import com.freeipodsoftware.abc.Util;
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.Messages;
@@ -18,8 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    private boolean intoSameFolder;
-    private String folder;
     private int currentFileNumber;
     private int channels;
     private int frequency;
@@ -35,17 +32,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public boolean makeUserInterview(Shell shell) {
-        BatchModeOptionsDialog options = new BatchModeOptionsDialog(shell);
-        options.setFolder(this.getSuggestedFolder());
-        if (options.open()) {
-            this.intoSameFolder = options.isIntoSameFolder();
-            this.folder = options.getFolder();
-            this.outputFileName = selectOutputFile(shell, getOuputFilenameSuggestion(inputFileList));
-            return this.outputFileName != null;
-        } else {
-            return false;
-        }
-
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.inputFileList));
+        return this.outputFileName != null;
     }
 
     protected void startConversion() {
@@ -61,7 +49,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
         for (int i = 0; i < this.inputFileList.length; ++i) {
             this.currentFileNumber = i + 1;
-            String filename = this.determineOutputFilename(this.inputFileList[i]);
+            String filename = this.determineTempFilename(this.inputFileList[i]);
             this.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
@@ -121,20 +109,15 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     }
 
-    private String determineOutputFilename(String inputFilename) {
+    private String determineTempFilename(String inputFilename) {
         String outputFilename;
-        if (this.intoSameFolder) {
-            outputFilename = inputFilename.replaceAll("(?i)\\.mp3", ".m4b");
-        } else {
-            File file = new File(inputFilename);
-            File outFile = new File(this.folder, file.getName());
-            outputFilename = outFile.getAbsolutePath().replaceAll("(?i)\\.mp3", ".m4b");
-        }
-
+        File file = new File(inputFilename);
+        String folder = System.getProperty("java.io.tmpdir");
+        File outFile = new File(folder, "~" + file.getName());
+        outputFilename = outFile.getAbsolutePath().replaceAll("(?i)\\.mp3", ".m4b");
         if (!outputFilename.endsWith(".m4b")) {
             outputFilename = outputFilename + ".m4b";
         }
-
         return Util.makeFilenameUnique(outputFilename);
     }
 

@@ -40,6 +40,11 @@ public class AppProperties {
         return applicationProps.getProperty(key);
     }
 
+    public static String getProperty(String key, String defaultValue) {
+        Properties applicationProps = getAppProperties();
+        return applicationProps.getProperty(key, defaultValue);
+    }
+
     public static void setProperty(String key, String value) {
         Properties applicationProps = getAppProperties();
         applicationProps.put(key, value);

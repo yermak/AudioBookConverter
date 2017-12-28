@@ -1,14 +1,13 @@
-package com.freeipodsoftware.abc.conversionstrategy;
+package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.BatchModeOptionsDialog;
-import com.freeipodsoftware.abc.StreamDumper;
 import com.freeipodsoftware.abc.Util;
+import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
+import com.freeipodsoftware.abc.conversionstrategy.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.Converter;
-import uk.yermak.audiobookconverter.StreamCopier;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,20 +16,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
+public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private boolean intoSameFolder;
     private String folder;
     private int currentFileNumber;
     private int channels;
     private int frequency;
     private int bitrate;
-
-    public BatchConversionStrategy() {
-    }
+    private String outputFileName;
 
     public long getOutputSize() {
-        return 0;
-        /*return this.canceled ? 0L : (new File(this.outputFileName)).length();*/
+        return this.canceled ? 0L : (new File(this.outputFileName)).length();
     }
 
     public int calcPercentFinishedForCurrentOutputFile() {
@@ -43,10 +39,12 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         if (options.open()) {
             this.intoSameFolder = options.isIntoSameFolder();
             this.folder = options.getFolder();
-            return true;
+            this.outputFileName = selectOutputFile(shell, getOuputFilenameSuggestion(inputFileList));
+            return this.outputFileName != null;
         } else {
             return false;
         }
+
     }
 
     protected void startConversion() {
@@ -58,23 +56,53 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public void run() {
-        List<Future> futures = new ArrayList<>();
+        List<Future<Converter.Output>> futures = new ArrayList<>();
 
         for (int i = 0; i < this.inputFileList.length; ++i) {
             this.currentFileNumber = i + 1;
-            String outputFileName = this.determineOutputFilename(this.inputFileList[i]);
+            String filename = this.determineOutputFilename(this.inputFileList[i]);
             this.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
-            Converter converter = new Converter(bitrate, channels, frequency, outputFileName, inputFileList[i]);
-            Future converterFuture = Executors.newWorkStealingPool().submit(converter);
+            Converter converter = new Converter(bitrate, channels, frequency, filename, inputFileList[i]);
+            Future<Converter.Output> converterFuture = Executors.newWorkStealingPool().submit(converter);
             futures.add(converterFuture);
         }
+        concat(futures);
+    }
+
+    private void concat(List<Future<Converter.Output>> futures) {
+
         try {
-            for (Future future : futures) {
-                future.get();
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
+                    "-protocol_whitelist", "file,pipe,concat",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", "-",
+                    "-f", "ipod",
+                    "-c", "copy",
+                    this.outputFileName);
+
+
+            Process ffmpegProcess = ffmpegProcessBuilder.start();
+            InputStream ffmpegIn = ffmpegProcess.getInputStream();
+            InputStream ffmpegErr = ffmpegProcess.getErrorStream();
+            PrintWriter ffmpegOut = new PrintWriter(new OutputStreamWriter(ffmpegProcess.getOutputStream()));
+
+            StreamCopier ffmpegToOut = new StreamCopier(ffmpegIn, NullOutputStream.NULL_OUTPUT_STREAM);
+            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
+            StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, NullOutputStream.NULL_OUTPUT_STREAM);
+            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+
+
+            for (Future<Converter.Output> future : futures) {
+                Converter.Output output = future.get();
+                ffmpegOut.println("file '" + output.getOutputFileName() + "'");
+                ffmpegOut.flush();
             }
-        } catch (InterruptedException | ExecutionException e) {
+            ffmpegOut.close();
+
+        } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
@@ -82,6 +110,8 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             this.finished = true;
             this.finishListener.finished();
         }
+
+
     }
 
     private String determineOutputFilename(String inputFilename) {

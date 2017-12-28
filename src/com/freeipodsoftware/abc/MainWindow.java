@@ -11,6 +11,8 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.ConversionMode;
+import uk.yermak.audiobookconverter.ParallelConversionStrategy;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,7 +26,6 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     private TagSuggestionStrategy tagSuggestionStrategy;
     private ProgressView progressView;
     private ConversionStrategy conversionStrategy;
-    private boolean batchMode;
 
     public static void main(String[] args) {
         Display display = Display.getDefault();
@@ -88,7 +89,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private void updateToggleableTagEditorEnablement() {
-        this.toggleableTagEditor.setEnabled(this.optionPanel.isSingleOutputFileMode());
+        this.toggleableTagEditor.setEnabled(this.optionPanel.getMode() == ConversionMode.SINGLE);
     }
 
     private void showAboutDialog() {
@@ -110,35 +111,21 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private ConversionStrategy getConversionStrategy() {
-        if (this.conversionStrategy == null || !this.conversionStrategy.getClass().equals(this.getConversionStrategyClass())) {
-            try {
-                this.conversionStrategy = (ConversionStrategy) this.getConversionStrategyClass().newInstance();
-            } catch (Exception var2) {
-                Display.getCurrent().syncExec(new Runnable() {
-                    public void run() {
-                        MessageBox messageBox = new MessageBox(MainWindow.this.sShell, 1);
-                        messageBox.setText(MainWindow.this.sShell.getText());
-                        messageBox.setMessage(Messages.getString("MainWindow.cannotInstantiateConversionStrategy") + " "  /* TODO +MainWindow.access$3(MainWindow.this)*/);
-                        messageBox.open();
-                    }
-                });
-            }
+        if (this.conversionStrategy != null) {
+            return this.conversionStrategy;
         }
-
+        switch (optionPanel.getMode()) {
+            case SINGLE:
+                this.conversionStrategy = new JoiningConversionStrategy();
+                break;
+            case BATCH:
+                this.conversionStrategy = new BatchConversionStrategy();
+                break;
+            case PARALLEL:
+                this.conversionStrategy = new ParallelConversionStrategy();
+                break;
+        }
         return this.conversionStrategy;
-    }
-
-    private Class<? extends ConversionStrategy> getConversionStrategyClass() {
-        return this.isBatchMode() ? BatchConversionStrategy.class : JoiningConversionStrategy.class;
-    }
-
-    private boolean isBatchMode() {
-        Display.getCurrent().syncExec(new Runnable() {
-            public void run() {
-                MainWindow.this.batchMode = !MainWindow.this.optionPanel.isSingleOutputFileMode();
-            }
-        });
-        return this.batchMode;
     }
 
     private void startConversion() {

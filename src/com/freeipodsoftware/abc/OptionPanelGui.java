@@ -8,9 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 public class OptionPanelGui extends Composite {
-    private Group batchModeGroup = null;
-    protected Button oneOutputFileOption = null;
-    protected Button oneOutputFilePerInputFileOption = null;
+    private Group batchModeGroup;
+    protected Button oneOutputFileOption;
+    protected Button oneOutputFilePerInputFileOption;
+    protected Button oneOutputFileParallelProcessingFileOption;
 
     public OptionPanelGui(Composite parent, int style) {
         super(parent, style);
@@ -36,5 +37,7 @@ public class OptionPanelGui extends Composite {
         this.oneOutputFileOption.setText(Messages.getString("OptionPanelGui.intoOneFile"));
         this.oneOutputFilePerInputFileOption = new Button(this.batchModeGroup, 16);
         this.oneOutputFilePerInputFileOption.setText(Messages.getString("OptionPanelGui.intoSeparateFiles"));
+        this.oneOutputFileParallelProcessingFileOption = new Button(this.batchModeGroup, 16);
+        this.oneOutputFileParallelProcessingFileOption.setText(Messages.getString("OptionPanelGui.intoOneFileParallel"));
     }
 }

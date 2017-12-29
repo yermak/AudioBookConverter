@@ -17,11 +17,12 @@ There is existing bugs with tags in unicode, so I highly recommend to stay with 
 --------------
 Major differences vs original version:
 --------------
-Performance improved form 5 to 30x times (depending on numbers of cores), due to recent release of Faac for x64.
-Improved (both speed and quality) of mp3 decoding due to switch to ffmpeg.
-Improved tag support according to MP4 specification.
-Added chapters support via MP4v2 project (Thanks to https://github.com/TechSmith for maintaining the fork).
-Added super-fast experimental mode of parallel encoding of MP3 files. (Works well for me).
+* Performance improved form 5 to 30x times (depending on numbers of cores), due to recent release of Faac for x64.
+* Improved (both speed and quality) of mp3 decoding due to switch to ffmpeg.
+* Improved tag support according to MP4 specification.
+* Added chapters support via MP4v2 project (Thanks to https://github.com/TechSmith for maintaining the fork).
+* Added super-fast experimental mode of parallel encoding of MP3 files. (Works well for me).
+* Keeping the same bitrate as original files to preserve quality
 
 
 

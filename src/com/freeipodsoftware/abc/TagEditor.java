@@ -37,7 +37,7 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void setTrack(String track) {
-        this.trackText.setText(Util.nullToEmptyString(track));
+        this.bookNumberText.setText(Util.nullToEmptyString(track));
     }
 
     public void setTotalTracks(String totalTracks) {
@@ -68,7 +68,7 @@ public class TagEditor extends TagEditorGui {
         tags.setSeries(this.series.getText());
         tags.setGenre(this.genreCombo.getText());
         tags.setYear(this.yearText.getText());
-        tags.setTrack(this.trackText.getText());
+        tags.setTrack(this.bookNumberText.getText());
         tags.setTotalTracks(this.totalBooksText.getText());
         tags.setComment(this.commentText.getText());
         return tags;

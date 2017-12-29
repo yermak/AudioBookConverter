@@ -16,6 +16,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     private int channels = 2;
     private int frequency = 44100;
     private int bitrate = 128000;
+    private long duration;
 
     public JoiningConversionStrategy() {
     }
@@ -49,13 +50,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         try {
             this.determineMaxChannelsAndFrequency();
 
-            int bitrate = this.bitrate;
-            int channels = this.channels;
-            int frequency = this.frequency;
-            String outputFileName = this.outputFileName;
-            String[] inputFileList = this.inputFileList;
-
-            Converter converter = new Converter(bitrate, channels, frequency, outputFileName, inputFileList);
+            Converter converter = new Converter(bitrate, channels, frequency, duration, outputFileName, inputFileList);
             Future converterFuture = Executors.newWorkStealingPool().submit(converter);
 
             converterFuture.get();

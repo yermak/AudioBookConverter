@@ -5,7 +5,7 @@ import com.freeipodsoftware.abc.Util;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.Converter;
+import uk.yermak.audiobookconverter.FFMpegFaacConverter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -64,8 +64,9 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             this.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
-            Converter converter = new Converter(bitrate, channels, frequency, duration, outputFileName, inputFileList[i]);
-            Future converterFuture = Executors.newWorkStealingPool().submit(converter);
+            Future converterFuture =
+                    Executors.newWorkStealingPool()
+                            .submit(new FFMpegFaacConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList[i]));
             futures.add(converterFuture);
         }
         try {

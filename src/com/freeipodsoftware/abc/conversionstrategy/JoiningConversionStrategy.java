@@ -4,7 +4,7 @@ import com.freeipodsoftware.abc.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.Converter;
+import uk.yermak.audiobookconverter.FFMpegFaacConverter;
 
 import java.io.*;
 import java.util.concurrent.Executors;
@@ -50,8 +50,9 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         try {
             this.determineMaxChannelsAndFrequency();
 
-            Converter converter = new Converter(bitrate, channels, frequency, duration, outputFileName, inputFileList);
-            Future converterFuture = Executors.newWorkStealingPool().submit(converter);
+            Future converterFuture =
+                    Executors.newWorkStealingPool()
+                            .submit(new FFMpegFaacConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList));
 
             converterFuture.get();
 

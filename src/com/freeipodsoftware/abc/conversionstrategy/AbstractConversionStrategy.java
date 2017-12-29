@@ -85,6 +85,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         fileDialog.setFilterExtensions(new String[]{"*.m4b"});
         fileDialog.setFileName(filenameSuggestion);
         String fileName = fileDialog.open();
+        if (fileName == null) return null;
         if (!fileName.toUpperCase().endsWith(".m4b".toUpperCase())) {
             fileName = fileName + ".m4b";
         }

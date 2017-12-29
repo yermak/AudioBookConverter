@@ -189,6 +189,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             MainWindow.this.setUIEnabled(true);
             MainWindow.this.progressView.finished();
         });
+        conversionStrategy = null;
     }
 
     public void canceled() {
@@ -196,6 +197,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             MainWindow.this.setUIEnabled(true);
             MainWindow.this.progressView.finished();
         });
+        conversionStrategy = null;
     }
 
     public static class UpdateThread extends Thread {

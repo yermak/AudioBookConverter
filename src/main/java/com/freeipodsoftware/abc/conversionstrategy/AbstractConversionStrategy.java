@@ -134,37 +134,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         return size;
     }
 
-    protected String getMp4TagsFaacOptions() {
-        if (this.mp4Tags == null) {
-            return "";
-        } else {
-            StringBuffer buffer = new StringBuffer();
-            this.appendFaacOptionIfNotEmpty(buffer, "--artist", this.mp4Tags.getWriter());
-            this.appendFaacOptionIfNotEmpty(buffer, "--writer", this.mp4Tags.getNarrator());
-            this.appendFaacOptionIfNotEmpty(buffer, "--title", this.mp4Tags.getTitle());
-            this.appendFaacOptionIfNotEmpty(buffer, "--album", this.mp4Tags.getSeries());
-            this.appendFaacOptionIfNotEmpty(buffer, "--genre", this.mp4Tags.getGenre());
-            this.appendFaacOptionIfNotEmpty(buffer, "--year", this.mp4Tags.getYear());
-            this.appendFaacOptionIfNotEmpty(buffer, "--track", this.mp4Tags.getTrack());
-            this.appendFaacOptionIfNotEmpty(buffer, "--disc", this.mp4Tags.getDisc());
-            this.appendFaacOptionIfNotEmpty(buffer, "--comment", this.mp4Tags.getComment());
-            return buffer.toString();
-        }
-    }
-
-    private void appendFaacOptionIfNotEmpty(StringBuffer buffer, String option, String text) {
-        if (Util.hasText(text)) {
-            buffer.append(option);
-            buffer.append(" \"");
-            buffer.append(this.filterEscapeChars(text));
-            buffer.append("\" ");
-        }
-
-    }
-
-    private String filterEscapeChars(String text) {
-        return text == null ? null : text.replace("\"", "\\\"");
-    }
 
     public void setPaused(boolean paused) {
         this.paused = paused;

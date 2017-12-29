@@ -1,5 +1,6 @@
 package com.freeipodsoftware.abc;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
@@ -68,8 +69,13 @@ public class TagEditor extends TagEditorGui {
         tags.setSeries(this.series.getText());
         tags.setGenre(this.genreCombo.getText());
         tags.setYear(this.yearText.getText());
-        tags.setTrack(this.bookNumberText.getText());
-        tags.setTotalTracks(this.totalBooksText.getText());
+        if (StringUtils.isNotBlank(this.bookNumberText.getText()) && StringUtils.isNumeric(this.bookNumberText.getText())){
+            tags.setTrack(Integer.valueOf(this.bookNumberText.getText()));
+        }
+        if (StringUtils.isNotBlank(this.totalBooksText.getText()) && StringUtils.isNumeric(this.totalBooksText.getText())){
+            tags.setTotalTracks(Integer.valueOf(this.totalBooksText.getText()));
+        }
+
         tags.setComment(this.commentText.getText());
         return tags;
     }

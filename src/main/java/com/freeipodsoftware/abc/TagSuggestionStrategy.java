@@ -37,7 +37,12 @@ public class TagSuggestionStrategy implements EventListener {
             this.tagEditor.setAlbum(tags.getSeries());
             this.tagEditor.setGenre(tags.getGenre());
             this.tagEditor.setYear(tags.getYear());
-            this.tagEditor.setTrack(tags.getTrack());
+            if (tags.getTrack() > 0) {
+                this.tagEditor.setTrack(String.valueOf(tags.getTrack()));
+            }
+            if (tags.getTotalTracks() > 0) {
+                this.tagEditor.setTotalTracks(String.valueOf(tags.getTotalTracks()));
+            }
             this.tagEditor.setComment(tags.getComment());
         }
 

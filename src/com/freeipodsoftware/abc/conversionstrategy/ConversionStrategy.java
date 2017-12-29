@@ -29,8 +29,6 @@ public interface ConversionStrategy {
 
     String getInfoText();
 
-    boolean supportsTagEditor();
-
     void setMp4Tags(Mp4Tags var1);
 
     String getAdditionalFinishedMessage();

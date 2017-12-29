@@ -139,10 +139,10 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
             return "";
         } else {
             StringBuffer buffer = new StringBuffer();
-            this.appendFaacOptionIfNotEmpty(buffer, "--artist", this.mp4Tags.getArtist());
-            this.appendFaacOptionIfNotEmpty(buffer, "--writer", this.mp4Tags.getWriter());
+            this.appendFaacOptionIfNotEmpty(buffer, "--artist", this.mp4Tags.getWriter());
+            this.appendFaacOptionIfNotEmpty(buffer, "--writer", this.mp4Tags.getNarrator());
             this.appendFaacOptionIfNotEmpty(buffer, "--title", this.mp4Tags.getTitle());
-            this.appendFaacOptionIfNotEmpty(buffer, "--album", this.mp4Tags.getAlbum());
+            this.appendFaacOptionIfNotEmpty(buffer, "--album", this.mp4Tags.getSeries());
             this.appendFaacOptionIfNotEmpty(buffer, "--genre", this.mp4Tags.getGenre());
             this.appendFaacOptionIfNotEmpty(buffer, "--year", this.mp4Tags.getYear());
             this.appendFaacOptionIfNotEmpty(buffer, "--track", this.mp4Tags.getTrack());

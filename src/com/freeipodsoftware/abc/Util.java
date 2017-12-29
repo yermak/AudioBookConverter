@@ -84,18 +84,18 @@ public class Util {
     }
 
     private static void importV1Tags(Mp4Tags tags, ID3v1 v1Tag) {
-        tags.setArtist(filterTag(v1Tag.getArtist()));
+        tags.setWriter(filterTag(v1Tag.getArtist()));
         tags.setTitle(filterTag(v1Tag.getTitle()));
-        tags.setAlbum(filterTag(v1Tag.getAlbum()));
+        tags.setSeries(filterTag(v1Tag.getAlbum()));
         tags.setGenre(filterTag(v1Tag.getSongGenre()));
         tags.setYear(filterTag(v1Tag.getYear()));
         tags.setComment(filterTag(v1Tag.getComment()));
     }
 
     private static void importV2Tags(Mp4Tags tags, AbstractID3v2 v2Tag) {
-        tags.setArtist(filterTag(v2Tag.getLeadArtist()));
+        tags.setWriter(filterTag(v2Tag.getLeadArtist()));
         tags.setTitle(filterTag(v2Tag.getSongTitle()));
-        tags.setAlbum(filterTag(v2Tag.getAlbumTitle()));
+        tags.setSeries(filterTag(v2Tag.getAlbumTitle()));
         tags.setGenre(filterTag(v2Tag.getSongTitle()));
         tags.setYear(String.valueOf(v2Tag.getYearReleased()));
 

@@ -11,7 +11,6 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.ParallelConversionStrategy;
 
 import java.io.BufferedReader;
@@ -85,7 +84,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private void updateToggleableTagEditorEnablement() {
-        this.toggleableTagEditor.setEnabled(this.optionPanel.getMode() == ConversionMode.SINGLE);
+        this.toggleableTagEditor.setEnabled(this.optionPanel.getMode().supportTags());
     }
 
     private void showAboutDialog() {
@@ -160,13 +159,12 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     private void setUIEnabled(boolean enabled) {
         this.startButton.setEnabled(enabled);
         this.inputFileSelection.setEnabled(enabled);
+        this.optionPanel.setEnabled(enabled);
         if (enabled) {
-            this.toggleableTagEditor.setEnabled(this.getConversionStrategy().supportsTagEditor());
+            this.toggleableTagEditor.setEnabled(this.optionPanel.getMode().supportTags());
         } else {
             this.toggleableTagEditor.setEnabled(false);
         }
-
-        this.optionPanel.setEnabled(enabled);
     }
 
     public void finishedWithError(final String errorMessage) {

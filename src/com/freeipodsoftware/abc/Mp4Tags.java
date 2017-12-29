@@ -1,33 +1,35 @@
 package com.freeipodsoftware.abc;
 
 public class Mp4Tags {
-    private String artist;
-    private String writer;
-    private String title;
-    private String album;
-    private String genre;
-    private String year;
-    private String track;
-    private String disc;
-    private String comment;
+    private String writer = "";
+    private String narrator = "";
+    private String title = "";
+    private String series = "";
+    private String genre = "";
+    private String year = "";
+    private String track = "";
+    private String disc = "";
+    private String comment = "";
+    private String totalTracks = "";
+    private String longDescription = "";
 
     public Mp4Tags() {
     }
 
-    public String getAlbum() {
-        return this.album;
+    public String getSeries() {
+        return this.series;
     }
 
-    public void setAlbum(String album) {
-        this.album = album;
+    public void setSeries(String series) {
+        this.series = series;
     }
 
-    public String getArtist() {
-        return this.artist;
+    public String getWriter() {
+        return this.writer;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setWriter(String writer) {
+        this.writer = writer;
     }
 
     public String getComment() {
@@ -70,12 +72,12 @@ public class Mp4Tags {
         this.track = track;
     }
 
-    public String getWriter() {
-        return this.writer;
+    public String getNarrator() {
+        return this.narrator;
     }
 
-    public void setWriter(String writer) {
-        this.writer = writer;
+    public void setNarrator(String narrator) {
+        this.narrator = narrator;
     }
 
     public String getYear() {
@@ -84,5 +86,21 @@ public class Mp4Tags {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    public String getTotalTracks() {
+        return totalTracks;
+    }
+
+    public void setTotalTracks(String totalTracks) {
+        this.totalTracks = totalTracks;
+    }
+
+    public String getLongDescription() {
+        return longDescription;
+    }
+
+    public void setLongDescription(String longDescription) {
+        this.longDescription = longDescription;
     }
 }

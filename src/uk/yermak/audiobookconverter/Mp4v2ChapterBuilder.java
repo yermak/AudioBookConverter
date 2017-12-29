@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Mp4v2ChapterBuilder implements ChapterBuilder {
 
-    private final List<Future<ConverterOutput>> futures;
+    private final List<ConverterOutput> outputs;
     private final String outputFileName;
 
-    public Mp4v2ChapterBuilder(List<Future<ConverterOutput>> futures, String outputFileName) {
-        this.futures = futures;
+    public Mp4v2ChapterBuilder(List<ConverterOutput> outputs, String outputFileName) {
+        this.outputs = outputs;
         this.outputFileName = outputFileName;
     }
 
@@ -38,10 +38,9 @@ public class Mp4v2ChapterBuilder implements ChapterBuilder {
         long duration = 0;
         int chapter = 0;
         try {
-            chaptersFile = new File(Utils.determineTempFilename(outputFileName, "m4b", "", "chapters.txt", false, new File(outputFileName).getParent()));
+            chaptersFile = new File(Utils.determineTempFilename(outputFileName, "m4b", "", "tagIt.txt", false, new File(outputFileName).getParent()));
             List<String> chapters = new ArrayList<>();
-            for (Future<ConverterOutput> future : futures) {
-                ConverterOutput output = future.get();
+            for (ConverterOutput output : outputs) {
                 duration += output.getDuration();
                 chapter++;
                 chapters.add(getChapterTime(duration) + " " + "Chapter " + chapter);

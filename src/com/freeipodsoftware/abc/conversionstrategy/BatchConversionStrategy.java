@@ -51,10 +51,6 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         Executors.newWorkStealingPool().execute(this);
     }
 
-    public boolean supportsTagEditor() {
-        return false;
-    }
-
     public void run() {
         List<Future> futures = new ArrayList<>();
 

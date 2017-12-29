@@ -13,11 +13,11 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void setArtist(String artist) {
-        this.artistText.setText(Util.nullToEmptyString(artist));
+        this.writerText.setText(Util.nullToEmptyString(artist));
     }
 
     public void setWriter(String writer) {
-        this.writerText.setText(Util.nullToEmptyString(writer));
+        this.narratorText.setText(Util.nullToEmptyString(writer));
     }
 
     public void setTitle(String title) {
@@ -25,7 +25,7 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void setAlbum(String album) {
-        this.albumText.setText(Util.nullToEmptyString(album));
+        this.series.setText(Util.nullToEmptyString(album));
     }
 
     public void setGenre(String genre) {
@@ -40,8 +40,8 @@ public class TagEditor extends TagEditorGui {
         this.trackText.setText(Util.nullToEmptyString(track));
     }
 
-    public void setDisc(String disc) {
-        this.discText.setText(disc);
+    public void setTotalTracks(String totalTracks) {
+        this.totalBooksText.setText(totalTracks);
     }
 
     public void setComment(String comment) {
@@ -56,20 +56,20 @@ public class TagEditor extends TagEditorGui {
         this.setGenre("");
         this.setYear("");
         this.setTrack("");
-        this.setDisc("");
+        this.setTotalTracks("");
         this.setComment("");
     }
 
     public Mp4Tags getMp4Tags() {
         Mp4Tags tags = new Mp4Tags();
-        tags.setArtist(this.artistText.getText());
         tags.setWriter(this.writerText.getText());
+        tags.setNarrator(this.narratorText.getText());
         tags.setTitle(this.titleText.getText());
-        tags.setAlbum(this.albumText.getText());
+        tags.setSeries(this.series.getText());
         tags.setGenre(this.genreCombo.getText());
         tags.setYear(this.yearText.getText());
         tags.setTrack(this.trackText.getText());
-        tags.setDisc(this.discText.getText());
+        tags.setTotalTracks(this.totalBooksText.getText());
         tags.setComment(this.commentText.getText());
         return tags;
     }

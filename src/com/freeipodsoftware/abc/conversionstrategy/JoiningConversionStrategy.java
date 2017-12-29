@@ -5,6 +5,8 @@ import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.FFMpegFaacConverter;
+import uk.yermak.audiobookconverter.Mp4v2Tagger;
+import uk.yermak.audiobookconverter.Tagger;
 
 import java.io.*;
 import java.util.concurrent.Executors;
@@ -33,10 +35,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         return Messages.getString("JoiningConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
     }
 
-    public boolean supportsTagEditor() {
-        return true;
-    }
-
     public boolean makeUserInterview(Shell shell) {
         this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.inputFileList));
         return this.outputFileName != null;
@@ -56,16 +54,20 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             converterFuture.get();
 
-            this.percentFinished = 100;
-            this.finished = true;
-            this.finishListener.finished();
+            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
+            tagger.tagIt();
+
+//            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(futures, outputFileName);
+//            chapterBuilder.chapters();
 
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
+            this.percentFinished = 100;
             this.finished = true;
+            this.finishListener.finished();
         }
     }
 

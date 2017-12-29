@@ -1,5 +1,10 @@
 This project is based on freeipodsoftware release of AudioBookConverter.
-It includes updated to recent version of software and performance improvements.
+Performance improved form 5 to 30x times (depending on numbers of cores). Original look & feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
+All libraries and dependencies are refreshed to the latests version available at this moment.
+Project is currently in alpha as has some minor ui bugs (progress bar, estimated file size, etc), however major functions work as expected.
+
+
+
 
 
 MP3 to iPod/iPhone Audio Book Converter

@@ -4,8 +4,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 public class SwtUtils {
-    public SwtUtils() {
-    }
 
     public static void setEnabledRecursive(Composite composite, boolean enabled) {
         Control[] children = composite.getChildren();

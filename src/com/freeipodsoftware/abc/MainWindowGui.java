@@ -102,7 +102,7 @@ public class MainWindowGui {
         gridData.horizontalAlignment = 4;
         gridData.verticalAlignment = 4;
         gridData.grabExcessVerticalSpace = true;
-        this.inputFileSelection = new InputFileSelection(this.sShell, 0);
+        this.inputFileSelection = new InputFileSelection(this.sShell);
         this.inputFileSelection.setToolTipText("");
         this.inputFileSelection.setLayoutData(gridData);
     }

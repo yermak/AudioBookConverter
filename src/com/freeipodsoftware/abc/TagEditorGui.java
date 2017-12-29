@@ -30,8 +30,8 @@ public class TagEditorGui extends Composite {
     private Label label9 = null;
     private Label label10 = null;
 
-    public TagEditorGui(Composite parent, int style) {
-        super(parent, style);
+    public TagEditorGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
     }
 

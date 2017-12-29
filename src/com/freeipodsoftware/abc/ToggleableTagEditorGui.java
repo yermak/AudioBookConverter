@@ -10,11 +10,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 
 public class ToggleableTagEditorGui extends Composite {
-    private static final String A_TAG_CLOSING = "</a>";
-    private static final String A_TAG = "<a>";
     private static final String SHOW_TAG_EDITOR = Messages.getString("ToggleableTagEditorGui.showTagEditor");
     private static final String HIDE_TAG_EDITOR = Messages.getString("ToggleableTagEditorGui.hideTagEditor");
-    public static final String TOGGLEABLE_TAG_EDITOR_VISIBLE = "toggleableTagEditor.visible";
     private Link toggleLink = null;
     private TagEditor tagEditor = null;
     private Label infoLabel = null;

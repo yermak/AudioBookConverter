@@ -170,11 +170,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         this.paused = paused;
     }
 
-    private long getFileSize(String filename) {
-        File file = new File(filename);
-        return file.exists() ? file.length() : 0L;
-    }
-
     public String getAdditionalFinishedMessage() {
         return "";
     }

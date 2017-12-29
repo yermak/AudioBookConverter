@@ -56,5 +56,6 @@ public class FFMpegConcatenator implements Concatenator {
             ConverterOutput output = future.get();
             FileUtils.deleteQuietly(new File(output.getOutputFileName()));
         }
+
     }
 }

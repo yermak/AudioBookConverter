@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Util;
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.Messages;
 import javazoom.jl.decoder.Bitstream;
@@ -40,10 +39,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         Executors.newWorkStealingPool().execute(this);
     }
 
-    public boolean supportsTagEditor() {
-        return false;
-    }
-
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
         try {
@@ -51,7 +46,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 this.currentFileNumber = i + 1;
                 String filename = Utils.determineTempFilename(this.inputFileList[i], "mp3", "~", "m4b", true, System.getProperty("java.io.tmpdir"));
                 this.determineChannelsAndFrequency(this.inputFileList[i]);
-                this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
@@ -61,7 +55,15 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             Concatenator concatenator = new FFMpegConcatenator(futures, this.outputFileName);
             concatenator.concat();
 
-            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(futures, outputFileName);
+            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
+            tagger.tagIt();
+
+            List<ConverterOutput> outputs = new ArrayList<>();
+            for (Future<ConverterOutput> future : futures) {
+                outputs.add(future.get());
+            }
+
+            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(outputs, outputFileName);
             chapterBuilder.chapters();
 
         } catch (InterruptedException | ExecutionException | IOException e) {

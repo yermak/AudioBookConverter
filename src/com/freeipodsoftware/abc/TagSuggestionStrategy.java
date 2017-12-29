@@ -32,9 +32,9 @@ public class TagSuggestionStrategy implements EventListener {
             this.firstInputFileName = this.inputFileSelection.getFileList()[0];
             this.tagEditor.clear();
             Mp4Tags tags = Util.readTagsFromInputFile(this.firstInputFileName);
-            this.tagEditor.setArtist(tags.getArtist());
+            this.tagEditor.setArtist(tags.getWriter());
             this.tagEditor.setTitle(tags.getTitle());
-            this.tagEditor.setAlbum(tags.getAlbum());
+            this.tagEditor.setAlbum(tags.getSeries());
             this.tagEditor.setGenre(tags.getGenre());
             this.tagEditor.setYear(tags.getYear());
             this.tagEditor.setTrack(tags.getTrack());

@@ -9,22 +9,22 @@ import org.eclipse.swt.widgets.*;
 public class TagEditorGui extends Composite {
     private static final String[] genres = new String[]{"Alternative", "Blues", "Books & Spoken", "Children's Music", "Classical", "Comedy", "Country", "Dance", "Easy Listening", "Electronic", "Folk", "Funk", "House", "Hip Hop", "Indie", "Industrial", "Jazz", "Metal", "Misc", "New Age", "Poscast", "Pop", "Punk", "Religious", "Rock", "Reggae", "Soft Rock", "Soundtrack", "Techno", "Trance", "Unclassifiable", "World"};
     private Composite tagsComposite = null;
-    private Label label = null;
-    protected Text artistText = null;
-    private Label label1 = null;
+    private Label writerLabel = null;
     protected Text writerText = null;
-    private Label label2 = null;
+    private Label narratorLebel = null;
+    protected Text narratorText = null;
+    private Label titleLabel = null;
     protected Text titleText = null;
-    private Label label3 = null;
-    protected Text albumText = null;
+    private Label seriesLabel = null;
+    protected Text series = null;
     private Label label4 = null;
     protected Combo genreCombo = null;
     private Label label5 = null;
     protected Text yearText = null;
     private Label label6 = null;
     protected Text trackText = null;
-    private Label label7 = null;
-    protected Text discText = null;
+    private Label totalBooksLabel = null;
+    protected Text totalBooksText = null;
     private Label label8 = null;
     protected Text commentText = null;
     private Label label9 = null;
@@ -106,27 +106,32 @@ public class TagEditorGui extends Composite {
         this.tagsComposite = new Composite(this, 0);
         this.tagsComposite.setLayout(gridLayout);
         this.tagsComposite.setLayoutData(gridData13);
-        this.label = new Label(this.tagsComposite, 0);
-        this.label.setText(Messages.getString("TagEditorGui.artist"));
-        this.label.setLayoutData(gridData8);
-        this.artistText = new Text(this.tagsComposite, 2048);
-        this.artistText.setText("");
-        this.artistText.setLayoutData(gridData1);
-        this.label1 = new Label(this.tagsComposite, 0);
-        this.label1.setText(Messages.getString("TagEditorGui.writer"));
-        this.label1.setLayoutData(gridData12);
+
+        this.writerLabel = new Label(this.tagsComposite, 0);
+        this.writerLabel.setText(Messages.getString("TagEditorGui.writer"));
+        this.writerLabel.setLayoutData(gridData8);
         this.writerText = new Text(this.tagsComposite, 2048);
-        this.writerText.setLayoutData(gridData3);
-        this.label2 = new Label(this.tagsComposite, 0);
-        this.label2.setText(Messages.getString("TagEditorGui.title"));
-        this.label2.setLayoutData(gridData7);
+        this.writerText.setText("");
+        this.writerText.setLayoutData(gridData1);
+
+        this.narratorLebel = new Label(this.tagsComposite, 0);
+        this.narratorLebel.setText(Messages.getString("TagEditorGui.narrator"));
+        this.narratorLebel.setLayoutData(gridData12);
+        this.narratorText = new Text(this.tagsComposite, 2048);
+        this.narratorText.setLayoutData(gridData3);
+
+        this.titleLabel = new Label(this.tagsComposite, 0);
+        this.titleLabel.setText(Messages.getString("TagEditorGui.title"));
+        this.titleLabel.setLayoutData(gridData7);
         this.titleText = new Text(this.tagsComposite, 2048);
         this.titleText.setLayoutData(gridData);
-        this.label3 = new Label(this.tagsComposite, 0);
-        this.label3.setText(Messages.getString("TagEditorGui.album"));
-        this.label3.setLayoutData(gridData111);
-        this.albumText = new Text(this.tagsComposite, 2048);
-        this.albumText.setLayoutData(gridData2);
+
+        this.seriesLabel = new Label(this.tagsComposite, 0);
+        this.seriesLabel.setText(Messages.getString("TagEditorGui.series"));
+        this.seriesLabel.setLayoutData(gridData111);
+        this.series = new Text(this.tagsComposite, 2048);
+        this.series.setLayoutData(gridData2);
+
         this.label4 = new Label(this.tagsComposite, 0);
         this.label4.setText(Messages.getString("TagEditorGui.genre"));
         this.label4.setLayoutData(gridData6);
@@ -138,27 +143,33 @@ public class TagEditorGui extends Composite {
         this.yearText.setLayoutData(gridData14);
         new Label(this.tagsComposite, 0);
         this.label6 = new Label(this.tagsComposite, 0);
-        this.label6.setText(Messages.getString("TagEditorGui.track"));
+        this.label6.setText(Messages.getString("TagEditorGui.bookNumber"));
         this.label6.setLayoutData(gridData5);
         this.trackText = new Text(this.tagsComposite, 2048);
         this.trackText.setLayoutData(gridData21);
         this.label9 = new Label(this.tagsComposite, 0);
-        this.label9.setText(Messages.getString("TagEditorGui.numberTotal"));
+//        this.label9.setText(Messages.getString("TagEditorGui.numberTotal"));
+        this.label9.setText("");
         this.label9.setFont(new Font(Display.getDefault(), "Tahoma", 8, 2));
         this.label9.setForeground(Display.getCurrent().getSystemColor(17));
         this.label9.setLayoutData(gridData15);
         this.label9.setEnabled(true);
-        this.label7 = new Label(this.tagsComposite, 0);
-        this.label7.setText(Messages.getString("TagEditorGui.disc"));
-        this.label7.setLayoutData(gridData9);
-        this.discText = new Text(this.tagsComposite, 2048);
-        this.discText.setLayoutData(gridData31);
+
+        this.totalBooksLabel = new Label(this.tagsComposite, 0);
+        this.totalBooksLabel.setText(Messages.getString("TagEditorGui.totalBooks"));
+        this.totalBooksLabel.setLayoutData(gridData9);
+
+        this.totalBooksText = new Text(this.tagsComposite, 2048);
+        this.totalBooksText.setLayoutData(gridData31);
+
         this.label10 = new Label(this.tagsComposite, 0);
-        this.label10.setText(Messages.getString("TagEditorGui.numberTotal"));
+//        this.label10.setText(Messages.getString("TagEditorGui.numberTotal"));
+        this.label10.setText("");
         this.label10.setEnabled(true);
         this.label10.setFont(new Font(Display.getDefault(), "Tahoma", 8, 2));
         this.label10.setForeground(Display.getCurrent().getSystemColor(17));
         this.label10.setLayoutData(gridData22);
+
         this.label8 = new Label(this.tagsComposite, 0);
         this.label8.setText(Messages.getString("TagEditorGui.comment"));
         this.label8.setLayoutData(gridData41);

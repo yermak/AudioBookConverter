@@ -21,6 +21,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     private int channels;
     private int frequency;
     private int bitrate;
+    private long duration;
 
     public BatchConversionStrategy() {
     }
@@ -63,7 +64,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             this.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
-            Converter converter = new Converter(bitrate, channels, frequency, outputFileName, inputFileList[i]);
+            Converter converter = new Converter(bitrate, channels, frequency, duration, outputFileName, inputFileList[i]);
             Future converterFuture = Executors.newWorkStealingPool().submit(converter);
             futures.add(converterFuture);
         }
@@ -107,12 +108,15 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         this.frequency = 0;
 
         try {
-            BufferedInputStream sourceStream = new BufferedInputStream(new FileInputStream(filename));
+            FileInputStream in = new FileInputStream(filename);
+            BufferedInputStream sourceStream = new BufferedInputStream(in);
             Bitstream stream = new Bitstream(sourceStream);
             Header header = stream.readFrame();
             this.channels = header.mode() == 3 ? 1 : 2;
             this.frequency = header.frequency();
             this.bitrate = header.bitrate();
+            long tn = in.getChannel().size();
+            this.duration = (long) header.total_ms((int) tn);
             stream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);

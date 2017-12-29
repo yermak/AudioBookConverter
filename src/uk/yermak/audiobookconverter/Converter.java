@@ -16,18 +16,20 @@ public class Converter implements Callable<Converter.Output> {
     private final int bitrate;
     private final int channels;
     private final int frequency;
+    private final long duration;
     private final String outputFileName;
     private final String[] inputFileList;
 
-    public Converter(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) {
+    public Converter(int bitrate, int channels, int frequency, long duration, String outputFileName, String... inputFileList) {
         this.bitrate = bitrate;
         this.channels = channels;
         this.frequency = frequency;
+        this.duration = duration;
         this.outputFileName = outputFileName;
         this.inputFileList = inputFileList;
     }
 
-    private static long convertMp3toM4a(int bitrate, int channels, int frequency, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
+    private static long convertMp3toM4a(int bitrate, int channels, int frequency, long duration, String outputFileName, String... inputFileList) throws IOException, InterruptedException, java.util.concurrent.ExecutionException {
         ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
                 "-protocol_whitelist", "file,pipe,concat",
                 "-f", "concat",
@@ -90,23 +92,29 @@ public class Converter implements Callable<Converter.Output> {
 
     @Override
     public Output call() throws Exception {
-        long unpackedSize = convertMp3toM4a(bitrate, channels, frequency, outputFileName, inputFileList);
-        return new Output(unpackedSize, outputFileName, inputFileList);
+        long unpackedSize = convertMp3toM4a(bitrate, channels, frequency, duration, outputFileName, inputFileList);
+        return new Output(unpackedSize, duration, outputFileName, inputFileList);
     }
 
     public static class Output {
         private long unpackedSize;
         private String outputFileName;
         private String[] inputFileList;
+        private long duration;
 
-        public Output(long unpackedSize, String outputFileName, String... inputFileList) {
+        public Output(long unpackedSize, long duration, String outputFileName, String... inputFileList) {
             this.unpackedSize = unpackedSize;
+            this.duration = duration;
             this.outputFileName = outputFileName;
             this.inputFileList = inputFileList;
         }
 
         public String getOutputFileName() {
             return outputFileName;
+        }
+
+        public long getDuration() {
+            return duration;
         }
     }
 

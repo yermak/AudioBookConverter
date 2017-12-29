@@ -44,7 +44,7 @@ public class InputFileSelection extends InputFileSelectionGui {
 
     private void createDropTarget() {
         DropTarget target = new DropTarget(this.list, 19);
-        target.setTransfer(FileTransfer.getInstance(), TextTransfer.getInstance());
+        target.setTransfer(new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
         target.addDropListener(new DropTargetAdapter() {
             public void drop(DropTargetEvent event) {
                 if (FileTransfer.getInstance().isSupportedType(event.currentDataType)) {

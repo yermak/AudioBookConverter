@@ -84,7 +84,7 @@ public class ProgressViewGui extends Composite {
         Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
         shell.setSize(new Point(300, 200));
-        new ProgressViewGui(shell, 0);
+        new ProgressViewGui(shell);
         shell.open();
 
         while (!shell.isDisposed()) {
@@ -96,8 +96,8 @@ public class ProgressViewGui extends Composite {
         display.dispose();
     }
 
-    public ProgressViewGui(Composite parent, int style) {
-        super(parent, style);
+    public ProgressViewGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
     }
 

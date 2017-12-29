@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
  */
 public interface Converter {
 
+    @SuppressWarnings("unused")
     ConverterOutput convertMp3toM4a() throws IOException, InterruptedException, ExecutionException;
 
 }

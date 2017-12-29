@@ -10,8 +10,8 @@ public class InputFileSelection extends InputFileSelectionGui {
     private String lastFolder;
     private EventDispatcher eventDispatcher;
 
-    public InputFileSelection(Composite parent, int style) {
-        super(parent, style);
+    public InputFileSelection(Composite parent) {
+        super(parent, 0);
         this.addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.addInputFile();

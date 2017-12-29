@@ -33,7 +33,7 @@ class AboutDialog extends Dialog {
         this.sShell = new Shell(parent, 67680);
         this.sShell.setText(Messages.getString("AboutDialog.caption"));
         this.sShell.setLayout(new GridLayout());
-        this.aboutComposite = new AboutDialogGui(this.sShell, 0);
+        this.aboutComposite = new AboutDialogGui(this.sShell);
         this.aboutComposite.getCloseButton().addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 AboutDialog.this.sShell.close();

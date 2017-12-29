@@ -12,8 +12,8 @@ import java.util.concurrent.Callable;
  */
 public class StreamCopier implements Callable<Long> {
 
-    private InputStream in;
-    private OutputStream out;
+    private final InputStream in;
+    private final OutputStream out;
 
 
     public StreamCopier(InputStream in, OutputStream out) {

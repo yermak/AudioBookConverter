@@ -10,11 +10,11 @@ import java.util.Set;
 
 public class OptionPanel extends OptionPanelGui {
     private static final String OPTION_PANEL_CONVERSION_MODE = "optionPanel.conversionMode";
-    private Set<OptionChangedListener> optionChangedListenerSet = new HashSet<>();
+    private final Set<OptionChangedListener> optionChangedListenerSet = new HashSet<>();
     private ConversionMode mode = ConversionMode.SINGLE;
 
     public OptionPanel(Composite parent) {
-        super(parent, 0);
+        super(parent);
         this.oneOutputFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.SINGLE));
         this.oneOutputFilePerInputFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.BATCH));
         this.oneOutputFileParallelProcessingFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.PARALLEL));
@@ -56,7 +56,7 @@ public class OptionPanel extends OptionPanelGui {
     }
 
     private class ModeSelectionAdapter extends SelectionAdapter {
-        private ConversionMode mode;
+        private final ConversionMode mode;
 
         public ModeSelectionAdapter(ConversionMode mode) {
             this.mode = mode;

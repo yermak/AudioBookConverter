@@ -76,7 +76,7 @@ public class AboutDialogGui extends Composite {
         Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
         shell.setSize(new Point(300, 200));
-        new AboutDialogGui(shell, 0);
+        new AboutDialogGui(shell);
         shell.pack();
         shell.open();
 
@@ -89,8 +89,8 @@ public class AboutDialogGui extends Composite {
         display.dispose();
     }
 
-    public AboutDialogGui(Composite parent, int style) {
-        super(parent, style);
+    public AboutDialogGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
     }
 

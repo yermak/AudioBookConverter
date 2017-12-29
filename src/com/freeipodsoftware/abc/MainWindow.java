@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class MainWindow extends MainWindowGui implements FinishListener {
-    private EventDispatcher eventDispatcher = new EventDispatcher();
+    private final EventDispatcher eventDispatcher = new EventDispatcher();
     private TagSuggestionStrategy tagSuggestionStrategy;
     private ProgressView progressView;
     private ConversionStrategy conversionStrategy;

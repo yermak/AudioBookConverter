@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class TagEditor extends TagEditorGui {
     public TagEditor(Composite parent) {
-        super(parent, 0);
+        super(parent);
     }
 
     public Point computeSize(int wHint, int hHint, boolean changed) {

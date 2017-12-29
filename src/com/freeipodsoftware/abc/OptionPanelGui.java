@@ -13,8 +13,8 @@ public class OptionPanelGui extends Composite {
     Button oneOutputFilePerInputFileOption;
     Button oneOutputFileParallelProcessingFileOption;
 
-    OptionPanelGui(Composite parent, int style) {
-        super(parent, style);
+    OptionPanelGui(Composite parent) {
+        super(parent, 0);
         this.initialize();
     }
 

@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 
 public class ProgressView extends ProgressViewGui {
     public ProgressView(Composite parent) {
-        super(parent, 0);
+        super(parent);
         this.infoLabel.setText("");
         this.cancelButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {

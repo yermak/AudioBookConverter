@@ -7,10 +7,9 @@ public class Mp4Tags {
     private String series = "";
     private String genre = "";
     private String year = "";
-    private String track = "";
-    private String disc = "";
+    private int track;
+    private int totalTracks;
     private String comment = "";
-    private String totalTracks = "";
     private String longDescription = "";
 
     public Mp4Tags() {
@@ -40,14 +39,6 @@ public class Mp4Tags {
         this.comment = comment;
     }
 
-    public String getDisc() {
-        return this.disc;
-    }
-
-    public void setDisc(String disc) {
-        this.disc = disc;
-    }
-
     public String getGenre() {
         return this.genre;
     }
@@ -64,11 +55,11 @@ public class Mp4Tags {
         this.title = title;
     }
 
-    public String getTrack() {
+    public int getTrack() {
         return this.track;
     }
 
-    public void setTrack(String track) {
+    public void setTrack(int track) {
         this.track = track;
     }
 
@@ -88,11 +79,11 @@ public class Mp4Tags {
         this.year = year;
     }
 
-    public String getTotalTracks() {
+    public int getTotalTracks() {
         return totalTracks;
     }
 
-    public void setTotalTracks(String totalTracks) {
+    public void setTotalTracks(int totalTracks) {
         this.totalTracks = totalTracks;
     }
 

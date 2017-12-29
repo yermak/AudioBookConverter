@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import com.freeipodsoftware.abc.Mp4Tags;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -29,13 +30,22 @@ public class Mp4v2Tagger implements Tagger {
                 "-w", "\"" + tags.getNarrator() + "\"",
                 "-g", "\"" + tags.getGenre() + "\"",
                 "-y", "\"" + tags.getYear() + "\"",
-                "-t", tags.getTrack(),
-                "-T", tags.getTotalTracks(),
                 "-c", "\"" + tags.getComment() + "\"",
                 "-l", "\"" + tags.getLongDescription() + "\"",
                 "-e", "\"https://github.com/yermak/AudioBookConverter\"",
-                "-E", "\"ffmpeg,faac,mp4v2\"",
-                outputFileName);
+                "-E", "\"ffmpeg,faac,mp4v2\""
+        );
+
+        if (tags.getTrack() <= 0) {
+            tagProcessBuilder.command().add("-t");
+            tagProcessBuilder.command().add(String.valueOf(tags.getTrack()));
+        }
+        if (tags.getTotalTracks() <= 0) {
+            tagProcessBuilder.command().add("-T");
+            tagProcessBuilder.command().add(String.valueOf(tags.getTotalTracks()));
+        }
+
+        tagProcessBuilder.command().add(outputFileName);
 
         Process tagsProcess = tagProcessBuilder.start();
 

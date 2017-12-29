@@ -96,7 +96,7 @@ public class Util {
         tags.setWriter(filterTag(v2Tag.getLeadArtist()));
         tags.setTitle(filterTag(v2Tag.getSongTitle()));
         tags.setSeries(filterTag(v2Tag.getAlbumTitle()));
-        tags.setGenre(filterTag(v2Tag.getSongTitle()));
+        tags.setGenre(filterTag(v2Tag.getSongGenre()));
         tags.setYear(String.valueOf(v2Tag.getYearReleased()));
 
 /*
@@ -105,10 +105,8 @@ public class Util {
 
         } else
 */
-        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum())) {
-            tags.setTrack("" + v2Tag.getTrackNumberOnAlbum());
-        } else {
-            tags.setTrack("");
+        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum()) && StringUtils.isNumeric(v2Tag.getTrackNumberOnAlbum())) {
+            tags.setTrack(Integer.valueOf(v2Tag.getTrackNumberOnAlbum()));
         }
 
         tags.setComment(filterTag(v2Tag.getSongComment()));

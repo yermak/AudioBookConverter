@@ -1,8 +1,13 @@
 Audio Book Converter V2
 ===============
-
 This project is based on freeipodsoftware release of AudioBookConverter.
- Original look & feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
+
+
+
+
+
+
+Original look & feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
 All libraries and dependencies are refreshed to the latests version available at this moment.
 Project is currently in alpha as has some minor ui bugs (progress bar, estimated file size, etc), however major functions work as expected.
 There is existing bugs with tags in unicode, so I highly recommend to stay with latin charset.

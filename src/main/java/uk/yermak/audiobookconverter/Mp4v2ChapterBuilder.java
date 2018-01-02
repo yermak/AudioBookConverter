@@ -38,7 +38,7 @@ public class Mp4v2ChapterBuilder implements ChapterBuilder {
         long duration = 0;
         int chapter = 0;
         try {
-            chaptersFile = new File(Utils.determineTempFilename(outputFileName, "m4b", "", "tagIt.txt", false, new File(outputFileName).getParent()));
+            chaptersFile = new File(Utils.determineTempFilename(outputFileName, "m4b", "", "chapters.txt", false, new File(outputFileName).getParent()));
             List<String> chapters = new ArrayList<>();
             for (ConverterOutput output : outputs) {
                 duration += output.getDuration();
@@ -49,14 +49,16 @@ public class Mp4v2ChapterBuilder implements ChapterBuilder {
 
             ProcessBuilder chapterProcessBuilder = new ProcessBuilder("external/mp4chaps.exe",
                     "-i",
+                    "-z",
                     outputFileName);
 
             Process chapterProcess = chapterProcessBuilder.start();
 //            PrintWriter chapterOut = new PrintWriter(new OutputStreamWriter(chapterProcess.getOutputStream()));
 
-            StreamCopier chapterToOut = new StreamCopier(chapterProcess.getInputStream(), NullOutputStream.NULL_OUTPUT_STREAM);
+            StreamCopier chapterToOut = new StreamCopier(chapterProcess.getInputStream(), System.out);
             Future<Long> chapterFuture = Executors.newWorkStealingPool().submit(chapterToOut);
-            StreamCopier chapterToErr = new StreamCopier(chapterProcess.getErrorStream(), NullOutputStream.NULL_OUTPUT_STREAM);
+            StreamCopier chapterToErr = new StreamCopier(chapterProcess.getErrorStream(), System.err);
+//            StreamCopier chapterToErr = new StreamCopier(chapterProcess.getErrorStream(), NullOutputStream.NULL_OUTPUT_STREAM);
             Future<Long> chapterErrFuture = Executors.newWorkStealingPool().submit(chapterToErr);
             chapterFuture.get();
         } finally {

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private int currentFileNumber;
@@ -41,17 +42,21 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
+        long time = System.currentTimeMillis();
         try {
+
             for (int i = 0; i < this.inputFileList.length; ++i) {
                 this.currentFileNumber = i + 1;
-                String filename = Utils.determineTempFilename(this.inputFileList[i], "mp3", "~", "m4b", true, System.getProperty("java.io.tmpdir"));
+                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + time + "-" + i + ".m4b").getName();
                 this.determineChannelsAndFrequency(this.inputFileList[i]);
 
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
-                                .submit(new FFMpegFaacConverter(bitrate, channels, frequency, duration, filename, inputFileList[i]));
+                                .submit(new FFMpegConverter(bitrate, channels, frequency, duration, filename, inputFileList[i]));
                 futures.add(converterFuture);
             }
+
+
             Concatenator concatenator = new FFMpegConcatenator(futures, this.outputFileName);
             concatenator.concat();
 

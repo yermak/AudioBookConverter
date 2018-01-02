@@ -61,12 +61,12 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
 
         StreamCopier ffmpegToFaac = new StreamCopier(ffmpegIn, faacOut);
         Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToFaac);
-        StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, NullOutputStream.NULL_OUTPUT_STREAM);
+        StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, System.err);
         Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
 
-        StreamCopier faacToConsole = new StreamCopier(faacIn, NullOutputStream.NULL_OUTPUT_STREAM);
+        StreamCopier faacToConsole = new StreamCopier(faacIn, System.out);
         Future<Long> faacFuture = Executors.newWorkStealingPool().submit(faacToConsole);
-        StreamCopier faacToErr = new StreamCopier(faacErr, NullOutputStream.NULL_OUTPUT_STREAM);
+        StreamCopier faacToErr = new StreamCopier(faacErr, System.err);
         Future<Long> faacErrFuture = Executors.newWorkStealingPool().submit(faacToErr);
 
 

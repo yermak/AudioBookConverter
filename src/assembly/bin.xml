@@ -12,13 +12,23 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>external</directory>
-            <outputDirectory>external</outputDirectory>
+            <directory>external/x64</directory>
+            <outputDirectory>external/x64</outputDirectory>
             <includes>
                 <include>*.exe</include>
                 <include>*.dll</include>
             </includes>
         </fileSet>
+<!--
+        <fileSet>
+            <directory>external/x86</directory>
+            <outputDirectory>external/x86</outputDirectory>
+            <includes>
+                <include>*.exe</include>
+                <include>*.dll</include>
+            </includes>
+        </fileSet>
+-->
         <fileSet>
             <directory>target/lib</directory>
             <outputDirectory>lib</outputDirectory>

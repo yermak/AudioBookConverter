@@ -22,7 +22,7 @@ public class Mp4v2Tagger implements Tagger {
     }
 
     public void tagIt() throws IOException, ExecutionException, InterruptedException {
-        ProcessBuilder tagProcessBuilder = new ProcessBuilder("external/mp4tags.exe",
+        ProcessBuilder tagProcessBuilder = new ProcessBuilder("external/x64/mp4tags.exe",
                 "-i", "Audiobook",
                 "-s", "\"" + tags.getTitle() + "\"",
                 "-A", "\"" + tags.getSeries() + "\"",

@@ -29,7 +29,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
     public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException, ExecutionException {
         try {
             mutex.acquire();
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x86/ffmpeg.exe",
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
                     "-i", inputFileList[0],
                     "-vn",
                     "-codec:a", "libfdk_aac",

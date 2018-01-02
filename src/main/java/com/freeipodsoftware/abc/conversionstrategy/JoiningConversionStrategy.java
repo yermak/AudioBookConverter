@@ -4,6 +4,7 @@ import com.freeipodsoftware.abc.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.FFMpegConverter;
 import uk.yermak.audiobookconverter.FFMpegFaacConverter;
 import uk.yermak.audiobookconverter.Mp4v2Tagger;
 import uk.yermak.audiobookconverter.Tagger;
@@ -50,7 +51,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             Future converterFuture =
                     Executors.newWorkStealingPool()
-                            .submit(new FFMpegFaacConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList));
+                            .submit(new FFMpegConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList));
 
             converterFuture.get();
 

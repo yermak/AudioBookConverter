@@ -26,7 +26,7 @@ public class FFMpegConcatenator implements Concatenator {
 
     public void concat() throws IOException, ExecutionException, InterruptedException {
 
-        ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
+        ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
                 "-protocol_whitelist", "file,pipe,concat",
                 "-vn",
                 "-f", "concat",

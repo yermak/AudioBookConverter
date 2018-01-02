@@ -47,7 +47,7 @@ public class Mp4v2ChapterBuilder implements ChapterBuilder {
             }
             FileUtils.writeLines(chaptersFile, chapters, false);
 
-            ProcessBuilder chapterProcessBuilder = new ProcessBuilder("external/mp4chaps.exe",
+            ProcessBuilder chapterProcessBuilder = new ProcessBuilder("external/x64/mp4chaps.exe",
                     "-i",
                     "-z",
                     outputFileName);

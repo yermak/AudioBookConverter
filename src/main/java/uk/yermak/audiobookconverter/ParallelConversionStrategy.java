@@ -47,7 +47,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
             for (int i = 0; i < this.inputFileList.length; ++i) {
                 this.currentFileNumber = i + 1;
-                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + time + "-" + i + ".m4b").getName();
+                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + time + "-" + i + ".m4b").getAbsolutePath();
                 this.determineChannelsAndFrequency(this.inputFileList[i]);
 
                 Future<ConverterOutput> converterFuture =

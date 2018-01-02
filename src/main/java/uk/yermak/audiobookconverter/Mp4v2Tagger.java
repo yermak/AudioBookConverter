@@ -1,9 +1,9 @@
 package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Mp4Tags;
+import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -50,7 +50,6 @@ public class Mp4v2Tagger implements Tagger {
         Process tagsProcess = tagProcessBuilder.start();
 
 
-//        StreamCopier tagsToOut = new StreamCopier(tagsProcess.getInputStream(), NullOutputStream.NULL_OUTPUT_STREAM);
         StreamCopier tagsToOut = new StreamCopier(tagsProcess.getInputStream(), System.out);
         Future<Long> tagsFuture = Executors.newWorkStealingPool().submit(tagsToOut);
         StreamCopier tagsToErr = new StreamCopier(tagsProcess.getErrorStream(), System.err);

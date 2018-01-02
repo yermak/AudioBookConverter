@@ -28,19 +28,20 @@ public class FFMpegConcatenator implements Concatenator {
 
         ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
                 "-protocol_whitelist", "file,pipe,concat",
+                "-vn",
                 "-f", "concat",
                 "-safe", "0",
                 "-i", "-",
                 "-f", "ipod",
-                "-c", "copy",
+                "-c:a", "copy",
                 outputFileName);
 
         Process ffmpegProcess = ffmpegProcessBuilder.start();
         PrintWriter ffmpegOut = new PrintWriter(ffmpegProcess.getOutputStream());
 
-        StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), NullOutputStream.NULL_OUTPUT_STREAM);
+        StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
         Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
-        StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), NullOutputStream.NULL_OUTPUT_STREAM);
+        StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
         Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
 
 

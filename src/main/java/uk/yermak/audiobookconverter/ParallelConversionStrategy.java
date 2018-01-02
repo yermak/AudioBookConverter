@@ -4,7 +4,9 @@ import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.Messages;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.*;
@@ -42,13 +44,14 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
-        long time = System.currentTimeMillis();
+        long jobId = System.currentTimeMillis();
         try {
 
             for (int i = 0; i < this.inputFileList.length; ++i) {
                 this.currentFileNumber = i + 1;
-                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + time + "-" + i + ".m4b").getAbsolutePath();
+                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + i + ".m4b").getAbsolutePath();
                 this.determineChannelsAndFrequency(this.inputFileList[i]);
+
 
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
@@ -56,20 +59,48 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 futures.add(converterFuture);
             }
 
-
-            Concatenator concatenator = new FFMpegConcatenator(futures, this.outputFileName);
-            concatenator.concat();
-
-            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
-            tagger.tagIt();
-
             List<ConverterOutput> outputs = new ArrayList<>();
-            for (Future<ConverterOutput> future : futures) {
-                outputs.add(future.get());
+            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
+            File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId+".txt");
+            List<String> outFiles = new ArrayList<>();
+            List<String> metaData = new ArrayList<>();
+
+            metaData.add(";FFMETADATA1");
+            metaData.add("major_brand=M4A");
+            metaData.add("minor_version=512");
+            metaData.add("compatible_brands=isomiso2)");
+            metaData.add("title=" + mp4Tags.getTitle());
+            metaData.add("artist=" + mp4Tags.getWriter());
+            metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries())?mp4Tags.getSeries():mp4Tags.getTitle()));
+            metaData.add("composer=" + mp4Tags.getNarrator());
+            metaData.add("comment=" + mp4Tags.getComment());
+            metaData.add("track=" + mp4Tags.getTrack() + "/" + mp4Tags.getTotalTracks());
+            metaData.add("media_type=2");
+            metaData.add("genre=Audiobook");
+            metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");
+
+            long totalDuration = 0;
+            for (int i = 0; i < futures.size(); i++) {
+                ConverterOutput output = futures.get(i).get();
+                outputs.add(output);
+                metaData.add("[CHAPTER]");
+                metaData.add("TIMEBASE=1/1000");
+                metaData.add("START=" + totalDuration);
+                totalDuration += output.getDuration();
+                metaData.add("END=" + totalDuration);
+                metaData.add("title=Chapter " + (i+1));
+
+                outFiles.add("file '" + output.getOutputFileName() + "'");
             }
 
-            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(outputs, outputFileName);
-            chapterBuilder.chapters();
+            FileUtils.writeLines(metaFile, metaData);
+            FileUtils.writeLines(fileListFile, outFiles);
+
+            Concatenator concatenator = new FFMpegConcatenator(outputs, this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath());
+            concatenator.concat();
+
+            FileUtils.deleteQuietly(metaFile);
+            FileUtils.deleteQuietly(fileListFile);
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();

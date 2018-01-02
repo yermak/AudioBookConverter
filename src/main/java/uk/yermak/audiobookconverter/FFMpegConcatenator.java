@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,12 +15,16 @@ import java.util.concurrent.Future;
  */
 public class FFMpegConcatenator implements Concatenator {
 
-    private final List<Future<ConverterOutput>> futures;
+    private final List<ConverterOutput> outputs;
     private final String outputFileName;
+    private String metaDataFileName;
+    private String fileListFileName;
 
-    public FFMpegConcatenator(List<Future<ConverterOutput>> futures, String outputFileName) {
-        this.futures = futures;
+    public FFMpegConcatenator(List<ConverterOutput> outputs, String outputFileName, String metaDataFileName, String fileListFileName) {
+        this.outputs = outputs;
         this.outputFileName = outputFileName;
+        this.metaDataFileName = metaDataFileName;
+        this.fileListFileName = fileListFileName;
     }
 
     public void concat() throws IOException, ExecutionException, InterruptedException {
@@ -31,30 +34,24 @@ public class FFMpegConcatenator implements Concatenator {
                 "-vn",
                 "-f", "concat",
                 "-safe", "0",
-                "-i", "-",
+                "-i", fileListFileName,
+                "-i", metaDataFileName,
+                "-map_metadata", "1",
                 "-f", "ipod",
                 "-c:a", "copy",
                 outputFileName);
 
         Process ffmpegProcess = ffmpegProcessBuilder.start();
-        PrintWriter ffmpegOut = new PrintWriter(ffmpegProcess.getOutputStream());
+//        PrintWriter ffmpegOut = new PrintWriter(ffmpegProcess.getOutputStream());
 
         StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
         Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
         StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
         Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
 
-
-        for (Future<ConverterOutput> future : futures) {
-            ConverterOutput output = future.get();
-            ffmpegOut.println("file '" + output.getOutputFileName() + "'");
-            ffmpegOut.flush();
-        }
-        ffmpegOut.close();
         ffmpegFuture.get();
 
-        for (Future<ConverterOutput> future : futures) {
-            ConverterOutput output = future.get();
+        for (ConverterOutput output : outputs) {
             FileUtils.deleteQuietly(new File(output.getOutputFileName()));
         }
 

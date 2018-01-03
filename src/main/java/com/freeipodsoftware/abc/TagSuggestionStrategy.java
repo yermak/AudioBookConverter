@@ -25,8 +25,8 @@ public class TagSuggestionStrategy implements EventListener {
         this.inputFileSelection = inputFileSelection;
     }
 
-    public void onEvent(String eventId) {
-        if (eventId.equals("fileListChangedEvent")) {
+    public void onEvent(String event) {
+        if (event.equals("fileListChangedEvent")) {
             this.suggestTags();
         }
     }

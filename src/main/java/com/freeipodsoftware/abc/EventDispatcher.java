@@ -15,7 +15,6 @@ public class EventDispatcher {
 
     public void raiseEvent(String eventId) {
         if (eventId != null) {
-
             for (EventListener listener : this.listenerSet) {
                 listener.onEvent(eventId);
             }

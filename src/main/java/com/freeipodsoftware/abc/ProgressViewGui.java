@@ -17,7 +17,7 @@ public class ProgressViewGui extends Composite {
     private Label outputSizeLabel = null;
     protected Label outputFileSizeValueLabel = null;
     protected Button cancelButton = null;
-    protected boolean canceled;
+    //    protected boolean canceled;
     protected Label infoLabel = null;
     protected Button pauseButton = null;
 

@@ -2,7 +2,6 @@ package com.freeipodsoftware.abc;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class Mp4Tags {

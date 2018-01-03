@@ -1,8 +1,6 @@
 package com.freeipodsoftware.abc;
 
-import com.freeipodsoftware.abc.conversionstrategy.BatchConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.ConversionStrategy;
-import com.freeipodsoftware.abc.conversionstrategy.JoiningConversionStrategy;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -11,8 +9,9 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.JobProgress;
 import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.ParallelConversionStrategy;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,9 +20,11 @@ import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
 
-public class MainWindow extends MainWindowGui implements FinishListener {
+public class MainWindow extends MainWindowGui implements StateListener {
     private final EventDispatcher eventDispatcher = new EventDispatcher();
+    private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
     private TagSuggestionStrategy tagSuggestionStrategy;
     private ProgressView progressView;
     private ConversionStrategy conversionStrategy;
@@ -31,6 +32,8 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     public static void main(String[] args) {
         Display display = Display.getDefault();
         MainWindow thisClass = new MainWindow();
+
+
         thisClass.create();
         thisClass.sShell.open();
         if (AppProperties.getBooleanProperty("stayUpdated") && !isUpdateCheckSuspended()) {
@@ -83,6 +86,8 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             }
         });
         this.optionPanel.addOptionChangedListener(MainWindow.this::updateToggleableTagEditorEnablement);
+
+        stateDispatcher.addListener(this);
     }
 
     private void updateToggleableTagEditorEnablement() {
@@ -111,35 +116,28 @@ public class MainWindow extends MainWindowGui implements FinishListener {
         if (this.conversionStrategy != null) {
             return this.conversionStrategy;
         }
-        switch (optionPanel.getMode()) {
-            case SINGLE:
-                this.conversionStrategy = new JoiningConversionStrategy();
-                break;
-            case BATCH:
-                this.conversionStrategy = new BatchConversionStrategy();
-                break;
-            case PARALLEL:
-                this.conversionStrategy = new ParallelConversionStrategy();
-                break;
-        }
+        this.conversionStrategy = optionPanel.getMode().createConvertionStrategy();
         return this.conversionStrategy;
     }
 
     private void startConversion() {
         List<MediaInfo> media = this.inputFileSelection.getMedia();
-        this.getConversionStrategy().setMedia(media);
-        if (this.getConversionStrategy().makeUserInterview(this.sShell)) {
-            this.createProgressView();
-            this.setUIEnabled(false);
-            this.getConversionStrategy().setFinishListener(this);
-            this.getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
-            this.getConversionStrategy().start(this.sShell);
-            ProgressUpdateThread progressUpdateThread = new ProgressUpdateThread(this.getConversionStrategy(), this.progressView);
-            progressUpdateThread.start();
+        if (media.size() > 0) {
+            if (this.getConversionStrategy().makeUserInterview(this.sShell, media.get(0).getFileName())) {
+                conversionStrategy.setMedia(media);
+                ProgressView progressView = createProgressView();
+                JobProgress jobProgress = new JobProgress(conversionStrategy, progressView, media);
+
+                this.setUIEnabled(false);
+                this.getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
+                this.getConversionStrategy().start(this.sShell);
+
+                Executors.newSingleThreadExecutor().execute(jobProgress);
+            }
         }
     }
 
-    private void createProgressView() {
+    private ProgressView createProgressView() {
         if (this.progressView == null) {
             GridData gridData = new GridData();
             gridData.grabExcessHorizontalSpace = true;
@@ -150,8 +148,10 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             this.progressView.setButtonWidthHint(this.inputFileSelection.getButtonWidthHint());
             Point preferedSize = this.progressView.computeSize(-1, -1);
             this.sShell.setSize(this.sShell.getSize().x, this.sShell.getSize().y + preferedSize.y);
+            return progressView;
         } else {
             this.progressView.reset();
+            return progressView;
         }
 
     }
@@ -174,7 +174,7 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             messageBox.setMessage(errorMessage);
             messageBox.open();
             MainWindow.this.setUIEnabled(true);
-            MainWindow.this.progressView.finished();
+            stateDispatcher.finished();
         });
     }
 
@@ -185,7 +185,6 @@ public class MainWindow extends MainWindowGui implements FinishListener {
             messageBox.setMessage(Messages.getString("MainWindow2.finished") + ".\n\n" + MainWindow.this.getConversionStrategy().getAdditionalFinishedMessage());
             messageBox.open();
             MainWindow.this.setUIEnabled(true);
-            MainWindow.this.progressView.finished();
         });
         conversionStrategy = null;
     }
@@ -193,9 +192,18 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     public void canceled() {
         this.sShell.getDisplay().syncExec(() -> {
             MainWindow.this.setUIEnabled(true);
-            MainWindow.this.progressView.finished();
         });
         conversionStrategy = null;
+    }
+
+    @Override
+    public void paused() {
+
+    }
+
+    @Override
+    public void resumed() {
+
     }
 
     public static class UpdateThread extends Thread {

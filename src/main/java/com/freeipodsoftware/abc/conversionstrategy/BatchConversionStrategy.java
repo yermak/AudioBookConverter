@@ -5,6 +5,7 @@ import com.freeipodsoftware.abc.Util;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.FFMpegConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -19,26 +20,13 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     private boolean intoSameFolder;
     private String folder;
     private int currentFileNumber;
-    private int channels;
-    private int frequency;
-    private int bitrate;
-    private long duration;
 
     public BatchConversionStrategy() {
     }
 
-    public long getOutputSize() {
-        return 0;
-        /*return this.canceled ? 0L : (new File(this.outputFileName)).length();*/
-    }
-
-    public int calcPercentFinishedForCurrentOutputFile() {
-        return this.currentInputFileSize > 0L ? (int) ((double) this.currentInputFileBytesProcessed / (double) this.currentInputFileSize * 100.0D) : 0;
-    }
-
-    public boolean makeUserInterview(Shell shell) {
+    public boolean makeUserInterview(Shell shell, String fileName) {
         BatchModeOptionsDialog options = new BatchModeOptionsDialog(shell);
-        options.setFolder(this.getSuggestedFolder());
+        options.setFolder(this.getSuggestedFolder(fileName));
         if (options.open()) {
             this.intoSameFolder = options.isIntoSameFolder();
             this.folder = options.getFolder();
@@ -62,7 +50,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
             Future converterFuture =
                     Executors.newWorkStealingPool()
-                            .submit(new FFMpegConverter(mediaInfo, outputFileName));
+                            .submit(new FFMpegConverter(mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
             futures.add(converterFuture);
         }
         try {
@@ -72,10 +60,10 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         } catch (InterruptedException | ExecutionException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             this.finished = true;
-            this.finishListener.finished();
+            StateDispatcher.getInstance().finished();
         }
     }
 
@@ -96,19 +84,12 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         return Util.makeFilenameUnique(outputFilename);
     }
 
-    public String getInfoText() {
-        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.media.size();
-    }
-
-    protected String getSuggestedFolder() {
-        if (this.media != null && this.media.size() > 0) {
-            try {
-                return new File(this.media.get(0).getFileName()).getParentFile().getAbsolutePath();
-            } catch (Exception var2) {
-                return "";
-            }
-        } else {
+    protected String getSuggestedFolder(String fileName) {
+        try {
+            return new File(fileName).getParentFile().getAbsolutePath();
+        } catch (Exception var2) {
             return "";
         }
+
     }
 }

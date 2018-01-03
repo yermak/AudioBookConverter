@@ -49,6 +49,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         }
     }
 
+
     protected void startConversion() {
         Executors.newWorkStealingPool().execute(this);
     }
@@ -56,12 +57,10 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     public void run() {
         List<Future> futures = new ArrayList<>();
 
-        for (int i = 0; i < this.inputFileList.length; ++i) {
+        for (int i = 0; i < this.media.size(); ++i) {
             this.currentFileNumber = i + 1;
-            String outputFileName = this.determineOutputFilename(this.inputFileList[i]);
-            MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(this.inputFileList[i]);
-            this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
-
+            MediaInfo mediaInfo = this.media.get(i);
+            String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
             Future converterFuture =
                     Executors.newWorkStealingPool()
                             .submit(new FFMpegConverter(mediaInfo, outputFileName));
@@ -99,7 +98,18 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public String getInfoText() {
-        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
+        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.media.size();
     }
 
+    protected String getSuggestedFolder() {
+        if (this.media != null && this.media.size() > 0) {
+            try {
+                return new File(this.media.get(0).getFileName()).getParentFile().getAbsolutePath();
+            } catch (Exception var2) {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
 }

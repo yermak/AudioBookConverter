@@ -1,52 +1,30 @@
 package uk.yermak.audiobookconverter;
 
+import com.freeipodsoftware.abc.Mp4Tags;
+
 /**
- * Created by Yermak on 02-Jan-18.
+ * Created by Yermak on 03-Jan-18.
  */
-public class MediaInfo {
-    private int channels;
-    private int frequency;
-    private int bitrate;
-    private long duration;
-    private String fileName;
+public interface MediaInfo {
+    void setChannels(int channels);
 
-    public MediaInfo(String fileName) {
-        this.fileName = fileName;
-    }
+    void setFrequency(int frequency);
 
-    public void setChannels(int channels) {
-        this.channels = channels;
-    }
+    void setBitrate(int bitrate);
 
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
-    }
+    void setDuration(long duration);
 
-    public void setBitrate(int bitrate) {
-        this.bitrate = bitrate;
-    }
+    int getChannels();
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
+    int getFrequency();
 
-    public int getChannels() {
-        return channels;
-    }
+    int getBitrate();
 
-    public int getFrequency() {
-        return frequency;
-    }
+    long getDuration();
 
-    public int getBitrate() {
-        return bitrate;
-    }
+    String getFileName();
 
-    public long getDuration() {
-        return duration;
-    }
+    void setMp4Tags(Mp4Tags mp4Tags);
 
-    public String getFileName() {
-        return fileName;
-    }
+    Mp4Tags getMp4Tags();
 }

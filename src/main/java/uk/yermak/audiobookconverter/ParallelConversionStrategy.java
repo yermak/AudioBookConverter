@@ -26,7 +26,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public boolean makeUserInterview(Shell shell) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.inputFileList));
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.media.get(0).getFileName()));
         return this.outputFileName != null;
     }
 
@@ -39,10 +39,9 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         long jobId = System.currentTimeMillis();
         try {
 
-            for (int i = 0; i < this.inputFileList.length; ++i) {
-                this.currentFileNumber = i + 1;
-                String tempOutput = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + i + ".m4b").getAbsolutePath();
-                MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(this.inputFileList[i]);
+            for (MediaInfo mediaInfo : media) {
+                ++currentFileNumber;
+                String tempOutput = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + ".m4b").getAbsolutePath();
 
 
                 Future<ConverterOutput> converterFuture =
@@ -105,7 +104,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public String getInfoText() {
-        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
+        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.media.size();
     }
-
 }

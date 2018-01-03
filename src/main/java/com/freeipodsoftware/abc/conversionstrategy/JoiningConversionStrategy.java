@@ -1,15 +1,11 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
-import com.freeipodsoftware.abc.Util;
-import javazoom.jl.decoder.Bitstream;
-import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.*;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private String outputFileName;
@@ -26,11 +22,11 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
     public String getInfoText() {
-        return Messages.getString("JoiningConversionStrategy.file") + " " + "0" + "/" + this.inputFileList.length;
+        return Messages.getString("JoiningConversionStrategy.file") + " " + "0" + "/" + this.media.size();
     }
 
     public boolean makeUserInterview(Shell shell) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.inputFileList));
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(media.get(0).getFileName()));
         return this.outputFileName != null;
     }
 
@@ -45,25 +41,11 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             int maxFrequency = 0;
             int maxBitrate = 0;
 
-            for (String fileName : inputFileList) {
-                MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(fileName);
+            for (MediaInfo mediaInfo : media) {
                 if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
                 if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
                 if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
             }
-
-
-//            Future converterFuture =
-//                    Executors.newWorkStealingPool()
-//                            .submit(new FFMpegConverter(new MediaInfo(inputFileList[]),outputFileName, inputFileList));
-//
-//            converterFuture.get();
-
-//            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
-//            tagger.tagIt();
-
-//            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(futures, outputFileName);
-//            chapterBuilder.chapters();
 
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -79,4 +61,5 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     public String getAdditionalFinishedMessage() {
         return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;
     }
+
 }

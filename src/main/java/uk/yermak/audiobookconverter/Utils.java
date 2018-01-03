@@ -6,10 +6,6 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
-import org.apache.commons.lang3.StringUtils;
-import org.farng.mp3.MP3File;
-import org.farng.mp3.id3.AbstractID3v2;
-import org.farng.mp3.id3.ID3v1;
 
 import java.io.File;
 import java.util.List;
@@ -45,59 +41,6 @@ public class Utils {
             throw new RuntimeException(e);
         } finally {
         }
-    }
-
-    public static Mp4Tags readTagsFromInputFile(String filename) {
-        Mp4Tags tags = new Mp4Tags();
-
-        try {
-            MP3File file = new MP3File(new File(filename));
-            AbstractID3v2 v2Tag = file.getID3v2Tag();
-            if (v2Tag != null) {
-                importV2Tags(tags, v2Tag);
-            } else {
-                ID3v1 v1Tag = file.getID3v1Tag();
-                if (v1Tag != null) {
-                    importV1Tags(tags, v1Tag);
-                }
-            }
-        } catch (Exception var5) {
-        }
-
-        return tags;
-    }
-
-    private static void importV1Tags(Mp4Tags tags, ID3v1 v1Tag) {
-        tags.setWriter(filterTag(v1Tag.getArtist()));
-        tags.setTitle(filterTag(v1Tag.getTitle()));
-        tags.setSeries(filterTag(v1Tag.getAlbum()));
-        tags.setGenre(filterTag(v1Tag.getSongGenre()));
-        tags.setYear(filterTag(v1Tag.getYear()));
-        tags.setComment(filterTag(v1Tag.getComment()));
-    }
-
-    private static void importV2Tags(Mp4Tags tags, AbstractID3v2 v2Tag) {
-        tags.setWriter(filterTag(v2Tag.getLeadArtist()));
-        tags.setTitle(filterTag(v2Tag.getSongTitle()));
-        tags.setSeries(filterTag(v2Tag.getAlbumTitle()));
-        tags.setGenre(filterTag(v2Tag.getSongGenre()));
-        tags.setYear(String.valueOf(v2Tag.getYearReleased()));
-
-/*
-        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum()) && StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum())) {
-            tags.setTrack(v2Tag.getTrackNumberOnAlbum() + "/" + v2Tag.getTrackNumberOnAlbum());
-
-        } else
-*/
-        if (StringUtils.isNotBlank(v2Tag.getTrackNumberOnAlbum()) && StringUtils.isNumeric(v2Tag.getTrackNumberOnAlbum())) {
-            tags.setTrack(Integer.valueOf(v2Tag.getTrackNumberOnAlbum()));
-        }
-
-        tags.setComment(filterTag(v2Tag.getSongComment()));
-    }
-
-    private static String filterTag(String tag) {
-        return tag == null ? "" : tag.trim();
     }
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {

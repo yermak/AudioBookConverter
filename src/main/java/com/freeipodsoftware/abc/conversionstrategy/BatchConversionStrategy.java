@@ -5,7 +5,6 @@ import com.freeipodsoftware.abc.Util;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.FFMpegConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;
 import java.io.PrintWriter;

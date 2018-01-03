@@ -7,7 +7,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InputFileSelection extends InputFileSelectionGui {
     public static final String FILE_LIST_CHANGED_EVENT = "fileListChangedEvent";

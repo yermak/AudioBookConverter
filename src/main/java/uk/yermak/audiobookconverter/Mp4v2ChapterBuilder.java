@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.File;
 import java.io.IOException;

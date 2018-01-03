@@ -2,9 +2,11 @@ package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.MediaInfo;
 
-import java.io.*;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.Executors;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {

@@ -1,14 +1,11 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.ConversionException;
 import com.freeipodsoftware.abc.FinishListener;
 import com.freeipodsoftware.abc.Mp4Tags;
-import com.freeipodsoftware.abc.Util;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.MediaInfo;
 
-import java.io.File;
 import java.util.List;
 
 public abstract class AbstractConversionStrategy implements ConversionStrategy {

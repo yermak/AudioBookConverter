@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Mp4Tags;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;

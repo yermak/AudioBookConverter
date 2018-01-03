@@ -2,10 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import com.freeipodsoftware.abc.conversionstrategy.Messages;
-import javazoom.jl.decoder.Bitstream;
-import javazoom.jl.decoder.Header;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Shell;
 
@@ -15,14 +12,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private int currentFileNumber;
-    private int channels;
-    private int frequency;
-    private int bitrate;
-    private long duration;
     private String outputFileName;
 
     public long getOutputSize() {
@@ -49,19 +41,19 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
             for (int i = 0; i < this.inputFileList.length; ++i) {
                 this.currentFileNumber = i + 1;
-                String filename = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + i + ".m4b").getAbsolutePath();
-                this.determineChannelsAndFrequency(this.inputFileList[i]);
+                String tempOutput = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + i + ".m4b").getAbsolutePath();
+                MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(this.inputFileList[i]);
 
 
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
-                                .submit(new FFMpegConverter(bitrate, channels, frequency, duration, filename, inputFileList[i]));
+                                .submit(new FFMpegConverter(mediaInfo, tempOutput));
                 futures.add(converterFuture);
             }
 
             List<ConverterOutput> outputs = new ArrayList<>();
             File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
-            File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId+".txt");
+            File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
             List<String> outFiles = new ArrayList<>();
             List<String> metaData = new ArrayList<>();
 
@@ -71,7 +63,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             metaData.add("compatible_brands=isomiso2");
             metaData.add("title=" + mp4Tags.getTitle());
             metaData.add("artist=" + mp4Tags.getWriter());
-            metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries())?mp4Tags.getSeries():mp4Tags.getTitle()));
+            metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries()) ? mp4Tags.getSeries() : mp4Tags.getTitle()));
             metaData.add("composer=" + mp4Tags.getNarrator());
             metaData.add("comment=" + mp4Tags.getComment());
             metaData.add("track=" + mp4Tags.getTrack() + "/" + mp4Tags.getTotalTracks());
@@ -88,7 +80,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 metaData.add("START=" + totalDuration);
                 totalDuration += output.getDuration();
                 metaData.add("END=" + totalDuration);
-                metaData.add("title=Chapter " + (i+1));
+                metaData.add("title=Chapter " + (i + 1));
 
                 outFiles.add("file '" + output.getOutputFileName() + "'");
             }
@@ -116,24 +108,4 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
     }
 
-    private void determineChannelsAndFrequency(String filename) {
-        this.channels = 0;
-        this.frequency = 0;
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(filename);
-            BufferedInputStream sourceStream = new BufferedInputStream(in);
-            Bitstream stream = new Bitstream(sourceStream);
-            Header header = stream.readFrame();
-            this.channels = header.mode() == 3 ? 1 : 2;
-            this.frequency = header.frequency();
-            this.bitrate = header.bitrate();
-            long tn = in.getChannel().size();
-            this.duration = (long) header.total_ms((int) tn);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-    }
 }

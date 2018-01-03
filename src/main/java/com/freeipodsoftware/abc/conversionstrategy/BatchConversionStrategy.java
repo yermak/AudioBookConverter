@@ -2,13 +2,14 @@ package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.BatchModeOptionsDialog;
 import com.freeipodsoftware.abc.Util;
-import javazoom.jl.decoder.Bitstream;
-import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.FFMpegConverter;
-import uk.yermak.audiobookconverter.FFMpegFaacConverter;
+import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.Utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -58,12 +59,12 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         for (int i = 0; i < this.inputFileList.length; ++i) {
             this.currentFileNumber = i + 1;
             String outputFileName = this.determineOutputFilename(this.inputFileList[i]);
-            this.determineChannelsAndFrequency(this.inputFileList[i]);
+            MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(this.inputFileList[i]);
             this.mp4Tags = Util.readTagsFromInputFile(this.inputFileList[i]);
 
             Future converterFuture =
                     Executors.newWorkStealingPool()
-                            .submit(new FFMpegConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList[i]));
+                            .submit(new FFMpegConverter(mediaInfo, outputFileName));
             futures.add(converterFuture);
         }
         try {
@@ -101,23 +102,4 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
     }
 
-    private void determineChannelsAndFrequency(String filename) {
-        this.channels = 0;
-        this.frequency = 0;
-
-        try {
-            FileInputStream in = new FileInputStream(filename);
-            BufferedInputStream sourceStream = new BufferedInputStream(in);
-            Bitstream stream = new Bitstream(sourceStream);
-            Header header = stream.readFrame();
-            this.channels = header.mode() == 3 ? 1 : 2;
-            this.frequency = header.frequency();
-            this.bitrate = header.bitrate();
-            long tn = in.getChannel().size();
-            this.duration = (long) header.total_ms((int) tn);
-            stream.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

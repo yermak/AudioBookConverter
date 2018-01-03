@@ -1,13 +1,11 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
+import com.freeipodsoftware.abc.Util;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Header;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.FFMpegConverter;
-import uk.yermak.audiobookconverter.FFMpegFaacConverter;
-import uk.yermak.audiobookconverter.Mp4v2Tagger;
-import uk.yermak.audiobookconverter.Tagger;
+import uk.yermak.audiobookconverter.*;
 
 import java.io.*;
 import java.util.concurrent.Executors;
@@ -15,11 +13,6 @@ import java.util.concurrent.Future;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private String outputFileName;
-    private int currentFileNumber;
-    private int channels = 2;
-    private int frequency = 44100;
-    private int bitrate = 128000;
-    private long duration;
 
     public JoiningConversionStrategy() {
     }
@@ -33,7 +26,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
     public String getInfoText() {
-        return Messages.getString("JoiningConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.inputFileList.length;
+        return Messages.getString("JoiningConversionStrategy.file") + " " + "0" + "/" + this.inputFileList.length;
     }
 
     public boolean makeUserInterview(Shell shell) {
@@ -47,16 +40,27 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
     public void run() {
         try {
-            this.determineMaxChannelsAndFrequency();
 
-            Future converterFuture =
-                    Executors.newWorkStealingPool()
-                            .submit(new FFMpegConverter(bitrate, channels, frequency, duration, outputFileName, inputFileList));
+            int maxChannels = 0;
+            int maxFrequency = 0;
+            int maxBitrate = 0;
 
-            converterFuture.get();
+            for (String fileName : inputFileList) {
+                MediaInfo mediaInfo = Utils.determineChannelsAndFrequency(fileName);
+                if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
+                if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
+                if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
+            }
 
-            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
-            tagger.tagIt();
+
+//            Future converterFuture =
+//                    Executors.newWorkStealingPool()
+//                            .submit(new FFMpegConverter(new MediaInfo(inputFileList[]),outputFileName, inputFileList));
+//
+//            converterFuture.get();
+
+//            Tagger tagger = new Mp4v2Tagger(mp4Tags, outputFileName);
+//            tagger.tagIt();
 
 //            ChapterBuilder chapterBuilder = new Mp4v2ChapterBuilder(futures, outputFileName);
 //            chapterBuilder.chapters();
@@ -69,38 +73,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             this.percentFinished = 100;
             this.finished = true;
             this.finishListener.finished();
-        }
-    }
-
-    private void determineMaxChannelsAndFrequency() {
-        this.channels = 0;
-        this.frequency = 0;
-
-        try {
-            for (String inputFile : this.inputFileList) {
-                BufferedInputStream sourceStream = new BufferedInputStream(new FileInputStream(inputFile));
-                Bitstream stream = new Bitstream(sourceStream);
-                Header header = stream.readFrame();
-                int fileChannels = header.mode() == 3 ? 1 : 2;
-                if (fileChannels > this.channels) {
-                    this.channels = fileChannels;
-                }
-
-                int fileFrequency = header.frequency();
-                if (fileFrequency > this.frequency) {
-                    this.frequency = fileFrequency;
-                }
-
-                int fileBitrate = header.bitrate();
-                if (fileBitrate > this.bitrate) {
-                    this.bitrate = header.bitrate();
-                }
-
-                stream.close();
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

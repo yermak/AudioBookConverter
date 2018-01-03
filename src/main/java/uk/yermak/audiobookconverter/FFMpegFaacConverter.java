@@ -79,7 +79,7 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
         try {
             totalBytes = ffmpegFuture.get();
             faacFuture.get();
-            return new ConverterOutput(totalBytes, duration, outputFileName, inputFileList);
+            return new ConverterOutput(new MediaInfo(inputFileList[0]), outputFileName);
         } catch (InterruptedException | ExecutionException ignorable) {
             ffmpegProcess.destroy();
             faacProcess.destroy();

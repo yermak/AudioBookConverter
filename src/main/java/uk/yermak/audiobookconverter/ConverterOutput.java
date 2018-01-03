@@ -4,16 +4,12 @@ package uk.yermak.audiobookconverter;
  * Created by Yermak on 29-Dec-17.
  */
 public class ConverterOutput {
-    private final long unpackedSize;
+    private MediaInfo mediaInfo;
     private final String outputFileName;
-    private final String[] inputFileList;
-    private final long duration;
 
-    public ConverterOutput(long unpackedSize, long duration, String outputFileName, String... inputFileList) {
-        this.unpackedSize = unpackedSize;
-        this.duration = duration;
+    public ConverterOutput(MediaInfo mediaInfo, String outputFileName) {
+        this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
-        this.inputFileList = inputFileList;
     }
 
     public String getOutputFileName() {
@@ -21,6 +17,6 @@ public class ConverterOutput {
     }
 
     public long getDuration() {
-        return duration;
+        return mediaInfo.getDuration();
     }
 }

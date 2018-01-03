@@ -11,14 +11,18 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.ParallelConversionStrategy;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class MainWindow extends MainWindowGui implements FinishListener {
     private final EventDispatcher eventDispatcher = new EventDispatcher();
@@ -124,18 +128,16 @@ public class MainWindow extends MainWindowGui implements FinishListener {
     }
 
     private void startConversion() {
-        if (this.inputFileSelection.getFileList().length != 0) {
-            this.getConversionStrategy().setInputFileList(this.inputFileSelection.getFileList());
-            if (this.getConversionStrategy().makeUserInterview(this.sShell)) {
-                this.createProgressView();
-                this.setUIEnabled(false);
-                this.getConversionStrategy().setFinishListener(this);
-                this.getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
-                this.getConversionStrategy().start(this.sShell);
-                ProgressUpdateThread progressUpdateThread = new ProgressUpdateThread(this.getConversionStrategy(), this.progressView);
-                progressUpdateThread.start();
-            }
-
+        List<MediaInfo> media = this.inputFileSelection.getMedia();
+        this.getConversionStrategy().setMedia(media);
+        if (this.getConversionStrategy().makeUserInterview(this.sShell)) {
+            this.createProgressView();
+            this.setUIEnabled(false);
+            this.getConversionStrategy().setFinishListener(this);
+            this.getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
+            this.getConversionStrategy().start(this.sShell);
+            ProgressUpdateThread progressUpdateThread = new ProgressUpdateThread(this.getConversionStrategy(), this.progressView);
+            progressUpdateThread.start();
         }
     }
 

@@ -3,9 +3,11 @@ package com.freeipodsoftware.abc.conversionstrategy;
 import com.freeipodsoftware.abc.FinishListener;
 import com.freeipodsoftware.abc.Mp4Tags;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.MediaInfo;
+
+import java.util.List;
 
 public interface ConversionStrategy {
-    void setInputFileList(String[] var1);
 
     void setFinishListener(FinishListener var1);
 
@@ -34,4 +36,6 @@ public interface ConversionStrategy {
     String getAdditionalFinishedMessage();
 
     void setPaused(boolean var1);
+
+    void setMedia(List<MediaInfo> media);
 }

@@ -39,6 +39,7 @@ public class FFMpegConcatenator implements Concatenator {
                 "-map_metadata", "1",
                 "-f", "ipod",
                 "-c:a", "copy",
+//                "-c:v", "copy",
                 outputFileName);
 
         Process ffmpegProcess = ffmpegProcessBuilder.start();

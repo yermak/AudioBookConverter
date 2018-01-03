@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import org.apache.commons.io.output.NullOutputStream;
-
 import java.io.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -79,7 +77,7 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
         try {
             totalBytes = ffmpegFuture.get();
             faacFuture.get();
-            return new ConverterOutput(new MediaInfo(inputFileList[0]), outputFileName);
+            return new ConverterOutput(new MediaInfoBean(inputFileList[0]), outputFileName);
         } catch (InterruptedException | ExecutionException ignorable) {
             ffmpegProcess.destroy();
             faacProcess.destroy();

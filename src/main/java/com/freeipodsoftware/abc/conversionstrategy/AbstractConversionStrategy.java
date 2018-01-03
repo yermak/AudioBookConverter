@@ -6,11 +6,12 @@ import com.freeipodsoftware.abc.Mp4Tags;
 import com.freeipodsoftware.abc.Util;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.MediaInfo;
 
 import java.io.File;
+import java.util.List;
 
 public abstract class AbstractConversionStrategy implements ConversionStrategy {
-    protected String[] inputFileList;
     protected FinishListener finishListener;
     protected boolean finished;
     private long overallInputSize;
@@ -26,12 +27,9 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     private boolean paused;
     protected long currentInputFileSize;
     protected long currentInputFileBytesProcessed;
+    protected List<MediaInfo> media;
 
     protected AbstractConversionStrategy() {
-    }
-
-    public void setInputFileList(String[] inputFileList) {
-        this.inputFileList = inputFileList;
     }
 
     protected abstract int calcPercentFinishedForCurrentOutputFile();
@@ -69,7 +67,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     }
 
     public void start(Shell shell) {
-        this.overallInputSize = this.determineInputSize();
+//        this.overallInputSize = this.determineInputSize();
         this.canceled = false;
         this.finished = false;
         this.inputBytesProcessed = 0L;
@@ -92,26 +90,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         return fileName;
     }
 
-    protected String getSuggestedFolder() {
-        if (this.inputFileList != null && this.inputFileList.length > 0) {
-            try {
-                return (new File(this.inputFileList[0])).getParentFile().getAbsolutePath();
-            } catch (Exception var2) {
-                return "";
-            }
-        } else {
-            return "";
-        }
-    }
-
-    protected String getOuputFilenameSuggestion(String... inputFileList) {
-        if (inputFileList.length > 0) {
-            String mp3Filename = this.inputFileList[0];
-            return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
-        } else {
-            return "";
-        }
-    }
 
     protected abstract void startConversion();
 
@@ -119,6 +97,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         this.canceled = true;
     }
 
+/*
     private long determineInputSize() {
         long size = 0L;
 
@@ -133,10 +112,24 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
 
         return size;
     }
+*/
 
+    protected String getOuputFilenameSuggestion(String... inputFileList) {
+        if (media.size() > 0) {
+            String mp3Filename = media.get(0).getFileName();
+            return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
+        } else {
+            return "";
+        }
+    }
 
     public void setPaused(boolean paused) {
         this.paused = paused;
+    }
+
+    @Override
+    public void setMedia(List<MediaInfo> media) {
+        this.media = media;
     }
 
     public String getAdditionalFinishedMessage() {

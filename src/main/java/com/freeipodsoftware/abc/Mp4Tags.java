@@ -1,5 +1,10 @@
 package com.freeipodsoftware.abc;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Iterator;
+import java.util.Map;
+
 public class Mp4Tags {
     private String writer = "";
     private String narrator = "";
@@ -13,6 +18,37 @@ public class Mp4Tags {
     private String longDescription = "";
 
     public Mp4Tags() {
+    }
+
+    public Mp4Tags(Map<String, String> tags) {
+        Iterator<Map.Entry<String, String>> iterator = tags.entrySet().iterator();
+        for (Iterator<Map.Entry<String, String>> it = iterator; it.hasNext(); ) {
+            Map.Entry entry = it.next();
+            System.out.println("entry.getKey() = " + entry.getKey());
+            System.out.println("entry.getValue() = " + entry.getValue());
+        }
+        setTitle(tags.get("title"));
+        setWriter(tags.get("artist"));
+        setNarrator(tags.get("album_artist"));
+        setSeries(tags.get("album"));
+        setYear(tags.get("year"));
+        setComment(tags.get("comment"));
+        setGenre(tags.get("genre"));
+
+        String track = tags.get("track");
+
+        if (StringUtils.isNotBlank(track)) {
+            String[] split = track.split("/");
+
+            if (split.length > 0 && StringUtils.isNumeric(split[0])) {
+                setTrack(Integer.parseInt(split[0]));
+            }
+            if (split.length > 1 && StringUtils.isNumeric(split[1])) {
+                setTotalTracks(Integer.parseInt(split[1]));
+            }
+        }
+
+
     }
 
     public String getSeries() {

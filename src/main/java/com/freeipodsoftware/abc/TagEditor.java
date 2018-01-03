@@ -13,12 +13,12 @@ public class TagEditor extends TagEditorGui {
         return this.isVisible() ? super.computeSize(wHint, hHint, changed) : new Point(0, 0);
     }
 
-    public void setArtist(String artist) {
-        this.writerText.setText(Util.nullToEmptyString(artist));
+    public void setWriter(String writer) {
+        this.writerText.setText(Util.nullToEmptyString(writer));
     }
 
-    public void setWriter(String writer) {
-        this.narratorText.setText(Util.nullToEmptyString(writer));
+    public void setNarrator(String narrator) {
+        this.narratorText.setText(Util.nullToEmptyString(narrator));
     }
 
     public void setTitle(String title) {
@@ -50,8 +50,8 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void clear() {
-        this.setArtist("");
         this.setWriter("");
+        this.setNarrator("");
         this.setTitle("");
         this.setAlbum("");
         this.setGenre("");

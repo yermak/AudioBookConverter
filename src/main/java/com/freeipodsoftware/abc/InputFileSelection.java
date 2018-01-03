@@ -156,10 +156,6 @@ public class InputFileSelection extends InputFileSelectionGui {
 
     }
 
-    public String[] getFileList() {
-        return this.fileList.getItems();
-    }
-
     public void setEventDispatcher(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
     }

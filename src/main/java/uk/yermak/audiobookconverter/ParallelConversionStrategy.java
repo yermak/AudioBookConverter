@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
-import com.freeipodsoftware.abc.conversionstrategy.Messages;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Shell;
@@ -20,16 +19,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     private int currentFileNumber;
     private String outputFileName;
 
-    public long getOutputSize() {
-        return this.canceled ? 0L : (new File(this.outputFileName)).length();
-    }
-
-    public int calcPercentFinishedForCurrentOutputFile() {
-        return this.currentInputFileSize > 0L ? (int) ((double) this.currentInputFileBytesProcessed / (double) this.currentInputFileSize * 100.0D) : 0;
-    }
-
-    public boolean makeUserInterview(Shell shell) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(this.media.get(0).getFileName()));
+    public boolean makeUserInterview(Shell shell, String fileName) {
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(fileName));
         return this.outputFileName != null;
     }
 
@@ -49,7 +40,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
-                                .submit(new FFMpegConverter(mediaInfo, tempOutput));
+                                .submit(new FFMpegConverter(mediaInfo, tempOutput, progressCallbacks.get(mediaInfo.getFileName())));
                 futures.add(converterFuture);
             }
 
@@ -99,14 +90,11 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             this.finished = true;
-            this.finishListener.finished();
+            StateDispatcher.getInstance().finished();
         }
     }
 
-    public String getInfoText() {
-        return Messages.getString("BatchConversionStrategy.file") + " " + this.currentFileNumber + "/" + this.media.size();
-    }
 }

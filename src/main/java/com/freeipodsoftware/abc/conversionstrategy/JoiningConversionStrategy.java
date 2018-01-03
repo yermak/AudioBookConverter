@@ -3,8 +3,8 @@ package com.freeipodsoftware.abc.conversionstrategy;
 import com.freeipodsoftware.abc.Messages;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executors;
@@ -15,20 +15,9 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     public JoiningConversionStrategy() {
     }
 
-    public long getOutputSize() {
-        return this.canceled ? 0L : (new File(this.outputFileName)).length();
-    }
 
-    public int calcPercentFinishedForCurrentOutputFile() {
-        return this.getProgress();
-    }
-
-    public String getInfoText() {
-        return Messages.getString("JoiningConversionStrategy.file") + " " + "0" + "/" + this.media.size();
-    }
-
-    public boolean makeUserInterview(Shell shell) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(media.get(0).getFileName()));
+    public boolean makeUserInterview(Shell shell, String fileName) {
+        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(fileName));
         return this.outputFileName != null;
     }
 
@@ -52,11 +41,10 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            this.finishListener.finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            this.percentFinished = 100;
             this.finished = true;
-            this.finishListener.finished();
+            StateDispatcher.getInstance().finished();
         }
     }
 

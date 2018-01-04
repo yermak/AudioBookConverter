@@ -1,6 +1,7 @@
 Audio Book Converter V2
 ===============
 * Convert Audiobook from mp3 to m4b.
+* Convert mp3 to Audiobook.
 * Convert mp3 to ipod format.
 * Convert mp3 to IBook (IPhone) format.
 
@@ -9,20 +10,19 @@ This project is based on freeipodsoftware release of AudioBookConverter.
 
 Original look and feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
 All libraries and dependencies are refreshed to the latests version available at this moment.
-Project is currently in alpha as has some minor ui bugs (progress bar, estimated file size, etc), however major functions work as expected.
-There is existing bugs with tags in unicode, so I highly recommend to stay with latin charset.
-
+Project is currently in alpha as there could besome minor ui bugs, however major functions work as expected.
 
 --------------
 Major differences vs original version:
 --------------
 * Performance improved form 5 to 15x times (depending on numbers of cores), old version of Faac replaced with fresh FFMpeg.
+* Added super-fast experimental mode of parallel encoding of MP3 files.
 * Improved (both speed and quality) of mp3 decoding due to switch to ffmpeg.
 * Improved tag support according to MP4 specification.
-* Added chapters support via MP4v2 project (Thanks to https://github.com/TechSmith for maintaining the fork).
-* Added super-fast experimental mode of parallel encoding of MP3 files. (Works well for me).
-* Keeping the same bitrate as original files to preserve quality
-
+* Fixed tags encoding issues due caused by legacy MP3 problems.
+* Fixed tags encoding issues with non-latin characters.
+* Keeping the same bitrate as original files to preserve quality.
+* Faac replaced with FFMpeg
 
 
 

@@ -59,8 +59,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
             prepareFilesAndFillMeta(jobId, outFiles, metaData, mp4Tags, media);
 
-            FileUtils.writeLines(metaFile, metaData);
-            FileUtils.writeLines(fileListFile, outFiles);
+            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 
             Concatenator concatenator = new FFMpegConcatenator(this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();

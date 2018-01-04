@@ -67,18 +67,6 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
 
             ffmpegFuture.get();
 
-/*
-            FFmpegBuilder builder = new FFmpegBuilder().setInput(mediaInfo.getFileName())
-//                    .setFormat("mp3")
-                    .addOutput(outputFileName)
-                    .setAudioBitRate(mediaInfo.getBitrate())
-                    .setAudioChannels(mediaInfo.getChannels())
-                    .setAudioSampleRate(mediaInfo.getFrequency())
-                    .setAudioCodec("libfdk_aac")
-                    .setFormat("ipod")
-                    .addExtraArgs("-vn").done();
-*/
-
             return new ConverterOutput(mediaInfo, outputFileName);
 
         } catch (URISyntaxException e) {

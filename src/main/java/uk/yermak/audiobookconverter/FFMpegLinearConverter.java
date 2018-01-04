@@ -11,40 +11,45 @@ import java.util.concurrent.*;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegConcatenator implements Concatenator, StateListener {
+public class FFMpegLinearConverter implements Concatenator, StateListener {
 
     private final String outputFileName;
     private String metaDataFileName;
     private String fileListFileName;
-    private ProgressCallback callback;
-    private boolean cancelled;
-    private boolean paused;
+    private MediaInfo mediaInfo;
+    private boolean cancelled = false;
+    private boolean paused = false;
+    private Process ffmpegProcess;
     private ProgressParser progressParser;
+    private ProgressCallback callback;
 
 
-    public FFMpegConcatenator(String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
+    public FFMpegLinearConverter(String outputFileName, String metaDataFileName, String fileListFileName, MediaInfo mediaInfo, ProgressCallback callback) {
         this.outputFileName = outputFileName;
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
+        this.mediaInfo = mediaInfo;
         this.callback = callback;
         StateDispatcher.getInstance().addListener(this);
-
     }
 
     public void concat() throws IOException, ExecutionException, InterruptedException {
         if (cancelled) return;
         while (paused) Thread.sleep(1000);
-        callback.reset();
+
         try {
             progressParser = new TcpProgressParser(progress -> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+                if (progress.isEnd()) {
+                    callback.completedConversion();
+                }
             });
             progressParser.start();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
-        Process ffmpegProcess = null;
+
         try {
             ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
                     "-protocol_whitelist", "file,pipe,concat",
@@ -54,8 +59,11 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
                     "-i", fileListFileName,
                     "-i", metaDataFileName,
                     "-map_metadata", "1",
+                    "-ar", String.valueOf(mediaInfo.getFrequency()),
+                    "-ac", String.valueOf(mediaInfo.getChannels()),
+                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
                     "-f", "ipod",
-                    "-c:a", "copy",
+                    "-codec:a", "libfdk_aac",
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 
@@ -65,7 +73,6 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
             Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
             StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
             Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
-
             while (!cancelled) {
                 try {
                     ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
@@ -94,15 +101,18 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
     @Override
     public void canceled() {
         cancelled = true;
+        if (ffmpegProcess != null) {
+            ffmpegProcess.destroy();
+        }
     }
 
     @Override
     public void paused() {
-        paused = true;
+
     }
 
     @Override
     public void resumed() {
-        paused = false;
+
     }
 }

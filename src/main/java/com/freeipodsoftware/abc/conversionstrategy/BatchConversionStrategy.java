@@ -41,6 +41,11 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         Executors.newWorkStealingPool().execute(this);
     }
 
+    @Override
+    protected String getConcatFile(long jobId, int currentFileNumber) {
+        return "";
+    }
+
     public void run() {
         List<Future> futures = new ArrayList<>();
 

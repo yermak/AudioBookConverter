@@ -28,11 +28,13 @@ public class JobProgress implements Runnable, StateListener {
 
     public JobProgress(ConversionStrategy conversionStrategy, ProgressView progressView, List<MediaInfo> media) {
         this.progressView = progressView;
+
         for (MediaInfo mediaInfo : media) {
             progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), this));
             totalFiles++;
             totalDuration += mediaInfo.getDuration();
         }
+        progressCallbacks.put("output", new ProgressCallback("output", this));
         conversionStrategy.setCallbacks(progressCallbacks);
         StateDispatcher.getInstance().addListener(this);
     }
@@ -126,5 +128,14 @@ public class JobProgress implements Runnable, StateListener {
     public void resumed() {
         startTime = System.currentTimeMillis() + pausedDuration;
         paused = false;
+    }
+
+    public void reset() {
+        durations.clear();
+        sizes.clear();
+        progressView.getDisplay().syncExec(() -> {
+            progressView.setProgress(0);
+            progressView.setRemainingTime(60 * 1000);
+        });
     }
 }

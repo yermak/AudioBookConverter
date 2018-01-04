@@ -1,12 +1,15 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.*;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
@@ -25,18 +28,33 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         Executors.newWorkStealingPool().execute(this);
     }
 
+    @Override
+    protected String getConcatFile(long jobId, int currentFileNumber) {
+        return media.get(currentFileNumber).getFileName();
+    }
+
     public void run() {
         try {
+            long jobId = System.currentTimeMillis();
 
-            int maxChannels = 0;
-            int maxFrequency = 0;
-            int maxBitrate = 0;
+            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
+            File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
 
-            for (MediaInfo mediaInfo : media) {
-                if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
-                if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
-                if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
-            }
+            List<String> outFiles = new ArrayList<>();
+            List<String> metaData = new ArrayList<>();
+
+            prepareFilesAndFillMeta(jobId, outFiles, metaData, mp4Tags, media);
+
+            FileUtils.writeLines(metaFile, metaData);
+            FileUtils.writeLines(fileListFile, outFiles);
+
+            MediaInfo mediaInfo = maximiseEncodingParameters();
+
+            Concatenator concatenator = new FFMpegLinearConverter(this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), mediaInfo, progressCallbacks.get("output"));
+            concatenator.concat();
+
+            FileUtils.deleteQuietly(metaFile);
+            FileUtils.deleteQuietly(fileListFile);
 
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -46,6 +64,24 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             this.finished = true;
             StateDispatcher.getInstance().finished();
         }
+    }
+
+    private MediaInfo maximiseEncodingParameters() {
+        int maxChannels = 0;
+        int maxFrequency = 0;
+        int maxBitrate = 0;
+
+        for (MediaInfo mediaInfo : media) {
+            if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
+            if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
+            if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
+        }
+
+        MediaInfoBean mediaInfo = new MediaInfoBean("");
+        mediaInfo.setBitrate(maxBitrate);
+        mediaInfo.setChannels(maxChannels);
+        mediaInfo.setFrequency(maxFrequency);
+        return mediaInfo;
     }
 
     public String getAdditionalFinishedMessage() {

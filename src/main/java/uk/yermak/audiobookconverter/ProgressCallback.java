@@ -22,4 +22,8 @@ public class ProgressCallback {
         jobProgress.incCompleted(fileName);
     }
 
+    public void reset() {
+        jobProgress.reset();
+
+    }
 }

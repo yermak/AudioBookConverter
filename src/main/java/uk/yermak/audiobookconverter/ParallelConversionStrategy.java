@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
@@ -10,13 +9,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    private int currentFileNumber;
     private String outputFileName;
 
     public boolean makeUserInterview(Shell shell, String fileName) {
@@ -33,59 +32,45 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         long jobId = System.currentTimeMillis();
         try {
 
+            List<MediaInfo> dest = new ArrayList<>();
             for (MediaInfo mediaInfo : media) {
-                ++currentFileNumber;
-                String tempOutput = new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + ".m4b").getAbsolutePath();
+                dest.add(mediaInfo);
+            }
+            Collections.sort(dest, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
 
-
+            for (int i = 0; i < dest.size(); i++) {
+                MediaInfo mediaInfo = dest.get(i);
+                String tempOutput = getConcatFile(jobId, mediaInfo.hashCode());
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
                                 .submit(new FFMpegConverter(mediaInfo, tempOutput, progressCallbacks.get(mediaInfo.getFileName())));
                 futures.add(converterFuture);
             }
 
-            List<ConverterOutput> outputs = new ArrayList<>();
+            for (Future<ConverterOutput> future : futures) {
+                future.get();
+            }
+
             File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
             File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+
             List<String> outFiles = new ArrayList<>();
             List<String> metaData = new ArrayList<>();
 
-            metaData.add(";FFMETADATA1");
-            metaData.add("major_brand=M4A");
-            metaData.add("minor_version=512");
-            metaData.add("compatible_brands=isomiso2");
-            metaData.add("title=" + mp4Tags.getTitle());
-            metaData.add("artist=" + mp4Tags.getWriter());
-            metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries()) ? mp4Tags.getSeries() : mp4Tags.getTitle()));
-            metaData.add("composer=" + mp4Tags.getNarrator());
-            metaData.add("comment=" + mp4Tags.getComment());
-            metaData.add("track=" + mp4Tags.getTrack() + "/" + mp4Tags.getTotalTracks());
-            metaData.add("media_type=2");
-            metaData.add("genre=Audiobook");
-            metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");
-
-            long totalDuration = 0;
-            for (int i = 0; i < futures.size(); i++) {
-                ConverterOutput output = futures.get(i).get();
-                outputs.add(output);
-                metaData.add("[CHAPTER]");
-                metaData.add("TIMEBASE=1/1000");
-                metaData.add("START=" + totalDuration);
-                totalDuration += output.getDuration();
-                metaData.add("END=" + totalDuration);
-                metaData.add("title=Chapter " + (i + 1));
-
-                outFiles.add("file '" + output.getOutputFileName() + "'");
-            }
+            prepareFilesAndFillMeta(jobId, outFiles, metaData, mp4Tags, media);
 
             FileUtils.writeLines(metaFile, metaData);
             FileUtils.writeLines(fileListFile, outFiles);
 
-            Concatenator concatenator = new FFMpegConcatenator(outputs, this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath());
+            Concatenator concatenator = new FFMpegConcatenator(this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
+
+            for (int i = 0; i < media.size(); i++) {
+                FileUtils.deleteQuietly(new File(getConcatFile(jobId, media.get(i).hashCode())));
+            }
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
@@ -95,6 +80,11 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             this.finished = true;
             StateDispatcher.getInstance().finished();
         }
+    }
+
+
+    protected String getConcatFile(long jobId, int currentFileNumber) {
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + ".m4b").getAbsolutePath();
     }
 
 }

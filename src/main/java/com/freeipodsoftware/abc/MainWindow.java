@@ -122,6 +122,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
 
     private void startConversion() {
         List<MediaInfo> media = this.inputFileSelection.getMedia();
+        getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
         if (media.size() > 0) {
             if (this.getConversionStrategy().makeUserInterview(this.sShell, media.get(0).getFileName())) {
                 conversionStrategy.setMedia(media);
@@ -129,9 +130,8 @@ public class MainWindow extends MainWindowGui implements StateListener {
                 JobProgress jobProgress = new JobProgress(conversionStrategy, progressView, media);
 
                 this.setUIEnabled(false);
-                this.getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
-                this.getConversionStrategy().start(this.sShell);
 
+                this.getConversionStrategy().start(this.sShell);
                 Executors.newSingleThreadExecutor().execute(jobProgress);
             }
         }

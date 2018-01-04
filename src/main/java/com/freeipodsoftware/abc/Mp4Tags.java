@@ -45,6 +45,7 @@ public class Mp4Tags {
     }
 
     public String getSeries() {
+        if (series == null) return title;
         return this.series;
     }
 

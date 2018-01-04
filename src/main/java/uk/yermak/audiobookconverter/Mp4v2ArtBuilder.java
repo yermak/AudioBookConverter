@@ -33,13 +33,20 @@ public class Mp4v2ArtBuilder {
     public void coverArt() throws IOException, ExecutionException, InterruptedException {
         Process pictureProcess = null;
         Process artProcess = null;
-        List<String> posters = new ArrayList<>();
+        Map<Long, String> posters = new HashMap<>();
         Set<String> tempPosters = new HashSet<>();
 
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(p -> posters.add(p.getPath())));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> {
+            try {
+                long crc32 = FileUtils.checksumCRC32(f);
+                posters.putIfAbsent(crc32, f.getPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
 
         try {
             for (MediaInfo mediaInfo : media) {
@@ -55,16 +62,17 @@ public class Mp4v2ArtBuilder {
                     StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
                     Future<Long> pictureFuture = Executors.newWorkStealingPool().submit(pictureToOut);
                     pictureFuture.get();
-                    posters.add(poster);
+                    File posterFile = new File(poster);
+                    long crc32 = FileUtils.checksumCRC32(posterFile);
+                    posters.putIfAbsent(crc32, poster);
                     tempPosters.add(poster);
                 }
             }
 
-            for (int i = 0; i < posters.size(); i++) {
-                String poster = posters.get(i);
-
+            int i = 0;
+            for (String poster : posters.values()) {
                 ProcessBuilder artProcessBuilder = new ProcessBuilder("external/x64/mp4art.exe",
-                        "--art-index", String.valueOf(i),
+                        "--art-index", String.valueOf(i++),
                         "--add", poster,
                         outputFileName);
 

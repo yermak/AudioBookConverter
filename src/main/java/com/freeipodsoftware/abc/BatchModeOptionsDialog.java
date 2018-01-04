@@ -2,6 +2,8 @@ package com.freeipodsoftware.abc;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -22,13 +24,21 @@ public class BatchModeOptionsDialog extends Dialog {
         this.setText(Messages.getString("BatchModeOptionsDialog.outputOptions"));
     }
 
+    public static void centerDialog(Shell parent, Shell shell) {
+        Rectangle parentSize = parent.getBounds();
+        Rectangle mySize = shell.getBounds();
+        int locationX = (parentSize.width - mySize.width) / 2 + parentSize.x;
+        int locationY = (parentSize.height - mySize.height) / 2 + parentSize.y;
+        shell.setLocation(new Point(locationX, locationY));
+    }
+
     public boolean open() {
         this.canceled = true;
         Shell parent = this.getParent();
         this.shell = new Shell(parent, 67696);
         this.shell.setText(this.getText());
         this.initializeComponents(this.shell);
-        Util.centerDialog(this.getParent(), this.shell);
+        centerDialog(this.getParent(), this.shell);
         this.shell.open();
         Display display = parent.getDisplay();
 

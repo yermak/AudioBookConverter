@@ -43,6 +43,10 @@ public class Utils {
         }
     }
 
+    static String getTmp(long jobId, int currentFileNumber, String extension) {
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + extension).getAbsolutePath();
+    }
+
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
         private final String filename;
@@ -66,7 +70,8 @@ public class Utils {
                     mediaInfo.setFrequency(fFmpegStream.sample_rate);
                     mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
                     mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
-                    break;
+                } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
+                    mediaInfo.setPictureFormat("jpg");
                 }
             }
             Mp4Tags mp4Tags = new Mp4Tags(format.tags);

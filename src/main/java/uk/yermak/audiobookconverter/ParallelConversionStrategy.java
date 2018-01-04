@@ -40,7 +40,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
             for (int i = 0; i < dest.size(); i++) {
                 MediaInfo mediaInfo = dest.get(i);
-                String tempOutput = getConcatFile(jobId, mediaInfo.hashCode());
+                String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()
                                 .submit(new FFMpegConverter(mediaInfo, tempOutput, progressCallbacks.get(mediaInfo.getFileName())));
@@ -69,8 +69,11 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             FileUtils.deleteQuietly(fileListFile);
 
             for (int i = 0; i < media.size(); i++) {
-                FileUtils.deleteQuietly(new File(getConcatFile(jobId, media.get(i).hashCode())));
+                FileUtils.deleteQuietly(new File(getTempFileName(jobId, media.get(i).hashCode(), ".m4b")));
             }
+
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, outputFileName, jobId);
+            artBuilder.coverArt();
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
@@ -83,8 +86,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
 
-    protected String getConcatFile(long jobId, int currentFileNumber) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + ".m4b").getAbsolutePath();
+    protected String getTempFileName(long jobId, int currentFileNumber, String extension) {
+        return Utils.getTmp(jobId, currentFileNumber, extension);
     }
 
 }

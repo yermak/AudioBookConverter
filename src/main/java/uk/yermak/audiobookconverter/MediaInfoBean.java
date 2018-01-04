@@ -12,6 +12,7 @@ public class MediaInfoBean implements MediaInfo {
     private long duration;
     private String fileName;
     private Mp4Tags mp4Tags;
+    private String format;
 
     public MediaInfoBean(String fileName) {
         this.fileName = fileName;
@@ -70,5 +71,14 @@ public class MediaInfoBean implements MediaInfo {
     @Override
     public Mp4Tags getMp4Tags() {
         return mp4Tags;
+    }
+
+    @Override
+    public String getPictureFormat() {
+        return format;
+    }
+
+    public void setPictureFormat(String format) {
+        this.format = format;
     }
 }

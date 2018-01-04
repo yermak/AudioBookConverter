@@ -79,4 +79,9 @@ public class MediaInfoProxy implements MediaInfo {
     public Mp4Tags getMp4Tags() {
         return getMediaInfo().getMp4Tags();
     }
+
+    @Override
+    public String getPictureFormat() {
+        return getMediaInfo().getPictureFormat();
+    }
 }

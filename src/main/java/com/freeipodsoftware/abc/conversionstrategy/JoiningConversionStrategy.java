@@ -45,8 +45,8 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             prepareFilesAndFillMeta(jobId, outFiles, metaData, mp4Tags, media);
 
-            FileUtils.writeLines(metaFile, metaData);
-            FileUtils.writeLines(fileListFile, outFiles);
+            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 
             MediaInfo mediaInfo = maximiseEncodingParameters();
 

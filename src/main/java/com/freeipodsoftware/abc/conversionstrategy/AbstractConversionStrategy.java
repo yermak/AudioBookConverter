@@ -128,6 +128,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         }
     }
 
-    protected abstract String getTempFileName(long jobId, int currentFileNumber, String extension);
+    protected abstract String getTempFileName(long jobId, int index, String extension);
 
 }

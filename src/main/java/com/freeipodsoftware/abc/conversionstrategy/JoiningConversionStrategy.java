@@ -29,13 +29,15 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
     @Override
-    protected String getTempFileName(long jobId, int currentFileNumber, String extension) {
-        return media.get(currentFileNumber).getFileName();
+    protected String getTempFileName(long jobId, int index, String extension) {
+        return media.get(index).getFileName();
     }
 
     public void run() {
+        long jobId = System.currentTimeMillis();
+        String tempFile = getTempFileName(jobId, 999999, ".m4b");
+
         try {
-            long jobId = System.currentTimeMillis();
 
             File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
             File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
@@ -50,11 +52,17 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             MediaInfo mediaInfo = maximiseEncodingParameters();
 
-            Concatenator concatenator = new FFMpegLinearConverter(this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), mediaInfo, progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), mediaInfo, progressCallbacks.get("output"));
             concatenator.concat();
 
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
+
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
+            artBuilder.coverArt();
+
+            FileUtils.moveFile(new File(tempFile), new File(outputFileName));
+
 
         } catch (Exception e) {
             StringWriter sw = new StringWriter();

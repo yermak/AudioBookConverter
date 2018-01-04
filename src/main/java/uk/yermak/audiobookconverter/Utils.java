@@ -43,8 +43,8 @@ public class Utils {
         }
     }
 
-    static String getTmp(long jobId, int currentFileNumber, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + currentFileNumber + extension).getAbsolutePath();
+    static String getTmp(long jobId, int index, String extension) {
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + index + extension).getAbsolutePath();
     }
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {

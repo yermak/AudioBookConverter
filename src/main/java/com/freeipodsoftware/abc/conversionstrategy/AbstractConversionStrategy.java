@@ -76,7 +76,9 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
             builder.append("] ");
         }
         if (StringUtils.isNotBlank(mp4Tags.getTitle())) {
-            builder.append(StringUtils.trim(mp4Tags.getTitle()));
+            builder
+                    .append(" - ")
+                    .append(StringUtils.trim(mp4Tags.getTitle()));
         }
         if (StringUtils.isNotBlank(mp4Tags.getNarrator())) {
             builder

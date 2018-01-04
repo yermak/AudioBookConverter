@@ -58,7 +58,40 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
 
     protected String getOuputFilenameSuggestion(String fileName) {
-        String mp3Filename = fileName;
+        StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(mp4Tags.getWriter())) {
+            builder
+                    .append(StringUtils.trim(mp4Tags.getWriter()));
+
+        }
+        if (StringUtils.isNotBlank(mp4Tags.getSeries()) && !StringUtils.equals(mp4Tags.getSeries(), mp4Tags.getTitle())) {
+            builder
+                    .append(" - [")
+                    .append(StringUtils.trim(mp4Tags.getSeries()));
+            if (mp4Tags.getTrack() > 0) {
+                builder
+                        .append(" - ")
+                        .append(mp4Tags.getTrack());
+            }
+            builder.append("] ");
+        }
+        if (StringUtils.isNotBlank(mp4Tags.getTitle())) {
+            builder.append(StringUtils.trim(mp4Tags.getTitle()));
+        }
+        if (StringUtils.isNotBlank(mp4Tags.getNarrator())) {
+            builder
+                    .append(" (")
+                    .append(StringUtils.trim(mp4Tags.getNarrator()))
+                    .append(")");
+        }
+        String result = builder.toString();
+        String mp3Filename;
+
+        if (StringUtils.isBlank(result)) {
+            mp3Filename = fileName;
+        } else {
+            mp3Filename = result;
+        }
         return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
     }
 

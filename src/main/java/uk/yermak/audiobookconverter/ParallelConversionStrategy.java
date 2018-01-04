@@ -19,7 +19,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     private String outputFileName;
 
     public boolean makeUserInterview(Shell shell, String fileName) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(fileName));
+        this.outputFileName = selectOutputFile(shell, getOuputFilenameSuggestion(fileName));
         return this.outputFileName != null;
     }
 

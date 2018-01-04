@@ -42,7 +42,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     @Override
-    protected String getConcatFile(long jobId, int currentFileNumber) {
+    protected String getTempFileName(long jobId, int currentFileNumber, String extension) {
         return "";
     }
 

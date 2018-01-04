@@ -53,7 +53,8 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
                     "-ar", String.valueOf(mediaInfo.getFrequency()),
                     "-ac", String.valueOf(mediaInfo.getChannels()),
                     "-progress", progressParser.getUri().toString(),
-                    outputFileName);
+                    outputFileName
+            );
 
             process = ffmpegProcessBuilder.start();
 

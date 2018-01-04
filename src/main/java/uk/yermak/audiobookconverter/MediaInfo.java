@@ -27,4 +27,6 @@ public interface MediaInfo {
     void setMp4Tags(Mp4Tags mp4Tags);
 
     Mp4Tags getMp4Tags();
+
+    String getPictureFormat();
 }

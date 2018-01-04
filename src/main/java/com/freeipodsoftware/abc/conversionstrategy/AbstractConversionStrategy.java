@@ -124,10 +124,10 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
             totalDuration += mediaInfos.get(i).getDuration();
             metaData.add("END=" + totalDuration);
             metaData.add("title=Chapter " + (i + 1));
-            outFiles.add("file '" + getConcatFile(jobId, mediaInfos.get(i).hashCode()) + "'");
+            outFiles.add("file '" + getTempFileName(jobId, mediaInfos.get(i).hashCode(), ".m4b") + "'");
         }
     }
 
-    protected abstract String getConcatFile(long jobId, int currentFileNumber);
+    protected abstract String getTempFileName(long jobId, int currentFileNumber, String extension);
 
 }

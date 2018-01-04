@@ -29,7 +29,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
     @Override
-    protected String getConcatFile(long jobId, int currentFileNumber) {
+    protected String getTempFileName(long jobId, int currentFileNumber, String extension) {
         return media.get(currentFileNumber).getFileName();
     }
 

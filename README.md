@@ -11,7 +11,7 @@ Main features:
 * Parallel encoding: more cores - faster results
 * Smart artwork support: combined from MP3 artwork and cover files from MP3 directory
 * Unicode tags support: keep tags in own language
-* Chapters support: jump to right chpater quickly
+* Chapters support: jump to the right chapter quickly
 * Simple UI (inherited from original version)
 --------------
 This project is based on freeipodsoftware release of AudioBookConverter.

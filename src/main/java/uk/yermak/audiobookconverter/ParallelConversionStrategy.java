@@ -30,6 +30,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
+        String tempFile = getTempFileName(jobId, 999999, ".m4b");
         try {
 
             List<MediaInfo> dest = new ArrayList<>();
@@ -62,7 +63,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             FileUtils.writeLines(metaFile, "UTF-8", metaData);
             FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 
-            Concatenator concatenator = new FFMpegConcatenator(this.outputFileName, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
             FileUtils.deleteQuietly(metaFile);
@@ -72,8 +73,10 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 FileUtils.deleteQuietly(new File(getTempFileName(jobId, media.get(i).hashCode(), ".m4b")));
             }
 
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, outputFileName, jobId);
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
             artBuilder.coverArt();
+
+            FileUtils.moveFile(new File(tempFile), new File(outputFileName));
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
@@ -86,8 +89,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
 
-    protected String getTempFileName(long jobId, int currentFileNumber, String extension) {
-        return Utils.getTmp(jobId, currentFileNumber, extension);
+    protected String getTempFileName(long jobId, int index, String extension) {
+        return Utils.getTmp(jobId, index, extension);
     }
 
 }

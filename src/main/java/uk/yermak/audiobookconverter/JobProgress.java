@@ -1,9 +1,9 @@
 package uk.yermak.audiobookconverter;
 
+import com.freeipodsoftware.abc.Messages;
 import com.freeipodsoftware.abc.ProgressView;
 import com.freeipodsoftware.abc.StateListener;
 import com.freeipodsoftware.abc.conversionstrategy.ConversionStrategy;
-import com.freeipodsoftware.abc.conversionstrategy.Messages;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +25,7 @@ public class JobProgress implements Runnable, StateListener {
     private boolean paused;
     private boolean cancelled;
     private long pausedDuration;
+    private long resetDuration;
 
     public JobProgress(ConversionStrategy conversionStrategy, ProgressView progressView, List<MediaInfo> media) {
         this.progressView = progressView;
@@ -77,7 +78,8 @@ public class JobProgress implements Runnable, StateListener {
         if (currentDuration > 0 && totalDuration > 0) {
             double progress = (double) currentDuration / totalDuration;
             long now = System.currentTimeMillis();
-            long remainingTime = (long) ((now - startTime) / progress - (now - startTime));
+            long delta = now - startTime - resetDuration;
+            long remainingTime = (long) (delta / progress - delta);
             long finalSize = estimatedSize;
             progressView.getDisplay().syncExec(() -> {
                 progressView.setProgress((int) (progress * 100));
@@ -99,7 +101,6 @@ public class JobProgress implements Runnable, StateListener {
             progressView.getDisplay().syncExec(() -> {
                 progressView.setInfoText("Updating media information...");
             });
-            finished = true;
         }
     }
 
@@ -133,6 +134,7 @@ public class JobProgress implements Runnable, StateListener {
     public void reset() {
         durations.clear();
         sizes.clear();
+        resetDuration = System.currentTimeMillis() - startTime;
         progressView.getDisplay().syncExec(() -> {
             progressView.setProgress(0);
             progressView.setRemainingTime(60 * 1000);

@@ -5,6 +5,7 @@ import com.freeipodsoftware.abc.StateListener;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.ProgressCallback;
 import uk.yermak.audiobookconverter.StateDispatcher;
@@ -133,6 +134,16 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     @Override
     public void resumed() {
+
+    }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
 
     }
 

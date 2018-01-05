@@ -5,6 +5,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.StateDispatcher;
 import uk.yermak.audiobookconverter.Utils;
 
 import java.util.ArrayList;
@@ -12,41 +13,43 @@ import java.util.List;
 
 public class InputFileSelection extends InputFileSelectionGui {
     public static final String FILE_LIST_CHANGED_EVENT = "fileListChangedEvent";
+    private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
     private String lastFolder;
-    private EventDispatcher eventDispatcher;
+    //    private EventDispatcher eventDispatcher;
     private List<MediaInfo> media = new ArrayList<>();
 
 
     public InputFileSelection(Composite parent) {
         super(parent, 0);
-        this.addButton.addSelectionListener(new SelectionAdapter() {
+        addButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.addInputFile();
             }
         });
-        this.removeButton.addSelectionListener(new SelectionAdapter() {
+        removeButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.removeInputFiles();
             }
         });
-        this.clearButton.addSelectionListener(new SelectionAdapter() {
+        clearButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.removeAllInputFiles();
             }
         });
-        this.moveUpButton.addSelectionListener(new SelectionAdapter() {
+        moveUpButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.moveUp();
             }
         });
-        this.moveDownButton.addSelectionListener(new SelectionAdapter() {
+        moveDownButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 InputFileSelection.this.moveDown();
             }
         });
-        this.createDropTarget();
-        this.fileList.addKeyListener(new InputFileSelection.MyKeyListener());
-        this.addButton.setFocus();
+        createDropTarget();
+        fileList.addKeyListener(new InputFileSelection.MyKeyListener());
+        addButton.setFocus();
+
     }
 
     private void createDropTarget() {
@@ -60,10 +63,8 @@ public class InputFileSelection extends InputFileSelectionGui {
                     for (String file : files) {
                         InputFileSelection.this.fileList.add(file);
                     }
-
-                    InputFileSelection.this.eventDispatcher.raiseEvent("fileListChangedEvent");
+                    stateDispatcher.fileListChanged();
                 }
-
             }
         });
     }
@@ -74,13 +75,13 @@ public class InputFileSelection extends InputFileSelectionGui {
     }
 
     public int getButtonWidthHint() {
-        return this.addButton.getSize().x;
+        return addButton.getSize().x;
     }
 
     private void addInputFile() {
         FileDialog fileDialog = new FileDialog(this.getShell(), 4098);
-        if (this.lastFolder != null) {
-            fileDialog.setFileName(this.lastFolder);
+        if (lastFolder != null) {
+            fileDialog.setFileName(lastFolder);
         }
 
         fileDialog.setFilterNames(new String[]{Messages.getString("InputFileSelection.mp3Files"), Messages.getString("InputFileSelection.allFiles")});
@@ -96,8 +97,7 @@ public class InputFileSelection extends InputFileSelectionGui {
                 fileList.add(fullName);
                 media.add(Utils.loadMediaInfo(fullName));
             }
-
-            this.eventDispatcher.raiseEvent("fileListChangedEvent");
+            stateDispatcher.fileListChanged();
         }
 
     }
@@ -105,34 +105,34 @@ public class InputFileSelection extends InputFileSelectionGui {
     private void removeAllInputFiles() {
         fileList.removeAll();
         media.clear();
-        this.eventDispatcher.raiseEvent("fileListChangedEvent");
+        stateDispatcher.fileListChanged();
     }
 
 
     private void removeInputFiles() {
-        int[] selectionIndices = this.fileList.getSelectionIndices();
+        int[] selectionIndices = fileList.getSelectionIndices();
         for (int i = 0; i < selectionIndices.length; i++) {
             int selectionIndex = selectionIndices[i];
             String item = fileList.getItem(selectionIndex);
             media.removeIf(mi -> item.equals(mi.getFileName()));
         }
         this.fileList.remove(selectionIndices);
-        this.eventDispatcher.raiseEvent("fileListChangedEvent");
+        stateDispatcher.fileListChanged();
     }
 
     private void moveDown() {
         if (this.fileList.getSelectionCount() == 1) {
-            int selectionIndex = this.fileList.getSelectionIndex();
+            int selectionIndex = fileList.getSelectionIndex();
             MediaInfo mediaInfo1 = media.get(selectionIndex);
             MediaInfo mediaInfo2 = media.get(selectionIndex + 1);
             media.set(selectionIndex, mediaInfo2);
             media.set(selectionIndex + 1, mediaInfo1);
 
-            if (selectionIndex < this.fileList.getItemCount() - 1) {
-                this.fileList.add(this.fileList.getItem(selectionIndex), selectionIndex + 2);
-                this.fileList.remove(selectionIndex);
-                this.fileList.setSelection(selectionIndex + 1);
-                this.eventDispatcher.raiseEvent("fileListChangedEvent");
+            if (selectionIndex < fileList.getItemCount() - 1) {
+                fileList.add(fileList.getItem(selectionIndex), selectionIndex + 2);
+                fileList.remove(selectionIndex);
+                fileList.setSelection(selectionIndex + 1);
+                stateDispatcher.fileListChanged();
             }
         }
 
@@ -140,25 +140,22 @@ public class InputFileSelection extends InputFileSelectionGui {
 
     private void moveUp() {
         if (this.fileList.getSelectionCount() == 1) {
-            int selectionIndex = this.fileList.getSelectionIndex();
+            int selectionIndex = fileList.getSelectionIndex();
             if (selectionIndex > 0) {
                 MediaInfo mediaInfo1 = media.get(selectionIndex);
                 MediaInfo mediaInfo2 = media.get(selectionIndex - 1);
                 media.set(selectionIndex, mediaInfo2);
                 media.set(selectionIndex - 1, mediaInfo1);
 
-                this.fileList.add(this.fileList.getItem(selectionIndex), selectionIndex - 1);
-                this.fileList.remove(selectionIndex + 1);
-                this.fileList.setSelection(selectionIndex - 1);
-                this.eventDispatcher.raiseEvent("fileListChangedEvent");
+                fileList.add(fileList.getItem(selectionIndex), selectionIndex - 1);
+                fileList.remove(selectionIndex + 1);
+                fileList.setSelection(selectionIndex - 1);
+                stateDispatcher.fileListChanged();
             }
         }
 
     }
 
-    public void setEventDispatcher(EventDispatcher eventDispatcher) {
-        this.eventDispatcher = eventDispatcher;
-    }
 
     public List<MediaInfo> getMedia() {
         return media;

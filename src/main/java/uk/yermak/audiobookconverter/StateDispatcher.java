@@ -63,4 +63,17 @@ public class StateDispatcher implements StateListener {
             l.resumed();
         });
     }
+
+    public void fileListChanged() {
+        listenerSet.forEach(l -> {
+            l.fileListChanged();
+        });
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+        listenerSet.forEach(l -> {
+            l.modeChanged(mode);
+        });
+    }
 }

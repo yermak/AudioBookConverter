@@ -64,11 +64,6 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
 
-;[Run]
-;Filename: "{app}\audiobookconverter-2.0-beta-1.exe"; Parameters: "-Xappcds:generatecache";
-;Filename: "{app}\audiobookconverter-2.0-beta-1.exe"; Description: "{cm:LaunchProgram,audiobookconverter-2.0-beta-1}"; Flags: nowait postinstall skipifsilent;
-;Filename: "{app}\audiobookconverter-2.0-beta-1.exe"; Parameters: "-install -svcName ""audiobookconverter-2.0-beta-1"" -svcDesc ""audiobookconverter-2.0-beta-1"" -mainExe ""audiobookconverter-2.0-beta-1.exe""  ";
-
 [UninstallRun]
 Filename: "{app}\audiobookconverter-2.0-beta-1.exe "; Parameters: "-uninstall -svcName audiobookconverter-2.0-beta-1 -stopOnUninstall";
 

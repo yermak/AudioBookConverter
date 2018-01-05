@@ -1,0 +1,24 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <formats>
+        <format>dir</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>README*</include>
+                <include>*.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>external/x64</directory>
+            <outputDirectory>external/x64</outputDirectory>
+            <includes>
+                <include>*.exe</include>
+                <include>*.dll</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

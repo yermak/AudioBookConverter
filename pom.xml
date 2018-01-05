@@ -108,16 +108,28 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptor>src/assembly/bin.xml</descriptor>
-                    <finalName>AudioBookConverter-${pom.version}</finalName>
-                </configuration>
                 <executions>
                     <execution>
+                        <id>zip</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
+                            <finalName>AudioBookConverter-${project.version}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>installer</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
+                            <outputDirectory>target/dir</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -129,12 +141,15 @@
                 <configuration>
                     <vendor>https://github.com/yermak</vendor>
                     <mainClass>com.freeipodsoftware.abc.MainWindow</mainClass>
-                    <!--<additionalAppResources>external/*</additionalAppResources>-->
                     <bundler>EXE</bundler>
                     <bundleArguments>
                         <runtime>C:\Program Files\Java\jre1.8.0_152</runtime>
                     </bundleArguments>
-                    <!--<additionalAppResources>${project.build.directory}/additionalResources</additionalAppResources>-->
+                    <!--
+                                        <additionalAppResources>
+                                            ${project.build.directory}/${project.artifactId}-${project.version}/${project.artifactId}-${project.version}
+                                        </additionalAppResources>
+                    -->
                     <verbose>true</verbose>
                 </configuration>
                 <executions>

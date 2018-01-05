@@ -6,6 +6,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.MessageBox;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.StateDispatcher;
 
 import java.text.DecimalFormat;
@@ -155,6 +156,16 @@ public class ProgressView extends ProgressViewGui implements StateListener {
                 pauseButton.setSelection(false);
             }
         });
+    }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
     }
 
 }

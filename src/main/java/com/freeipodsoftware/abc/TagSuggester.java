@@ -1,20 +1,21 @@
 package com.freeipodsoftware.abc;
 
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-public class TagSuggestionStrategy implements EventListener {
+public class TagSuggester implements StateListener {
     private TagEditor tagEditor;
     private InputFileSelection inputFileSelection;
+    private StateDispatcher stateDispatcher = StateDispatcher.getInstance();
+    private ConversionMode mode;
 
-    public TagSuggestionStrategy() {
-    }
-
-    public void setEventDispatcher(EventDispatcher eventDispatcher) {
-        eventDispatcher.addListener(this);
+    public TagSuggester() {
+        stateDispatcher.addListener(this);
     }
 
     public void setTagEditor(TagEditor tagEditor) {
@@ -25,14 +26,9 @@ public class TagSuggestionStrategy implements EventListener {
         this.inputFileSelection = inputFileSelection;
     }
 
-    public void onEvent(String event) {
-        if (event.equals("fileListChangedEvent")) {
-            this.suggestTags();
-        }
-    }
-
-
     private void suggestTags() {
+        if (mode == ConversionMode.BATCH) return;
+
         List<MediaInfo> media = inputFileSelection.getMedia();
         this.tagEditor.clear();
         if (media.size() > 0) {
@@ -66,5 +62,40 @@ public class TagSuggestionStrategy implements EventListener {
             return text;
         }
 
+    }
+
+    @Override
+    public void finishedWithError(String error) {
+
+    }
+
+    @Override
+    public void finished() {
+
+    }
+
+    @Override
+    public void canceled() {
+
+    }
+
+    @Override
+    public void paused() {
+
+    }
+
+    @Override
+    public void resumed() {
+
+    }
+
+    @Override
+    public void fileListChanged() {
+        suggestTags();
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+        this.mode = mode;
     }
 }

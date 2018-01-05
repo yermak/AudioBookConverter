@@ -105,4 +105,14 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
     public void resumed() {
         paused = false;
     }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
+    }
 }

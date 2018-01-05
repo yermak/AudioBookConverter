@@ -131,6 +131,16 @@ public class JobProgress implements Runnable, StateListener {
         paused = false;
     }
 
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
+    }
+
     public void reset() {
         durations.clear();
         sizes.clear();

@@ -115,4 +115,14 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
     public void resumed() {
 
     }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
+    }
 }

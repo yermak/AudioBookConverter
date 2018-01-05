@@ -9,6 +9,7 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.JobProgress;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.StateDispatcher;
@@ -23,16 +24,14 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 public class MainWindow extends MainWindowGui implements StateListener {
-    private final EventDispatcher eventDispatcher = new EventDispatcher();
     private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
-    private TagSuggestionStrategy tagSuggestionStrategy;
+    private TagSuggester tagSuggester;
     private ProgressView progressView;
     private ConversionStrategy conversionStrategy;
 
     public static void main(String[] args) {
         Display display = Display.getDefault();
         MainWindow thisClass = new MainWindow();
-
 
         thisClass.create();
         thisClass.sShell.open();
@@ -53,45 +52,37 @@ public class MainWindow extends MainWindowGui implements StateListener {
     }
 
     protected void create() {
-        this.createSShell();
-        this.startButton.addSelectionListener(new SelectionAdapter() {
+        createSShell();
+        startButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 MainWindow.this.startConversion();
             }
         });
-        this.inputFileSelection.setEventDispatcher(this.eventDispatcher);
-        this.tagSuggestionStrategy = new TagSuggestionStrategy();
-        this.tagSuggestionStrategy.setEventDispatcher(this.eventDispatcher);
-        this.tagSuggestionStrategy.setTagEditor(this.toggleableTagEditor.getTagEditor());
-        this.tagSuggestionStrategy.setInputFileSelection(this.inputFileSelection);
-        this.updateToggleableTagEditorEnablement();
-        this.aboutLink2.addSelectionListener(new SelectionAdapter() {
+
+        tagSuggester = new TagSuggester();
+        tagSuggester.setTagEditor(toggleableTagEditor.getTagEditor());
+        tagSuggester.setInputFileSelection(this.inputFileSelection);
+        aboutLink2.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 MainWindow.this.showAboutDialog();
             }
         });
-        this.updateLink.addSelectionListener(new SelectionAdapter() {
+        updateLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
-        this.websiteLink.addSelectionListener(new SelectionAdapter() {
+        websiteLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
-        this.helpLink.addSelectionListener(new SelectionAdapter() {
+        helpLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
-        this.optionPanel.addOptionChangedListener(MainWindow.this::updateToggleableTagEditorEnablement);
-
         stateDispatcher.addListener(this);
-    }
-
-    private void updateToggleableTagEditorEnablement() {
-        this.toggleableTagEditor.setEnabled(this.optionPanel.getMode().supportTags());
     }
 
     private void showAboutDialog() {
@@ -204,6 +195,16 @@ public class MainWindow extends MainWindowGui implements StateListener {
     @Override
     public void resumed() {
 
+    }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+        toggleableTagEditor.setEnabled(optionPanel.getMode().supportTags());
     }
 
     public static class UpdateThread extends Thread {

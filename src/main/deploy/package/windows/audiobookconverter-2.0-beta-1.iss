@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppTitle "AudioBookConverterV2"
-#define MyAppName "audiobookconverter"
+#define MyAppName "AudioBookConverter"
 #define MyAppVersion "2.0-beta-1"
 #define MyAppPublisher "https://github.com/yermak"
 #define MyAppURL "https://github.com/yermak/AudioBookConverter"
@@ -32,7 +32,7 @@ DefaultGroupName={#MyAppTitle}
 DisableProgramGroupPage=No
 
 
-OutputBaseFilename={#MyAppTitle}-Installer
+OutputBaseFilename={#MyAppName}-Installer-{#MyAppVersion}
 Compression=lzma2/ultra64
 SolidCompression=yes
 

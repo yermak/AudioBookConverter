@@ -116,4 +116,13 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
         this.paused = false;
     }
 
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
+    }
 }

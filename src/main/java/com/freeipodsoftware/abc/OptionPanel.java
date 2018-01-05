@@ -4,13 +4,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import uk.yermak.audiobookconverter.ConversionMode;
-
-import java.util.HashSet;
-import java.util.Set;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
 public class OptionPanel extends OptionPanelGui {
     private static final String OPTION_PANEL_CONVERSION_MODE = "optionPanel.conversionMode";
-    private final Set<OptionChangedListener> optionChangedListenerSet = new HashSet<>();
     private ConversionMode mode = ConversionMode.SINGLE;
 
     public OptionPanel(Composite parent) {
@@ -19,16 +16,7 @@ public class OptionPanel extends OptionPanelGui {
         this.oneOutputFilePerInputFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.BATCH));
         this.oneOutputFileParallelProcessingFileOption.addSelectionListener(new ModeSelectionAdapter(ConversionMode.PARALLEL));
         this.setConversionMode(ConversionMode.valueOf(AppProperties.getProperty(OPTION_PANEL_CONVERSION_MODE, ConversionMode.SINGLE.toString())));
-    }
-
-    void addOptionChangedListener(OptionChangedListener listener) {
-        this.optionChangedListenerSet.add(listener);
-    }
-
-    private void fireOptionChanged() {
-        for (OptionChangedListener optionChangedListener : optionChangedListenerSet) {
-            optionChangedListener.optionChanged();
-        }
+        StateDispatcher.getInstance().modeChanged(mode);
     }
 
     public ConversionMode getMode() {
@@ -65,7 +53,7 @@ public class OptionPanel extends OptionPanelGui {
         public void widgetSelected(SelectionEvent e) {
             OptionPanel.this.mode = this.mode;
             AppProperties.setProperty(OPTION_PANEL_CONVERSION_MODE, mode.toString());
-            OptionPanel.this.fireOptionChanged();
+            StateDispatcher.getInstance().modeChanged(mode);
         }
     }
 }

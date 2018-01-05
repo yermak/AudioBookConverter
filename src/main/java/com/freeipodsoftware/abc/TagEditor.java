@@ -14,31 +14,31 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void setWriter(String writer) {
-        this.writerText.setText(Util.nullToEmptyString(writer));
+        this.writerText.setText(StringUtils.stripToEmpty(writer));
     }
 
     public void setNarrator(String narrator) {
-        this.narratorText.setText(Util.nullToEmptyString(narrator));
+        this.narratorText.setText(StringUtils.stripToEmpty(narrator));
     }
 
     public void setTitle(String title) {
-        this.titleText.setText(Util.nullToEmptyString(title));
+        this.titleText.setText(StringUtils.stripToEmpty(title));
     }
 
     public void setAlbum(String album) {
-        this.series.setText(Util.nullToEmptyString(album));
+        this.series.setText(StringUtils.stripToEmpty(album));
     }
 
     public void setGenre(String genre) {
-        this.genreCombo.setText(Util.nullToEmptyString(genre));
+        this.genreCombo.setText(StringUtils.stripToEmpty(genre));
     }
 
     public void setYear(String year) {
-        this.yearText.setText(Util.nullToEmptyString(year));
+        this.yearText.setText(StringUtils.stripToEmpty(year));
     }
 
     public void setTrack(String track) {
-        this.bookNumberText.setText(Util.nullToEmptyString(track));
+        this.bookNumberText.setText(StringUtils.stripToEmpty(track));
     }
 
     public void setTotalTracks(String totalTracks) {
@@ -46,7 +46,7 @@ public class TagEditor extends TagEditorGui {
     }
 
     public void setComment(String comment) {
-        this.commentText.setText(Util.nullToEmptyString(comment));
+        this.commentText.setText(StringUtils.stripToEmpty(comment));
     }
 
     public void clear() {

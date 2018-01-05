@@ -35,8 +35,16 @@ public class ProgressView extends ProgressViewGui implements StateListener {
     }
 
     private void suspendOrResume() {
-        StateDispatcher.getInstance().paused();
         suspended = !suspended;
+        if (suspended) {
+            pauseButton.setText("Resume");
+            pauseButton.setSelection(true);
+        } else {
+            pauseButton.setText("Pause");
+            pauseButton.setSelection(false);
+        }
+
+        StateDispatcher.getInstance().paused();
     }
 
     private void cancel() {
@@ -124,48 +132,22 @@ public class ProgressView extends ProgressViewGui implements StateListener {
 
     @Override
     public void canceled() {
-        getDisplay().syncExec(() -> {
-            this.cancelButton.setEnabled(false);
-            this.pauseButton.setEnabled(false);
-        });
     }
 
     @Override
     public void paused() {
-        getDisplay().syncExec(() -> {
-            if (suspended) {
-                pauseButton.setText("Resume");
-                pauseButton.setSelection(true);
-            } else {
-                pauseButton.setText("Pause");
-                pauseButton.setSelection(false);
-            }
-        });
-
-
     }
 
     @Override
     public void resumed() {
-        getDisplay().syncExec(() -> {
-            if (suspended) {
-                pauseButton.setText("Resume");
-                pauseButton.setSelection(true);
-            } else {
-                pauseButton.setText("Pause");
-                pauseButton.setSelection(false);
-            }
-        });
     }
 
     @Override
     public void fileListChanged() {
-
     }
 
     @Override
     public void modeChanged(ConversionMode mode) {
-
     }
 
 }

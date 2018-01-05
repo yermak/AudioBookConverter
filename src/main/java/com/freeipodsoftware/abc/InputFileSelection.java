@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InputFileSelection extends InputFileSelectionGui {
-    public static final String FILE_LIST_CHANGED_EVENT = "fileListChangedEvent";
     private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
     private String lastFolder;
-    //    private EventDispatcher eventDispatcher;
     private List<MediaInfo> media = new ArrayList<>();
 
 

@@ -8,6 +8,7 @@
     <artifactId>audiobookconverter</artifactId>
     <version>2.0-beta-1</version>
 
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -15,6 +16,7 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
+        <app.main.class>com.freeipodsoftware.abc.MainWindow</app.main.class>
     </properties>
 
 
@@ -84,19 +86,6 @@
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>copy-external</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/external</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
 
@@ -128,6 +117,40 @@
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.6.0</version>
+                <configuration>
+                    <vendor>https://github.com/yermak</vendor>
+                    <mainClass>com.freeipodsoftware.abc.MainWindow</mainClass>
+                    <!--<additionalAppResources>external/*</additionalAppResources>-->
+                    <bundler>EXE</bundler>
+                    <bundleArguments>
+                        <runtime>C:\Program Files\Java\jre1.8.0_152</runtime>
+                    </bundleArguments>
+                    <!--<additionalAppResources>${project.build.directory}/additionalResources</additionalAppResources>-->
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- required before build-native -->
+                        <id>create-jfxjar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-native</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-native</goal>
                         </goals>
                     </execution>
                 </executions>

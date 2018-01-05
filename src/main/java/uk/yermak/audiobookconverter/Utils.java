@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Mp4Tags;
-import com.freeipodsoftware.abc.Util;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -23,9 +22,6 @@ public class Utils {
         String result = outFile.getAbsolutePath().replaceAll("(?i)\\." + extension, "." + suffix);
         if (!result.endsWith("." + suffix)) {
             result = result + "." + suffix;
-        }
-        if (uniqie) {
-            return Util.makeFilenameUnique(result);
         }
         return result;
     }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.stage.Screen?>
+<GridPane fx:controller="uk.yermak.audiobookconverter.fx.Controller"
+          xmlns:fx="http://javafx.com/fxml"
+          hgap="0" vgap="0"
+          fx:id="root"
+          prefHeight="${screen.visualBounds.height * 0.50}" prefWidth="${screen.visualBounds.width * 0.30}"
+          minHeight="${screen.visualBounds.height * 0.50}" minWidth="${screen.visualBounds.width * 0.30}"
+>
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+    <padding>
+        <Insets top="0" right="0" bottom="0" left="0"/>
+    </padding>
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" prefWidth="${root.width}"/>
+    </columnConstraints>
+
+
+    <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="0" gridLinesVisible="true">
+        <columnConstraints>
+            <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+            <ColumnConstraints hgrow="ALWAYS"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <children>
+            <Label text="AudioBookConverter V2"
+                   GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="2" alignment="TOP_LEFT"
+                   GridPane.valignment="TOP">
+                <font>
+                    <Font name="Arial Black" size="24.0"/>
+                </font>
+            </Label>
+            <Label text="Add MP3 files to convert and bring them in right order..."
+                   GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="3"
+                   alignment="BOTTOM_LEFT"
+                   GridPane.valignment="TOP" GridPane.halignment="LEFT">
+            </Label>
+
+
+            <Hyperlink text="Website" onAction="#openLink"
+                       GridPane.columnIndex="1" GridPane.rowIndex="0"
+                       GridPane.valignment="TOP" GridPane.halignment="RIGHT">
+                <tooltip>
+                    <Tooltip text="https://github.com/yermak/AudioBookConverter"/>
+                </tooltip>
+            </Hyperlink>
+            <Hyperlink text="About this software" onAction="#openLink"
+                       GridPane.columnIndex="2" GridPane.rowIndex="0"
+                       GridPane.valignment="TOP" GridPane.halignment="LEFT">
+                <tooltip>
+                    <Tooltip text="https://github.com/yermak/AudioBookConverter/wiki/About"/>
+                </tooltip>
+            </Hyperlink>
+            <Hyperlink text="Help" onAction="#openLink"
+                       GridPane.columnIndex="1" GridPane.rowIndex="1"
+                       GridPane.valignment="TOP" GridPane.halignment="RIGHT">
+                <tooltip>
+                    <Tooltip text="https://github.com/yermak/AudioBookConverter/wiki/Help"/>
+                </tooltip>
+            </Hyperlink>
+            <Hyperlink text="Check for updates" onAction="#openLink"
+                       GridPane.columnIndex="2" GridPane.rowIndex="1"
+                       GridPane.valignment="TOP" GridPane.halignment="LEFT">
+                <tooltip>
+                    <Tooltip text="https://github.com/yermak/AudioBookConverter/releases"/>
+                </tooltip>
+            </Hyperlink>
+        </children>
+
+    </GridPane>
+
+
+</GridPane>

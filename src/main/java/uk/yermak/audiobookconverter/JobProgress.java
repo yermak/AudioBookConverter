@@ -133,6 +133,11 @@ public class JobProgress implements Runnable, StateListener {
 
     @Override
     public void fileListChanged() {
+        progressView.getDisplay().syncExec(() -> {
+            progressView.setProgress(0);
+            progressView.setElapsedTime(0);
+            progressView.setEstimatedFinalOutputSize(0);
+        });
 
     }
 

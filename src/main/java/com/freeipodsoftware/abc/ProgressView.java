@@ -39,12 +39,12 @@ public class ProgressView extends ProgressViewGui implements StateListener {
         if (suspended) {
             pauseButton.setText("Resume");
             pauseButton.setSelection(true);
+            StateDispatcher.getInstance().paused();
         } else {
             pauseButton.setText("Pause");
             pauseButton.setSelection(false);
+            StateDispatcher.getInstance().resumed();
         }
-
-        StateDispatcher.getInstance().paused();
     }
 
     private void cancel() {

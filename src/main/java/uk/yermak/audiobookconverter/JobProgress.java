@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class JobProgress implements Runnable, StateListener {
     private ProgressView progressView;
-    private Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
     private long startTime = System.currentTimeMillis();
     private boolean finished;
     private int totalFiles;
@@ -24,12 +23,12 @@ public class JobProgress implements Runnable, StateListener {
     private Map<String, Long> sizes = new HashMap<>();
     private boolean paused;
     private boolean cancelled;
-    private long pausedDuration;
-    private long resetDuration;
+    private long pausePeriod;
 
     public JobProgress(ConversionStrategy conversionStrategy, ProgressView progressView, List<MediaInfo> media) {
         this.progressView = progressView;
 
+        Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         for (MediaInfo mediaInfo : media) {
             progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), this));
             totalFiles++;
@@ -50,13 +49,15 @@ public class JobProgress implements Runnable, StateListener {
         });
 
         while (!finished && !cancelled && !paused) {
-            progressView.getDisplay().syncExec(() -> {
-                progressView.setElapsedTime(System.currentTimeMillis() - startTime);
-            });
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
+            progressView.getDisplay().syncExec(() -> progressView.setElapsedTime(System.currentTimeMillis() - startTime));
+            silentSleep();
+        }
+    }
+
+    private void silentSleep() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
     }
 
@@ -77,9 +78,8 @@ public class JobProgress implements Runnable, StateListener {
 
         if (currentDuration > 0 && totalDuration > 0) {
             double progress = (double) currentDuration / totalDuration;
-            long now = System.currentTimeMillis();
-            long delta = now - startTime - resetDuration;
-            long remainingTime = (long) (delta / progress - delta);
+            long delta = (System.currentTimeMillis() - pausePeriod) - startTime;
+            long remainingTime = (long) (delta / progress);
             long finalSize = estimatedSize;
             progressView.getDisplay().syncExec(() -> {
                 progressView.setProgress((int) (progress * 100));
@@ -94,13 +94,9 @@ public class JobProgress implements Runnable, StateListener {
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles != totalFiles) {
-            progressView.getDisplay().syncExec(() -> {
-                progressView.setInfoText(Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles);
-            });
+            progressView.getDisplay().syncExec(() -> progressView.setInfoText(Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles));
         } else {
-            progressView.getDisplay().syncExec(() -> {
-                progressView.setInfoText("Updating media information...");
-            });
+            progressView.getDisplay().syncExec(() -> progressView.setInfoText("Updating media information..."));
         }
     }
 
@@ -121,20 +117,18 @@ public class JobProgress implements Runnable, StateListener {
 
     @Override
     public void paused() {
-        pausedDuration = System.currentTimeMillis() - startTime;
+        pausePeriod = System.currentTimeMillis() - startTime;
         paused = true;
     }
 
     @Override
     public void resumed() {
-        startTime = System.currentTimeMillis() + pausedDuration;
         paused = false;
     }
 
     @Override
     public void fileListChanged() {
         resetStats();
-
     }
 
     private void resetStats() {
@@ -153,7 +147,6 @@ public class JobProgress implements Runnable, StateListener {
     public void reset() {
         durations.clear();
         sizes.clear();
-        resetDuration = System.currentTimeMillis() - startTime;
         progressView.getDisplay().syncExec(() -> {
             progressView.setProgress(0);
             progressView.setRemainingTime(60 * 1000);

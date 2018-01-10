@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.*;
 
 public class InputFileSelectionGui extends Composite {
     private Label label = null;
-    protected List fileList = null;
+    protected List fileListControl = null;
     private Composite composite = null;
     protected Button addButton = null;
     protected Button removeButton = null;
@@ -105,8 +105,8 @@ public class InputFileSelectionGui extends Composite {
         this.label = new Label(this, 64);
         this.label.setText(Messages.getString("InputFileSelectionGui.headline"));
         this.label.setLayoutData(gridData11);
-        this.fileList = new List(this, 2818);
-        this.fileList.setLayoutData(gridData);
+        this.fileListControl = new List(this, 2818);
+        this.fileListControl.setLayoutData(gridData);
         this.setLayout(gridLayout);
         this.createComposite();
         this.setSize(new Point(545, 367));

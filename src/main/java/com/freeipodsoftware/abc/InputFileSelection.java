@@ -5,8 +5,8 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.MediaLoader;
 import uk.yermak.audiobookconverter.StateDispatcher;
-import uk.yermak.audiobookconverter.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +45,13 @@ public class InputFileSelection extends InputFileSelectionGui {
             }
         });
         createDropTarget();
-        fileList.addKeyListener(new InputFileSelection.MyKeyListener());
+        fileListControl.addKeyListener(new InputFileSelection.MyKeyListener());
         addButton.setFocus();
 
     }
 
     private void createDropTarget() {
-        DropTarget target = new DropTarget(this.fileList, 19);
+        DropTarget target = new DropTarget(this.fileListControl, 19);
         target.setTransfer(new Transfer[]{FileTransfer.getInstance(), TextTransfer.getInstance()});
         target.addDropListener(new DropTargetAdapter() {
             public void drop(DropTargetEvent event) {
@@ -59,7 +59,7 @@ public class InputFileSelection extends InputFileSelectionGui {
                     String[] files = (String[]) event.data;
 
                     for (String file : files) {
-                        InputFileSelection.this.fileList.add(file);
+                        InputFileSelection.this.fileListControl.add(file);
                     }
                     stateDispatcher.fileListChanged();
                 }
@@ -87,49 +87,54 @@ public class InputFileSelection extends InputFileSelectionGui {
         String firstFile = fileDialog.open();
         if (firstFile != null) {
             this.lastFolder = firstFile;
-            String[] fileNames = fileDialog.getFileNames();
-
-            for (String fileName : fileNames) {
-                String filterPath = fileDialog.getFilterPath();
-                String fullName = filterPath + System.getProperty("file.separator") + fileName;
-                fileList.add(fullName);
-                media.add(Utils.loadMediaInfo(fullName));
-            }
+            List<MediaInfo> addedMedia = loadMediaFiles(fileDialog.getFilterPath(), fileDialog.getFileNames());
+            media.addAll(addedMedia);
+            addedMedia.forEach(m -> fileListControl.add(m.getFileName()));
             stateDispatcher.fileListChanged();
         }
 
     }
 
+    private List<MediaInfo> loadMediaFiles(String directory, String[] fileNames) {
+        List<String> files = new ArrayList<>();
+        for (String fileName : fileNames) {
+            String fullName = directory + System.getProperty("file.separator") + fileName;
+            files.add(fullName);
+        }
+        List<MediaInfo> addedMedia = new MediaLoader(files).loadMediaInfo();
+        return addedMedia;
+    }
+
     private void removeAllInputFiles() {
-        fileList.removeAll();
+        fileListControl.removeAll();
         media.clear();
         stateDispatcher.fileListChanged();
     }
 
 
     private void removeInputFiles() {
-        int[] selectionIndices = fileList.getSelectionIndices();
+        int[] selectionIndices = fileListControl.getSelectionIndices();
         for (int i = 0; i < selectionIndices.length; i++) {
             int selectionIndex = selectionIndices[i];
-            String item = fileList.getItem(selectionIndex);
+            String item = fileListControl.getItem(selectionIndex);
             media.removeIf(mi -> item.equals(mi.getFileName()));
         }
-        this.fileList.remove(selectionIndices);
+        this.fileListControl.remove(selectionIndices);
         stateDispatcher.fileListChanged();
     }
 
     private void moveDown() {
-        if (this.fileList.getSelectionCount() == 1) {
-            int selectionIndex = fileList.getSelectionIndex();
+        if (this.fileListControl.getSelectionCount() == 1) {
+            int selectionIndex = fileListControl.getSelectionIndex();
             MediaInfo mediaInfo1 = media.get(selectionIndex);
             MediaInfo mediaInfo2 = media.get(selectionIndex + 1);
             media.set(selectionIndex, mediaInfo2);
             media.set(selectionIndex + 1, mediaInfo1);
 
-            if (selectionIndex < fileList.getItemCount() - 1) {
-                fileList.add(fileList.getItem(selectionIndex), selectionIndex + 2);
-                fileList.remove(selectionIndex);
-                fileList.setSelection(selectionIndex + 1);
+            if (selectionIndex < fileListControl.getItemCount() - 1) {
+                fileListControl.add(fileListControl.getItem(selectionIndex), selectionIndex + 2);
+                fileListControl.remove(selectionIndex);
+                fileListControl.setSelection(selectionIndex + 1);
                 stateDispatcher.fileListChanged();
             }
         }
@@ -137,17 +142,17 @@ public class InputFileSelection extends InputFileSelectionGui {
     }
 
     private void moveUp() {
-        if (this.fileList.getSelectionCount() == 1) {
-            int selectionIndex = fileList.getSelectionIndex();
+        if (this.fileListControl.getSelectionCount() == 1) {
+            int selectionIndex = fileListControl.getSelectionIndex();
             if (selectionIndex > 0) {
                 MediaInfo mediaInfo1 = media.get(selectionIndex);
                 MediaInfo mediaInfo2 = media.get(selectionIndex - 1);
                 media.set(selectionIndex, mediaInfo2);
                 media.set(selectionIndex - 1, mediaInfo1);
 
-                fileList.add(fileList.getItem(selectionIndex), selectionIndex - 1);
-                fileList.remove(selectionIndex + 1);
-                fileList.setSelection(selectionIndex - 1);
+                fileListControl.add(fileListControl.getItem(selectionIndex), selectionIndex - 1);
+                fileListControl.remove(selectionIndex + 1);
+                fileListControl.setSelection(selectionIndex - 1);
                 stateDispatcher.fileListChanged();
             }
         }
@@ -168,7 +173,7 @@ public class InputFileSelection extends InputFileSelectionGui {
             if (e.keyCode == 127) {
                 InputFileSelection.this.removeInputFiles();
             } else if (e.keyCode == 97 && e.stateMask == 262144) {
-                InputFileSelection.this.fileList.selectAll();
+                InputFileSelection.this.fileListControl.selectAll();
             }
 
         }

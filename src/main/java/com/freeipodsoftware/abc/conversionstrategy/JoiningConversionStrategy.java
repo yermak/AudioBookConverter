@@ -50,9 +50,9 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             FileUtils.writeLines(metaFile, "UTF-8", metaData);
             FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 
-            MediaInfo mediaInfo = maximiseEncodingParameters();
+            MediaInfo maxMedia = maximiseEncodingParameters();
 
-            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), mediaInfo, progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
             concatenator.concat();
 
             FileUtils.deleteQuietly(metaFile);
@@ -74,23 +74,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         }
     }
 
-    private MediaInfo maximiseEncodingParameters() {
-        int maxChannels = 0;
-        int maxFrequency = 0;
-        int maxBitrate = 0;
 
-        for (MediaInfo mediaInfo : media) {
-            if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
-            if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
-            if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
-        }
-
-        MediaInfoBean mediaInfo = new MediaInfoBean("");
-        mediaInfo.setBitrate(maxBitrate);
-        mediaInfo.setChannels(maxChannels);
-        mediaInfo.setFrequency(maxFrequency);
-        return mediaInfo;
-    }
 
     public String getAdditionalFinishedMessage() {
         return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;

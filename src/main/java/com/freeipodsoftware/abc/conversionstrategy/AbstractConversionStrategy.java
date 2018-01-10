@@ -5,10 +5,7 @@ import com.freeipodsoftware.abc.StateListener;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.ProgressCallback;
-import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.*;
 
 import java.util.List;
 import java.util.Map;
@@ -175,5 +172,23 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     }
 
     protected abstract String getTempFileName(long jobId, int index, String extension);
+
+    protected MediaInfo maximiseEncodingParameters() {
+        int maxChannels = 0;
+        int maxFrequency = 0;
+        int maxBitrate = 0;
+
+        for (MediaInfo mediaInfo : media) {
+            if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
+            if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
+            if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
+        }
+
+        MediaInfoBean mediaInfo = new MediaInfoBean("");
+        mediaInfo.setBitrate(maxBitrate);
+        mediaInfo.setChannels(maxChannels);
+        mediaInfo.setFrequency(maxFrequency);
+        return mediaInfo;
+    }
 
 }

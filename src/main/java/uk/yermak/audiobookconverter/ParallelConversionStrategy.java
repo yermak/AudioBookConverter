@@ -88,8 +88,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             e.printStackTrace(new PrintWriter(sw));
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            this.finished = true;
-            StateDispatcher.getInstance().finished();
+            finilize();
         }
     }
 

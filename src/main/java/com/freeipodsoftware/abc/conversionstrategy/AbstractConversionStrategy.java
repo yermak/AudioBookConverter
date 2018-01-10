@@ -191,4 +191,13 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         return mediaInfo;
     }
 
+    protected void finilize() {
+        if (canceled) {
+            StateDispatcher.getInstance().canceled();
+        } else {
+            this.finished = true;
+            StateDispatcher.getInstance().finished();
+        }
+    }
+
 }

@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private boolean intoSameFolder;
     private String folder;
-    private int currentFileNumber;
 
     public BatchConversionStrategy() {
     }
@@ -78,7 +77,6 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         List<Future> futures = new ArrayList<>();
 
         for (int i = 0; i < this.media.size(); ++i) {
-            this.currentFileNumber = i + 1;
             MediaInfo mediaInfo = this.media.get(i);
             String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
             Future converterFuture =
@@ -95,8 +93,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             e.printStackTrace(new PrintWriter(sw));
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            this.finished = true;
-            StateDispatcher.getInstance().finished();
+            finilize();
         }
     }
 

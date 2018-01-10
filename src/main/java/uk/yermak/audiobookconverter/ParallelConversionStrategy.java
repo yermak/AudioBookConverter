@@ -30,17 +30,22 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
-        String tempFile = getTempFileName(jobId, 999999, ".m4b");
-        try {
 
+        String tempFile = getTempFileName(jobId, 999999, ".m4b");
+
+        MediaInfo maxMedia = maximiseEncodingParameters();
+
+        try {
             List<MediaInfo> dest = new ArrayList<>();
             for (MediaInfo mediaInfo : media) {
                 dest.add(mediaInfo);
+                mediaInfo.setFrequency(maxMedia.getFrequency());
+                mediaInfo.setChannels(maxMedia.getChannels());
+                mediaInfo.setBitrate(maxMedia.getBitrate());
             }
             Collections.sort(dest, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
 
-            for (int i = 0; i < dest.size(); i++) {
-                MediaInfo mediaInfo = dest.get(i);
+            for (MediaInfo mediaInfo : dest) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 Future<ConverterOutput> converterFuture =
                         Executors.newWorkStealingPool()

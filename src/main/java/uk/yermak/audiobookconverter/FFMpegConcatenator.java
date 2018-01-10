@@ -42,7 +42,6 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
             });
             progressParser.start();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
         }
 
         Process ffmpegProcess = null;

@@ -67,7 +67,7 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public String getFileName() {
-        return getMediaInfo().getFileName();
+        return filename;
     }
 
     @Override
@@ -83,5 +83,10 @@ public class MediaInfoProxy implements MediaInfo {
     @Override
     public String getPictureFormat() {
         return getMediaInfo().getPictureFormat();
+    }
+
+    @Override
+    public void setPictureFormat(String format) {
+        getMediaInfo().setPictureFormat(format);
     }
 }

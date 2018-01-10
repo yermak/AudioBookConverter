@@ -4,6 +4,7 @@ import com.freeipodsoftware.abc.StateListener;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.*;
@@ -46,7 +47,9 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
 
         Process ffmpegProcess = null;
         try {
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
+            String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(path,
                     "-protocol_whitelist", "file,pipe,concat",
                     "-vn",
                     "-f", "concat",

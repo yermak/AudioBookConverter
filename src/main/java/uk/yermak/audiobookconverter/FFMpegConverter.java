@@ -4,6 +4,7 @@ import com.freeipodsoftware.abc.StateListener;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -44,7 +45,9 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             });
             progressParser.start();
 
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
+            String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(path,
                     "-i", mediaInfo.getFileName(),
                     "-vn",
                     "-codec:a", "libfdk_aac",

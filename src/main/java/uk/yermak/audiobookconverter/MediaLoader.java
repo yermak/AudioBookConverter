@@ -5,6 +5,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.concurrent.*;
 public class MediaLoader {
 
     private List<String> fileNames;
-    private ExecutorService executorService = Executors.newWorkStealingPool();
+    private static ExecutorService executorService = Executors.newWorkStealingPool();
 
 
     public MediaLoader(List<String> files) {
@@ -69,7 +70,9 @@ public class MediaLoader {
                         mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
                         mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
                     } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
-                        mediaInfo.setPictureFormat("jpg");
+                        Future futureLoad = executorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
+                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
+                        mediaInfo.setArtWork(artWork);
                     }
                 }
                 Mp4Tags mp4Tags = new Mp4Tags(format.tags);
@@ -79,6 +82,45 @@ public class MediaLoader {
                 throw e;
             } finally {
                 mutex.release();
+            }
+        }
+
+
+    }
+
+    private static class ArtWorkCallable implements Callable<ArtWork> {
+
+        private MediaInfoBean mediaInfo;
+        private String format;
+
+        public ArtWorkCallable(MediaInfoBean mediaInfo, String format) {
+            this.mediaInfo = mediaInfo;
+            this.format = format;
+        }
+
+        @Override
+        public ArtWork call() throws Exception {
+            Process pictureProcess = null;
+
+            try {
+                String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), "." + format);
+                String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(path,
+                        "-i", mediaInfo.getFileName(),
+                        poster);
+                pictureProcess = pictureProcessBuilder.start();
+
+                StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
+                Future<Long> pictureFuture = Executors.newWorkStealingPool().submit(pictureToOut);
+                // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
+                StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.err);
+                Future<Long> errFuture = Executors.newWorkStealingPool().submit(pictureToErr);
+                pictureFuture.get();
+                File posterFile = new File(poster);
+                long crc32 = FileUtils.checksumCRC32(posterFile);
+                return new ArtWorkBean(poster, format, crc32);
+            } finally {
+                if (pictureProcess != null) pictureProcess.destroy();
             }
         }
     }

@@ -31,7 +31,6 @@ public class Mp4v2ArtBuilder {
 
 
     public void coverArt() throws IOException, ExecutionException, InterruptedException {
-        Process pictureProcess = null;
         Process artProcess = null;
         Map<Long, String> posters = new HashMap<>();
         Set<String> tempPosters = new HashSet<>();
@@ -47,30 +46,15 @@ public class Mp4v2ArtBuilder {
                 throw new RuntimeException(e);
             }
         }));
-        try {
-            for (MediaInfo mediaInfo : media) {
-                String pictureFormat = mediaInfo.getPictureFormat();
-                if (pictureFormat != null) {
-                    String poster = Utils.getTmp(jobId, mediaInfo.hashCode(), "." + pictureFormat);
-                    String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
-                    ProcessBuilder pictureProcessBuilder = new ProcessBuilder(path,
-                            "-i", mediaInfo.getFileName(),
-                            poster);
-                    pictureProcess = pictureProcessBuilder.start();
 
-                    StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
-                    Future<Long> pictureFuture = Executors.newWorkStealingPool().submit(pictureToOut);
-                    // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                    StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.err);
-                    Future<Long> errFuture = Executors.newWorkStealingPool().submit(pictureToErr);
-                    pictureFuture.get();
-                    File posterFile = new File(poster);
-                    long crc32 = FileUtils.checksumCRC32(posterFile);
-                    posters.putIfAbsent(crc32, poster);
-                    tempPosters.add(poster);
-                }
+        media.forEach(m -> {
+            if (m.getArtWork() != null) {
+                posters.putIfAbsent(m.getArtWork().getCrc32(), m.getArtWork().getFileName());
+                tempPosters.add(m.getArtWork().getFileName());
             }
+        });
 
+        try {
             int i = 0;
             for (String poster : posters.values()) {
                 String path = new File("external/x64/mp4art.exe").getAbsolutePath();
@@ -90,7 +74,6 @@ public class Mp4v2ArtBuilder {
             for (String tempPoster : tempPosters) {
                 FileUtils.deleteQuietly(new File(tempPoster));
             }
-            if (pictureProcess != null) pictureProcess.destroy();
             if (artProcess != null) artProcess.destroy();
         }
     }

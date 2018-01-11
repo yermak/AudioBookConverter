@@ -47,20 +47,22 @@ public class Mp4v2ArtBuilder {
                 throw new RuntimeException(e);
             }
         }));
-
         try {
             for (MediaInfo mediaInfo : media) {
                 String pictureFormat = mediaInfo.getPictureFormat();
                 if (pictureFormat != null) {
                     String poster = Utils.getTmp(jobId, mediaInfo.hashCode(), "." + pictureFormat);
-                    ProcessBuilder pictureProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
+                    String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+                    ProcessBuilder pictureProcessBuilder = new ProcessBuilder(path,
                             "-i", mediaInfo.getFileName(),
                             poster);
-                    pictureProcessBuilder.redirectErrorStream();
                     pictureProcess = pictureProcessBuilder.start();
 
                     StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
                     Future<Long> pictureFuture = Executors.newWorkStealingPool().submit(pictureToOut);
+                    // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
+                    StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.err);
+                    Future<Long> errFuture = Executors.newWorkStealingPool().submit(pictureToErr);
                     pictureFuture.get();
                     File posterFile = new File(poster);
                     long crc32 = FileUtils.checksumCRC32(posterFile);
@@ -71,7 +73,8 @@ public class Mp4v2ArtBuilder {
 
             int i = 0;
             for (String poster : posters.values()) {
-                ProcessBuilder artProcessBuilder = new ProcessBuilder("external/x64/mp4art.exe",
+                String path = new File("external/x64/mp4art.exe").getAbsolutePath();
+                ProcessBuilder artProcessBuilder = new ProcessBuilder(path,
                         "--art-index", String.valueOf(i++),
                         "--add", poster,
                         outputFileName);

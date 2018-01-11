@@ -1,25 +1,25 @@
-package com.freeipodsoftware.abc;
+package uk.yermak.audiobookconverter;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-public class Mp4Tags {
+public class AudioBookInfo {
     private String writer = "";
     private String narrator = "";
     private String title = "";
     private String series = "";
     private String genre = "";
     private String year = "";
-    private int track;
+    private int bookNumber;
     private int totalTracks;
     private String comment = "";
     private String longDescription = "";
 
-    public Mp4Tags() {
+    public AudioBookInfo() {
     }
 
-    public Mp4Tags(Map<String, String> tags) {
+    public AudioBookInfo(Map<String, String> tags) {
         if (tags != null) {
             setTitle(tags.get("title"));
             setWriter(tags.get("artist"));
@@ -35,7 +35,7 @@ public class Mp4Tags {
                 String[] split = track.split("/");
 
                 if (split.length > 0 && StringUtils.isNumeric(split[0])) {
-                    setTrack(Integer.parseInt(split[0]));
+                    setBookNumber(Integer.parseInt(split[0]));
                 }
                 if (split.length > 1 && StringUtils.isNumeric(split[1])) {
                     setTotalTracks(Integer.parseInt(split[1]));
@@ -85,12 +85,12 @@ public class Mp4Tags {
         this.title = title;
     }
 
-    public int getTrack() {
-        return this.track;
+    public int getBookNumber() {
+        return this.bookNumber;
     }
 
-    public void setTrack(int track) {
-        this.track = track;
+    public void setBookNumber(int bookNumber) {
+        this.bookNumber = bookNumber;
     }
 
     public String getNarrator() {

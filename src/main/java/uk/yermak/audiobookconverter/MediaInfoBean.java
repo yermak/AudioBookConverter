@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Mp4Tags;
-
 /**
  * Created by Yermak on 02-Jan-18.
  */
@@ -11,7 +9,7 @@ public class MediaInfoBean implements MediaInfo {
     private int bitrate = 128000;
     private long duration;
     private String fileName;
-    private Mp4Tags mp4Tags;
+    private AudioBookInfo mp4Tags;
     private ArtWork artWork;
 
     public MediaInfoBean(String fileName) {
@@ -64,12 +62,12 @@ public class MediaInfoBean implements MediaInfo {
     }
 
     @Override
-    public void setMp4Tags(Mp4Tags mp4Tags) {
+    public void setMp4Tags(AudioBookInfo mp4Tags) {
         this.mp4Tags = mp4Tags;
     }
 
     @Override
-    public Mp4Tags getMp4Tags() {
+    public AudioBookInfo getMp4Tags() {
         return mp4Tags;
     }
 

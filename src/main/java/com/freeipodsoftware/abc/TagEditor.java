@@ -3,6 +3,7 @@ package com.freeipodsoftware.abc;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import uk.yermak.audiobookconverter.AudioBookInfo;
 
 public class TagEditor extends TagEditorGui {
     public TagEditor(Composite parent) {
@@ -61,8 +62,8 @@ public class TagEditor extends TagEditorGui {
         this.setComment("");
     }
 
-    public Mp4Tags getMp4Tags() {
-        Mp4Tags tags = new Mp4Tags();
+    public AudioBookInfo getMp4Tags() {
+        AudioBookInfo tags = new AudioBookInfo();
         tags.setWriter(this.writerText.getText());
         tags.setNarrator(this.narratorText.getText());
         tags.setTitle(this.titleText.getText());
@@ -70,7 +71,7 @@ public class TagEditor extends TagEditorGui {
         tags.setGenre(this.genreCombo.getText());
         tags.setYear(this.yearText.getText());
         if (StringUtils.isNotBlank(this.bookNumberText.getText()) && StringUtils.isNumeric(this.bookNumberText.getText())){
-            tags.setTrack(Integer.valueOf(this.bookNumberText.getText()));
+            tags.setBookNumber(Integer.valueOf(this.bookNumberText.getText()));
         }
         if (StringUtils.isNotBlank(this.totalBooksText.getText()) && StringUtils.isNumeric(this.totalBooksText.getText())){
             tags.setTotalTracks(Integer.valueOf(this.totalBooksText.getText()));

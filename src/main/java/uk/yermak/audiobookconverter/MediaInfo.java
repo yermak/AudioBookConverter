@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Mp4Tags;
-
 /**
  * Created by Yermak on 03-Jan-18.
  */
@@ -24,9 +22,9 @@ public interface MediaInfo {
 
     String getFileName();
 
-    void setMp4Tags(Mp4Tags mp4Tags);
+    void setMp4Tags(AudioBookInfo mp4Tags);
 
-    Mp4Tags getMp4Tags();
+    AudioBookInfo getMp4Tags();
 
     ArtWork getArtWork();
 

@@ -1,6 +1,5 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.Mp4Tags;
 import com.freeipodsoftware.abc.StateListener;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.FileDialog;
@@ -14,7 +13,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     protected boolean finished;
     protected boolean canceled;
     protected boolean paused;
-    protected Mp4Tags mp4Tags;
+    protected AudioBookInfo mp4Tags;
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
 
@@ -22,7 +21,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     protected AbstractConversionStrategy() {
     }
 
-    public void setMp4Tags(Mp4Tags mp4Tags) {
+    public void setMp4Tags(AudioBookInfo mp4Tags) {
         this.mp4Tags = mp4Tags;
     }
 
@@ -66,10 +65,10 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
             builder
                     .append(" - [")
                     .append(StringUtils.trim(mp4Tags.getSeries()));
-            if (mp4Tags.getTrack() > 0) {
+            if (mp4Tags.getBookNumber() > 0) {
                 builder
                         .append(" - ")
-                        .append(mp4Tags.getTrack());
+                        .append(mp4Tags.getBookNumber());
             }
             builder.append("] ");
         }
@@ -144,7 +143,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     }
 
-    protected void prepareFilesAndFillMeta(long jobId, List<String> outFiles, List<String> metaData, Mp4Tags mp4Tags, List<MediaInfo> mediaInfos) {
+    protected void prepareFilesAndFillMeta(long jobId, List<String> outFiles, List<String> metaData, AudioBookInfo mp4Tags, List<MediaInfo> mediaInfos) {
         metaData.add(";FFMETADATA1");
         metaData.add("major_brand=M4A");
         metaData.add("minor_version=512");
@@ -154,7 +153,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries()) ? mp4Tags.getSeries() : mp4Tags.getTitle()));
         metaData.add("composer=" + mp4Tags.getNarrator());
         metaData.add("comment=" + mp4Tags.getComment());
-        metaData.add("track=" + mp4Tags.getTrack() + "/" + mp4Tags.getTotalTracks());
+        metaData.add("track=" + mp4Tags.getBookNumber() + "/" + mp4Tags.getTotalTracks());
         metaData.add("media_type=2");
         metaData.add("genre=Audiobook");
         metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");

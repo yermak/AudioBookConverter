@@ -1,7 +1,7 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.Mp4Tags;
 import org.eclipse.swt.widgets.Shell;
+import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.ProgressCallback;
 
@@ -14,7 +14,7 @@ public interface ConversionStrategy {
 
     void start(Shell var1);
 
-    void setMp4Tags(Mp4Tags var1);
+    void setMp4Tags(AudioBookInfo var1);
 
     String getAdditionalFinishedMessage();
 

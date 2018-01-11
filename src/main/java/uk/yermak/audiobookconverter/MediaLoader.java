@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Mp4Tags;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -75,7 +74,7 @@ public class MediaLoader {
                         mediaInfo.setArtWork(artWork);
                     }
                 }
-                Mp4Tags mp4Tags = new Mp4Tags(format.tags);
+                AudioBookInfo mp4Tags = new AudioBookInfo(format.tags);
                 mediaInfo.setMp4Tags(mp4Tags);
                 return mediaInfo;
             } catch (IOException e) {

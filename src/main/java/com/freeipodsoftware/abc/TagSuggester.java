@@ -1,6 +1,7 @@
 package com.freeipodsoftware.abc;
 
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.StateDispatcher;
@@ -32,7 +33,7 @@ public class TagSuggester implements StateListener {
         List<MediaInfo> media = inputFileSelection.getMedia();
         this.tagEditor.clear();
         if (media.size() > 0) {
-            Mp4Tags tags = media.get(0).getMp4Tags();
+            AudioBookInfo tags = media.get(0).getMp4Tags();
             this.tagEditor.setWriter(tags.getWriter());
 //            this.tagEditor.setWriter(fixEncoding(tags.getWriter()));
             this.tagEditor.setNarrator(tags.getNarrator());
@@ -40,8 +41,8 @@ public class TagSuggester implements StateListener {
             this.tagEditor.setAlbum(tags.getSeries());
             this.tagEditor.setGenre(tags.getGenre());
             this.tagEditor.setYear(tags.getYear());
-            if (tags.getTrack() > 0) {
-                this.tagEditor.setTrack(String.valueOf(tags.getTrack()));
+            if (tags.getBookNumber() > 0) {
+                this.tagEditor.setTrack(String.valueOf(tags.getBookNumber()));
             }
             if (tags.getTotalTracks() > 0) {
                 this.tagEditor.setTotalTracks(String.valueOf(tags.getTotalTracks()));

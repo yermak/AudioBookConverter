@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Mp4Tags;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -71,12 +69,12 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
-    public void setMp4Tags(Mp4Tags mp4Tags) {
+    public void setMp4Tags(AudioBookInfo mp4Tags) {
         getMediaInfo().setMp4Tags(mp4Tags);
     }
 
     @Override
-    public Mp4Tags getMp4Tags() {
+    public AudioBookInfo getMp4Tags() {
         return getMediaInfo().getMp4Tags();
     }
 

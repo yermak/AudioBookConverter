@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.MessageBox;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.StateListener;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;

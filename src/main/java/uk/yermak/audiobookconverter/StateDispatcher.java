@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.StateListener;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

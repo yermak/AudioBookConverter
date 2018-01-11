@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.StateListener;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 

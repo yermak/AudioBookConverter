@@ -9,10 +9,7 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.JobProgress;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

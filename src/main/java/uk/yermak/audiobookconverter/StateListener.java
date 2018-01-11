@@ -1,6 +1,4 @@
-package com.freeipodsoftware.abc;
-
-import uk.yermak.audiobookconverter.ConversionMode;
+package uk.yermak.audiobookconverter;
 
 public interface StateListener {
     void finishedWithError(String error);

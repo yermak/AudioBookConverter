@@ -81,12 +81,13 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
-    public String getPictureFormat() {
-        return getMediaInfo().getPictureFormat();
+    public ArtWork getArtWork() {
+        return getMediaInfo().getArtWork();
     }
 
     @Override
-    public void setPictureFormat(String format) {
-        getMediaInfo().setPictureFormat(format);
+    public void setArtWork(ArtWork artWork) {
+        getMediaInfo().setArtWork(artWork);
     }
+
 }

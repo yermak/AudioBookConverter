@@ -13,7 +13,9 @@ import java.util.Map;
  * Created by Yermak on 03-Jan-18.
  */
 public class JobProgress implements Runnable, StateListener {
+    private final ConversionStrategy conversionStrategy;
     private ProgressView progressView;
+    private final List<MediaInfo> media;
     private long startTime = System.currentTimeMillis();
     private boolean finished;
     private int totalFiles;
@@ -24,9 +26,17 @@ public class JobProgress implements Runnable, StateListener {
     private boolean paused;
     private boolean cancelled;
     private long pausePeriod;
+    private long pauseTime;
 
     public JobProgress(ConversionStrategy conversionStrategy, ProgressView progressView, List<MediaInfo> media) {
+        this.conversionStrategy = conversionStrategy;
         this.progressView = progressView;
+        this.media = media;
+    }
+
+
+    @Override
+    public void run() {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         for (MediaInfo mediaInfo : media) {
@@ -37,11 +47,7 @@ public class JobProgress implements Runnable, StateListener {
         progressCallbacks.put("output", new ProgressCallback("output", this));
         conversionStrategy.setCallbacks(progressCallbacks);
         StateDispatcher.getInstance().addListener(this);
-    }
 
-
-    @Override
-    public void run() {
         progressView.getDisplay().syncExec(() -> {
             progressView.setInfoText(Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles);
             progressView.setProgress(0);
@@ -78,8 +84,8 @@ public class JobProgress implements Runnable, StateListener {
 
         if (currentDuration > 0 && totalDuration > 0) {
             double progress = (double) currentDuration / totalDuration;
-            long delta = (System.currentTimeMillis() - pausePeriod) - startTime;
-            long remainingTime = (long) (delta / progress);
+            long delta = System.currentTimeMillis() - pausePeriod - startTime;
+            long remainingTime = ((long) (delta / progress)) - delta + 1000;
             long finalSize = estimatedSize;
             progressView.getDisplay().syncExec(() -> {
                 progressView.setProgress((int) (progress * 100));
@@ -113,17 +119,27 @@ public class JobProgress implements Runnable, StateListener {
     @Override
     public void canceled() {
         cancelled = true;
+        durations.clear();
+        sizes.clear();
+        progressView.getDisplay().syncExec(() -> {
+            progressView.setProgress(0);
+            progressView.setRemainingTime(0);
+            progressView.setElapsedTime(0);
+            progressView.setEstimatedFinalOutputSize(-1L);
+            progressView.getDisplay().syncExec(() -> progressView.setInfoText("Conversion was cancelled"));
+        });
     }
 
     @Override
     public void paused() {
-        pausePeriod = System.currentTimeMillis() - startTime;
         paused = true;
+        pauseTime = System.currentTimeMillis();
     }
 
     @Override
     public void resumed() {
         paused = false;
+        pausePeriod += System.currentTimeMillis() - pauseTime;
     }
 
     @Override

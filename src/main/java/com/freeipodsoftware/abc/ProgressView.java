@@ -80,7 +80,6 @@ public class ProgressView extends ProgressViewGui implements StateListener {
     }
 
     private String formatTime(long millis) {
-
         String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
@@ -94,11 +93,14 @@ public class ProgressView extends ProgressViewGui implements StateListener {
             DecimalFormat mbFormat = new DecimalFormat("0");
             this.outputFileSizeValueLabel.setText(mbFormat.format((double) bytes / 1048576.0D) + " MB");
         }
-
     }
 
     public void setRemainingTime(long remainingTime) {
-        remainingTimeLabel.setText(Messages.getString("ProgressView.timeRemaining") + " " + formatTime(remainingTime));
+        if (remainingTime == -1L) {
+            remainingTimeLabel.setText(Messages.getString("ProgressView.timeRemaining") + " --- ");
+        } else {
+            remainingTimeLabel.setText(Messages.getString("ProgressView.timeRemaining") + " " + formatTime(remainingTime));
+        }
     }
 
     public void setInfoText(String infoText) {

@@ -69,7 +69,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
         });
         updateLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Program.launch("https://github.com/yermak/AudioBookConverter");
+                Program.launch("https://github.com/yermak/AudioBookConverter/releases");
             }
         });
         websiteLink.addSelectionListener(new SelectionAdapter() {
@@ -79,7 +79,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
         });
         helpLink.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                Program.launch("https://github.com/yermak/AudioBookConverter");
+                Program.launch("https://github.com/yermak/AudioBookConverter/wiki/Help");
             }
         });
         stateDispatcher.addListener(this);

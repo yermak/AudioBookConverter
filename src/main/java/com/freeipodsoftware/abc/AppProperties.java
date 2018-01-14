@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class AppProperties {
     public static final String WEBSITE_URL = "https://github.com/yermak/AudioBookConverter";
-    public static final String HELP_URL = "https://github.com/yermak/AudioBookConverter";
+    public static final String HELP_URL = "https://github.com/yermak/AudioBookConverter/";
     private static final String APP_PROPERTIES = "app.properties";
     private static final String APPDATA = "APPDATA";
     private static final String MP3TOI_POD_AUDIO_BOOK_CONVERTER = "MP3toiPodAudioBookConverter";

@@ -36,7 +36,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
         thisClass.create();
         thisClass.sShell.open();
         if (AppProperties.getBooleanProperty("stayUpdated") && !isUpdateCheckSuspended()) {
-            checkForUpdates(thisClass.sShell);
+//            checkForUpdates(thisClass.sShell);
         }
 
         while (!thisClass.sShell.isDisposed()) {

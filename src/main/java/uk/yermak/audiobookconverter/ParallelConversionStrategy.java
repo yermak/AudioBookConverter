@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import com.freeipodsoftware.abc.Messages;
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.widgets.Shell;
@@ -93,6 +94,10 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     protected String getTempFileName(long jobId, int index, String extension) {
         return Utils.getTmp(jobId, index, extension);
+    }
+
+    public String getAdditionalFinishedMessage() {
+        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;
     }
 
 }

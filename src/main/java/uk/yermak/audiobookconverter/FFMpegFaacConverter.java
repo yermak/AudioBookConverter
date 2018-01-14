@@ -36,12 +36,10 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
                 "-acodec", "pcm_s16le",
                 "-");
 
-
         Process ffmpegProcess = ffmpegProcessBuilder.start();
         InputStream ffmpegIn = ffmpegProcess.getInputStream();
         InputStream ffmpegErr = ffmpegProcess.getErrorStream();
         PrintWriter ffmpegOut = new PrintWriter(new OutputStreamWriter(ffmpegProcess.getOutputStream()));
-
 
         ProcessBuilder faacProcessBuilder = new ProcessBuilder("external/faac.exe",
                 "-b", String.valueOf(bitrate / 1024),

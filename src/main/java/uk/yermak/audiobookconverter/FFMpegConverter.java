@@ -52,7 +52,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
                     "-vn",
                     "-codec:a", "libfdk_aac",
                     "-f", "ipod",
-                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
+//                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
                     "-ar", String.valueOf(mediaInfo.getFrequency()),
                     "-ac", String.valueOf(mediaInfo.getChannels()),
                     "-progress", progressParser.getUri().toString(),

@@ -2,11 +2,15 @@ package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Mp4Tags;
 import com.freeipodsoftware.abc.StateListener;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -144,7 +148,10 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     }
 
-    protected void prepareFilesAndFillMeta(long jobId, List<String> outFiles, List<String> metaData, Mp4Tags mp4Tags, List<MediaInfo> mediaInfos) {
+    protected File prepareMeta(long jobId) throws IOException {
+        File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
+        List<String> metaData = new ArrayList<>();
+
         metaData.add(";FFMETADATA1");
         metaData.add("major_brand=M4A");
         metaData.add("minor_version=512");
@@ -160,16 +167,31 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");
 
         long totalDuration = 0;
-        for (int i = 0; i < mediaInfos.size(); i++) {
+        for (int i = 0; i < media.size(); i++) {
             metaData.add("[CHAPTER]");
             metaData.add("TIMEBASE=1/1000");
             metaData.add("START=" + totalDuration);
-            totalDuration += mediaInfos.get(i).getDuration();
+            totalDuration += media.get(i).getDuration();
             metaData.add("END=" + totalDuration);
             metaData.add("title=Chapter " + (i + 1));
-            outFiles.add("file '" + getTempFileName(jobId, mediaInfos.get(i).hashCode(), ".m4b") + "'");
         }
+        FileUtils.writeLines(metaFile, "UTF-8", metaData);
+        return metaFile;
+
     }
+
+    protected File prepareFiles(long jobId) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+        List<String> outFiles = new ArrayList<>();
+
+        for (int i = 0; i < media.size(); i++) {
+            outFiles.add("file '" + getTempFileName(jobId, media.get(i).hashCode(), ".m4b") + "'");
+        }
+        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
+
+        return fileListFile;
+    }
+
 
     protected abstract String getTempFileName(long jobId, int index, String extension);
 

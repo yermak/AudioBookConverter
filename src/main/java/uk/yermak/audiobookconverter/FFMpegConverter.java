@@ -21,6 +21,8 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
     private boolean cancelled;
     private boolean paused;
     private Process process;
+    private final static String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+
 
     public FFMpegConverter(MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
         this.mediaInfo = mediaInfo;
@@ -45,9 +47,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             });
             progressParser.start();
 
-            String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
-
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(path,
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-vn",
                     "-codec:a", "libfdk_aac",

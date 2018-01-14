@@ -80,7 +80,6 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
                 } catch (TimeoutException ignored) {
                 }
             }
-
         } finally {
             if (ffmpegProcess != null) ffmpegProcess.destroy();
             if (progressParser != null) progressParser.stop();

@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private String outputFileName;
+    private ExecutorService executorService = Executors.newWorkStealingPool();
 
     public boolean makeUserInterview(Shell shell, String fileName) {
         this.outputFileName = selectOutputFile(shell, getOuputFilenameSuggestion(fileName));
@@ -33,23 +35,20 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
         String tempFile = getTempFileName(jobId, 999999, ".m4b");
 
+        File fileListFile = null;
+        File metaFile = null;
+
         MediaInfo maxMedia = maximiseEncodingParameters();
 
         try {
-            List<MediaInfo> dest = new ArrayList<>();
-            for (MediaInfo mediaInfo : media) {
-                dest.add(mediaInfo);
-                mediaInfo.setFrequency(maxMedia.getFrequency());
-                mediaInfo.setChannels(maxMedia.getChannels());
-                mediaInfo.setBitrate(maxMedia.getBitrate());
-            }
-            Collections.sort(dest, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
+            fileListFile = prepareFiles(jobId);
+            metaFile = prepareMeta(jobId);
 
-            for (MediaInfo mediaInfo : dest) {
+            List<MediaInfo> prioritizedMedia = prioritiseMedia(maxMedia);
+            for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
-                Future<ConverterOutput> converterFuture =
-                        Executors.newWorkStealingPool()
-                                .submit(new FFMpegConverter(mediaInfo, tempOutput, progressCallbacks.get(mediaInfo.getFileName())));
+                ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
@@ -57,26 +56,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 future.get();
             }
 
-            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
-            File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-
-            List<String> outFiles = new ArrayList<>();
-            List<String> metaData = new ArrayList<>();
-
-            prepareFilesAndFillMeta(jobId, outFiles, metaData, mp4Tags, media);
-
-            FileUtils.writeLines(metaFile, "UTF-8", metaData);
-            FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
-
             Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
-
-            FileUtils.deleteQuietly(metaFile);
-            FileUtils.deleteQuietly(fileListFile);
-
-            for (int i = 0; i < media.size(); i++) {
-                FileUtils.deleteQuietly(new File(getTempFileName(jobId, media.get(i).hashCode(), ".m4b")));
-            }
 
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
             artBuilder.coverArt();
@@ -89,7 +70,24 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             finilize();
+            for (MediaInfo mediaInfo : media) {
+                FileUtils.deleteQuietly(new File(getTempFileName(jobId, mediaInfo.hashCode(), ".m4b")));
+            }
+            FileUtils.deleteQuietly(metaFile);
+            FileUtils.deleteQuietly(fileListFile);
         }
+    }
+
+    private List<MediaInfo> prioritiseMedia(MediaInfo maxMedia) {
+        List<MediaInfo> sortedMedia = new ArrayList<>();
+        for (MediaInfo mediaInfo : media) {
+            sortedMedia.add(mediaInfo);
+            mediaInfo.setFrequency(maxMedia.getFrequency());
+            mediaInfo.setChannels(maxMedia.getChannels());
+            mediaInfo.setBitrate(maxMedia.getBitrate());
+        }
+        Collections.sort(sortedMedia, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
+        return sortedMedia;
     }
 
 

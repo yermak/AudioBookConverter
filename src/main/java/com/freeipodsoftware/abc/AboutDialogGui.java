@@ -22,7 +22,6 @@ public class AboutDialogGui extends Composite {
     private Link link4 = null;
     private Link link5 = null;
     private Composite composite = null;
-    //    private Button checkBox = null;
     private Button closeButton = null;
     private Link link6;
     private Link link7 = null;
@@ -51,17 +50,9 @@ public class AboutDialogGui extends Composite {
         this.composite = new Composite(this, 0);
         this.composite.setLayoutData(gridData2);
         this.composite.setLayout(gridLayout);
-//        this.checkBox = new Button(this.composite, 32);
-//        this.checkBox.setSelection(AppProperties.getBooleanProperty("stayUpdated"));
-//        this.checkBox.setText(Messages.getString("AboutComposite.checkForUpdates"));
         this.closeButton = new Button(this.composite, 0);
         this.closeButton.setText(Messages.getString("AboutComposite.close"));
         this.closeButton.setLayoutData(gridData3);
-//        this.closeButton.addSelectionListener(new SelectionAdapter() {
-//            public void widgetSelected(SelectionEvent e) {
-//                AppProperties.setBooleanProperty("stayUpdated", AboutDialogGui.this.checkBox.getSelection());
-//            }
-//        });
         this.closeButton.setFocus();
     }
 

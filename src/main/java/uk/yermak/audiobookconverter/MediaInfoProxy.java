@@ -69,13 +69,13 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
-    public void setMp4Tags(AudioBookInfo mp4Tags) {
-        getMediaInfo().setMp4Tags(mp4Tags);
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        getMediaInfo().setBookInfo(bookInfo);
     }
 
     @Override
-    public AudioBookInfo getMp4Tags() {
-        return getMediaInfo().getMp4Tags();
+    public AudioBookInfo getBookInfo() {
+        return getMediaInfo().getBookInfo();
     }
 
     @Override

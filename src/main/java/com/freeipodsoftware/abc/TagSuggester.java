@@ -30,21 +30,21 @@ public class TagSuggester implements StateListener {
         List<MediaInfo> media = inputFileSelection.getMedia();
         this.tagEditor.clear();
         if (media.size() > 0) {
-            AudioBookInfo tags = media.get(0).getMp4Tags();
-            this.tagEditor.setWriter(tags.getWriter());
-//            this.tagEditor.setWriter(fixEncoding(tags.getWriter()));
-            this.tagEditor.setNarrator(tags.getNarrator());
-            this.tagEditor.setTitle(tags.getTitle());
-            this.tagEditor.setAlbum(tags.getSeries());
-            this.tagEditor.setGenre(tags.getGenre());
-            this.tagEditor.setYear(tags.getYear());
-            if (tags.getBookNumber() > 0) {
-                this.tagEditor.setTrack(String.valueOf(tags.getBookNumber()));
+            AudioBookInfo bookInfo = media.get(0).getBookInfo();
+            this.tagEditor.setWriter(bookInfo.getWriter());
+//            this.tagEditor.setWriter(fixEncoding(bookInfo.getWriter()));
+            this.tagEditor.setNarrator(bookInfo.getNarrator());
+            this.tagEditor.setTitle(bookInfo.getTitle());
+            this.tagEditor.setAlbum(bookInfo.getSeries());
+            this.tagEditor.setGenre(bookInfo.getGenre());
+            this.tagEditor.setYear(bookInfo.getYear());
+            if (bookInfo.getBookNumber() > 0) {
+                this.tagEditor.setTrack(String.valueOf(bookInfo.getBookNumber()));
             }
-            if (tags.getTotalTracks() > 0) {
-                this.tagEditor.setTotalTracks(String.valueOf(tags.getTotalTracks()));
+            if (bookInfo.getTotalTracks() > 0) {
+                this.tagEditor.setTotalTracks(String.valueOf(bookInfo.getTotalTracks()));
             }
-            this.tagEditor.setComment(tags.getComment());
+            this.tagEditor.setComment(bookInfo.getComment());
         }
     }
 

@@ -9,7 +9,7 @@ public class MediaInfoBean implements MediaInfo {
     private int bitrate = 128000;
     private long duration;
     private String fileName;
-    private AudioBookInfo mp4Tags;
+    private AudioBookInfo bookInfo;
     private ArtWork artWork;
 
     public MediaInfoBean(String fileName) {
@@ -62,13 +62,13 @@ public class MediaInfoBean implements MediaInfo {
     }
 
     @Override
-    public void setMp4Tags(AudioBookInfo mp4Tags) {
-        this.mp4Tags = mp4Tags;
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        this.bookInfo = bookInfo;
     }
 
     @Override
-    public AudioBookInfo getMp4Tags() {
-        return mp4Tags;
+    public AudioBookInfo getBookInfo() {
+        return bookInfo;
     }
 
     public ArtWork getArtWork() {

@@ -8,12 +8,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
-import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.JobProgress;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.StateDispatcher;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -90,7 +85,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
 
     private void startConversion() {
         List<MediaInfo> media = this.inputFileSelection.getMedia();
-        getConversionStrategy().setMp4Tags(this.toggleableTagEditor.getTagEditor().getMp4Tags());
+        getConversionStrategy().setBookInfo(this.toggleableTagEditor.getTagEditor().getAudioBookInfo());
         if (media.size() > 0) {
             if (this.getConversionStrategy().makeUserInterview(this.sShell, media.get(0).getFileName())) {
                 conversionStrategy.setMedia(media);

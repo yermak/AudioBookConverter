@@ -16,17 +16,15 @@ public class Mp4v2ArtBuilder {
 
     private List<MediaInfo> media;
     private final String outputFileName;
-    private long jobId;
+    private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
 
     public Mp4v2ArtBuilder(List<MediaInfo> media, String outputFileName, long jobId) {
         this.media = media;
         this.outputFileName = outputFileName;
-        this.jobId = jobId;
     }
 
     private Collection<File> findPictures(File dir) {
-        Collection<File> files = FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
-        return files;
+        return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
     }
 
 
@@ -57,8 +55,7 @@ public class Mp4v2ArtBuilder {
         try {
             int i = 0;
             for (String poster : posters.values()) {
-                String path = new File("external/x64/mp4art.exe").getAbsolutePath();
-                ProcessBuilder artProcessBuilder = new ProcessBuilder(path,
+                ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                         "--art-index", String.valueOf(i++),
                         "--add", poster,
                         outputFileName);

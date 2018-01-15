@@ -18,8 +18,8 @@ import java.util.concurrent.*;
 public class MediaLoader {
 
     private List<String> fileNames;
+    private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
     private static ExecutorService executorService = Executors.newWorkStealingPool();
-
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
@@ -27,8 +27,7 @@ public class MediaLoader {
 
     public List<MediaInfo> loadMediaInfo() {
         try {
-            String path = new File("external/x64/ffprobe.exe").getAbsolutePath();
-            FFprobe ffprobe = new FFprobe(path);
+            FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
@@ -89,6 +88,8 @@ public class MediaLoader {
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
 
+        private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+
         private MediaInfoBean mediaInfo;
         private String format;
 
@@ -103,8 +104,7 @@ public class MediaLoader {
 
             try {
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), "." + format);
-                String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
-                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(path,
+                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         poster);
                 pictureProcess = pictureProcessBuilder.start();

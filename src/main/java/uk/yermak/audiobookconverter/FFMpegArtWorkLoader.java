@@ -17,6 +17,7 @@ public class FFMpegArtWorkLoader {
     private String format;
     private long jobId;
     private MediaInfo mediaInfo;
+    private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
 
     public FFMpegArtWorkLoader(MediaInfo mediaInfo) {
         this.mediaInfo = mediaInfo;
@@ -30,8 +31,8 @@ public class FFMpegArtWorkLoader {
         try {
             fileId = mediaInfo.hashCode();
             String poster = Utils.getTmp(jobId, fileId, "." + format);
-            String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
-            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(path,
+
+            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     poster);
             pictureProcess = pictureProcessBuilder.start();

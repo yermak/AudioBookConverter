@@ -8,7 +8,7 @@ import uk.yermak.audiobookconverter.StateDispatcher;
 
 public class OptionPanel extends OptionPanelGui {
     private static final String OPTION_PANEL_CONVERSION_MODE = "optionPanel.conversionMode";
-    private ConversionMode mode = ConversionMode.SINGLE;
+    private ConversionMode mode = ConversionMode.PARALLEL;
 
     public OptionPanel(Composite parent) {
         super(parent);

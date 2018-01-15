@@ -19,7 +19,8 @@ public class MediaLoader {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static ExecutorService executorService = Executors.newWorkStealingPool();
+    private static ExecutorService mediaExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+    private static ExecutorService artExecutorService = Executors.newFixedThreadPool(2);
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
@@ -30,7 +31,7 @@ public class MediaLoader {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
-                Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
+                Future futureLoad = mediaExecutorService.submit(new MediaInfoCallable(ffprobe, fileName));
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
@@ -68,7 +69,7 @@ public class MediaLoader {
                         mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
                         mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
                     } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
-                        Future futureLoad = executorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
+                        Future futureLoad = artExecutorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
                         mediaInfo.setArtWork(artWork);
                     }

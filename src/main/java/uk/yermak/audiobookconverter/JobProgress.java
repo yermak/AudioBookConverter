@@ -113,6 +113,7 @@ public class JobProgress implements Runnable, StateListener {
     @Override
     public void finished() {
         finished = true;
+        resetStats();
     }
 
     @Override

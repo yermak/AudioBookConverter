@@ -53,8 +53,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 futures.add(converterFuture);
             }
 
-            for (int i = 0; i < futures.size() && !canceled; i++) {
-                Future<ConverterOutput> future = futures.get(i);
+            for (Future<ConverterOutput> future : futures) {
+                if (canceled) return;
                 future.get();
             }
 

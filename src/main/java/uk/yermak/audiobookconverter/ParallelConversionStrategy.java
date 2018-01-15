@@ -53,16 +53,20 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 futures.add(converterFuture);
             }
 
-            for (Future<ConverterOutput> future : futures) {
+            for (int i = 0; i < futures.size() && !canceled; i++) {
+                Future<ConverterOutput> future = futures.get(i);
                 future.get();
             }
 
+            if (canceled) return;
             Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
+            if (canceled) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
             artBuilder.coverArt();
 
+            if (canceled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputFileName));
 
         } catch (InterruptedException | ExecutionException | IOException e) {

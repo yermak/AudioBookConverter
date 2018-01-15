@@ -10,6 +10,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.*;
 
+import static com.freeipodsoftware.abc.AppProperties.WEBSITE_URL;
+
 public class AboutDialogGui extends Composite {
     private Label label = null;
     private Label label1 = null;
@@ -20,7 +22,6 @@ public class AboutDialogGui extends Composite {
     private Link link4 = null;
     private Link link5 = null;
     private Composite composite = null;
-    private Button checkBox = null;
     private Button closeButton = null;
     private Link link6;
     private Link link7 = null;
@@ -49,17 +50,9 @@ public class AboutDialogGui extends Composite {
         this.composite = new Composite(this, 0);
         this.composite.setLayoutData(gridData2);
         this.composite.setLayout(gridLayout);
-        this.checkBox = new Button(this.composite, 32);
-        this.checkBox.setSelection(AppProperties.getBooleanProperty("stayUpdated"));
-        this.checkBox.setText(Messages.getString("AboutComposite.checkForUpdates"));
         this.closeButton = new Button(this.composite, 0);
         this.closeButton.setText(Messages.getString("AboutComposite.close"));
         this.closeButton.setLayoutData(gridData3);
-        this.closeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                AppProperties.setBooleanProperty("stayUpdated", AboutDialogGui.this.checkBox.getSelection());
-            }
-        });
         this.closeButton.setFocus();
     }
 
@@ -114,36 +107,38 @@ public class AboutDialogGui extends Composite {
         Label versionLabel = new Label(this, 0);
         versionLabel.setText(Messages.getString("AboutComposite.version") + Version.getVersionString());
         this.link7 = new Link(this, 0);
-        this.link7.setText(Messages.getString("AboutComposite.website") + ": <a>www.freeipodsoftware.com</a>");
-        this.assignLink(this.link7, "http://www.freeipodsoftware.com/");
+        this.link7.setText(Messages.getString("AboutComposite.website") + ": <a>AudioBookConverter</a>");
+        this.assignLink(this.link7, WEBSITE_URL);
         this.label = new Label(this, 64);
         this.label.setText(Messages.getString("AboutComposite.description"));
         this.label.setLayoutData(gridData);
         this.label1 = new Label(this, 0);
         this.label1.setText(Messages.getString("AboutComposite.thirdPartyText") + ":");
         this.link = new Link(this, 0);
-        this.link.setText("<a>JLayer</a>");
-        this.assignLink(this.link, "http://www.javazoom.net/javalayer/javalayer.html");
+        this.link.setText("<a>FFMpeg</a>");
+        this.assignLink(this.link, "https://ffmpeg.org");
         this.link1 = new Link(this, 0);
-        this.link1.setText("<a>Freeware Advanced Audio Coder</a>");
-        this.assignLink(this.link1, "http://www.audiocoding.com/");
+        this.link1.setText("<a>MP4V2</a>");
+        this.assignLink(this.link1, "https://code.google.com/p/mp4v2//");
         this.link2 = new Link(this, 0);
-        this.link2.setText("<a>Apache Jakarta Commons IO</a>");
-        this.assignLink(this.link2, "http://jakarta.apache.org/commons/io/");
+        this.link2.setText("<a>Apache Jakarta Commons</a>");
+        this.assignLink(this.link2, "http://jakarta.apache.org/commons/");
         this.link3 = new Link(this, 0);
         this.link3.setText("<a>Eclipse SWT</a>");
-        this.jid3Link = new Link(this, 0);
-        this.jid3Link.setText("<a>JID3</a>");
-        this.assignLink(this.jid3Link, "http://jid3.blinkenlights.org/");
         this.assignLink(this.link3, "http://eclipse.org/swt");
+        this.jid3Link = new Link(this, 0);
+        this.jid3Link.setText("<a>FFMpeg Cli Wrapper</a>");
+        this.assignLink(this.jid3Link, "https://github.com/bramp/ffmpeg-cli-wrapper");
         this.link5 = new Link(this, 0);
         this.link5.setText(Messages.getString("AboutComposite.developedBy") + " <a>Florian Fankhauser</a> " + Messages.getString("AboutComposite.usingJava") + ".");
         this.assignLink(this.link5, "http://ffxml.net");
-        Label translatorLabel = new Label(this, 0);
-        translatorLabel.setText(Messages.getString("AboutComposite.translatedBy") + " " + Messages.getString("AboutComposite.translatorName") + ".");
+        Link modifiedLink = new Link(this, 0);
+        modifiedLink.setText(Messages.getString("AboutComposite.modifiedBy") + " " + "<a>Yarick Yermak</a>" + ".");
+        this.assignLink(modifiedLink, "https://github.com/yermak/");
+
         this.link6 = new Link(this, 0);
-        this.link6.setText(Messages.getString("AboutComposite.forMoreInformationVisit") + " <a>www.freeipodsoftware.com</a>.");
-        this.assignLink(this.link6, "http://www.freeipodsoftware.com/");
+        this.link6.setText(Messages.getString("AboutComposite.forMoreInformationVisit") + " <a>" + WEBSITE_URL + "</a>.");
+        this.assignLink(this.link6, WEBSITE_URL);
         this.link4 = new Link(this, 0);
         this.link4.setText(Messages.getString("AboutComposite.releasedUnderThe") + " <a>GNU General Public License</a>.");
         this.assignLink(this.link4, "http://www.gnu.org/licenses/gpl.html");

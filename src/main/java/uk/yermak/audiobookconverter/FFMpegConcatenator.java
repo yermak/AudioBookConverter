@@ -20,6 +20,8 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
     private boolean cancelled;
     private boolean paused;
     private ProgressParser progressParser;
+    private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+
 
 
     public FFMpegConcatenator(String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
@@ -45,9 +47,8 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
 
         Process ffmpegProcess = null;
         try {
-            String path = new File("external/x64/ffmpeg.exe").getAbsolutePath();
 
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(path,
+            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                     "-protocol_whitelist", "file,pipe,concat",
                     "-vn",
                     "-f", "concat",

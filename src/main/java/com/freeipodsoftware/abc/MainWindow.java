@@ -10,13 +10,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionMode;
+import uk.yermak.audiobookconverter.JobProgress;
+import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.StateDispatcher;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -32,16 +30,12 @@ public class MainWindow extends MainWindowGui implements StateListener {
 
         thisClass.create();
         thisClass.sShell.open();
-        if (AppProperties.getBooleanProperty("stayUpdated") && !isUpdateCheckSuspended()) {
-            checkForUpdates(thisClass.sShell);
-        }
 
         while (!thisClass.sShell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
-
         display.dispose();
     }
 
@@ -86,20 +80,6 @@ public class MainWindow extends MainWindowGui implements StateListener {
         (new AboutDialog(this.sShell)).open();
     }
 
-    private static boolean isUpdateCheckSuspended() {
-        try {
-            Date noUpdateCheckUntil = AppProperties.getDateProperty("noUpdateCheckUntil");
-            return (new Date()).before(noUpdateCheckUntil);
-        } catch (Exception var1) {
-            return false;
-        }
-    }
-
-    private static void checkForUpdates(Shell shell) {
-        MainWindow.UpdateThread updateThread = new MainWindow.UpdateThread(shell);
-        updateThread.start();
-    }
-
     private ConversionStrategy getConversionStrategy() {
         if (this.conversionStrategy != null) {
             return this.conversionStrategy;
@@ -141,7 +121,6 @@ public class MainWindow extends MainWindowGui implements StateListener {
             this.progressView.reset();
             return progressView;
         }
-
     }
 
     private void setUIEnabled(boolean enabled) {
@@ -204,32 +183,4 @@ public class MainWindow extends MainWindowGui implements StateListener {
         toggleableTagEditor.setEnabled(optionPanel.getMode().supportTags());
     }
 
-    public static class UpdateThread extends Thread {
-        public UpdateThread(Shell shell) {
-            this.setDaemon(true);
-
-            try {
-                URL updateUrl = new URL("https://github.com/yermak/AudioBookConverter");
-                URLConnection yc = updateUrl.openConnection();
-                BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-                String inputLine = in.readLine();
-                in.close();
-                if ("true".equals(inputLine)) {
-                    MessageBox msg = new MessageBox(shell, 194);
-                    msg.setText(Messages.getString("MainWindow2.newVersion"));
-                    msg.setMessage(Messages.getString("MainWindow2.aNewVersionIsAvailable"));
-                    int result = msg.open();
-                    if (result == 64) {
-                        Program.launch("https://github.com/yermak/AudioBookConverter");
-                    } else {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.add(5, 7);
-                        AppProperties.setDateProperty("noUpdateCheckUntil", calendar.getTime());
-                    }
-                }
-            } catch (Exception var9) {
-            }
-
-        }
-    }
 }

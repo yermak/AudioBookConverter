@@ -15,7 +15,7 @@ public class JobProgress implements Runnable, StateListener {
     private final ConversionStrategy conversionStrategy;
     private ProgressView progressView;
     private final List<MediaInfo> media;
-    private long startTime = System.currentTimeMillis();
+    private long startTime;
     private boolean finished;
     private int totalFiles;
     private int completedFiles;
@@ -36,7 +36,7 @@ public class JobProgress implements Runnable, StateListener {
 
     @Override
     public void run() {
-
+        startTime = System.currentTimeMillis();
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         for (MediaInfo mediaInfo : media) {
             progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), this));

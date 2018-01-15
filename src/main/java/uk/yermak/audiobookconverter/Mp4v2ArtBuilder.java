@@ -12,15 +12,18 @@ import java.util.concurrent.Future;
 /**
  * Created by Yermak on 04-Jan-18.
  */
-public class Mp4v2ArtBuilder {
+public class Mp4v2ArtBuilder implements StateListener {
 
     private List<MediaInfo> media;
     private final String outputFileName;
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
+    private boolean cancelled;
+    private boolean paused;
 
     public Mp4v2ArtBuilder(List<MediaInfo> media, String outputFileName, long jobId) {
         this.media = media;
         this.outputFileName = outputFileName;
+        StateDispatcher.getInstance().addListener(this);
     }
 
     private Collection<File> findPictures(File dir) {
@@ -55,6 +58,7 @@ public class Mp4v2ArtBuilder {
         try {
             int i = 0;
             for (String poster : posters.values()) {
+                if (cancelled) break;
                 ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                         "--art-index", String.valueOf(i++),
                         "--add", poster,
@@ -73,5 +77,40 @@ public class Mp4v2ArtBuilder {
             }
             if (artProcess != null) artProcess.destroy();
         }
+    }
+
+    @Override
+    public void finishedWithError(String error) {
+
+    }
+
+    @Override
+    public void finished() {
+
+    }
+
+    @Override
+    public void canceled() {
+        cancelled = true;
+    }
+
+    @Override
+    public void paused() {
+        paused = true;
+    }
+
+    @Override
+    public void resumed() {
+        paused = false;
+    }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
     }
 }

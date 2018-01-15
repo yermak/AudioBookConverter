@@ -53,8 +53,10 @@ public class JobProgress implements Runnable, StateListener {
             progressView.setRemainingTime(10 * 60 * 1000);
         });
 
-        while (!finished && !cancelled && !paused) {
-            progressView.getDisplay().syncExec(() -> progressView.setElapsedTime(System.currentTimeMillis() - startTime));
+        while (!finished && !cancelled) {
+            if (!paused) {
+                progressView.getDisplay().syncExec(() -> progressView.setElapsedTime(System.currentTimeMillis() - startTime - pausePeriod));
+            }
             silentSleep();
         }
     }

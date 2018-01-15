@@ -16,7 +16,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     protected boolean finished;
     protected boolean canceled;
     protected boolean paused;
-    protected AudioBookInfo mp4Tags;
+    protected AudioBookInfo bookInfo;
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
 
@@ -24,8 +24,8 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     protected AbstractConversionStrategy() {
     }
 
-    public void setMp4Tags(AudioBookInfo mp4Tags) {
-        this.mp4Tags = mp4Tags;
+    public void setBookInfo(AudioBookInfo audioBookInfo) {
+        this.bookInfo = audioBookInfo;
     }
 
     @Override
@@ -59,31 +59,31 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     protected String getOuputFilenameSuggestion(String fileName) {
         StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(mp4Tags.getWriter())) {
+        if (StringUtils.isNotBlank(bookInfo.getWriter())) {
             builder
-                    .append(StringUtils.trim(mp4Tags.getWriter()));
+                    .append(StringUtils.trim(bookInfo.getWriter()));
 
         }
-        if (StringUtils.isNotBlank(mp4Tags.getSeries()) && !StringUtils.equals(mp4Tags.getSeries(), mp4Tags.getTitle())) {
+        if (StringUtils.isNotBlank(bookInfo.getSeries()) && !StringUtils.equals(bookInfo.getSeries(), bookInfo.getTitle())) {
             builder
                     .append(" - [")
-                    .append(StringUtils.trim(mp4Tags.getSeries()));
-            if (mp4Tags.getBookNumber() > 0) {
+                    .append(StringUtils.trim(bookInfo.getSeries()));
+            if (bookInfo.getBookNumber() > 0) {
                 builder
                         .append(" - ")
-                        .append(mp4Tags.getBookNumber());
+                        .append(bookInfo.getBookNumber());
             }
             builder.append("] ");
         }
-        if (StringUtils.isNotBlank(mp4Tags.getTitle())) {
+        if (StringUtils.isNotBlank(bookInfo.getTitle())) {
             builder
                     .append(" - ")
-                    .append(StringUtils.trim(mp4Tags.getTitle()));
+                    .append(StringUtils.trim(bookInfo.getTitle()));
         }
-        if (StringUtils.isNotBlank(mp4Tags.getNarrator())) {
+        if (StringUtils.isNotBlank(bookInfo.getNarrator())) {
             builder
                     .append(" (")
-                    .append(StringUtils.trim(mp4Tags.getNarrator()))
+                    .append(StringUtils.trim(bookInfo.getNarrator()))
                     .append(")");
         }
         String result = builder.toString();
@@ -154,12 +154,12 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         metaData.add("major_brand=M4A");
         metaData.add("minor_version=512");
         metaData.add("compatible_brands=isomiso2");
-        metaData.add("title=" + mp4Tags.getTitle());
-        metaData.add("artist=" + mp4Tags.getWriter());
-        metaData.add("album=" + (StringUtils.isNotBlank(mp4Tags.getSeries()) ? mp4Tags.getSeries() : mp4Tags.getTitle()));
-        metaData.add("composer=" + mp4Tags.getNarrator());
-        metaData.add("comment=" + mp4Tags.getComment());
-        metaData.add("track=" + mp4Tags.getBookNumber() + "/" + mp4Tags.getTotalTracks());
+        metaData.add("title=" + bookInfo.getTitle());
+        metaData.add("artist=" + bookInfo.getWriter());
+        metaData.add("album=" + (StringUtils.isNotBlank(bookInfo.getSeries()) ? bookInfo.getSeries() : bookInfo.getTitle()));
+        metaData.add("composer=" + bookInfo.getNarrator());
+        metaData.add("comment=" + bookInfo.getComment());
+        metaData.add("track=" + bookInfo.getBookNumber() + "/" + bookInfo.getTotalTracks());
         metaData.add("media_type=2");
         metaData.add("genre=Audiobook");
         metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");
@@ -172,7 +172,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
             totalDuration += media.get(i).getDuration();
             metaData.add("END=" + totalDuration);
             metaData.add("title=Chapter " + (i + 1));
-            outFiles.add("file '" + getTempFileName(jobId, mediaInfos.get(i).hashCode(), ".m4b") + "'");
         }
         FileUtils.writeLines(metaFile, "UTF-8", metaData);
         return metaFile;

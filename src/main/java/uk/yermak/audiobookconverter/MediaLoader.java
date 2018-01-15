@@ -73,8 +73,8 @@ public class MediaLoader {
                         mediaInfo.setArtWork(artWork);
                     }
                 }
-                AudioBookInfo mp4Tags = new AudioBookInfo(format.tags);
-                mediaInfo.setMp4Tags(mp4Tags);
+                AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
+                mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
                 throw e;

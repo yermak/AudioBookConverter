@@ -12,9 +12,9 @@ public interface ConversionStrategy {
 
     boolean makeUserInterview(Shell shell, String fileName);
 
-    void start(Shell var1);
+    void start(Shell shell);
 
-    void setMp4Tags(AudioBookInfo var1);
+    void setBookInfo(AudioBookInfo audioBookInfo);
 
     String getAdditionalFinishedMessage();
 

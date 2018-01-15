@@ -22,9 +22,9 @@ public interface MediaInfo {
 
     String getFileName();
 
-    void setMp4Tags(AudioBookInfo mp4Tags);
+    void setBookInfo(AudioBookInfo bookInfo);
 
-    AudioBookInfo getMp4Tags();
+    AudioBookInfo getBookInfo();
 
     ArtWork getArtWork();
 

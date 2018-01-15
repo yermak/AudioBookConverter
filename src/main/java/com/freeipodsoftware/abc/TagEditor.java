@@ -62,7 +62,7 @@ public class TagEditor extends TagEditorGui {
         this.setComment("");
     }
 
-    public AudioBookInfo getMp4Tags() {
+    public AudioBookInfo getAudioBookInfo() {
         AudioBookInfo tags = new AudioBookInfo();
         tags.setWriter(this.writerText.getText());
         tags.setNarrator(this.narratorText.getText());

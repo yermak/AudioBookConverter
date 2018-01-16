@@ -1,6 +1,11 @@
 package uk.yermak.audiobookconverter;
 
+import net.bramp.ffmpeg.progress.ProgressParser;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -20,4 +25,30 @@ public class Utils {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + index + extension).getAbsolutePath();
     }
 
+    public static void closeSilently(ProgressParser progressParser) {
+        if (progressParser != null) {
+            try {
+                progressParser.stop();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    public static void closeSilently(Process process) {
+        if (process != null) {
+            process.destroyForcibly();
+        }
+    }
+
+    public static void closeSilently(Future future) {
+        if (future != null) {
+            future.cancel(true);
+        }
+    }
+
+    public static void closeSilently(ExecutorService executorService) {
+        if (executorService != null) {
+            executorService.shutdownNow();
+        }
+    }
 }

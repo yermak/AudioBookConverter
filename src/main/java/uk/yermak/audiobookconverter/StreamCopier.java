@@ -5,6 +5,9 @@ import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 /**
@@ -12,6 +15,7 @@ import java.util.concurrent.Callable;
  */
 public class StreamCopier implements Callable<Long> {
 
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
     private final InputStream in;
     private final OutputStream out;
 
@@ -31,5 +35,13 @@ public class StreamCopier implements Callable<Long> {
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);
         return count;
+    }
+
+    public static Future<Long> submit(StreamCopier streamCopier) {
+        return executorService.submit(streamCopier);
+    }
+
+    public static Future<Long> submit(InputStream in, OutputStream out) {
+        return executorService.submit(new StreamCopier(in, out));
     }
 }

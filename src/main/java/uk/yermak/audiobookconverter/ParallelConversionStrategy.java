@@ -104,4 +104,9 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;
     }
 
+    @Override
+    public void canceled() {
+        canceled = true;
+        Utils.closeSilently(executorService);
+    }
 }

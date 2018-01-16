@@ -75,7 +75,7 @@ public class Mp4v2ArtBuilder implements StateListener {
             for (String tempPoster : tempPosters) {
                 FileUtils.deleteQuietly(new File(tempPoster));
             }
-            if (artProcess != null) artProcess.destroy();
+            Utils.closeSilently(artProcess);
         }
     }
 

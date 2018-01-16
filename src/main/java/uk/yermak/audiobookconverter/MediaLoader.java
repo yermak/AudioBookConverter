@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 /**
  * Created by yermak on 1/10/2018.
  */
-public class MediaLoader {
+public class MediaLoader implements StateListener {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
@@ -24,6 +24,7 @@ public class MediaLoader {
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
+        StateDispatcher.getInstance().addListener(this);
     }
 
     public List<MediaInfo> loadMediaInfo() {
@@ -39,6 +40,42 @@ public class MediaLoader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void finishedWithError(String error) {
+
+    }
+
+    @Override
+    public void finished() {
+
+    }
+
+    @Override
+    public void canceled() {
+        Utils.closeSilently(artExecutorService);
+        Utils.closeSilently(mediaExecutorService);
+    }
+
+    @Override
+    public void paused() {
+
+    }
+
+    @Override
+    public void resumed() {
+
+    }
+
+    @Override
+    public void fileListChanged() {
+
+    }
+
+    @Override
+    public void modeChanged(ConversionMode mode) {
+
     }
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {
@@ -120,7 +157,7 @@ public class MediaLoader {
                 long crc32 = FileUtils.checksumCRC32(posterFile);
                 return new ArtWorkBean(poster, format, crc32);
             } finally {
-                if (pictureProcess != null) pictureProcess.destroy();
+                Utils.closeSilently(pictureProcess);
             }
         }
     }

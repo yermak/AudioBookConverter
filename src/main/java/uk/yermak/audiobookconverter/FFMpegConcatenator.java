@@ -14,6 +14,7 @@ import java.util.concurrent.*;
 public class FFMpegConcatenator implements Concatenator, StateListener {
 
     private final String outputFileName;
+    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private String metaDataFileName;
     private String fileListFileName;
     private ProgressCallback callback;
@@ -21,7 +22,6 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
     private boolean paused;
     private ProgressParser progressParser;
     private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
-
 
 
     public FFMpegConcatenator(String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
@@ -64,9 +64,9 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
             ffmpegProcess = ffmpegProcessBuilder.start();
 
             StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
-            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
+            Future<Long> ffmpegFuture = executorService.submit(ffmpegToOut);
             StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
-            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
 
             while (!cancelled) {
                 try {
@@ -77,8 +77,8 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
             }
 
         } finally {
-            if (ffmpegProcess != null) ffmpegProcess.destroy();
-            if (progressParser != null) progressParser.stop();
+            Utils.closeSilently(ffmpegProcess);
+            Utils.closeSilently(progressParser);
         }
 
     }
@@ -96,6 +96,7 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
     @Override
     public void canceled() {
         cancelled = true;
+        Utils.closeSilently(executorService);
     }
 
     @Override

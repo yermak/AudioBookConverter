@@ -68,6 +68,9 @@ public class MainWindow extends MainWindowGui implements StateListener {
                 Program.launch("https://github.com/yermak/AudioBookConverter");
             }
         });
+        sShell.addDisposeListener(e -> stateDispatcher.canceled());
+
+
         stateDispatcher.addListener(this);
     }
 

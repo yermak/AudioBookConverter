@@ -31,8 +31,6 @@ public class ProgressView extends ProgressViewGui implements StateListener {
             }
         });
         StateDispatcher.getInstance().addListener(this);
-
-
     }
 
     private void suspendOrResume() {

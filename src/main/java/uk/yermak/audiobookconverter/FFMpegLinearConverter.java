@@ -13,6 +13,7 @@ import java.util.concurrent.*;
 public class FFMpegLinearConverter implements Concatenator, StateListener {
 
     private final String outputFileName;
+    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private String metaDataFileName;
     private String fileListFileName;
     private MediaInfo mediaInfo;
@@ -69,9 +70,9 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
             ffmpegProcess = ffmpegProcessBuilder.start();
 
             StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
-            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToOut);
+            Future<Long> ffmpegFuture = executorService.submit(ffmpegToOut);
             StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
-            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
             while (!cancelled) {
                 try {
                     ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
@@ -80,8 +81,8 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
                 }
             }
         } finally {
-            if (ffmpegProcess != null) ffmpegProcess.destroy();
-            if (progressParser != null) progressParser.stop();
+            Utils.closeSilently(ffmpegProcess);
+            Utils.closeSilently(progressParser);
         }
 
     }
@@ -99,9 +100,7 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
     @Override
     public void canceled() {
         cancelled = true;
-        if (ffmpegProcess != null) {
-            ffmpegProcess.destroy();
-        }
+        Utils.closeSilently(executorService);
     }
 
     @Override

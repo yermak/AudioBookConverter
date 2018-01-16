@@ -43,13 +43,13 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             metaFile = prepareMeta(jobId);
             fileListFile = prepareFiles(jobId);
-
+            if (canceled) return;
             Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
             concatenator.concat();
-
+            if (canceled) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
             artBuilder.coverArt();
-
+            if (canceled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputFileName));
         } catch (Exception e) {
             StringWriter sw = new StringWriter();

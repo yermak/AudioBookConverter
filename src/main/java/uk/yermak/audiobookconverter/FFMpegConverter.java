@@ -13,6 +13,7 @@ import java.util.concurrent.*;
  * Created by Yermak on 29-Dec-17.
  */
 public class FFMpegConverter implements Callable<ConverterOutput>, Converter, StateListener {
+    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
@@ -64,9 +65,9 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             InputStream ffmpegErr = process.getErrorStream();
 
             StreamCopier ffmpegToConsole = new StreamCopier(ffmpegIn, System.out);
-            Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToConsole);
+            Future<Long> ffmpegFuture = executorService.submit(ffmpegToConsole);
             StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, System.err);
-            Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
 
             ffmpegFuture.get();
 
@@ -76,12 +77,8 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             throw new RuntimeException(e);
         } finally {
             mutex.release();
-            if (process != null) {
-                process.destroy();
-            }
-            if (progressParser != null) {
-                progressParser.stop();
-            }
+            Utils.closeSilently(process);
+            Utils.closeSilently(progressParser);
         }
     }
 
@@ -97,15 +94,12 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
 
     @Override
     public void finished() {
-
     }
 
     @Override
     public void canceled() {
         this.cancelled = true;
-        if (process != null) {
-            process.destroy();
-        }
+        Utils.closeSilently(executorService);
     }
 
     @Override

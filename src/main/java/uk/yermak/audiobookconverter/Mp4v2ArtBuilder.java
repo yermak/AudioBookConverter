@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.Future;
  */
 public class Mp4v2ArtBuilder implements StateListener {
 
+    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private List<MediaInfo> media;
     private final String outputFileName;
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
@@ -68,7 +70,7 @@ public class Mp4v2ArtBuilder implements StateListener {
                 artProcess = artProcessBuilder.start();
 
                 StreamCopier artToOut = new StreamCopier(artProcess.getInputStream(), System.out);
-                Future<Long> artFuture = Executors.newWorkStealingPool().submit(artToOut);
+                Future<Long> artFuture = executorService.submit(artToOut);
                 artFuture.get();
             }
         } finally {
@@ -92,6 +94,7 @@ public class Mp4v2ArtBuilder implements StateListener {
     @Override
     public void canceled() {
         cancelled = true;
+        Utils.closeSilently(executorService);
     }
 
     @Override

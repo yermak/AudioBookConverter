@@ -72,7 +72,8 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             ffmpegFuture.get();
 
             return new ConverterOutput(mediaInfo, outputFileName);
-
+        } catch (CancellationException ce) {
+            return null;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } finally {

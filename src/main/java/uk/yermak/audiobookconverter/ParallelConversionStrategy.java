@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import com.freeipodsoftware.abc.Messages;
 import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.swt.widgets.Shell;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +17,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    private String outputFileName;
+    //    private String outputFileName;
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
-    public boolean makeUserInterview(Shell shell, String fileName) {
-        this.outputFileName = selectOutputFile(shell, getOuputFilenameSuggestion(fileName));
-        return this.outputFileName != null;
-    }
+
 
     protected void startConversion() {
         Executors.newWorkStealingPool().execute(this);
@@ -67,7 +63,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             artBuilder.coverArt();
 
             if (canceled) return;
-            FileUtils.moveFile(new File(tempFile), new File(outputFileName));
+            FileUtils.moveFile(new File(tempFile), new File(outputDestination));
 
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
@@ -101,7 +97,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public String getAdditionalFinishedMessage() {
-        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;
+        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputDestination;
     }
 
     @Override

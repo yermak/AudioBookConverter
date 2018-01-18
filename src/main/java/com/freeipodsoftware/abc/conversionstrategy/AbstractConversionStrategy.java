@@ -2,8 +2,6 @@ package com.freeipodsoftware.abc.conversionstrategy;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
@@ -12,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+//import org.eclipse.swt.widgets.Shell;
+
 public abstract class AbstractConversionStrategy implements ConversionStrategy, StateListener {
     protected boolean finished;
     protected boolean canceled;
@@ -19,6 +19,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     protected AudioBookInfo bookInfo;
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
+    protected String outputDestination;
 
 
     protected AbstractConversionStrategy() {
@@ -33,69 +34,20 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         return "";
     }
 
-    public void start(Shell shell) {
+    public void start() {
         this.canceled = false;
         this.finished = false;
         StateDispatcher.getInstance().addListener(this);
         this.startConversion();
     }
 
-    protected static String selectOutputFile(Shell shell, String filenameSuggestion) {
-        FileDialog fileDialog = new FileDialog(shell, 8192);
-        fileDialog.setFilterNames(new String[]{" (*.m4b)"});
-        fileDialog.setFilterExtensions(new String[]{"*.m4b"});
-        fileDialog.setFileName(filenameSuggestion);
-        String fileName = fileDialog.open();
-        if (fileName == null) return null;
-        if (!fileName.toUpperCase().endsWith(".m4b".toUpperCase())) {
-            fileName = fileName + ".m4b";
-        }
-        return fileName;
-    }
 
+    public void setOutputDestination(String outputDestination) {
+        this.outputDestination = outputDestination;
+    }
 
     protected abstract void startConversion();
 
-
-    protected String getOuputFilenameSuggestion(String fileName) {
-        StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(bookInfo.getWriter())) {
-            builder
-                    .append(StringUtils.trim(bookInfo.getWriter()));
-
-        }
-        if (StringUtils.isNotBlank(bookInfo.getSeries()) && !StringUtils.equals(bookInfo.getSeries(), bookInfo.getTitle())) {
-            builder
-                    .append(" - [")
-                    .append(StringUtils.trim(bookInfo.getSeries()));
-            if (bookInfo.getBookNumber() > 0) {
-                builder
-                        .append(" - ")
-                        .append(bookInfo.getBookNumber());
-            }
-            builder.append("] ");
-        }
-        if (StringUtils.isNotBlank(bookInfo.getTitle())) {
-            builder
-                    .append(" - ")
-                    .append(StringUtils.trim(bookInfo.getTitle()));
-        }
-        if (StringUtils.isNotBlank(bookInfo.getNarrator())) {
-            builder
-                    .append(" (")
-                    .append(StringUtils.trim(bookInfo.getNarrator()))
-                    .append(")");
-        }
-        String result = builder.toString();
-        String mp3Filename;
-
-        if (StringUtils.isBlank(result)) {
-            mp3Filename = fileName;
-        } else {
-            mp3Filename = result;
-        }
-        return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
-    }
 
     @Override
     public void setMedia(List<MediaInfo> media) {
@@ -182,8 +134,8 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
         List<String> outFiles = new ArrayList<>();
 
-        for (int i = 0; i < media.size(); i++) {
-            outFiles.add("file '" + getTempFileName(jobId, media.get(i).hashCode(), ".m4b") + "'");
+        for (MediaInfo mediaInfo : media) {
+            outFiles.add("file '" + getTempFileName(jobId, mediaInfo.hashCode(), ".m4b") + "'");
         }
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 

@@ -1,11 +1,10 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.BatchModeOptionsDialog;
 import com.freeipodsoftware.abc.Messages;
-import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.FFMpegConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -13,14 +12,15 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    private boolean intoSameFolder;
-    private String folder;
+    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    //    private boolean intoSameFolder;
 
     public BatchConversionStrategy() {
     }
@@ -51,21 +51,8 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         }
     }
 
-    public boolean makeUserInterview(Shell shell, String fileName) {
-        BatchModeOptionsDialog options = new BatchModeOptionsDialog(shell);
-        options.setFolder(this.getSuggestedFolder(fileName));
-        if (options.open()) {
-            this.intoSameFolder = options.isIntoSameFolder();
-            this.folder = options.getFolder();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     protected void startConversion() {
-        Executors.newWorkStealingPool().execute(this);
+        executorService.execute(this);
     }
 
     @Override
@@ -80,7 +67,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             MediaInfo mediaInfo = this.media.get(i);
             String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
             Future converterFuture =
-                    Executors.newWorkStealingPool()
+                    executorService
                             .submit(new FFMpegConverter(mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
             futures.add(converterFuture);
         }
@@ -99,11 +86,11 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
 
     private String determineOutputFilename(String inputFilename) {
         String outputFilename;
-        if (this.intoSameFolder) {
+        if (outputDestination == null) {
             outputFilename = inputFilename.replaceAll("(?i)\\.mp3", ".m4b");
         } else {
             File file = new File(inputFilename);
-            File outFile = new File(this.folder, file.getName());
+            File outFile = new File(this.outputDestination, file.getName());
             outputFilename = outFile.getAbsolutePath().replaceAll("(?i)\\.mp3", ".m4b");
         }
 
@@ -114,12 +101,9 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         return makeFilenameUnique(outputFilename);
     }
 
-    protected String getSuggestedFolder(String fileName) {
-        try {
-            return new File(fileName).getParentFile().getAbsolutePath();
-        } catch (Exception var2) {
-            return "";
-        }
 
+    @Override
+    public void canceled() {
+        Utils.closeSilently(executorService);
     }
 }

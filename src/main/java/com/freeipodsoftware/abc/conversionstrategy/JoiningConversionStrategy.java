@@ -2,7 +2,6 @@ package com.freeipodsoftware.abc.conversionstrategy;
 
 import com.freeipodsoftware.abc.Messages;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
@@ -11,16 +10,11 @@ import java.io.StringWriter;
 import java.util.concurrent.Executors;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    private String outputFileName;
 
     public JoiningConversionStrategy() {
     }
 
 
-    public boolean makeUserInterview(Shell shell, String fileName) {
-        this.outputFileName = selectOutputFile(shell, this.getOuputFilenameSuggestion(fileName));
-        return this.outputFileName != null;
-    }
 
     protected void startConversion() {
         Executors.newWorkStealingPool().execute(this);
@@ -50,7 +44,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
             artBuilder.coverArt();
             if (canceled) return;
-            FileUtils.moveFile(new File(tempFile), new File(outputFileName));
+            FileUtils.moveFile(new File(tempFile), new File(outputDestination));
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -65,7 +59,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
 
     public String getAdditionalFinishedMessage() {
-        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputFileName;
+        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputDestination;
     }
 
 }

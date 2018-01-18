@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,5 +51,45 @@ public class Utils {
         if (executorService != null) {
             executorService.shutdownNow();
         }
+    }
+
+    public static String getOuputFilenameSuggestion(String fileName, AudioBookInfo bookInfo) {
+        StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotBlank(bookInfo.getWriter())) {
+            builder
+                    .append(StringUtils.trim(bookInfo.getWriter()));
+
+        }
+        if (StringUtils.isNotBlank(bookInfo.getSeries()) && !StringUtils.equals(bookInfo.getSeries(), bookInfo.getTitle())) {
+            builder
+                    .append(" - [")
+                    .append(StringUtils.trim(bookInfo.getSeries()));
+            if (bookInfo.getBookNumber() > 0) {
+                builder
+                        .append(" - ")
+                        .append(bookInfo.getBookNumber());
+            }
+            builder.append("] ");
+        }
+        if (StringUtils.isNotBlank(bookInfo.getTitle())) {
+            builder
+                    .append(" - ")
+                    .append(StringUtils.trim(bookInfo.getTitle()));
+        }
+        if (StringUtils.isNotBlank(bookInfo.getNarrator())) {
+            builder
+                    .append(" (")
+                    .append(StringUtils.trim(bookInfo.getNarrator()))
+                    .append(")");
+        }
+        String result = builder.toString();
+        String mp3Filename;
+
+        if (StringUtils.isBlank(result)) {
+            mp3Filename = fileName;
+        } else {
+            mp3Filename = result;
+        }
+        return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
     }
 }

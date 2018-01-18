@@ -7,9 +7,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import uk.yermak.audiobookconverter.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -86,18 +89,65 @@ public class MainWindow extends MainWindowGui implements StateListener {
         return this.conversionStrategy;
     }
 
+
+    protected static String selectOutputFile(Shell shell, String filenameSuggestion) {
+        FileDialog fileDialog = new FileDialog(shell, 8192);
+        fileDialog.setFilterNames(new String[]{" (*.m4b)"});
+        fileDialog.setFilterExtensions(new String[]{"*.m4b"});
+        fileDialog.setFileName(filenameSuggestion);
+        String fileName = fileDialog.open();
+
+        if (fileName == null) return null;
+        if (!fileName.toUpperCase().endsWith(".m4b".toUpperCase())) {
+            fileName = fileName + ".m4b";
+        }
+        return fileName;
+    }
+
+    protected String getSameFolder(String fileName) {
+        try {
+            return new File(fileName).getParentFile().getAbsolutePath();
+        } catch (Exception var2) {
+            return "";
+        }
+    }
+
     private void startConversion() {
+
         List<MediaInfo> media = this.inputFileSelection.getMedia();
-        getConversionStrategy().setBookInfo(this.toggleableTagEditor.getTagEditor().getAudioBookInfo());
         if (media.size() > 0) {
-            if (this.getConversionStrategy().makeUserInterview(this.sShell, media.get(0).getFileName())) {
+            AudioBookInfo audioBookInfo = this.toggleableTagEditor.getTagEditor().getAudioBookInfo();
+            MediaInfo mediaInfo = media.get(0);
+            String outputDestination = null;
+            boolean selected = false;
+            if (optionPanel.getMode().equals(ConversionMode.BATCH)) {
+                BatchModeOptionsDialog options = new BatchModeOptionsDialog(this.sShell);
+                String sameFolder = this.getSameFolder(mediaInfo.getFileName());
+                options.setFolder(sameFolder);
+                if (options.open()) {
+                    if (options.isIntoSameFolder()) {
+                        selected = true;
+                    } else {
+                        outputDestination = options.getFolder();
+                        selected = true;
+                    }
+                }
+            } else {
+                outputDestination = selectOutputFile(this.sShell, Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
+                selected = outputDestination != null;
+            }
+
+            if (selected) {
+                getConversionStrategy().setOutputDestination(outputDestination);
+                getConversionStrategy().setBookInfo(audioBookInfo);
+
                 conversionStrategy.setMedia(media);
                 ProgressView progressView = createProgressView();
                 JobProgress jobProgress = new JobProgress(conversionStrategy, progressView, media);
 
                 this.setUIEnabled(false);
 
-                this.getConversionStrategy().start(this.sShell);
+                this.getConversionStrategy().start();
                 Executors.newSingleThreadExecutor().execute(jobProgress);
             }
         }

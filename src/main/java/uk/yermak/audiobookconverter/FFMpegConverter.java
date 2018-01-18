@@ -22,6 +22,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
     private boolean paused;
     private Process process;
     private final static String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+    private ProgressParser progressParser = null;
 
 
     public FFMpegConverter(MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
@@ -32,7 +33,6 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
     }
 
     public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException, ExecutionException {
-        ProgressParser progressParser = null;
         try {
             mutex.acquire();
             if (cancelled) return null;
@@ -90,17 +90,21 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
 
     @Override
     public void finishedWithError(String error) {
-
+        Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void finished() {
+        Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void canceled() {
         this.cancelled = true;
         Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override

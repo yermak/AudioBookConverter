@@ -23,7 +23,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
 
     protected void startConversion() {
-        Executors.newWorkStealingPool().execute(this);
+        executorService.execute(this);
     }
 
     public void run() {

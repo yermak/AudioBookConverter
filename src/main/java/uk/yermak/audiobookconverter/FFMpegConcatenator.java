@@ -85,18 +85,21 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
 
     @Override
     public void finishedWithError(String error) {
-
+        Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void finished() {
-
+        Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void canceled() {
         cancelled = true;
         Utils.closeSilently(executorService);
+//        Utils.closeSilently(progressParser);
     }
 
     @Override

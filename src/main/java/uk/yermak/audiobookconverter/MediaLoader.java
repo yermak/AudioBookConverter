@@ -4,7 +4,6 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -154,7 +153,7 @@ public class MediaLoader implements StateListener {
                 Future<Long> errFuture = Executors.newWorkStealingPool().submit(pictureToErr);
                 pictureFuture.get();
                 File posterFile = new File(poster);
-                long crc32 = FileUtils.checksumCRC32(posterFile);
+                long crc32 = Utils.checksumCRC32(posterFile);
                 return new ArtWorkBean(poster, format, crc32);
             } finally {
                 Utils.closeSilently(pictureProcess);

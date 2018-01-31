@@ -58,8 +58,8 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             concatenator.concat();
 
             if (canceled) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
-            artBuilder.coverArt();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            artBuilder.coverArt(media, tempFile);
 
             if (canceled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));

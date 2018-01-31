@@ -19,4 +19,8 @@ public class ConverterOutput {
     public long getDuration() {
         return mediaInfo.getDuration();
     }
+
+    public MediaInfo getMediaInfo() {
+        return mediaInfo;
+    }
 }

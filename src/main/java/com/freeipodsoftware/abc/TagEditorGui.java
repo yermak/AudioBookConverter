@@ -7,7 +7,36 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 public class TagEditorGui extends Composite {
-    private static final String[] genres = new String[]{"Alternative", "Blues", "Books & Spoken", "Children's Music", "Classical", "Comedy", "Country", "Dance", "Easy Listening", "Electronic", "Folk", "Funk", "House", "Hip Hop", "Indie", "Industrial", "Jazz", "Metal", "Misc", "New Age", "Poscast", "Pop", "Punk", "Religious", "Rock", "Reggae", "Soft Rock", "Soundtrack", "Techno", "Trance", "Unclassifiable", "World"};
+    private static final String[] genres = new String[]{
+            "Art",
+            "Biography",
+            "Business",
+            "Children's",
+            "Christian",
+            "Classics",
+            "Crime",
+            "Fantasy",
+            "Fiction",
+            "Health",
+            "Historical Fiction",
+            "History",
+            "Horror",
+            "Humor and Comedy",
+            "Mystery",
+            "Nonfiction",
+            "Philosophy",
+            "Poetry",
+            "Psychology",
+            "Religion",
+            "Romance",
+            "Science",
+            "Science Fiction",
+            "Self Help",
+            "Sports",
+            "Thriller",
+            "Travel"};
+
+
     private Composite tagsComposite = null;
     private Label writerLabel = null;
     protected Text writerText = null;

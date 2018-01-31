@@ -66,7 +66,7 @@ public class Mp4v2ArtBuilder implements StateListener {
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                     "--art-index", String.valueOf(index),
-                    "--add", poster,
+                    "--add", "\"" + poster + "\"",
                     outputFileName);
 
             artProcessBuilder.redirectErrorStream();

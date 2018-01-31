@@ -1,6 +1,5 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import com.freeipodsoftware.abc.Messages;
 import uk.yermak.audiobookconverter.FFMpegConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.StateDispatcher;
@@ -15,40 +14,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
-    //    private boolean intoSameFolder;
 
     public BatchConversionStrategy() {
-    }
-
-    public static String makeFilenameUnique(String filename) {
-        Pattern extPattern = Pattern.compile("\\.(\\w+)$");
-        Matcher extMatcher = extPattern.matcher(filename);
-        if (extMatcher.find()) {
-            try {
-                String extension = extMatcher.group(1);
-
-                for (File outputFile = new File(filename); outputFile.exists(); outputFile = new File(filename)) {
-                    Pattern pattern = Pattern.compile("(?i)(.*)\\((\\d+)\\)\\." + extension + "$");
-                    Matcher matcher = pattern.matcher(filename);
-                    if (matcher.find()) {
-                        filename = matcher.group(1) + "(" + (Integer.parseInt(matcher.group(2)) + 1) + ")." + extension;
-                    } else {
-                        filename = filename.replaceAll("." + extension + "$", "(1)." + extension);
-                    }
-                }
-
-                return filename;
-            } catch (Exception var7) {
-                throw new RuntimeException(Messages.getString("Util.connotUseFilename") + " " + filename);
-            }
-        } else {
-            throw new RuntimeException(Messages.getString("Util.connotUseFilename") + " " + filename + " (2)");
-        }
     }
 
     protected void startConversion() {
@@ -98,12 +68,22 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
             outputFilename = outputFilename + ".m4b";
         }
 
-        return makeFilenameUnique(outputFilename);
+        return Utils.makeFilenameUnique(outputFilename);
     }
 
 
     @Override
     public void canceled() {
         Utils.closeSilently(executorService);
+    }
+
+    @Override
+    public String getAdditionalFinishedMessage() {
+        return outputDestination;
+    }
+
+    @Override
+    public void setOutputDestination(String outputDestination) {
+        this.outputDestination = outputDestination;
     }
 }

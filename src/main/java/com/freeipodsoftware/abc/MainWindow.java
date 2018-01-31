@@ -148,6 +148,7 @@ public class MainWindow extends MainWindowGui implements StateListener {
                 this.setUIEnabled(false);
 
                 this.getConversionStrategy().start();
+
                 Executors.newSingleThreadExecutor().execute(jobProgress);
             }
         }

@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Messages;
 import net.bramp.ffmpeg.progress.ProgressParser;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -119,6 +120,14 @@ public class Utils {
             }
         } else {
             throw new RuntimeException(Messages.getString("Util.connotUseFilename") + " " + filename + " (2)");
+        }
+    }
+
+    public static long checksumCRC32(File file) {
+        try {
+            return FileUtils.checksumCRC32(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

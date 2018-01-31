@@ -40,8 +40,8 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
             concatenator.concat();
             if (canceled) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(media, tempFile, jobId);
-            artBuilder.coverArt();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            artBuilder.coverArt(media, tempFile);
             if (canceled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
         } catch (Exception e) {

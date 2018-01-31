@@ -16,15 +16,10 @@ import java.util.concurrent.Future;
 public class Mp4v2ArtBuilder implements StateListener {
 
     private final ExecutorService executorService = Executors.newWorkStealingPool();
-    private List<MediaInfo> media;
-    private final String outputFileName;
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
     private boolean cancelled;
-    private boolean paused;
 
-    public Mp4v2ArtBuilder(List<MediaInfo> media, String outputFileName, long jobId) {
-        this.media = media;
-        this.outputFileName = outputFileName;
+    public Mp4v2ArtBuilder() {
         StateDispatcher.getInstance().addListener(this);
     }
 
@@ -33,22 +28,30 @@ public class Mp4v2ArtBuilder implements StateListener {
     }
 
 
-    public void coverArt() throws IOException, ExecutionException, InterruptedException {
-        Process artProcess = null;
+    public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, ExecutionException, InterruptedException {
         Map<Long, String> posters = new HashMap<>();
         Set<String> tempPosters = new HashSet<>();
 
+        searchForPosters(media, posters, tempPosters);
+
+        try {
+            int i = 0;
+            for (String poster : posters.values()) {
+                if (cancelled) break;
+                updateSinglePoster(poster, i++, outputFileName);
+            }
+        } finally {
+            for (String tempPoster : tempPosters) {
+                FileUtils.deleteQuietly(new File(tempPoster));
+            }
+        }
+    }
+
+    private void searchForPosters(List<MediaInfo> media, Map<Long, String> posters, Set<String> tempPosters) {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> {
-            try {
-                long crc32 = FileUtils.checksumCRC32(f);
-                posters.putIfAbsent(crc32, f.getPath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> posters.putIfAbsent(Utils.checksumCRC32(f), f.getPath())));
 
         media.forEach(m -> {
             if (m.getArtWork() != null) {
@@ -56,27 +59,23 @@ public class Mp4v2ArtBuilder implements StateListener {
                 tempPosters.add(m.getArtWork().getFileName());
             }
         });
+    }
 
+    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, ExecutionException, InterruptedException {
+        Process artProcess = null;
         try {
-            int i = 0;
-            for (String poster : posters.values()) {
-                if (cancelled) break;
-                ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
-                        "--art-index", String.valueOf(i++),
-                        "--add", poster,
-                        outputFileName);
+            ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
+                    "--art-index", String.valueOf(index),
+                    "--add", poster,
+                    outputFileName);
 
-                artProcessBuilder.redirectErrorStream();
-                artProcess = artProcessBuilder.start();
+            artProcessBuilder.redirectErrorStream();
+            artProcess = artProcessBuilder.start();
 
-                StreamCopier artToOut = new StreamCopier(artProcess.getInputStream(), System.out);
-                Future<Long> artFuture = executorService.submit(artToOut);
-                artFuture.get();
-            }
+            StreamCopier artToOut = new StreamCopier(artProcess.getInputStream(), System.out);
+            Future<Long> artFuture = executorService.submit(artToOut);
+            artFuture.get();
         } finally {
-            for (String tempPoster : tempPosters) {
-                FileUtils.deleteQuietly(new File(tempPoster));
-            }
             Utils.closeSilently(artProcess);
         }
     }
@@ -99,12 +98,10 @@ public class Mp4v2ArtBuilder implements StateListener {
 
     @Override
     public void paused() {
-        paused = true;
     }
 
     @Override
     public void resumed() {
-        paused = false;
     }
 
     @Override

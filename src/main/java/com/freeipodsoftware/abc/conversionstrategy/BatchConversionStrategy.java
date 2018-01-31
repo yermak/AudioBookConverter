@@ -1,11 +1,9 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
-import uk.yermak.audiobookconverter.FFMpegConverter;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.StateDispatcher;
-import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -31,21 +29,26 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     }
 
     public void run() {
-        List<Future> futures = new ArrayList<>();
+        List<Future<ConverterOutput>> futures = new ArrayList<>();
 
         for (int i = 0; i < this.media.size(); ++i) {
             MediaInfo mediaInfo = this.media.get(i);
             String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
-            Future converterFuture =
+            Future<ConverterOutput> converterFuture =
                     executorService
                             .submit(new FFMpegConverter(mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
             futures.add(converterFuture);
         }
         try {
-            for (Future future : futures) {
-                future.get();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            for (Future<ConverterOutput> future : futures) {
+                ConverterOutput output = future.get();
+                ArtWork artWork = output.getMediaInfo().getArtWork();
+                if (artWork != null) {
+                    artBuilder.updateSinglePoster(artWork.getFileName(), 0, output.getOutputFileName());
+                }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());

@@ -122,7 +122,7 @@ public class AboutDialogGui extends Composite {
         this.assignLink(this.link1, "https://code.google.com/p/mp4v2//");
         this.link2 = new Link(this, 0);
         this.link2.setText("<a>Apache Jakarta Commons</a>");
-        this.assignLink(this.link2, "http://jakarta.apache.org/commons/");
+        this.assignLink(this.link2, "https://commons.apache.org/");
         this.link3 = new Link(this, 0);
         this.link3.setText("<a>Eclipse SWT</a>");
         this.assignLink(this.link3, "http://eclipse.org/swt");

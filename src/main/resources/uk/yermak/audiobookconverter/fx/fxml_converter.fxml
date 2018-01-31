@@ -25,7 +25,7 @@
      </columnConstraints>-->
 
 
-    <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="0" gridLinesVisible="true">
+    <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="0" gridLinesVisible="false">
         <columnConstraints>
             <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
             <ColumnConstraints hgrow="ALWAYS"/>
@@ -80,7 +80,7 @@
     </GridPane>
 
 
-    <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="true">
+    <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="false">
         <columnConstraints>
             <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
             <ColumnConstraints hgrow="ALWAYS"/>
@@ -110,13 +110,13 @@
                 </tooltip>
             </Button>
             <Button text="Up" minWidth="${screen.visualBounds.width * 0.05}"
-                    GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+                    GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.valignment="TOP">
                 <tooltip>
                     <Tooltip text="Move selected file up"/>
                 </tooltip>
             </Button>
             <Button text="Down" minWidth="${screen.visualBounds.width * 0.05}"
-                    GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+                    GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="TOP">
                 <tooltip>
                     <Tooltip text="Move selected file down"/>
                 </tooltip>

@@ -30,9 +30,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     }
 
     @Override
-    public String getAdditionalFinishedMessage() {
-        return "";
-    }
+    public abstract String getAdditionalFinishedMessage();
 
     public void start() {
         this.canceled = false;
@@ -42,9 +40,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     }
 
 
-    public void setOutputDestination(String outputDestination) {
-        this.outputDestination = outputDestination;
-    }
+    public abstract void setOutputDestination(String outputDestination);
 
     protected abstract void startConversion();
 

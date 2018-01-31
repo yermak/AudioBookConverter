@@ -21,7 +21,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
 
-
     protected void startConversion() {
         executorService.execute(this);
     }
@@ -104,5 +103,14 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     public void canceled() {
         canceled = true;
         Utils.closeSilently(executorService);
+    }
+
+    @Override
+    public void setOutputDestination(String outputDestination) {
+        if (new File(outputDestination).exists()) {
+            this.outputDestination = Utils.makeFilenameUnique(outputDestination);
+        } else {
+            this.outputDestination = outputDestination;
+        }
     }
 }

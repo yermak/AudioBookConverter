@@ -15,7 +15,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
 
-
     protected void startConversion() {
         Executors.newWorkStealingPool().execute(this);
     }
@@ -57,9 +56,16 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
 
-
     public String getAdditionalFinishedMessage() {
         return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputDestination;
     }
 
+    @Override
+    public void setOutputDestination(String outputDestination) {
+        if (new File(outputDestination).exists()) {
+            this.outputDestination = Utils.makeFilenameUnique(outputDestination);
+        } else {
+            this.outputDestination = outputDestination;
+        }
+    }
 }

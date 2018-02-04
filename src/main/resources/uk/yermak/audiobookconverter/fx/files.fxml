@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.Screen?>
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="false"
+          fx:controller="uk.yermak.audiobookconverter.fx.FilesController">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+
+    </fx:define>
+
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="SOMETIMES"/>
+    </columnConstraints>
+    <children>
+        <ListView GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="6"
+                  GridPane.valignment="TOP">
+
+        </ListView>
+        <Button text="Add" minWidth="${screen.visualBounds.width * 0.05}" onAction="#addFiles"
+                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.valignment="TOP">
+            <tooltip>
+                <Tooltip text="Add files for conversion to the list"/>
+            </tooltip>
+        </Button>
+        <Button text="Remove" minWidth="${screen.visualBounds.width * 0.05}"
+                GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="TOP">
+            <tooltip>
+                <Tooltip text="Removes selected files from the list"/>
+            </tooltip>
+        </Button>
+        <Button text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
+                GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP">
+            <tooltip>
+                <Tooltip text="Remove all files from the list"/>
+            </tooltip>
+        </Button>
+        <Button text="Up" minWidth="${screen.visualBounds.width * 0.05}"
+                GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.valignment="TOP">
+            <tooltip>
+                <Tooltip text="Move selected file up"/>
+            </tooltip>
+        </Button>
+        <Button text="Down" minWidth="${screen.visualBounds.width * 0.05}"
+                GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="TOP">
+            <tooltip>
+                <Tooltip text="Move selected file down"/>
+            </tooltip>
+        </Button>
+
+    </children>
+</GridPane>

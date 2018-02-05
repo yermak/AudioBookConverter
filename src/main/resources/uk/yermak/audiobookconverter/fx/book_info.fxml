@@ -32,7 +32,9 @@
         <TextField GridPane.columnIndex="1" GridPane.rowIndex="0"/>
         <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         <TextField GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <!--<TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>-->
+        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true"/>
+
 
         <Label text="Series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
         <Label text="Book #" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>

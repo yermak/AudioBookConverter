@@ -1,6 +1,5 @@
 package com.freeipodsoftware.abc;
 
-import com.freeipodsoftware.abc.conversionstrategy.ConversionStrategy;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;

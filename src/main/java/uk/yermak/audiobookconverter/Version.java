@@ -1,4 +1,4 @@
-package com.freeipodsoftware.abc;
+package uk.yermak.audiobookconverter;
 
 public class Version {
     public static final int MAJOR = 2;

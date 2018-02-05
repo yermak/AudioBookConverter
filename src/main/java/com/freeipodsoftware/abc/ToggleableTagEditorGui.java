@@ -8,6 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import uk.yermak.audiobookconverter.AppProperties;
 
 public class ToggleableTagEditorGui extends Composite {
     private static final String SHOW_TAG_EDITOR = Messages.getString("ToggleableTagEditorGui.showTagEditor");

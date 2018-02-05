@@ -1,6 +1,4 @@
-package com.freeipodsoftware.abc.conversionstrategy;
-
-import uk.yermak.audiobookconverter.*;
+package uk.yermak.audiobookconverter;
 
 import java.io.File;
 import java.io.IOException;

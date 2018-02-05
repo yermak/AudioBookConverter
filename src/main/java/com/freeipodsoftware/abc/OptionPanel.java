@@ -3,6 +3,7 @@ package com.freeipodsoftware.abc;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
+import uk.yermak.audiobookconverter.AppProperties;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.StateDispatcher;
 

@@ -9,8 +9,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.*;
+import uk.yermak.audiobookconverter.Version;
 
-import static com.freeipodsoftware.abc.AppProperties.WEBSITE_URL;
+import static uk.yermak.audiobookconverter.AppProperties.WEBSITE_URL;
 
 public class AboutDialogGui extends Composite {
     private Label label = null;

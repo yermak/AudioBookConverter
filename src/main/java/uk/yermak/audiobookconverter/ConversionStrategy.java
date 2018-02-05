@@ -1,8 +1,4 @@
-package com.freeipodsoftware.abc.conversionstrategy;
-
-import uk.yermak.audiobookconverter.AudioBookInfo;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.ProgressCallback;
+package uk.yermak.audiobookconverter;
 
 import java.util.List;
 import java.util.Map;

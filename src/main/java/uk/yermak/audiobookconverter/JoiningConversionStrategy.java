@@ -1,8 +1,7 @@
-package com.freeipodsoftware.abc.conversionstrategy;
+package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Messages;
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
 import java.io.PrintWriter;

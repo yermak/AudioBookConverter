@@ -1,4 +1,4 @@
-package com.freeipodsoftware.abc;
+package uk.yermak.audiobookconverter;
 
 import java.io.File;
 import java.io.FileInputStream;

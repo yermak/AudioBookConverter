@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import com.freeipodsoftware.abc.Messages;
 import com.freeipodsoftware.abc.ProgressView;
-import com.freeipodsoftware.abc.conversionstrategy.ConversionStrategy;
 
 import java.util.HashMap;
 import java.util.List;

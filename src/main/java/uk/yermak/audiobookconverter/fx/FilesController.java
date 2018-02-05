@@ -1,10 +1,13 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -25,6 +28,8 @@ import java.util.List;
 public class FilesController {
     private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
 
+    @FXML
+    ListView fileList;
 
     @FXML
     protected void addFiles(ActionEvent event) {
@@ -45,6 +50,7 @@ public class FilesController {
 
     private void showDirectorySelection(Window window) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select folder with MP3 files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
             Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3"}, true);
@@ -57,6 +63,9 @@ public class FilesController {
         List<String> fileNames = new ArrayList<>();
         files.forEach(f -> fileNames.add(f.getPath()));
         List<MediaInfo> addedMedia = new MediaLoader(fileNames).loadMediaInfo();
+        ObservableList<String> data = FXCollections.observableArrayList(fileNames);
+        fileList.setItems(data);
+
 
 //        addedMedia.forEach(m -> fileListControl.add(m.getFileName()));
         stateDispatcher.fileListChanged();
@@ -65,10 +74,30 @@ public class FilesController {
 
     private void showFileSelection(Window window) {
         final FileChooser fileChooser = new FileChooser();
+//        fileChooser.setInitialDirectory();
+        fileChooser.setTitle("Select MP3 files for conversion");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("mp3", "*.mp3")
         );
         List<File> files = fileChooser.showOpenMultipleDialog(window);
-        processFiles(files);
+        if (files != null) {
+            processFiles(files);
+        }
+    }
+
+    public void removeFiles(ActionEvent event) {
+
+    }
+
+    public void clear(ActionEvent event) {
+        fileList.getItems().clear();
+    }
+
+    public void moveUp(ActionEvent event) {
+
+    }
+
+    public void moveDown(ActionEvent event) {
+
     }
 }

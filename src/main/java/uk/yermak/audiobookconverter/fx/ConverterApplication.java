@@ -8,15 +8,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class ConverterApplication extends Application {
     static ConverterApplication instance = null;
+    private Scene scene;
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static Window getWindow() {
+        return instance.scene.getWindow();
     }
 
     @Override
@@ -31,7 +37,7 @@ public class ConverterApplication extends Application {
             e.printStackTrace();
         }
 
-        Scene scene = new Scene(root);
+        scene = new Scene(root);
 
         stage.setTitle("AudioBookConverter V2");
         stage.setScene(scene);

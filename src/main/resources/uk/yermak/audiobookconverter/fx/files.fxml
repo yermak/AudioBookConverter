@@ -17,7 +17,6 @@
     <children>
         <ListView GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="6" fx:id="fileList"
                   GridPane.valignment="TOP">
-
         </ListView>
         <Button text="Add" minWidth="${screen.visualBounds.width * 0.05}" onAction="#addFiles"
                 GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.valignment="TOP">

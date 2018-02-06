@@ -8,27 +8,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.Window;
+import uk.yermak.audiobookconverter.ConvertsionContext;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class ConverterApplication extends Application {
-    static ConverterApplication instance = null;
-    private Scene scene;
+    private static JfxEnv env;
+    private static ConvertsionContext context = new ConvertsionContext();
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public static Window getWindow() {
-        return instance.scene.getWindow();
-    }
-
     @Override
     public void start(Stage stage) {
-        instance = this;
-
         Parent root = null;
         try {
             URL resource = getClass().getClassLoader().getResource("uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
@@ -37,7 +31,7 @@ public class ConverterApplication extends Application {
             e.printStackTrace();
         }
 
-        scene = new Scene(root);
+        Scene scene = new Scene(root);
 
         stage.setTitle("AudioBookConverter V2");
         stage.setScene(scene);
@@ -45,5 +39,14 @@ public class ConverterApplication extends Application {
         stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);
         stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.3);
         stage.show();
+        env = new JfxEnv(scene, getHostServices());
+    }
+
+    public static ConvertsionContext getContext() {
+        return context;
+    }
+
+    public static JfxEnv getEnv() {
+        return env;
     }
 }

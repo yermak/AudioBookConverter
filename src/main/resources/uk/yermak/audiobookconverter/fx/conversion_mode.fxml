@@ -15,9 +15,9 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <fx:define>
-        <ToggleGroup fx:id="mode"/>
+        <ToggleGroup fx:id="modeGroup"/>
     </fx:define>
-    <RadioButton text="Join" toggleGroup="$mode"/>
-    <RadioButton text="Batch" toggleGroup="$mode"/>
-    <RadioButton text="Parallel" toggleGroup="$mode" selected="true"/>
+    <RadioButton text="Parallel" toggleGroup="$modeGroup" onAction="#parallelMode" selected="true"/>
+    <RadioButton text="Batch" toggleGroup="$modeGroup" onAction="#batchMode"/>
+    <RadioButton text="Join" toggleGroup="$modeGroup" onAction="#joinMode"/>
 </VBox>

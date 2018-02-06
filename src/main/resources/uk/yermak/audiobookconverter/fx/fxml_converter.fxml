@@ -42,7 +42,7 @@
 
     <Button text="Start Conversion" minWidth="${screen.visualBounds.width * 0.1}"
             minHeight="${screen.visualBounds.height*0.05}"
-            alignment="CENTER">
+            alignment="CENTER" onAction="#start">
         <tooltip>
             <Tooltip text="Start conversion of files"/>
         </tooltip>

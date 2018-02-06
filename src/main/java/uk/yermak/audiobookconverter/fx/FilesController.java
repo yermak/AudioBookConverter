@@ -5,10 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -29,26 +26,26 @@ public class FilesController {
     private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
 
     @FXML
-    ListView fileList;
+    ListView<MediaInfo> fileList;
+    private final ContextMenu contextMenu = new ContextMenu();
+
+    @FXML
+    public void initialize() {
+        MenuItem item1 = new MenuItem("Files");
+        item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getWindow()));
+        MenuItem item2 = new MenuItem("Folder");
+        item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getWindow()));
+        contextMenu.getItems().addAll(item1, item2);
+        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
 
     @FXML
     protected void addFiles(ActionEvent event) {
         Button node = (Button) event.getSource();
-        Window window = node.getScene().getWindow();
-
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem item1 = new MenuItem("Files");
-        item1.setOnAction(e -> showFileSelection(window));
-        MenuItem item2 = new MenuItem("Folder");
-        item2.setOnAction(e -> showDirectorySelection(window));
-
-        contextMenu.getItems().addAll(item1, item2);
         contextMenu.show(node, Side.RIGHT, 0, 0);
-
-        node.setContextMenu(contextMenu);
     }
 
-    private void showDirectorySelection(Window window) {
+    private void selectFolderDialog(Window window) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select folder with MP3 files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
@@ -63,16 +60,13 @@ public class FilesController {
         List<String> fileNames = new ArrayList<>();
         files.forEach(f -> fileNames.add(f.getPath()));
         List<MediaInfo> addedMedia = new MediaLoader(fileNames).loadMediaInfo();
-        ObservableList<String> data = FXCollections.observableArrayList(fileNames);
+
+        ObservableList<MediaInfo> data = FXCollections.observableArrayList(addedMedia);
         fileList.setItems(data);
-
-
-//        addedMedia.forEach(m -> fileListControl.add(m.getFileName()));
         stateDispatcher.fileListChanged();
-
     }
 
-    private void showFileSelection(Window window) {
+    private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
 //        fileChooser.setInitialDirectory();
         fileChooser.setTitle("Select MP3 files for conversion");
@@ -86,18 +80,43 @@ public class FilesController {
     }
 
     public void removeFiles(ActionEvent event) {
-
+        ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
+        fileList.getItems().removeAll(selected);
     }
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
+        stateDispatcher.fileListChanged();
     }
 
     public void moveUp(ActionEvent event) {
-
+        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+        if (selectedIndices.size() == 1) {
+            ObservableList<MediaInfo> items = fileList.getItems();
+            int selected = selectedIndices.get(0);
+            if (selected > 0) {
+                MediaInfo upper = items.get(selected - 1);
+                MediaInfo lower = items.get(selected);
+                items.set(selected - 1, lower);
+                items.set(selected, upper);
+                fileList.getSelectionModel().clearAndSelect(selected - 1);
+            }
+        }
     }
 
     public void moveDown(ActionEvent event) {
+        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+        if (selectedIndices.size() == 1) {
+            ObservableList<MediaInfo> items = fileList.getItems();
+            int selected = selectedIndices.get(0);
+            if (selected < items.size() - 1) {
+                MediaInfo lower = items.get(selected + 1);
+                MediaInfo upper = items.get(selected);
+                items.set(selected, lower);
+                items.set(selected + 1, upper);
+                fileList.getSelectionModel().clearAndSelect(selected + 1);
+            }
+        }
 
     }
 }

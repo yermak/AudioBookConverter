@@ -3,7 +3,7 @@ package uk.yermak.audiobookconverter;
 import java.util.List;
 import java.util.Map;
 
-public interface ConversionStrategy {
+public interface ConversionStrategy extends Runnable {
 
     void start();
 

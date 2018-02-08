@@ -19,7 +19,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     //    private String outputFileName;
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
-
     protected void startConversion() {
         executorService.execute(this);
     }

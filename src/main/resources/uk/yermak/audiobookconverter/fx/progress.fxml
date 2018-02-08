@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+    <HBox>
+        <Label></Label>
+        <Label></Label>
+    </HBox>
+    <ProgressBar></ProgressBar>
+    <Label></Label>
+</fx:root>

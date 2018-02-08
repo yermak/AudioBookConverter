@@ -8,14 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import uk.yermak.audiobookconverter.ConvertsionContext;
+import uk.yermak.audiobookconverter.ConversionContext;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
-    private static ConvertsionContext context = new ConvertsionContext();
+    private static ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {
         launch(args);
@@ -42,7 +42,7 @@ public class ConverterApplication extends Application {
         env = new JfxEnv(scene, getHostServices());
     }
 
-    public static ConvertsionContext getContext() {
+    public static ConversionContext getContext() {
         return context;
     }
 

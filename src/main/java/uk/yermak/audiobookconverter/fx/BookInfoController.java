@@ -7,7 +7,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.util.TextFieldValidator;
+import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
 /**
  * Created by Yermak on 04-Feb-18.

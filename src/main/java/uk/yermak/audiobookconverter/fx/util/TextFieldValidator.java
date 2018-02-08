@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter.util;
+package uk.yermak.audiobookconverter.fx.util;
 
 import javafx.beans.NamedArg;
 import javafx.scene.control.TextFormatter;

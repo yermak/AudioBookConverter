@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by Yermak on 03-Jan-18.
  */
-public class JobProgress implements Runnable, StateListener {
+public class JobProgress implements Runnable, StateListener, Refreshable {
     private final ConversionStrategy conversionStrategy;
     private ProgressView progressView;
     private final List<MediaInfo> media;

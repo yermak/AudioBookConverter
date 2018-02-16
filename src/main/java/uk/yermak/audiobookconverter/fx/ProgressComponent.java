@@ -1,10 +1,11 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.fx;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
+import uk.yermak.audiobookconverter.ConversionProgress;
 
 import java.io.IOException;
 
@@ -12,6 +13,9 @@ import java.io.IOException;
  * Created by yermak on 08-Feb-18.
  */
 public class ProgressComponent extends VBox {
+    public Label elapsedTime;
+    public Label remainingTime;
+    public Label estimatedSize;
     @FXML
     private Label state;
     @FXML
@@ -33,15 +37,14 @@ public class ProgressComponent extends VBox {
             throw new RuntimeException(exception);
         }
 
-
-//        progressBar.progressProperty().bind(conversionProgress.getProgress());
-
-
 //        filesCount.textProperty().bindBidirectional(conversionProgress.get new NumberStringConverter());
 
     }
 
     public void setConversionProgress(ConversionProgress conversionProgress) {
         this.conversionProgress = conversionProgress;
+//        progressBar.progressProperty().bind(progressBean.progress);
+//        message.textProperty().bind(progressBean.message);
     }
+
 }

@@ -39,6 +39,7 @@
         </Tab>
     </TabPane>
 
+    <VBox fx:id="progressArea"/>
 
     <Button text="Start Conversion" minWidth="${screen.visualBounds.width * 0.1}"
             minHeight="${screen.visualBounds.height*0.05}"

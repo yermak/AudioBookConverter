@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import com.freeipodsoftware.abc.Messages;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,7 +13,6 @@ public class ConversionProgress implements Runnable, StateListener {
 
     private ProgressStatus status;
 
-    private List<MediaInfo> media;
     private long startTime;
     private boolean finished;
     private int totalFiles;
@@ -26,29 +24,28 @@ public class ConversionProgress implements Runnable, StateListener {
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
+    private long elapsedTime;
+    private String infoText;
+    private long remainingTime;
+    private long estimatedFinalOutputSize;
+
+    public ConversionProgress(int totalFiles, long totalDuration) {
+        this.totalFiles = totalFiles;
+        this.totalDuration = totalDuration;
+    }
 
 
     public void run() {
         startTime = System.currentTimeMillis();
-        Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-        for (MediaInfo mediaInfo : media) {
-            progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), this));
-            totalFiles++;
-            totalDuration += mediaInfo.getDuration();
-        }
-        progressCallbacks.put("output", new ProgressCallback("output", this));
-        conversionStrategy.setCallbacks(progressCallbacks);
         StateDispatcher.getInstance().addListener(this);
 
-        progressView.getDisplay().syncExec(() -> {
-            progressView.setInfoText(Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles);
-            progressView.setProgress(0);
-            progressView.setRemainingTime(10 * 60 * 1000);
-        });
+        infoText = Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles;
+        progress = 0;
+        remainingTime = 10 * 60 * 1000;
 
         while (!finished && !cancelled) {
             if (!paused) {
-                progressView.getDisplay().syncExec(() -> progressView.setElapsedTime(System.currentTimeMillis() - startTime - pausePeriod));
+                elapsedTime = System.currentTimeMillis() - startTime - pausePeriod;
             }
             silentSleep();
         }
@@ -63,29 +60,22 @@ public class ConversionProgress implements Runnable, StateListener {
 
     public synchronized void converted(String fileName, long timeInMillis, long size) {
         if (paused || cancelled) return;
-        int currentDuration = 0;
+        long currentDuration;
         durations.put(fileName, timeInMillis);
 
-        for (Long l : durations.values()) {
-            currentDuration += l;
-        }
+        currentDuration = durations.values().stream().mapToLong(d -> d).sum();
 
-        long estimatedSize = 0;
         sizes.put(fileName, size);
-        for (Long l : sizes.values()) {
-            estimatedSize += l;
-        }
+        long estimatedSize = sizes.values().stream().mapToLong(l -> l).sum();
 
         if (currentDuration > 0 && totalDuration > 0) {
             double progress = (double) currentDuration / totalDuration;
             long delta = System.currentTimeMillis() - pausePeriod - startTime;
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             long finalSize = estimatedSize;
-            progressView.getDisplay().syncExec(() -> {
-                progressView.setProgress((int) (progress * 100));
-                progressView.setRemainingTime(remainingTime);
-                progressView.setEstimatedFinalOutputSize((long) (finalSize / progress));
-            });
+            this.progress = (int) (progress * 100);
+            this.remainingTime = remainingTime;
+            this.estimatedFinalOutputSize = (long) (finalSize / progress);
         }
 
     }
@@ -94,9 +84,9 @@ public class ConversionProgress implements Runnable, StateListener {
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles != totalFiles) {
-            progressView.getDisplay().syncExec(() -> progressView.setInfoText(Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles));
+            infoText = Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles;
         } else {
-            progressView.getDisplay().syncExec(() -> progressView.setInfoText("Updating media information..."));
+            infoText = "Updating media information...";
         }
     }
 
@@ -116,13 +106,11 @@ public class ConversionProgress implements Runnable, StateListener {
         cancelled = true;
         durations.clear();
         sizes.clear();
-        progressView.getDisplay().syncExec(() -> {
-            progressView.setProgress(0);
-            progressView.setRemainingTime(0);
-            progressView.setElapsedTime(0);
-            progressView.setEstimatedFinalOutputSize(-1L);
-            progressView.getDisplay().syncExec(() -> progressView.setInfoText("Conversion was cancelled"));
-        });
+        progress = 0;
+        remainingTime = 0;
+        elapsedTime = 0;
+        estimatedFinalOutputSize = -1L;
+        infoText = "Conversion was cancelled";
     }
 
     @Override
@@ -143,11 +131,9 @@ public class ConversionProgress implements Runnable, StateListener {
     }
 
     private void resetStats() {
-        progressView.getDisplay().syncExec(() -> {
-            progressView.setProgress(0);
-            progressView.setElapsedTime(0);
-            progressView.setEstimatedFinalOutputSize(0);
-        });
+        progress = 0;
+        elapsedTime = 0;
+        estimatedFinalOutputSize = -1L;
     }
 
     @Override
@@ -158,9 +144,11 @@ public class ConversionProgress implements Runnable, StateListener {
     public void reset() {
         durations.clear();
         sizes.clear();
-        progressView.getDisplay().syncExec(() -> {
-            progressView.setProgress(0);
-            progressView.setRemainingTime(60 * 1000);
-        });
+        progress = 0;
+        remainingTime = 60 * 1000;
+    }
+
+    public Number getProgress() {
+        return progress;
     }
 }

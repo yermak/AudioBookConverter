@@ -4,14 +4,13 @@ package uk.yermak.audiobookconverter;
  * Created by Yermak on 03-Jan-18.
  */
 public class ProgressCallback {
-    private String fileName;
+    protected String fileName;
     private JobProgress jobProgress;
 
     public ProgressCallback(String fileName, JobProgress jobProgress) {
         this.fileName = fileName;
         this.jobProgress = jobProgress;
     }
-
 
     public void converted(long timeInMillis, long size) {
         jobProgress.converted(fileName, timeInMillis, size);
@@ -24,6 +23,5 @@ public class ProgressCallback {
 
     public void reset() {
         jobProgress.reset();
-
     }
 }

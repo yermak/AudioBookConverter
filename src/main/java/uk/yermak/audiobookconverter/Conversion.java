@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,15 +39,22 @@ public class Conversion {
         return bookInfo;
     }
 
-    public void start(String outputDestination) {
-        ConversionStrategy convertionStrategy = mode.createConvertionStrategy();
-        JobProgress jobProgress = new JobProgress(convertionStrategy, null, media);
-        executorService.execute(jobProgress);
+    public void start(String outputDestination, ConversionProgress conversionProgress) {
+        ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
 
-        convertionStrategy.setOutputDestination(outputDestination);
-        convertionStrategy.setBookInfo(bookInfo);
-        convertionStrategy.setMedia(media);
 
-        executorService.execute(convertionStrategy);
+        Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
+        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback2(mediaInfo.getFileName(), conversionProgress)));
+        progressCallbacks.put("output", new ProgressCallback2("output", conversionProgress));
+
+        conversionStrategy.setCallbacks(progressCallbacks);
+
+        executorService.execute(conversionProgress);
+
+        conversionStrategy.setOutputDestination(outputDestination);
+        conversionStrategy.setBookInfo(bookInfo);
+        conversionStrategy.setMedia(media);
+
+        executorService.execute(conversionStrategy);
     }
 }

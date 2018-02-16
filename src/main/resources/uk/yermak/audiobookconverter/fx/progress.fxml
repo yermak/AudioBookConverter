@@ -1,13 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
-    <HBox>
-        <Label fx:id="state"/>
-        <Label fx:id="filesCount"/>
-    </HBox>
-    <ProgressBar fx:id="progressBar"/>
-    <Label fx:id="message"/>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="uk.yermak.audiobookconverter.fx.ProgressComponent">
+    <GridPane>
+        <Label text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="TOP_LEFT"
+               GridPane.valignment="TOP">
+            <font>
+                <Font name="Arial Black" size="12.0"/>
+            </font>
+        </Label>
+        <Label fx:id="state" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="3"
+               alignment="TOP_RIGHT"/>
+
+        <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4"/>
+
+        <Label text="Time elapsed" GridPane.columnIndex="0" GridPane.rowIndex="2" alignment="TOP_LEFT"/>
+        <Label fx:id="elapsedTime" GridPane.columnIndex="1" GridPane.rowIndex="2" alignment="TOP_LEFT"/>
+
+        <Label text="Time remaining" GridPane.columnIndex="2" GridPane.rowIndex="2" alignment="TOP_RIGHT"/>
+        <Label fx:id="remainingTime" GridPane.columnIndex="3" GridPane.rowIndex="2" alignment="TOP_RIGHT"/>
+
+        <Label text="Estimated final output file size" GridPane.columnIndex="0" GridPane.rowIndex="3"
+               alignment="TOP_LEFT"/>
+        <Label fx:id="estimatedSize" GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="TOP_LEFT"/>
+
+        <Button text="Pause" alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#pause">
+            <tooltip>
+                <Tooltip text="Pause conversion of files. Will allow current blocks to complete"/>
+            </tooltip>
+        </Button>
+        <Button text="Pause" alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#cancel">
+            <tooltip>
+                <Tooltip text="Cancel conversion"/>
+            </tooltip>
+        </Button>
+
+    </GridPane>
 </fx:root>

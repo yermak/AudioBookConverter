@@ -44,8 +44,8 @@ public class Conversion {
 
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback2(mediaInfo.getFileName(), conversionProgress)));
-        progressCallbacks.put("output", new ProgressCallback2("output", conversionProgress));
+        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), conversionProgress)));
+        progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));
 
         conversionStrategy.setCallbacks(progressCallbacks);
 

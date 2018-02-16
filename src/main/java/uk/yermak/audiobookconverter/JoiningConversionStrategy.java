@@ -23,7 +23,8 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
     public void run() {
         long jobId = System.currentTimeMillis();
-        String tempFile = getTempFileName(jobId, 999999, ".m4b");
+
+        String tempFile = Utils.getTmp(jobId, 999999, ".m4b");
 
         File metaFile = null;
         File fileListFile = null;

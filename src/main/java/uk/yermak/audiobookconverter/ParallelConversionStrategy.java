@@ -29,7 +29,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         List<Future<ConverterOutput>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
-        String tempFile = getTempFileName(jobId, 999999, ".m4b");
+        String tempFile = Utils.getTmp(jobId, 999999, ".m4b");
 
         File fileListFile = null;
         File metaFile = null;

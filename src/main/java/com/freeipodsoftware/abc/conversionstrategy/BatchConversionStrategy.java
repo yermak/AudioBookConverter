@@ -1,5 +1,6 @@
 package com.freeipodsoftware.abc.conversionstrategy;
 
+import org.apache.commons.io.FileUtils;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
@@ -12,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
@@ -78,6 +81,16 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
     @Override
     public void canceled() {
         Utils.closeSilently(executorService);
+    }
+
+    @Override
+    protected File prepareFiles(long jobId) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+        List<String> outFiles = IntStream.range(0, media.size()).mapToObj(i -> "file '" + getTempFileName(jobId, i, ".m4b") + "'").collect(Collectors.toList());
+
+        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
+
+        return fileListFile;
     }
 
     @Override

@@ -126,17 +126,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     }
 
-    protected File prepareFiles(long jobId) throws IOException {
-        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = new ArrayList<>();
-
-        for (MediaInfo mediaInfo : media) {
-            outFiles.add("file '" + getTempFileName(jobId, mediaInfo.hashCode(), ".m4b") + "'");
-        }
-        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
-
-        return fileListFile;
-    }
+    protected abstract File prepareFiles(long jobId) throws IOException;
 
 
     protected abstract String getTempFileName(long jobId, int index, String extension);

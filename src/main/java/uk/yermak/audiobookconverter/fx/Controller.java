@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import uk.yermak.audiobookconverter.*;
 
@@ -11,6 +12,9 @@ import java.util.List;
  * Created by Yermak on 06-Jan-18.
  */
 public class Controller {
+
+    @FXML
+    public VBox progressArea;
 
     @FXML
     public void initialize() {
@@ -29,7 +33,7 @@ public class Controller {
             String outputDestination = null;
             boolean selected = false;
             if (context.getMode().equals(ConversionMode.BATCH)) {
-             /*   BatchModeOptionsDialog options = new BatchModeOptionsDialog(ConverterApplication.getEnv().getWindow());
+              /*  BatchModeOptionsDialog options = new BatchModeOptionsDialog(ConverterApplication.getEnv().getWindow());
                 String sameFolder = this.getSameFolder(mediaInfo.getFileName());
                 options.setFolder(sameFolder);
                 if (options.open()) {
@@ -48,7 +52,7 @@ public class Controller {
                 fileChooser.getExtensionFilters().add(
                         new FileChooser.ExtensionFilter("m4b", "*.m4b")
                 );
-                outputDestination = fileChooser.showSaveDialog(env.getWindow()).getName();
+                outputDestination = fileChooser.showSaveDialog(env.getWindow()).getPath();
                 selected = outputDestination != null;
             }
 
@@ -58,7 +62,16 @@ public class Controller {
 
 //                this.setUIEnabled(false);
 
-                context.startConversion(outputDestination);
+                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
+
+                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
+
+                ProgressComponent progressComponent = new ProgressComponent();
+                progressComponent.setConversionProgress(conversionProgress);
+
+                progressArea.getChildren().add(progressComponent);
+
+                context.startConversion(outputDestination, conversionProgress);
 
 
 //

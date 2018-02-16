@@ -39,8 +39,8 @@ public class ConversionContext {
         return conversion.getMode();
     }
 
-    public void startConversion(String outputDestination) {
-        conversion.start(outputDestination);
+    public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
+        conversion.start(outputDestination, conversionProgress);
 
     }
 }

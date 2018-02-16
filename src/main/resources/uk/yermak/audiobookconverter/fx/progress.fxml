@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.VBox?>
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
     <HBox>
-        <Label></Label>
-        <Label></Label>
+        <Label fx:id="state"/>
+        <Label fx:id="filesCount"/>
     </HBox>
-    <ProgressBar></ProgressBar>
-    <Label></Label>
+    <ProgressBar fx:id="progressBar"/>
+    <Label fx:id="message"/>
 </fx:root>

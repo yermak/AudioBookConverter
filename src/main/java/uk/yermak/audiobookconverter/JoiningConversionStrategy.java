@@ -4,9 +4,13 @@ import com.freeipodsoftware.abc.Messages;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
@@ -65,5 +69,14 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         } else {
             this.outputDestination = outputDestination;
         }
+    }
+
+    protected File prepareFiles(long jobId) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+        List<String> outFiles = IntStream.range(0, media.size()).mapToObj(i -> "file '" + getTempFileName(jobId, i, ".m4b") + "'").collect(Collectors.toList());
+
+        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
+
+        return fileListFile;
     }
 }

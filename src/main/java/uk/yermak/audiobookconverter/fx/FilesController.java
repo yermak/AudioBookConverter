@@ -32,11 +32,20 @@ public class FilesController {
     @FXML
     public void initialize() {
         MenuItem item1 = new MenuItem("Files");
-        item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getWindow()));
+        item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
-        item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getWindow()));
+        item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
         contextMenu.getItems().addAll(item1, item2);
+
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        initializeConversion();
+    }
+
+    private void initializeConversion() {
+        ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+        fileList.setItems(media);
+        ConverterApplication.getContext().setMedia(media);
     }
 
     @FXML
@@ -61,9 +70,7 @@ public class FilesController {
         files.forEach(f -> fileNames.add(f.getPath()));
         List<MediaInfo> addedMedia = new MediaLoader(fileNames).loadMediaInfo();
 
-        ObservableList<MediaInfo> data = FXCollections.observableArrayList(addedMedia);
-        fileList.setItems(data);
-        stateDispatcher.fileListChanged();
+        fileList.getItems().addAll(addedMedia);
     }
 
     private void selectFilesDialog(Window window) {

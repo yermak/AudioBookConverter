@@ -11,6 +11,6 @@ public class LinksController {
     @FXML
     protected void openLink(ActionEvent event) {
         Hyperlink source = (Hyperlink) event.getSource();
-        ConverterApplication.instance.getHostServices().showDocument(source.getTooltip().getText());
+        ConverterApplication.getEnv().showDocument(source.getTooltip().getText());
     }
 }

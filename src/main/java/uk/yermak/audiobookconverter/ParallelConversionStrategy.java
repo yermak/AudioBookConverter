@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
     //    private String outputFileName;
@@ -27,7 +28,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         List<Future<ConverterOutput>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
-        String tempFile = getTempFileName(jobId, 999999, ".m4b");
+        String tempFile = Utils.getTmp(jobId, 999999, ".m4b");
 
         File fileListFile = null;
         File metaFile = null;
@@ -110,5 +111,12 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         } else {
             this.outputDestination = outputDestination;
         }
+    }
+
+    protected File prepareFiles(long jobId) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+        List<String> outFiles = media.stream().map(mediaInfo -> "file '" + getTempFileName(jobId, mediaInfo.hashCode(), ".m4b") + "'").collect(Collectors.toList());
+        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
+        return fileListFile;
     }
 }

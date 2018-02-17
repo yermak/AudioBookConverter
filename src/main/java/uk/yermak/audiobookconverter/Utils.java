@@ -26,7 +26,7 @@ public class Utils {
         return result;
     }
 
-    static String getTmp(long jobId, int index, String extension) {
+    public static String getTmp(long jobId, int index, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + index + extension).getAbsolutePath();
     }
 

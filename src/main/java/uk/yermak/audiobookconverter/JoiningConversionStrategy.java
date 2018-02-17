@@ -10,8 +10,6 @@ import java.util.concurrent.Executors;
 
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
-    public JoiningConversionStrategy() {
-    }
 
 
     protected void startConversion() {

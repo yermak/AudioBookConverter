@@ -14,9 +14,6 @@ import java.util.concurrent.Future;
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
 
-    public BatchConversionStrategy() {
-    }
-
     protected void startConversion() {
         executorService.execute(this);
     }

@@ -77,7 +77,7 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
                 try {
                     ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
                     break;
-                } catch (TimeoutException ignored) {
+                } catch (TimeoutException | CancellationException ignored) {
                 }
             }
         } finally {

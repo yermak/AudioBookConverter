@@ -1,23 +1,29 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static uk.yermak.audiobookconverter.ConversionMode.PARALLEL;
+import static uk.yermak.audiobookconverter.ProgressStatus.*;
 
 /**
  * Created by Yermak on 06-Feb-18.
  */
 public class Conversion {
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
-    private List<MediaInfo> media;
-    private ConversionMode mode;
+    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+    private ConversionMode mode = ConversionMode.PARALLEL;
     private AudioBookInfo bookInfo;
-
-    public void setMedia(List<MediaInfo> media) {
-        this.media = media;
-    }
+    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", NOT_READY);
 
     public void setMode(ConversionMode mode) {
         this.mode = mode;
@@ -27,7 +33,7 @@ public class Conversion {
         this.bookInfo = bookInfo;
     }
 
-    public List<MediaInfo> getMedia() {
+    public ObservableList<MediaInfo> getMedia() {
         return media;
     }
 
@@ -40,8 +46,8 @@ public class Conversion {
     }
 
     public void start(String outputDestination, ConversionProgress conversionProgress) {
+        status.set(STARTED);
         ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
-
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), conversionProgress)));
@@ -56,5 +62,22 @@ public class Conversion {
         conversionStrategy.setMedia(media);
 
         executorService.execute(conversionStrategy);
+        status.set(IN_PROGRESS);
+    }
+
+    public void addMediaChangeListener(ListChangeListener<MediaInfo> listener) {
+        media.addListener(listener);
+    }
+
+    public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {
+        status.addListener(listener);
+    }
+
+    public void pause() {
+        status.set(PAUSED);
+    }
+
+    public void stop() {
+        status.set(READY);
     }
 }

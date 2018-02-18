@@ -54,7 +54,7 @@ public class BookInfoController {
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setTitle(comment.getText()));
 
-        ObservableList<MediaInfo> media = (ObservableList<MediaInfo>) ConverterApplication.getContext().getMedia();
+        ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         media.addListener((InvalidationListener) observable -> copyTags((ObservableList<MediaInfo>) observable));
     }
 

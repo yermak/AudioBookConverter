@@ -1,7 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.ObservableList;
+
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by yermak on 06-Feb-18.
@@ -14,20 +15,12 @@ public class ConversionContext {
     public ConversionContext() {
     }
 
-    public void setMedia(List<MediaInfo> media) {
-        conversion.setMedia(media);
-    }
-
     public void setMode(ConversionMode mode) {
         conversion.setMode(mode);
     }
 
     public void setBookInfo(AudioBookInfo bookInfo) {
         conversion.setBookInfo(bookInfo);
-    }
-
-    public List<MediaInfo> getMedia() {
-        return conversion.getMedia();
     }
 
     public AudioBookInfo getBookInfo() {
@@ -42,5 +35,17 @@ public class ConversionContext {
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
         conversion.start(outputDestination, conversionProgress);
 
+    }
+
+    public Conversion getConversion() {
+        return conversion;
+    }
+
+    public void pauseConversion() {
+        conversion.pause();
+    }
+
+    public void stopConversion() {
+        conversion.stop();
     }
 }

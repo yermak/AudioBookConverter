@@ -2,7 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import uk.yermak.audiobookconverter.*;
 
@@ -14,11 +14,25 @@ import java.util.List;
 public class Controller {
 
     @FXML
-    public VBox progressArea;
+    public ProgressComponent progress;
+    @FXML
+    public Button startButton;
+    @FXML
+    public Button pauseButton;
+    @FXML
+    public Button stopButton;
 
     @FXML
     public void initialize() {
+        ConversionContext context = ConverterApplication.getContext();
+        context.getConversion().addMediaChangeListener(c -> updateUI(c.getList().isEmpty()));
 
+    }
+
+    private void updateUI(boolean disable) {
+        startButton.setDisable(disable);
+        pauseButton.setDisable(!disable);
+        stopButton.setDisable(!disable);
     }
 
     public void start(ActionEvent actionEvent) {
@@ -26,7 +40,7 @@ public class Controller {
         JfxEnv env = ConverterApplication.getEnv();
 
 
-        List<MediaInfo> media = context.getMedia();
+        List<MediaInfo> media = context.getConversion().getMedia();
         if (media.size() > 0) {
             AudioBookInfo audioBookInfo = context.getBookInfo();
             MediaInfo mediaInfo = media.get(0);
@@ -57,26 +71,24 @@ public class Controller {
             }
 
             if (selected) {
-//                ProgressView progressView = createProgressView();
-//                JobProgress jobProgress = new JobProgress(conversionStrategy, progressView, media);
 
-//                this.setUIEnabled(false);
+                updateUI(true);
 
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
-
-                ProgressComponent progressComponent = new ProgressComponent();
-                progressComponent.setConversionProgress(conversionProgress);
-
-                progressArea.getChildren().add(progressComponent);
-
+                progress.setConversionProgress(conversionProgress);
                 context.startConversion(outputDestination, conversionProgress);
-
-
-//
-
             }
         }
+    }
+
+
+    public void pause(ActionEvent actionEvent) {
+        ConverterApplication.getContext().pauseConversion();
+    }
+
+    public void stop(ActionEvent actionEvent) {
+        updateUI(false);
+        ConverterApplication.getContext().stopConversion();
     }
 }

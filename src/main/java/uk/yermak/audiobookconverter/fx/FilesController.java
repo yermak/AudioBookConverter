@@ -1,6 +1,10 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.collections.FXCollections;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,9 +14,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.MediaLoader;
-import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.ProgressStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,29 +28,65 @@ import java.util.List;
  * Created by Yermak on 04-Feb-18.
  */
 public class FilesController {
-    private final StateDispatcher stateDispatcher = StateDispatcher.getInstance();
 
     @FXML
+    public Button addButton;
+    @FXML
+    public Button removeButton;
+    @FXML
+    public Button clearButton;
+    @FXML
+    public Button upButton;
+    @FXML
+    public Button downButton;
+    @FXML
     ListView<MediaInfo> fileList;
+
     private final ContextMenu contextMenu = new ContextMenu();
 
     @FXML
     public void initialize() {
+        ConversionContext context = ConverterApplication.getContext();
+
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
         item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
         contextMenu.getItems().addAll(item1, item2);
 
+        ObservableList<MediaInfo> media = context.getConversion().getMedia();
+        fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        initializeConversion();
+        context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case IN_PROGRESS:
+                case STARTED:
+                    updateUI(true);
+                    break;
+                default:
+                    updateUI(false);
+            }
+        });
+
+        media.addListener(new MediaInfoListChangeListener());
+        fileList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<MediaInfo>() {
+            @Override
+            public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
+                ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+                boolean disableMovement = selectedIndices.size() != 1;
+                upButton.setDisable(disableMovement);
+                downButton.setDisable(disableMovement);
+            }
+        });
     }
 
-    private void initializeConversion() {
-        ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-        fileList.setItems(media);
-        ConverterApplication.getContext().setMedia(media);
+    private void updateUI(boolean disable) {
+        addButton.setDisable(disable);
+        removeButton.setDisable(disable);
+        clearButton.setDisable(disable);
+        upButton.setDisable(disable);
+        downButton.setDisable(disable);
     }
 
     @FXML
@@ -93,7 +134,6 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-        stateDispatcher.fileListChanged();
     }
 
     public void moveUp(ActionEvent event) {
@@ -125,5 +165,16 @@ public class FilesController {
             }
         }
 
+    }
+
+    private class MediaInfoListChangeListener implements ListChangeListener<MediaInfo> {
+        @Override
+        public void onChanged(Change<? extends MediaInfo> c) {
+            boolean disable = c.getList().isEmpty();
+            removeButton.setDisable(disable);
+            clearButton.setDisable(disable);
+            upButton.setDisable(disable);
+            downButton.setDisable(disable);
+        }
     }
 }

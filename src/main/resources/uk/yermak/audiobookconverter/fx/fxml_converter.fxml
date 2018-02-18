@@ -5,6 +5,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.stage.Screen?>
+<?import uk.yermak.audiobookconverter.fx.ProgressComponent?>
+<?import javafx.scene.layout.HBox?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.Controller"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
@@ -39,14 +41,30 @@
         </Tab>
     </TabPane>
 
-    <VBox fx:id="progressArea"/>
+    <HBox>
+        <Button fx:id="startButton" text="Start" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
+                minHeight="${screen.visualBounds.height*0.05}"
+                alignment="CENTER" onAction="#start">
+            <tooltip>
+                <Tooltip text="Start conversion of files"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="pauseButton" text="Pause" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
+                minHeight="${screen.visualBounds.height*0.05}"
+                alignment="CENTER" onAction="#pause">
+            <tooltip>
+                <Tooltip text="Pause conversion of files"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="stopButton" text="Stop" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
+                minHeight="${screen.visualBounds.height*0.05}"
+                alignment="CENTER" onAction="#stop">
+            <tooltip>
+                <Tooltip text="Stop conversion of files"/>
+            </tooltip>
+        </Button>
+    </HBox>
 
-    <Button text="Start Conversion" minWidth="${screen.visualBounds.width * 0.1}"
-            minHeight="${screen.visualBounds.height*0.05}"
-            alignment="CENTER" onAction="#start">
-        <tooltip>
-            <Tooltip text="Start conversion of files"/>
-        </tooltip>
-    </Button>
+    <!--<ProgressComponent fx:id="progress"/>-->
 
 </VBox>

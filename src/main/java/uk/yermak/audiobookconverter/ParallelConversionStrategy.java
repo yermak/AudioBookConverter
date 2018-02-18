@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    //    private String outputFileName;
+
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
     protected void startConversion() {

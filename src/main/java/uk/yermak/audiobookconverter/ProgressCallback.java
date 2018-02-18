@@ -4,6 +4,7 @@ package uk.yermak.audiobookconverter;
  * Created by Yermak on 03-Jan-18.
  */
 public class ProgressCallback {
+
     protected String fileName;
     private Refreshable refreshable;
 

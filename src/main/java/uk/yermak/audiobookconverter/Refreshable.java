@@ -6,8 +6,6 @@ package uk.yermak.audiobookconverter;
 public interface Refreshable {
 
     void converted(String fileName, long timeInMillis, long size);
-
     void incCompleted(String fileName);
-
     void reset();
 }

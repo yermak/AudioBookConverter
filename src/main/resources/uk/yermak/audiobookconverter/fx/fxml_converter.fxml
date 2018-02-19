@@ -65,6 +65,6 @@
         </Button>
     </HBox>
 
-    <!--<ProgressComponent fx:id="progress"/>-->
+    <ProgressComponent fx:id="progress" prefWidth="${screen.visualBounds.width * 0.30}"/>
 
 </VBox>

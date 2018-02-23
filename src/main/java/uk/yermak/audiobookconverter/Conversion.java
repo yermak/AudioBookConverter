@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static uk.yermak.audiobookconverter.ConversionMode.PARALLEL;
 import static uk.yermak.audiobookconverter.ProgressStatus.*;
 
 /**
@@ -45,21 +43,22 @@ public class Conversion {
         return bookInfo;
     }
 
-    public void start(String outputDestination, ConversionProgress conversionProgress) {
+    public void start(String outputDestination, Refreshable refreshable) {
         status.set(STARTED);
         ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), conversionProgress)));
-        progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));
+        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
+        progressCallbacks.put("output", new ProgressCallback("output", refreshable));
 
         conversionStrategy.setCallbacks(progressCallbacks);
 
-        executorService.execute(conversionProgress);
+//        executorService.execute(refreshable);
 
         conversionStrategy.setOutputDestination(outputDestination);
         conversionStrategy.setBookInfo(bookInfo);
         conversionStrategy.setMedia(media);
+
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);

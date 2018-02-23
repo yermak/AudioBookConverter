@@ -1,8 +1,10 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.fx;
 
-import com.freeipodsoftware.abc.Messages;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import uk.yermak.audiobookconverter.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,16 +13,13 @@ import java.util.Map;
  * Created by yermak on 08-Feb-18.
  */
 public class ConversionProgress implements Runnable, StateListener, Refreshable {
-    SimpleStringProperty info = new SimpleStringProperty();
+
+    SimpleLongProperty elapsed = new SimpleLongProperty();
+    SimpleLongProperty remaining = new SimpleLongProperty();
+    SimpleLongProperty size = new SimpleLongProperty();
+    SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.STARTED);
+    SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleIntegerProperty progress = new SimpleIntegerProperty();
-    SimpleStringProperty message = new SimpleStringProperty();
-
-
-//    private int progress;
-
-    private ProgressStatus status;
-
-    private Refreshable refreshable;
 
     private long startTime;
     private boolean finished;
@@ -33,10 +32,9 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
-    private long elapsedTime;
-    private String infoText;
-    private long remainingTime;
-    private long estimatedFinalOutputSize;
+//    private long elapsedTime;
+//    private String infoText;
+//    private long remainingTime;
 
     public ConversionProgress(int totalFiles, long totalDuration) {
         this.totalFiles = totalFiles;
@@ -47,14 +45,13 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     public void run() {
         startTime = System.currentTimeMillis();
         StateDispatcher.getInstance().addListener(this);
-
-        infoText = Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles;
+        filesCount.set(completedFiles + "/" + totalFiles);
         progress.set(0);
-        remainingTime = 10 * 60 * 1000;
+        remaining.set(10 * 60 * 1000);
 
         while (!finished && !cancelled) {
             if (!paused) {
-                elapsedTime = System.currentTimeMillis() - startTime - pausePeriod;
+                elapsed.set(System.currentTimeMillis() - startTime - pausePeriod);
             }
             silentSleep();
         }
@@ -83,8 +80,8 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             long finalSize = estimatedSize;
             this.progress.set((int) (progress * 100));
-            this.remainingTime = remainingTime;
-            this.estimatedFinalOutputSize = (long) (finalSize / progress);
+            this.remaining.set(remainingTime);
+            this.size.set((int) (finalSize / progress));
         }
     }
 
@@ -92,9 +89,10 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles != totalFiles) {
-            infoText = Messages.getString("BatchConversionStrategy.file") + " " + completedFiles + "/" + totalFiles;
+            filesCount.set(completedFiles + "/" + totalFiles);
         } else {
-            infoText = "Updating media information...";
+            state.set(ProgressStatus.COMPLETED);
+//            infoText = "Updating media information...";
         }
 
     }
@@ -116,10 +114,11 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         durations.clear();
         sizes.clear();
         progress.set(0);
-        remainingTime = 0;
-        elapsedTime = 0;
-        estimatedFinalOutputSize = -1L;
-        infoText = "Conversion was cancelled";
+        remaining.set(0);
+        elapsed.set(0);
+        size.set(-1);
+        state.set(ProgressStatus.CANCELLED);
+//        infoText = "Conversion was cancelled";
     }
 
     @Override
@@ -141,8 +140,8 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
 
     private void resetStats() {
         progress.set(0);
-        elapsedTime = 0;
-        estimatedFinalOutputSize = -1L;
+        elapsed.set(0);
+        size.set(-1);
     }
 
     @Override
@@ -154,6 +153,6 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         durations.clear();
         sizes.clear();
         progress.set(0);
-        remainingTime = 60 * 1000;
+        remaining.set(60 * 1000);
     }
 }

@@ -2,28 +2,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
-    <GridPane>
-        <Label text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="TOP_LEFT"
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml">
+    <Label text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0"
                GridPane.valignment="TOP">
             <font>
                 <Font name="Arial Black" size="12.0"/>
             </font>
         </Label>
-        <Label fx:id="state" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="3"
-               alignment="TOP_RIGHT"/>
+    <Label text="Converted files" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2"
+           GridPane.halignment="RIGHT"/>
+    <Label fx:id="filesCount" text="0/0" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
-        <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4"
-                     prefWidth="Infinity"/>
+    <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4"
+                 GridPane.halignment="CENTER"/>
 
-        <Label text="Time elapsed" GridPane.columnIndex="0" GridPane.rowIndex="2" alignment="TOP_LEFT"/>
-        <Label fx:id="elapsedTime" GridPane.columnIndex="1" GridPane.rowIndex="2" alignment="TOP_LEFT"/>
+    <Label text="Time elapsed" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="LEFT"/>
+    <Label fx:id="elapsedTime" text="0:00:00" GridPane.columnIndex="1" GridPane.rowIndex="2"
+           GridPane.halignment="LEFT"/>
 
-        <Label text="Time remaining" GridPane.columnIndex="2" GridPane.rowIndex="2" alignment="TOP_RIGHT"/>
-        <Label fx:id="remainingTime" GridPane.columnIndex="3" GridPane.rowIndex="2" alignment="TOP_RIGHT"/>
+    <Label text="Time remaining" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+    <Label fx:id="remainingTime" text="0:00:00" GridPane.columnIndex="3" GridPane.rowIndex="2"
+           GridPane.halignment="RIGHT"/>
 
-        <Label text="Estimated final output file size" GridPane.columnIndex="0" GridPane.rowIndex="3"
-               alignment="TOP_LEFT"/>
-        <Label fx:id="estimatedSize" GridPane.columnIndex="1" GridPane.rowIndex="3" alignment="TOP_LEFT"/>
-    </GridPane>
+    <Label text="Estimated final output file size" GridPane.columnIndex="0" GridPane.rowIndex="3"
+           GridPane.columnSpan="2"
+           GridPane.halignment="LEFT"/>
+    <Label fx:id="estimatedSize" text="0MB" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
+    <Label fx:id="state" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 </fx:root>

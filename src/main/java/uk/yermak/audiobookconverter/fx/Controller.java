@@ -7,6 +7,7 @@ import javafx.stage.FileChooser;
 import uk.yermak.audiobookconverter.*;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Yermak on 06-Jan-18.
@@ -14,7 +15,7 @@ import java.util.List;
 public class Controller {
 
     @FXML
-    public ProgressComponent progress;
+    public ProgressComponent progressBar;
     @FXML
     public Button startButton;
     @FXML
@@ -60,13 +61,7 @@ public class Controller {
                 }*/
             } else {
 
-                final FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
-                fileChooser.setTitle("Save AudioBook");
-                fileChooser.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("m4b", "*.m4b")
-                );
-                outputDestination = fileChooser.showSaveDialog(env.getWindow()).getPath();
+                outputDestination = selectOutputFile(env, audioBookInfo, mediaInfo);
                 selected = outputDestination != null;
             }
 
@@ -76,10 +71,23 @@ public class Controller {
 
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
-                progress.setConversionProgress(conversionProgress);
+                Executors.newSingleThreadExecutor().execute(conversionProgress);
+                progressBar.setConversionProgress(conversionProgress);
                 context.startConversion(outputDestination, conversionProgress);
             }
         }
+    }
+
+    private String selectOutputFile(JfxEnv env, AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+        String outputDestination;
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
+        fileChooser.setTitle("Save AudioBook");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("m4b", "*.m4b")
+        );
+        outputDestination = fileChooser.showSaveDialog(env.getWindow()).getPath();
+        return outputDestination;
     }
 
 

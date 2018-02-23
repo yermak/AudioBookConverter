@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.collections.ObservableList;
-
 import java.util.LinkedList;
 
 /**
@@ -32,8 +30,8 @@ public class ConversionContext {
         return conversion.getMode();
     }
 
-    public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
-        conversion.start(outputDestination, conversionProgress);
+    public void startConversion(String outputDestination, Refreshable refreshable) {
+        conversion.start(outputDestination, refreshable);
 
     }
 

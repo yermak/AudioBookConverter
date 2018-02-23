@@ -4,17 +4,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.VBox;
-import uk.yermak.audiobookconverter.ConversionProgress;
+import javafx.scene.layout.GridPane;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
+import uk.yermak.audiobookconverter.ProgressStatus;
 
 import java.io.IOException;
 
 /**
  * Created by yermak on 08-Feb-18.
  */
-public class ProgressComponent extends VBox {
+public class ProgressComponent extends GridPane {
+
+    @FXML
     public Label elapsedTime;
+    @FXML
     public Label remainingTime;
+    @FXML
     public Label estimatedSize;
     @FXML
     private Label state;
@@ -22,8 +28,8 @@ public class ProgressComponent extends VBox {
     private Label filesCount;
     @FXML
     private ProgressBar progressBar;
-    @FXML
-    private Label message;
+
+
     private ConversionProgress conversionProgress;
 
     public ProgressComponent() {
@@ -36,15 +42,30 @@ public class ProgressComponent extends VBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
-//        filesCount.textProperty().bindBidirectional(conversionProgress.get new NumberStringConverter());
-
+        progressBar.progressProperty().setValue(0);
+        progressBar.setMinWidth(550);
     }
+
 
     public void setConversionProgress(ConversionProgress conversionProgress) {
         this.conversionProgress = conversionProgress;
-//        progressBar.progressProperty().bind(progressBean.progress);
-//        message.textProperty().bind(progressBean.message);
+        filesCount.textProperty().bindBidirectional(conversionProgress.filesCount);
+        progressBar.progressProperty().bindBidirectional(conversionProgress.progress);
+        estimatedSize.textProperty().bindBidirectional(conversionProgress.size, new NumberStringConverter());
+        elapsedTime.textProperty().bindBidirectional(conversionProgress.elapsed, new NumberStringConverter());
+        remainingTime.textProperty().bindBidirectional(conversionProgress.remaining, new NumberStringConverter());
+        state.textProperty().bindBidirectional(conversionProgress.state, new StateStringConverter());
     }
 
+    private static class StateStringConverter extends StringConverter<ProgressStatus> {
+        @Override
+        public String toString(ProgressStatus status) {
+            return status.toString();
+        }
+
+        @Override
+        public ProgressStatus fromString(String value) {
+            return ProgressStatus.valueOf(value);
+        }
+    }
 }

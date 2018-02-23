@@ -3,10 +3,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.stage.Screen?>
 <?import uk.yermak.audiobookconverter.fx.ProgressComponent?>
-<?import javafx.scene.layout.HBox?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.Controller"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
@@ -29,7 +29,7 @@
     </TitledPane>
 
 
-    <TabPane minHeight="${screen.visualBounds.height*0.25}" prefHeight="${screen.visualBounds.height*0.25}">
+    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
@@ -65,6 +65,7 @@
         </Button>
     </HBox>
 
-    <ProgressComponent fx:id="progress" prefWidth="${screen.visualBounds.width * 0.30}"/>
+    <ProgressComponent fx:id="progressBar" prefWidth="${screen.visualBounds.width * 0.30}"
+                       minWidth="${screen.visualBounds.width * 0.30}"/>
 
 </VBox>

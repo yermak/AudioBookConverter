@@ -1,13 +1,11 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
-import uk.yermak.audiobookconverter.ProgressStatus;
 
 import java.io.IOException;
 
@@ -49,23 +47,12 @@ public class ProgressComponent extends GridPane {
 
     public void setConversionProgress(ConversionProgress conversionProgress) {
         this.conversionProgress = conversionProgress;
-        filesCount.textProperty().bindBidirectional(conversionProgress.filesCount);
-        progressBar.progressProperty().bindBidirectional(conversionProgress.progress);
-        estimatedSize.textProperty().bindBidirectional(conversionProgress.size, new NumberStringConverter());
-        elapsedTime.textProperty().bindBidirectional(conversionProgress.elapsed, new NumberStringConverter());
-        remainingTime.textProperty().bindBidirectional(conversionProgress.remaining, new NumberStringConverter());
-        state.textProperty().bindBidirectional(conversionProgress.state, new StateStringConverter());
+        conversionProgress.filesCount.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> filesCount.setText(newValue)));
+        conversionProgress.progress.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> progressBar.progressProperty().set(newValue.doubleValue())));
+        conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(newValue.toString())));
+        conversionProgress.elapsed.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> elapsedTime.setText(newValue.toString())));
+        conversionProgress.remaining.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> remainingTime.setText(newValue.toString())));
+        conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue.toString())));
     }
 
-    private static class StateStringConverter extends StringConverter<ProgressStatus> {
-        @Override
-        public String toString(ProgressStatus status) {
-            return status.toString();
-        }
-
-        @Override
-        public ProgressStatus fromString(String value) {
-            return ProgressStatus.valueOf(value);
-        }
-    }
 }

@@ -40,6 +40,11 @@ public class ConverterApplication extends Application {
         stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.3);
         stage.show();
         env = new JfxEnv(scene, getHostServices());
+
+       /* FolderDialog folderDialog = new FolderDialog();
+        folderDialog.showAndWait();*/
+
+
     }
 
     public static ConversionContext getContext() {

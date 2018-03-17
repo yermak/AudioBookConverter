@@ -48,6 +48,7 @@ public class Controller {
             String outputDestination = null;
             boolean selected = false;
             if (context.getMode().equals(ConversionMode.BATCH)) {
+
               /*  BatchModeOptionsDialog options = new BatchModeOptionsDialog(ConverterApplication.getEnv().getWindow());
                 String sameFolder = this.getSameFolder(mediaInfo.getFileName());
                 options.setFolder(sameFolder);

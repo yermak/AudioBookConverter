@@ -3,15 +3,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.stage.Screen?>
-<?import uk.yermak.audiobookconverter.fx.ProgressComponent?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.Controller"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
       prefHeight="${screen.visualBounds.height * 0.65}" prefWidth="${screen.visualBounds.width * 0.30}"
-      minHeight="${screen.visualBounds.height * 0.65}" minWidth="${screen.visualBounds.width * 0.30}"
+      minHeight="-Infinity" minWidth="-Infinity" maxHeight="-Infinity" maxWidth="-Infinity"
 >
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
@@ -33,39 +31,17 @@
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
-        <Tab text="Conversion mode" closable="false">
-            <fx:include source="conversion_mode.fxml"/>
-        </Tab>
         <Tab text="Book Info" closable="false">
             <fx:include source="book_info.fxml"/>
         </Tab>
+        <Tab text="Conversion mode" closable="false">
+            <fx:include source="conversion_mode.fxml"/>
+        </Tab>
+        <Tab text="Queue" closable="false">
+            <VBox fx:id="progressQuoue"/>
+        </Tab>
     </TabPane>
 
-    <HBox>
-        <Button fx:id="startButton" text="Start" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
-                minHeight="${screen.visualBounds.height*0.05}"
-                alignment="CENTER" onAction="#start">
-            <tooltip>
-                <Tooltip text="Start conversion of files"/>
-            </tooltip>
-        </Button>
-        <Button fx:id="pauseButton" text="Pause" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
-                minHeight="${screen.visualBounds.height*0.05}"
-                alignment="CENTER" onAction="#pause">
-            <tooltip>
-                <Tooltip text="Pause conversion of files"/>
-            </tooltip>
-        </Button>
-        <Button fx:id="stopButton" text="Stop" minWidth="${screen.visualBounds.width * 0.09}" disable="true"
-                minHeight="${screen.visualBounds.height*0.05}"
-                alignment="CENTER" onAction="#stop">
-            <tooltip>
-                <Tooltip text="Stop conversion of files"/>
-            </tooltip>
-        </Button>
-    </HBox>
 
-    <ProgressComponent fx:id="progressBar" prefWidth="${screen.visualBounds.width * 0.30}"
-                       minWidth="${screen.visualBounds.width * 0.30}"/>
 
 </VBox>

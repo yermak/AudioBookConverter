@@ -60,6 +60,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     private void silentSleep() {
         try {
             Thread.sleep(1000);
+//            Thread.yield();
         } catch (InterruptedException e) {
         }
     }

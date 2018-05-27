@@ -1,9 +1,5 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,10 +10,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.ConversionContext;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.MediaLoader;
-import uk.yermak.audiobookconverter.ProgressStatus;
+import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,11 +35,22 @@ public class FilesController {
     @FXML
     ListView<MediaInfo> fileList;
 
+
+    @FXML
+    public Button startButton;
+    @FXML
+    public Button pauseButton;
+    @FXML
+    public Button stopButton;
+    @FXML
+//    public ProgressComponent progressBar;
+
     private final ContextMenu contextMenu = new ContextMenu();
 
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
+
 
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
@@ -62,26 +66,25 @@ public class FilesController {
             switch (newValue) {
                 case IN_PROGRESS:
                 case STARTED:
-                    updateUI(true);
+                    updateFilesUI(true);
                     break;
                 default:
-                    updateUI(false);
+                    updateFilesUI(false);
             }
         });
 
         media.addListener(new MediaInfoListChangeListener());
-        fileList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<MediaInfo>() {
-            @Override
-            public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
-                ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-                boolean disableMovement = selectedIndices.size() != 1;
-                upButton.setDisable(disableMovement);
-                downButton.setDisable(disableMovement);
-            }
+        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+            boolean disableMovement = selectedIndices.size() != 1;
+            upButton.setDisable(disableMovement);
+            downButton.setDisable(disableMovement);
         });
+
+        context.getConversion().addMediaChangeListener(c -> updateProcessUI(c.getList().isEmpty()));
     }
 
-    private void updateUI(boolean disable) {
+    private void updateFilesUI(boolean disable) {
         addButton.setDisable(disable);
         removeButton.setDisable(disable);
         clearButton.setDisable(disable);
@@ -177,4 +180,75 @@ public class FilesController {
             downButton.setDisable(disable);
         }
     }
+
+    private void updateProcessUI(boolean disable) {
+        startButton.setDisable(disable);
+        pauseButton.setDisable(!disable);
+        stopButton.setDisable(!disable);
+    }
+
+    public void start(ActionEvent actionEvent) {
+        ConversionContext context = ConverterApplication.getContext();
+        JfxEnv env = ConverterApplication.getEnv();
+
+
+        List<MediaInfo> media = context.getConversion().getMedia();
+        if (media.size() > 0) {
+            AudioBookInfo audioBookInfo = context.getBookInfo();
+            MediaInfo mediaInfo = media.get(0);
+            String outputDestination = null;
+            boolean selected = false;
+            if (context.getMode().equals(ConversionMode.BATCH)) {
+
+              /*  BatchModeOptionsDialog options = new BatchModeOptionsDialog(ConverterApplication.getEnv().getWindow());
+                String sameFolder = this.getSameFolder(mediaInfo.getFileName());
+                options.setFolder(sameFolder);
+                if (options.open()) {
+                    if (options.isIntoSameFolder()) {
+                        selected = true;
+                    } else {
+                        outputDestination = options.getFolder();
+                        selected = true;
+                    }
+                }*/
+            } else {
+
+                outputDestination = selectOutputFile(env, audioBookInfo, mediaInfo);
+                selected = outputDestination != null;
+            }
+
+            if (selected) {
+
+                updateProcessUI(true);
+
+                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
+                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
+                context.startConversion(outputDestination, conversionProgress);
+            }
+        }
+    }
+
+    private String selectOutputFile(JfxEnv env, AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+        String outputDestination;
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
+        fileChooser.setTitle("Save AudioBook");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("m4b", "*.m4b")
+        );
+        outputDestination = fileChooser.showSaveDialog(env.getWindow()).getPath();
+        return outputDestination;
+    }
+
+
+    public void pause(ActionEvent actionEvent) {
+        ConverterApplication.getContext().pauseConversion();
+    }
+
+    public void stop(ActionEvent actionEvent) {
+        updateProcessUI(false);
+        ConverterApplication.getContext().stopConversion();
+    }
+
+
 }

@@ -21,7 +21,7 @@ public class BookInfoController {
     @FXML
     private TextField narrator;
     @FXML
-    private ComboBox genre;
+    private ComboBox<String> genre;
     @FXML
     private TextField series;
     @FXML

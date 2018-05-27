@@ -44,6 +44,7 @@ public class Conversion {
     }
 
     public void start(String outputDestination, Refreshable refreshable) {
+        Executors.newSingleThreadExecutor().execute(refreshable);
         status.set(STARTED);
         ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
 

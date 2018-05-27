@@ -43,12 +43,13 @@ public class ProgressComponent extends GridPane {
             throw new RuntimeException(exception);
         }
         progressBar.progressProperty().setValue(0);
-        progressBar.setMinWidth(550);
+//        prefWidthProperty().bind(((VBox) getParent()).widthProperty().subtract(20));
+
+        progressBar.setMaxWidth(Double.MAX_VALUE);
     }
 
 
     public void setConversionProgress(ConversionProgress conversionProgress) {
-        this.conversionProgress = conversionProgress;
         conversionProgress.filesCount.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> filesCount.setText(newValue)));
         conversionProgress.progress.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> progressBar.progressProperty().set(newValue.doubleValue())));
         conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(formatSize(newValue.longValue()))));

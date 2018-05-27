@@ -140,11 +140,11 @@
                 <version>8.6.0</version>
                 <configuration>
                     <vendor>https://github.com/yermak</vendor>
-                    <mainClass>com.freeipodsoftware.abc.MainWindow</mainClass>
+                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                     <bundler>EXE</bundler>
 
                     <bundleArguments>
-                        <runtime>C:\Program Files\Java\jre1.8.0_152</runtime>
+                        <runtime>D:\Programs\Java\jre1.8.0_162</runtime>
                     </bundleArguments>
                     <!--
                                         <additionalAppResources>

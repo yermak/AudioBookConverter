@@ -6,7 +6,6 @@
 <?import javafx.stage.Screen?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
           fx:controller="uk.yermak.audiobookconverter.fx.BookInfoController"
-          minHeight="${screen.visualBounds.height*0.2}" prefHeight="${screen.visualBounds.height*0.2}"
           gridLinesVisible="false">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>

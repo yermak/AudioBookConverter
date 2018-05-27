@@ -101,6 +101,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     @Override
     public void finished() {
         finished = true;
+        state.set(ProgressStatus.FINISHED);
         resetStats();
     }
 

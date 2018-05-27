@@ -218,11 +218,18 @@ public class FilesController {
             }
 
             if (selected) {
-
                 updateProcessUI(true);
-
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
+
+
+                conversionProgress.state.addListener((observable, oldValue, newValue) -> {
+                    if (newValue.equals(ProgressStatus.FINISHED) || newValue.equals(ProgressStatus.CANCELLED)) {
+                        updateProcessUI(false);
+                        updateFilesUI(false);
+                    }
+                });
+
                 context.startConversion(outputDestination, conversionProgress);
             }
         }

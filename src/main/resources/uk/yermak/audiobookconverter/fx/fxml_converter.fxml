@@ -27,7 +27,7 @@
     </TitledPane>
 
 
-    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}">
+    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}" fx:id="tabs">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
@@ -37,8 +37,8 @@
         <Tab text="Conversion mode" closable="false">
             <fx:include source="conversion_mode.fxml"/>
         </Tab>
-        <Tab text="Queue" closable="false">
-            <VBox fx:id="progressQuoue"/>
+        <Tab text="Queue" closable="false" fx:id="queueTab">
+            <VBox fx:id="progressQueue"/>
         </Tab>
     </TabPane>
 

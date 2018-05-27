@@ -1,6 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,7 +19,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     SimpleLongProperty size = new SimpleLongProperty();
     SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.STARTED);
     SimpleStringProperty filesCount = new SimpleStringProperty();
-    SimpleIntegerProperty progress = new SimpleIntegerProperty();
+    SimpleDoubleProperty progress = new SimpleDoubleProperty();
 
     private long startTime;
     private boolean finished;
@@ -32,9 +32,6 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
-//    private long elapsedTime;
-//    private String infoText;
-//    private long remainingTime;
 
     public ConversionProgress(int totalFiles, long totalDuration) {
         this.totalFiles = totalFiles;
@@ -80,7 +77,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
             long delta = System.currentTimeMillis() - pausePeriod - startTime;
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             long finalSize = estimatedSize;
-            this.progress.set((int) (progress * 100));
+            this.progress.set(progress);
             this.remaining.set(remainingTime);
             this.size.set((int) (finalSize / progress));
         }
@@ -89,13 +86,11 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     public synchronized void incCompleted(String fileName) {
         completedFiles++;
         if (paused || cancelled) return;
-        if (completedFiles != totalFiles) {
-            filesCount.set(completedFiles + "/" + totalFiles);
-        } else {
+        if (completedFiles == totalFiles) {
             state.set(ProgressStatus.COMPLETED);
 //            infoText = "Updating media information...";
         }
-
+        filesCount.set(completedFiles + "/" + totalFiles);
     }
 
     @Override
@@ -140,9 +135,9 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     }
 
     private void resetStats() {
-        progress.set(0);
-        elapsed.set(0);
-        size.set(-1);
+//        progress.set(0);
+//        elapsed.set(0);
+//        size.set(-1);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.Subscriber;
@@ -11,7 +13,13 @@ import uk.yermak.audiobookconverter.Subscriber;
 public class Controller implements Subscriber{
 
     @FXML
-    VBox progressQuoue;
+    VBox progressQueue;
+
+    @FXML
+    TabPane tabs;
+
+    @FXML
+    Tab queueTab;
 
     @FXML
     public void initialize() {
@@ -23,6 +31,7 @@ public class Controller implements Subscriber{
     public void addConversionProgress(ConversionProgress conversionProgress) {
         ProgressComponent progressComponent = new ProgressComponent();
         progressComponent.setConversionProgress(conversionProgress);
-        progressQuoue.getChildren().add(progressComponent);
+        progressQueue.getChildren().add(progressComponent);
+        tabs.getSelectionModel().select(queueTab);
     }
 }

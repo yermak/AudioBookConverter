@@ -65,7 +65,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
 
     @Override
     public void finished() {
-
+        finished=true;
     }
 
     @Override

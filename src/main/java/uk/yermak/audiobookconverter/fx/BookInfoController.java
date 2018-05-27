@@ -52,7 +52,7 @@ public class BookInfoController {
         series.textProperty().addListener(o -> bookInfo.setSeries(series.getText()));
         bookNo.textProperty().addListener(o -> bookInfo.setBookNumber(Integer.parseInt(bookNo.getText())));
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.setTitle(comment.getText()));
+        comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         media.addListener((InvalidationListener) observable -> copyTags((ObservableList<MediaInfo>) observable));

@@ -31,14 +31,14 @@
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
-        <Tab text="Book Info" closable="false">
+        <Tab text="Book Info" closable="false" >
             <fx:include source="book_info.fxml"/>
         </Tab>
         <Tab text="Conversion mode" closable="false">
             <fx:include source="conversion_mode.fxml"/>
         </Tab>
         <Tab text="Queue" closable="false" fx:id="queueTab">
-            <VBox fx:id="progressQueue"/>
+            <ListView fx:id="progressQueue"/>
         </Tab>
     </TabPane>
 

@@ -115,10 +115,10 @@ public class Utils {
 
                 return filename;
             } catch (Exception var7) {
-                throw new RuntimeException(Messages.getString("Util.connotUseFilename") + " " + filename);
+                throw new RuntimeException("Cannot use filename" + " " + filename);
             }
         } else {
-            throw new RuntimeException(Messages.getString("Util.connotUseFilename") + " " + filename + " (2)");
+            throw new RuntimeException("Cannot use filename"+ " " + filename + " (2)");
         }
     }
 

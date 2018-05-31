@@ -94,7 +94,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public String getAdditionalFinishedMessage() {
-        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputDestination;
+        return "Ouput filename" + ":\n" + this.outputDestination;
     }
 
     @Override

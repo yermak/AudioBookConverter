@@ -4,26 +4,25 @@ package uk.yermak.audiobookconverter;
  * Created by Yermak on 03-Jan-18.
  */
 public class ProgressCallback {
-    private String fileName;
-    private JobProgress jobProgress;
 
-    public ProgressCallback(String fileName, JobProgress jobProgress) {
+    protected String fileName;
+    private Refreshable refreshable;
+
+    public ProgressCallback(String fileName, Refreshable refreshable) {
         this.fileName = fileName;
-        this.jobProgress = jobProgress;
+        this.refreshable = refreshable;
     }
 
-
     public void converted(long timeInMillis, long size) {
-        jobProgress.converted(fileName, timeInMillis, size);
+        refreshable.converted(fileName, timeInMillis, size);
     }
 
 
     public void completedConversion() {
-        jobProgress.incCompleted(fileName);
+        refreshable.incCompleted(fileName);
     }
 
     public void reset() {
-        jobProgress.reset();
-
+        refreshable.reset();
     }
 }

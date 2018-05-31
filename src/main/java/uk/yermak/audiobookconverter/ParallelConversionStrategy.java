@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.freeipodsoftware.abc.Messages;
-import com.freeipodsoftware.abc.conversionstrategy.AbstractConversionStrategy;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -18,9 +16,8 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
-    //    private String outputFileName;
-    private ExecutorService executorService = Executors.newWorkStealingPool();
 
+    private ExecutorService executorService = Executors.newWorkStealingPool();
 
     protected void startConversion() {
         executorService.execute(this);
@@ -97,7 +94,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
     }
 
     public String getAdditionalFinishedMessage() {
-        return Messages.getString("JoiningConversionStrategy.outputFilename") + ":\n" + this.outputDestination;
+        return "Ouput filename" + ":\n" + this.outputDestination;
     }
 
     @Override

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml"
+         gridLinesVisible="false" hgap="5" vgap="2">
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
+
+    <children>
+        <Label text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0"
+               GridPane.valignment="TOP">
+            <font>
+                <Font name="Arial Black" size="12.0"/>
+            </font>
+        </Label>
+        <Label fx:id="state" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+
+        <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4"
+                     GridPane.halignment="CENTER"/>
+
+        <Label text="Converted files" GridPane.columnIndex="0" GridPane.rowIndex="2"
+               GridPane.halignment="LEFT"/>
+        <Label fx:id="filesCount" text="0/0" GridPane.columnIndex="1" GridPane.rowIndex="2"
+               GridPane.halignment="LEFT"/>
+
+        <Label text="Estimated output file size" GridPane.columnIndex="2" GridPane.rowIndex="2"
+               GridPane.halignment="RIGHT" />
+        <Label fx:id="estimatedSize" text="0MB" GridPane.columnIndex="3" GridPane.rowIndex="2"
+               GridPane.halignment="LEFT"/>
+
+
+
+        <Label text="Time elapsed" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
+        <Label fx:id="elapsedTime" text="0:00:00" GridPane.columnIndex="1" GridPane.rowIndex="3"
+               GridPane.halignment="LEFT"/>
+
+
+        <Label text="Estimated time remaining" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label fx:id="remainingTime" text="0:00:00" GridPane.columnIndex="3" GridPane.rowIndex="3"
+               GridPane.halignment="RIGHT"/>
+
+
+    </children>
+</fx:root>

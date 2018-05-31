@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.stage.Screen?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <fx:define>
+        <ToggleGroup fx:id="folderGroup"/>
+    </fx:define>
+    <RadioButton text="Same folder as input file" toggleGroup="$folderGroup" onAction="#selectSourceDirectory"
+                 selected="true"/>
+    <RadioButton text="Choose..." toggleGroup="$folderGroup" onAction="#selectOtherDirectory"/>
+</VBox>

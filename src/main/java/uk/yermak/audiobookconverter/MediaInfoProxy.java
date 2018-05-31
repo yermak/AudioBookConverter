@@ -88,4 +88,9 @@ public class MediaInfoProxy implements MediaInfo {
         getMediaInfo().setArtWork(artWork);
     }
 
+
+    @Override
+    public String toString() {
+        return filename;
+    }
 }

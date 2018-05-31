@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.Screen?>
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
+          fx:controller="uk.yermak.audiobookconverter.fx.BookInfoController"
+          gridLinesVisible="false">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <children>
+
+        <Label text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="Writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="Narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="Genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+
+        <TextField fx:id="title" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <TextField fx:id="writer" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <TextField fx:id="narrator" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <!--<TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>-->
+        <ComboBox fx:id="genre" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true"/>
+
+
+        <Label text="Series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="Book #" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="Year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="Comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+
+        <TextField fx:id="series" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+        <!--<Spinner fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1" min="$min" max="$max"/>-->
+        <TextField fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+        <TextField fx:id="year" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+        <TextField fx:id="comment" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+
+    </children>
+</GridPane>

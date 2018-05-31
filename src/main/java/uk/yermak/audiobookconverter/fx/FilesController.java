@@ -137,6 +137,7 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
+
     }
 
     public void moveUp(ActionEvent event) {

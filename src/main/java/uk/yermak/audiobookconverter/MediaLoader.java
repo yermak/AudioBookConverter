@@ -8,6 +8,7 @@ import net.bramp.ffmpeg.probe.FFmpegStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -18,11 +19,11 @@ public class MediaLoader implements StateListener {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static ExecutorService mediaExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-    private static ExecutorService artExecutorService = Executors.newFixedThreadPool(2);
+    private static ExecutorService executorService = Executors.newWorkStealingPool();
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
+        Collections.sort(fileNames);
         StateDispatcher.getInstance().addListener(this);
     }
 
@@ -31,7 +32,7 @@ public class MediaLoader implements StateListener {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
-                Future futureLoad = mediaExecutorService.submit(new MediaInfoCallable(ffprobe, fileName));
+                Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
@@ -53,8 +54,7 @@ public class MediaLoader implements StateListener {
 
     @Override
     public void canceled() {
-        Utils.closeSilently(artExecutorService);
-        Utils.closeSilently(mediaExecutorService);
+        Utils.closeSilently(executorService);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class MediaLoader implements StateListener {
                         mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
                         mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
                     } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
-                        Future futureLoad = artExecutorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
+                        Future futureLoad = executorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
                         mediaInfo.setArtWork(artWork);
                     }
@@ -147,10 +147,10 @@ public class MediaLoader implements StateListener {
                 pictureProcess = pictureProcessBuilder.start();
 
                 StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
-                Future<Long> pictureFuture = Executors.newWorkStealingPool().submit(pictureToOut);
+                Future<Long> pictureFuture = executorService.submit(pictureToOut);
                 // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.err);
-                Future<Long> errFuture = Executors.newWorkStealingPool().submit(pictureToErr);
+                StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.out);
+                Future<Long> errFuture = executorService.submit(pictureToErr);
                 pictureFuture.get();
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);

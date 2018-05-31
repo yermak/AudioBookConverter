@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.stage.Screen?>
+<VBox fx:controller="uk.yermak.audiobookconverter.fx.Controller"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      prefHeight="${screen.visualBounds.height * 0.65}" prefWidth="${screen.visualBounds.width * 0.30}"
+      minHeight="-Infinity" minWidth="-Infinity" maxHeight="-Infinity" maxWidth="-Infinity"
+>
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <fx:include source="links.fxml"/>
+
+    <TitledPane text="Add MP3 files to convert and bring them in right order..." collapsible="false">
+        <fx:include source="files.fxml"/>
+    </TitledPane>
+
+
+    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}" fx:id="tabs">
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+        </padding>
+        <Tab text="Book Info" closable="false" >
+            <fx:include source="book_info.fxml"/>
+        </Tab>
+        <Tab text="Conversion mode" closable="false">
+            <fx:include source="conversion_mode.fxml"/>
+        </Tab>
+        <Tab text="Queue" closable="false" fx:id="queueTab">
+            <ListView fx:id="progressQueue"/>
+        </Tab>
+    </TabPane>
+
+
+
+</VBox>

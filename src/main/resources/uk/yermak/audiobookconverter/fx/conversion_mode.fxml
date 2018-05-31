@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.*?>
+<GridPane xmlns:fx="http://javafx.com/fxml" fx:controller="uk.yermak.audiobookconverter.fx.ConversionModeController" vgap="15">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <fx:define>
+        <ToggleGroup fx:id="modeGroup"/>
+    </fx:define>
+    <RadioButton text="Fast multithreaded conversion of input files to single book (Recommended)"
+                 GridPane.columnIndex="0" GridPane.rowIndex="0"
+                 toggleGroup="$modeGroup" onAction="#parallelMode" selected="true" wrapText="true"/>
+    <RadioButton text="Convert each input file into separate output file (Used for compatibility /n with old devices and players, limited with storage or file size)"
+                 GridPane.columnIndex="0" GridPane.rowIndex="1"
+                 toggleGroup="$modeGroup" onAction="#batchMode" wrapText="true" />
+    <RadioButton text="Sequential conversion of input files to single book (Slow encoding and lower CPU usage)"
+                 GridPane.columnIndex="0" GridPane.rowIndex="2"
+                 toggleGroup="$modeGroup" onAction="#joinMode" wrapText="true" />
+</GridPane>

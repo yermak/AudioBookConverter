@@ -108,7 +108,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         metaData.add("comment=" + bookInfo.getComment());
         metaData.add("track=" + bookInfo.getBookNumber() + "/" + bookInfo.getTotalTracks());
         metaData.add("media_type=2");
-        metaData.add("genre=Audiobook");
+        metaData.add("genre=" + bookInfo.getGenre());
         metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter");
 
         long totalDuration = 0;

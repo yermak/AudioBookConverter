@@ -243,7 +243,9 @@ public class FilesController {
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("m4b", "*.m4b")
         );
-        outputDestination = fileChooser.showSaveDialog(env.getWindow()).getPath();
+        File file = fileChooser.showSaveDialog(env.getWindow());
+        if (file == null) return null;
+        outputDestination = file.getPath();
         return outputDestination;
     }
 

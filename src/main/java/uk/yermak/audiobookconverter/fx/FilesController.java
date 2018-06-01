@@ -103,7 +103,7 @@ public class FilesController {
         directoryChooser.setTitle("Select folder with MP3 files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
-            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3"}, true);
+            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "wma"}, true);
             processFiles(files);
         }
     }
@@ -120,9 +120,10 @@ public class FilesController {
     private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
 //        fileChooser.setInitialDirectory();
-        fileChooser.setTitle("Select MP3 files for conversion");
+        fileChooser.setTitle("Select MP3/WMA files for conversion");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("mp3", "*.mp3")
+                new FileChooser.ExtensionFilter("mp3", "*.mp3"),
+                new FileChooser.ExtensionFilter("wma", "*.wma")
         );
         List<File> files = fileChooser.showOpenMultipleDialog(window);
         if (files != null) {

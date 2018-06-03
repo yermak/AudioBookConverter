@@ -53,17 +53,18 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
         try {
             ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/x64/ffmpeg.exe",
                     "-protocol_whitelist", "file,pipe,concat",
-                    "-vn",
                     "-f", "concat",
                     "-safe", "0",
                     "-i", fileListFileName,
                     "-i", metaDataFileName,
                     "-map_metadata", "1",
+                    "-vn",
                     "-ar", String.valueOf(mediaInfo.getFrequency()),
                     "-ac", String.valueOf(mediaInfo.getChannels()),
-                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
+//                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
                     "-f", "ipod",
                     "-codec:a", "libfdk_aac",
+                        "-codec:v", "copy",
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 

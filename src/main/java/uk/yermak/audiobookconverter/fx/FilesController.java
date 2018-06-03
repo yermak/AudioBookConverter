@@ -198,31 +198,18 @@ public class FilesController {
             AudioBookInfo audioBookInfo = context.getBookInfo();
             MediaInfo mediaInfo = media.get(0);
             String outputDestination = null;
-            boolean selected = false;
             if (context.getMode().equals(ConversionMode.BATCH)) {
-
-              /*  BatchModeOptionsDialog options = new BatchModeOptionsDialog(ConverterApplication.getEnv().getWindow());
-                String sameFolder = this.getSameFolder(mediaInfo.getFileName());
-                options.setFolder(sameFolder);
-                if (options.open()) {
-                    if (options.isIntoSameFolder()) {
-                        selected = true;
-                    } else {
-                        outputDestination = options.getFolder();
-                        selected = true;
-                    }
-                }*/
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setTitle("Select destination folder for encoded files");
+                File selectedDirectory = directoryChooser.showDialog(env.getWindow());
+                outputDestination = selectedDirectory.getPath();
             } else {
-
                 outputDestination = selectOutputFile(env, audioBookInfo, mediaInfo);
-                selected = outputDestination != null;
             }
-
-            if (selected) {
+            if (outputDestination != null) {
                 updateProcessUI(true);
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
-
 
                 conversionProgress.state.addListener((observable, oldValue, newValue) -> {
                     if (newValue.equals(ProgressStatus.FINISHED) || newValue.equals(ProgressStatus.CANCELLED)) {

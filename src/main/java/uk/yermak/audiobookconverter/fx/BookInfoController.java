@@ -46,7 +46,7 @@ public class BookInfoController {
         writer.textProperty().addListener(o -> bookInfo.setWriter(writer.getText()));
         narrator.textProperty().addListener(o -> bookInfo.setNarrator(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.setGenre(genre.getValue().toString()));
+        genre.valueProperty().addListener(o -> bookInfo.setGenre(genre.getValue()));
         genre.getEditor().textProperty().addListener(o -> bookInfo.setGenre(genre.getEditor().getText()));
 
         series.textProperty().addListener(o -> bookInfo.setSeries(series.getText()));

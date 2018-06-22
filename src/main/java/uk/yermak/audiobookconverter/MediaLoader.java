@@ -39,6 +39,7 @@ public class MediaLoader implements StateListener {
             }
             return media;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -116,6 +117,7 @@ public class MediaLoader implements StateListener {
                 mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
+                e.printStackTrace();
                 throw e;
             } finally {
 //                mutex.release();

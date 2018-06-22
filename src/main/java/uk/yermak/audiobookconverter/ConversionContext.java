@@ -53,4 +53,8 @@ public class ConversionContext {
     public void subscribeForStart(Subscriber subscriber) {
         this.subscriber = subscriber;
     }
+
+    public void finishedConversion() {
+        conversion.finished();
+    }
 }

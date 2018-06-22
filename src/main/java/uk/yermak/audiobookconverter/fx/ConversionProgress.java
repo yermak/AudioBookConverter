@@ -2,12 +2,15 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionMode;
+import uk.yermak.audiobookconverter.Refreshable;
+import uk.yermak.audiobookconverter.StateDispatcher;
+import uk.yermak.audiobookconverter.StateListener;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by yermak on 08-Feb-18.
@@ -17,9 +20,9 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
-    SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.IN_PROGRESS);
     SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleDoubleProperty progress = new SimpleDoubleProperty();
+    SimpleStringProperty state = new SimpleStringProperty("");
 
     private long startTime;
     private boolean finished;
@@ -36,10 +39,12 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     public ConversionProgress(int totalFiles, long totalDuration) {
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
+
     }
 
 
     public void run() {
+        state.set("RUNNING");
         startTime = System.currentTimeMillis();
         StateDispatcher.getInstance().addListener(this);
         filesCount.set(completedFiles + "/" + totalFiles);
@@ -87,8 +92,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-//            state.set(ProgressStatus.COMPLETED);
-//            infoText = "Updating media information...";
+            state.set("FINALIZING");
         }
         filesCount.set(completedFiles + "/" + totalFiles);
     }
@@ -96,12 +100,14 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     @Override
     public void finishedWithError(String error) {
         finished = true;
+        state.set("ERROR");
     }
 
     @Override
     public void finished() {
+        ConverterApplication.getContext().finishedConversion();
         finished = true;
-        state.set(ProgressStatus.FINISHED);
+        state.set("FINISHED");
         resetStats();
     }
 
@@ -114,7 +120,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
-        state.set(ProgressStatus.CANCELLED);
+        state.set("CANCELLED");
 //        infoText = "Conversion was cancelled";
     }
 
@@ -122,12 +128,14 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     public void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
+        state.set("PAUSED");
     }
 
     @Override
     public void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
+        state.set("RUNNING");
     }
 
     @Override

@@ -13,8 +13,6 @@ import java.util.stream.IntStream;
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
 
-
-
     @Override
     protected String getTempFileName(long jobId, int index, String extension) {
         return media.get(index).getFileName();
@@ -42,6 +40,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             if (canceled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
         } catch (Exception e) {
+            e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());

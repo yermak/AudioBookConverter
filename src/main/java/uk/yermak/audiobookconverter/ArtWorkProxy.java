@@ -20,6 +20,7 @@ public class ArtWorkProxy implements ArtWork {
         try {
             return futureLoad.get();
         } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

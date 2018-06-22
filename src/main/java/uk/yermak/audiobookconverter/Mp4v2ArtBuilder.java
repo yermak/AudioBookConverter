@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by Yermak on 04-Jan-18.
@@ -61,7 +60,7 @@ public class Mp4v2ArtBuilder implements StateListener {
         });
     }
 
-    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, ExecutionException, InterruptedException {
+    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, InterruptedException {
         Process artProcess = null;
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
@@ -69,12 +68,12 @@ public class Mp4v2ArtBuilder implements StateListener {
                     "--add", "\"" + poster + "\"",
                     outputFileName);
 
-            artProcessBuilder.redirectErrorStream();
+//            artProcessBuilder.redirectErrorStream();
             artProcess = artProcessBuilder.start();
 
-            StreamCopier artToOut = new StreamCopier(artProcess.getInputStream(), System.out);
-            Future<Long> artFuture = executorService.submit(artToOut);
-            artFuture.get();
+            StreamCopier.copy(artProcess.getInputStream(), System.out);
+            StreamCopier.copy(artProcess.getErrorStream(), System.err);
+            artProcess.waitFor();
         } finally {
             Utils.closeSilently(artProcess);
         }

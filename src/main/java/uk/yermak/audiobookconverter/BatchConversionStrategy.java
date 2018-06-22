@@ -18,9 +18,6 @@ import java.util.stream.IntStream;
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
 
-    protected void startConversion() {
-        executorService.execute(this);
-    }
 
     @Override
     protected String getTempFileName(long jobId, int index, String extension) {
@@ -90,10 +87,6 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         return fileListFile;
     }
 
-    @Override
-    public String getAdditionalFinishedMessage() {
-        return outputDestination;
-    }
 
     @Override
     public void setOutputDestination(String outputDestination) {

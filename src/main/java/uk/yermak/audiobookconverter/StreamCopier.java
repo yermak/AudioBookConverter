@@ -20,7 +20,7 @@ public class StreamCopier implements Callable<Long> {
     private final OutputStream out;
 
 
-    public StreamCopier(InputStream in, OutputStream out) {
+    private StreamCopier(InputStream in, OutputStream out) {
         this.in = in;
         this.out = out;
     }
@@ -37,11 +37,8 @@ public class StreamCopier implements Callable<Long> {
         return count;
     }
 
-    public static Future<Long> submit(StreamCopier streamCopier) {
-        return executorService.submit(streamCopier);
-    }
 
-    public static Future<Long> submit(InputStream in, OutputStream out) {
+    public static Future<Long> copy(InputStream in, OutputStream out) {
         return executorService.submit(new StreamCopier(in, out));
     }
 }

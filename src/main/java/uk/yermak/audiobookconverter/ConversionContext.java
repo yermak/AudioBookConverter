@@ -34,8 +34,8 @@ public class ConversionContext {
     }
 
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
-        conversion.start(outputDestination, conversionProgress);
         subscriber.addConversionProgress(conversionProgress);
+        conversion.start(outputDestination, conversionProgress);
     }
 
     public Conversion getConversion() {

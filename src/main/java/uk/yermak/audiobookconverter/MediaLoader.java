@@ -19,7 +19,7 @@ public class MediaLoader implements StateListener {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static ExecutorService executorService = Executors.newWorkStealingPool();
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
@@ -33,6 +33,7 @@ public class MediaLoader implements StateListener {
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
+//                futureLoad.get();
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
@@ -106,6 +107,7 @@ public class MediaLoader implements StateListener {
                         mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
                     } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
                         Future futureLoad = executorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
+//                        futureLoad.get();
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
                         mediaInfo.setArtWork(artWork);
                     }
@@ -146,12 +148,14 @@ public class MediaLoader implements StateListener {
                         poster);
                 pictureProcess = pictureProcessBuilder.start();
 
-                StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
-                Future<Long> pictureFuture = executorService.submit(pictureToOut);
+                Future<Long> pictureFuture = StreamCopier.copy(pictureProcess.getInputStream(), System.out);
+//                Future<Long> pictureFuture = Executors.newCachedThreadPool().submit(pictureToOut);
                 // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.out);
-                Future<Long> errFuture = executorService.submit(pictureToErr);
-                pictureFuture.get();
+                Future<Long> errFuture = StreamCopier.copy(pictureProcess.getErrorStream(), System.err);
+//                Future<Long> errFuture = executorService.submit(pictureToErr);
+                pictureProcess.waitFor();
+//                pictureFuture.get();
+//                errFuture.get();
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);
                 return new ArtWorkBean(poster, format, crc32);

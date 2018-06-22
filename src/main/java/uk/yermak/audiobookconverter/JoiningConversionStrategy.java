@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -15,9 +14,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
 
 
-    protected void startConversion() {
-        Executors.newWorkStealingPool().execute(this);
-    }
 
     @Override
     protected String getTempFileName(long jobId, int index, String extension) {
@@ -56,10 +52,6 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         }
     }
 
-
-    public String getAdditionalFinishedMessage() {
-        return "Ouput filename" + ":\n" + this.outputDestination;
-    }
 
     @Override
     public void setOutputDestination(String outputDestination) {

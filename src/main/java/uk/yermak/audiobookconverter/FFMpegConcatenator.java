@@ -6,7 +6,9 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -33,7 +35,7 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
 
     }
 
-    public void concat() throws IOException, ExecutionException, InterruptedException {
+    public void concat() throws IOException, InterruptedException {
         if (cancelled) return;
         while (paused) Thread.sleep(1000);
         callback.reset();
@@ -63,18 +65,11 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
 
             ffmpegProcess = ffmpegProcessBuilder.start();
 
-            StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
-            Future<Long> ffmpegFuture = executorService.submit(ffmpegToOut);
-            StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
-            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
+            StreamCopier.copy(ffmpegProcess.getInputStream(), System.out);
+            StreamCopier.copy(ffmpegProcess.getErrorStream(), System.err);
 
-            while (!cancelled) {
-                try {
-                    ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
-                    break;
-                } catch (TimeoutException ignored) {
-                }
-            }
+            for (boolean finished = false; !cancelled && !finished; finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS))
+                ;
 
         } finally {
             Utils.closeSilently(ffmpegProcess);

@@ -10,7 +10,7 @@ import uk.yermak.audiobookconverter.Subscriber;
 /**
  * Created by Yermak on 06-Jan-18.
  */
-public class Controller implements Subscriber{
+public class Controller implements Subscriber {
 
     @FXML
     ListView<ProgressComponent> progressQueue;
@@ -29,9 +29,11 @@ public class Controller implements Subscriber{
 
     @Override
     public void addConversionProgress(ConversionProgress conversionProgress) {
+//        Platform.runLater(() -> {
         ProgressComponent progressComponent = new ProgressComponent();
         progressComponent.setConversionProgress(conversionProgress);
         progressQueue.getItems().add(progressComponent);
         tabs.getSelectionModel().select(queueTab);
+//        });
     }
 }

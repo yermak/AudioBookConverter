@@ -29,22 +29,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
     }
 
     @Override
-    public abstract String getAdditionalFinishedMessage();
-
-    public void start() {
-        this.canceled = false;
-        this.finished = false;
-        StateDispatcher.getInstance().addListener(this);
-        this.startConversion();
-    }
-
-
-    public abstract void setOutputDestination(String outputDestination);
-
-    protected abstract void startConversion();
-
-
-    @Override
     public void setMedia(List<MediaInfo> media) {
         this.media = media;
     }

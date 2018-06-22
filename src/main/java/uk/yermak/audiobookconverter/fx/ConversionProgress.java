@@ -107,7 +107,7 @@ public class ConversionProgress implements Runnable, Refreshable {
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-            state.set("Merging chapters and adding art work...");
+            state.set("Merging chapters...");
         }
         filesCount.set(completedFiles + "/" + totalFiles);
     }
@@ -125,7 +125,7 @@ public class ConversionProgress implements Runnable, Refreshable {
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
-        state.set("CANCELLED");
+        state.set("Cancelled");
     }
 
     private void paused() {

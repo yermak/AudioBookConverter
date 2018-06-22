@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
+
 /**
  * Created by Yermak on 04-Feb-18.
  */
@@ -216,7 +218,11 @@ public class FilesController {
 
 
     public void pause(ActionEvent actionEvent) {
-        ConverterApplication.getContext().pauseConversion();
+        if (ConverterApplication.getContext().getConversion().getStatus().equals(PAUSED)) {
+            ConverterApplication.getContext().resumeConversion();
+        } else {
+            ConverterApplication.getContext().pauseConversion();
+        }
     }
 
     public void stop(ActionEvent actionEvent) {
@@ -228,24 +234,30 @@ public class FilesController {
 
             Platform.runLater(() -> {
                 switch (status) {
+                    case PAUSED:
+                        pauseButton.setText("Resume");
+                        break;
                     case FINISHED:
                     case CANCELLED:
                     case READY:
+                        pauseButton.setText("Pause");
+
                         addButton.setDisable(false);
 //                        if (listEmpty != null) {
-                            clearButton.setDisable(listEmpty);
-                            startButton.setDisable(listEmpty);
+                        clearButton.setDisable(listEmpty);
+                        startButton.setDisable(listEmpty);
 //                        }
 //                        if (selecteFiles != null) {
-                            upButton.setDisable(selecteFiles != 1);
-                            downButton.setDisable(selecteFiles != 1);
-                            removeButton.setDisable(selecteFiles < 1);
+                        upButton.setDisable(selecteFiles != 1);
+                        downButton.setDisable(selecteFiles != 1);
+                        removeButton.setDisable(selecteFiles < 1);
 //                        }
                         startButton.setDisable(listEmpty);
                         pauseButton.setDisable(true);
                         stopButton.setDisable(true);
                         break;
                     case IN_PROGRESS:
+                        pauseButton.setText("Pause");
                         addButton.setDisable(true);
                         removeButton.setDisable(true);
                         clearButton.setDisable(true);

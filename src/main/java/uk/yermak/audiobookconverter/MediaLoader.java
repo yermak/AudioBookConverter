@@ -35,7 +35,6 @@ public class MediaLoader {
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
-//                futureLoad.get();
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }

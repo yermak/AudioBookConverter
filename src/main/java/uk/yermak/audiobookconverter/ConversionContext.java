@@ -61,4 +61,8 @@ public class ConversionContext {
     public void error(String message) {
         conversion.error(message);
     }
+
+    public void resumeConversion() {
+        conversion.resume();
+    }
 }

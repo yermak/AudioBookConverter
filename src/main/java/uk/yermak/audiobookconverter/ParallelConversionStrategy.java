@@ -99,7 +99,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     @Override
     public void canceled() {
-        canceled = true;
+        super.canceled();
         Utils.closeSilently(executorService);
     }
 

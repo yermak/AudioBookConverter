@@ -19,7 +19,7 @@ public class MediaLoader implements StateListener {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static ExecutorService executorService = Executors.newWorkStealingPool();
+    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
@@ -91,7 +91,7 @@ public class MediaLoader implements StateListener {
         @Override
         public MediaInfo call() throws Exception {
             try {
-                mutex.acquire();
+//                mutex.acquire();
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 FFmpegFormat format = probeResult.getFormat();
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
@@ -116,7 +116,7 @@ public class MediaLoader implements StateListener {
             } catch (IOException e) {
                 throw e;
             } finally {
-                mutex.release();
+//                mutex.release();
             }
         }
 

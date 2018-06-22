@@ -1,25 +1,31 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * Created by Yermak on 04-Jan-18.
  */
-public class Mp4v2ArtBuilder implements StateListener {
+public class Mp4v2ArtBuilder {
 
     private final ExecutorService executorService = Executors.newWorkStealingPool();
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
     private boolean cancelled;
 
     public Mp4v2ArtBuilder() {
-        StateDispatcher.getInstance().addListener(this);
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case CANCELLED:
+                    cancelled = true;
+                    break;
+            }
+        });
     }
 
     private Collection<File> findPictures(File dir) {
@@ -27,7 +33,7 @@ public class Mp4v2ArtBuilder implements StateListener {
     }
 
 
-    public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, ExecutionException, InterruptedException {
+    public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, InterruptedException {
         Map<Long, String> posters = new HashMap<>();
         Set<String> tempPosters = new HashSet<>();
 
@@ -77,39 +83,5 @@ public class Mp4v2ArtBuilder implements StateListener {
         } finally {
             Utils.closeSilently(artProcess);
         }
-    }
-
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-
-    }
-
-    @Override
-    public void canceled() {
-        cancelled = true;
-        Utils.closeSilently(executorService);
-    }
-
-    @Override
-    public void paused() {
-    }
-
-    @Override
-    public void resumed() {
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
     }
 }

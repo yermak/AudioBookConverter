@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegConcatenator implements Concatenator, StateListener {
+public class FFMpegConcatenator implements Concatenator {
 
     private final String outputFileName;
     private final ExecutorService executorService = Executors.newWorkStealingPool();
@@ -31,8 +32,16 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
         this.callback = callback;
-        StateDispatcher.getInstance().addListener(this);
-
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case CANCELLED:
+                    cancelled = true;
+                    break;
+                case PAUSED:
+                    paused = true;
+                    break;
+            }
+        });
     }
 
     public void concat() throws IOException, InterruptedException {
@@ -75,45 +84,5 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
             Utils.closeSilently(ffmpegProcess);
             Utils.closeSilently(progressParser);
         }
-
-    }
-
-    @Override
-    public void finishedWithError(String error) {
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void finished() {
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void canceled() {
-        cancelled = true;
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void paused() {
-        paused = true;
-    }
-
-    @Override
-    public void resumed() {
-        paused = false;
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
     }
 }

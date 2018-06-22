@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegLinearConverter implements Concatenator, StateListener {
+public class FFMpegLinearConverter implements Concatenator {
 
     private final String outputFileName;
     private final ExecutorService executorService = Executors.newWorkStealingPool();
@@ -32,7 +33,16 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
         this.fileListFileName = fileListFileName;
         this.mediaInfo = mediaInfo;
         this.callback = callback;
-        StateDispatcher.getInstance().addListener(this);
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case CANCELLED:
+                    cancelled = true;
+                    break;
+                case PAUSED:
+                    paused = true;
+                    break;
+            }
+        });
     }
 
     public void concat() throws IOException, InterruptedException {
@@ -85,39 +95,4 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
 
     }
 
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-
-    }
-
-    @Override
-    public void canceled() {
-        cancelled = true;
-        Utils.closeSilently(executorService);
-    }
-
-    @Override
-    public void paused() {
-
-    }
-
-    @Override
-    public void resumed() {
-
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
-    }
 }

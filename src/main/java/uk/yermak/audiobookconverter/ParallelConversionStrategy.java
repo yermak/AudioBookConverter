@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +29,10 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
         File fileListFile = null;
         File metaFile = null;
-
-        MediaInfo maxMedia = maximiseEncodingParameters();
-
         try {
+            MediaInfo maxMedia = maximiseEncodingParameters();
+
+
             fileListFile = prepareFiles(jobId);
             metaFile = prepareMeta(jobId);
 
@@ -44,28 +45,26 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             }
 
             for (Future<ConverterOutput> future : futures) {
-                if (canceled) return;
+                if (cancelled) return;
                 future.get();
             }
-
-            if (canceled) return;
+            if (cancelled) return;
             Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
-            if (canceled) return;
+            if (cancelled) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             artBuilder.coverArt(media, tempFile);
 
-            if (canceled) return;
+            if (cancelled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
-
+            ConverterApplication.getContext().finishedConversion();
         } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            finilize();
             for (MediaInfo mediaInfo : media) {
                 FileUtils.deleteQuietly(new File(getTempFileName(jobId, mediaInfo.hashCode(), ".m4b")));
             }
@@ -89,13 +88,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     protected String getTempFileName(long jobId, int index, String extension) {
         return Utils.getTmp(jobId, index, extension);
-    }
-
-
-    @Override
-    public void canceled() {
-        super.canceled();
-        Utils.closeSilently(executorService);
     }
 
     @Override

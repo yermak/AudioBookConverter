@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,16 +27,16 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
 
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
-
-        for (int i = 0; i < this.media.size(); ++i) {
-            MediaInfo mediaInfo = this.media.get(i);
-            String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
-            Future<ConverterOutput> converterFuture =
-                    executorService
-                            .submit(new FFMpegConverter(mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
-            futures.add(converterFuture);
-        }
         try {
+            for (int i = 0; i < this.media.size(); ++i) {
+                MediaInfo mediaInfo = this.media.get(i);
+                String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
+                Future<ConverterOutput> converterFuture =
+                        executorService
+                                .submit(new FFMpegConverter(mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
+                futures.add(converterFuture);
+            }
+
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             for (Future<ConverterOutput> future : futures) {
                 ConverterOutput output = future.get();
@@ -47,10 +48,9 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
-        } finally {
-            finilize();
+            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
         }
+        ConverterApplication.getContext().finishedConversion();
     }
 
     private String determineOutputFilename(String inputFilename) {
@@ -70,12 +70,6 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
         return Utils.makeFilenameUnique(outputFilename);
     }
 
-
-    @Override
-    public void canceled() {
-        super.canceled();
-        Utils.closeSilently(executorService);
-    }
 
     @Override
     protected File prepareFiles(long jobId) throws IOException {

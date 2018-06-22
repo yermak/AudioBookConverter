@@ -57,4 +57,8 @@ public class ConversionContext {
     public void finishedConversion() {
         conversion.finished();
     }
+
+    public void error(String message) {
+        conversion.error(message);
+    }
 }

@@ -10,12 +10,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by yermak on 1/10/2018.
  */
-public class MediaLoader implements StateListener {
+public class MediaLoader {
 
     private List<String> fileNames;
     private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
@@ -24,7 +27,6 @@ public class MediaLoader implements StateListener {
     public MediaLoader(List<String> files) {
         this.fileNames = files;
         Collections.sort(fileNames);
-        StateDispatcher.getInstance().addListener(this);
     }
 
     public List<MediaInfo> loadMediaInfo() {
@@ -44,46 +46,10 @@ public class MediaLoader implements StateListener {
         }
     }
 
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-
-    }
-
-    @Override
-    public void canceled() {
-        Utils.closeSilently(executorService);
-    }
-
-    @Override
-    public void paused() {
-
-    }
-
-    @Override
-    public void resumed() {
-
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
-    }
-
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
         private final String filename;
         private FFprobe ffprobe;
-        private final static Semaphore mutex = new Semaphore(Runtime.getRuntime().availableProcessors() * 2);
 
         public MediaInfoCallable(FFprobe ffprobe, String filename) {
             this.ffprobe = ffprobe;
@@ -93,7 +59,6 @@ public class MediaLoader implements StateListener {
         @Override
         public MediaInfo call() throws Exception {
             try {
-//                mutex.acquire();
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 FFmpegFormat format = probeResult.getFormat();
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
@@ -119,12 +84,8 @@ public class MediaLoader implements StateListener {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw e;
-            } finally {
-//                mutex.release();
             }
         }
-
-
     }
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
@@ -150,14 +111,10 @@ public class MediaLoader implements StateListener {
                         poster);
                 pictureProcess = pictureProcessBuilder.start();
 
-                Future<Long> pictureFuture = StreamCopier.copy(pictureProcess.getInputStream(), System.out);
-//                Future<Long> pictureFuture = Executors.newCachedThreadPool().submit(pictureToOut);
+                StreamCopier.copy(pictureProcess.getInputStream(), System.out);
                 // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                Future<Long> errFuture = StreamCopier.copy(pictureProcess.getErrorStream(), System.err);
-//                Future<Long> errFuture = executorService.submit(pictureToErr);
+                StreamCopier.copy(pictureProcess.getErrorStream(), System.err);
                 pictureProcess.waitFor();
-//                pictureFuture.get();
-//                errFuture.get();
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);
                 return new ArtWorkBean(poster, format, crc32);

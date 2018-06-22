@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,21 +32,21 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             metaFile = prepareMeta(jobId);
             fileListFile = prepareFiles(jobId);
-            if (canceled) return;
+            if (cancelled) return;
             Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
             concatenator.concat();
-            if (canceled) return;
+            if (cancelled) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             artBuilder.coverArt(media, tempFile);
-            if (canceled) return;
+            if (cancelled) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
+            ConverterApplication.getContext().finishedConversion();
         } catch (Exception e) {
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            finilize();
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
         }

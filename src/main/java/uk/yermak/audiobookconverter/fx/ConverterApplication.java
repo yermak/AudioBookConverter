@@ -42,7 +42,10 @@ public class ConverterApplication extends Application {
         env = new JfxEnv(scene, getHostServices());
 
 
-        stage.setOnCloseRequest(event -> ConverterApplication.getContext().stopConversion());
+        stage.setOnCloseRequest(event -> {
+            ConverterApplication.getContext().stopConversion();
+            System.exit(0);
+        });
 
        /* FolderDialog folderDialog = new FolderDialog();
         folderDialog.showAndWait();*/

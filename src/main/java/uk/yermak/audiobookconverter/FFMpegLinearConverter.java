@@ -5,7 +5,9 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -33,7 +35,7 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
         StateDispatcher.getInstance().addListener(this);
     }
 
-    public void concat() throws IOException, ExecutionException, InterruptedException {
+    public void concat() throws IOException, InterruptedException {
         if (cancelled) return;
         while (paused) Thread.sleep(1000);
 
@@ -64,22 +66,17 @@ public class FFMpegLinearConverter implements Concatenator, StateListener {
 //                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
                     "-f", "ipod",
                     "-codec:a", "libfdk_aac",
-                        "-codec:v", "copy",
+                    "-codec:v", "copy",
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 
             ffmpegProcess = ffmpegProcessBuilder.start();
 
-            StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
-            Future<Long> ffmpegFuture = executorService.submit(ffmpegToOut);
-            StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
-            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
-            while (!cancelled) {
-                try {
-                    ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
-                    break;
-                } catch (TimeoutException | CancellationException ignored) {
-                }
+            StreamCopier.copy(ffmpegProcess.getInputStream(), System.out);
+            StreamCopier.copy(ffmpegProcess.getErrorStream(), System.err);
+            boolean finished = false;
+            while (!cancelled && !finished) {
+                finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {
             Utils.closeSilently(ffmpegProcess);

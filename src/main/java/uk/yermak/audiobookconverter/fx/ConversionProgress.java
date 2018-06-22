@@ -17,7 +17,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
-    SimpleObjectProperty<ProgressStatus> state;
+    SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.IN_PROGRESS);
     SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleDoubleProperty progress = new SimpleDoubleProperty();
 

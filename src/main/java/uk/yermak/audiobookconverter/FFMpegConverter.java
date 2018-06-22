@@ -7,17 +7,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 
 /**
  * Created by Yermak on 29-Dec-17.
  */
 public class FFMpegConverter implements Callable<ConverterOutput>, Converter, StateListener {
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    //    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
-    private final static Semaphore mutex = new Semaphore(Runtime.getRuntime().availableProcessors() + 1);
+    //    private final static Semaphore mutex = new Semaphore(Runtime.getRuntime().availableProcessors() + 1);
     private boolean cancelled;
     private boolean paused;
     private Process process;
@@ -32,9 +33,9 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
         StateDispatcher.getInstance().addListener(this);
     }
 
-    public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException, ExecutionException {
+    public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException {
         try {
-            mutex.acquire();
+//            mutex.acquire();
             if (cancelled) return null;
             while (paused) Thread.sleep(1000);
 
@@ -64,12 +65,10 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
             InputStream ffmpegIn = process.getInputStream();
             InputStream ffmpegErr = process.getErrorStream();
 
-            StreamCopier ffmpegToConsole = new StreamCopier(ffmpegIn, System.out);
-            Future<Long> ffmpegFuture = executorService.submit(ffmpegToConsole);
-            StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, System.err);
-            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
+            StreamCopier.copy(ffmpegIn, System.out);
+            StreamCopier.copy(ffmpegErr, System.err);
 
-            ffmpegFuture.get();
+            process.waitFor();
 
             return new ConverterOutput(mediaInfo, outputFileName);
         } catch (CancellationException ce) {
@@ -77,7 +76,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } finally {
-            mutex.release();
+//            mutex.release();
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
@@ -90,20 +89,20 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter, St
 
     @Override
     public void finishedWithError(String error) {
-        Utils.closeSilently(executorService);
+//        Utils.closeSilently(executorService);
 //        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void finished() {
-        Utils.closeSilently(executorService);
+//        Utils.closeSilently(executorService);
 //        Utils.closeSilently(progressParser);
     }
 
     @Override
     public void canceled() {
         this.cancelled = true;
-        Utils.closeSilently(executorService);
+//        Utils.closeSilently(executorService);
 //        Utils.closeSilently(progressParser);
     }
 

@@ -73,7 +73,7 @@ public class FilesController {
         media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), null));
 
         fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), null, fileList.getSelectionModel().getSelectedIndices().size() == 1)
+                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), null, fileList.getSelectionModel().getSelectedIndices().size())
         );
 
        /* context.getConversion().addMediaChangeListener(c ->
@@ -224,7 +224,7 @@ public class FilesController {
     }
 
     class ButtonStateMachineComposite {
-        void updateUI(ProgressStatus status, Boolean listEmpty, Boolean singleFileSelected) {
+        void updateUI(ProgressStatus status, Boolean listEmpty, Integer selecteFiles) {
 
             Platform.runLater(() -> {
                 switch (status) {
@@ -233,10 +233,10 @@ public class FilesController {
                             clearButton.setDisable(listEmpty);
                             startButton.setDisable(listEmpty);
                         }
-                        if (singleFileSelected != null) {
-                            upButton.setDisable(!singleFileSelected);
-                            downButton.setDisable(!singleFileSelected);
-                            removeButton.setDisable(!singleFileSelected);
+                        if (selecteFiles != null) {
+                            upButton.setDisable(selecteFiles != 1);
+                            downButton.setDisable(selecteFiles != 1);
+                            removeButton.setDisable(selecteFiles < 1);
                         }
                         pauseButton.setDisable(true);
                         stopButton.setDisable(true);

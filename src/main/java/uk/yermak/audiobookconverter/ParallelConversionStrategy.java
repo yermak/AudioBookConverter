@@ -19,9 +19,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
-    protected void startConversion() {
-        executorService.execute(this);
-    }
 
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
@@ -93,9 +90,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         return Utils.getTmp(jobId, index, extension);
     }
 
-    public String getAdditionalFinishedMessage() {
-        return "Ouput filename" + ":\n" + this.outputDestination;
-    }
 
     @Override
     public void canceled() {

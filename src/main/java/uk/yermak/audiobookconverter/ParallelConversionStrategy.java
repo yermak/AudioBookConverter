@@ -60,6 +60,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
 
         } catch (InterruptedException | ExecutionException | IOException e) {
+            e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());

@@ -68,6 +68,7 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
             ffmpegProcess.waitFor();
             return new ConverterOutput(new MediaInfoBean(inputFileList[0]), outputFileName);
         } catch (InterruptedException ignorable) {
+            ignorable.printStackTrace();
             throw ignorable;
         } finally {
             Utils.closeSilently(ffmpegProcess);

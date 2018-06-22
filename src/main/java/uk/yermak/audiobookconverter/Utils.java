@@ -34,6 +34,7 @@ public class Utils {
             try {
                 progressParser.stop();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -114,7 +115,8 @@ public class Utils {
                 }
 
                 return filename;
-            } catch (Exception var7) {
+            } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException("Cannot use filename" + " " + filename);
             }
         } else {
@@ -126,6 +128,7 @@ public class Utils {
         try {
             return FileUtils.checksumCRC32(file);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

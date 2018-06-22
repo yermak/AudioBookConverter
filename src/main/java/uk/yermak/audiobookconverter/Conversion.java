@@ -91,6 +91,9 @@ public class Conversion {
     }
 
 
+    public void finished() {
+        status.set(ProgressStatus.FINISHED);
+    }
 }
 
 

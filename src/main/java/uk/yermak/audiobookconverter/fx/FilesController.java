@@ -67,13 +67,13 @@ public class FilesController {
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         context.getConversion().addStatusChangeListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(newValue, null, null)
+                buttonStateMachineComposite.updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices().size())
         );
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), null));
+        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices().size()));
 
         fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), null, fileList.getSelectionModel().getSelectedIndices().size())
+                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices().size())
         );
 
        /* context.getConversion().addMediaChangeListener(c ->
@@ -228,16 +228,20 @@ public class FilesController {
 
             Platform.runLater(() -> {
                 switch (status) {
+                    case FINISHED:
+                    case CANCELLED:
                     case READY:
-                        if (listEmpty != null) {
+                        addButton.setDisable(false);
+//                        if (listEmpty != null) {
                             clearButton.setDisable(listEmpty);
                             startButton.setDisable(listEmpty);
-                        }
-                        if (selecteFiles != null) {
+//                        }
+//                        if (selecteFiles != null) {
                             upButton.setDisable(selecteFiles != 1);
                             downButton.setDisable(selecteFiles != 1);
                             removeButton.setDisable(selecteFiles < 1);
-                        }
+//                        }
+                        startButton.setDisable(listEmpty);
                         pauseButton.setDisable(true);
                         stopButton.setDisable(true);
                         break;

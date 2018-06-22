@@ -19,7 +19,7 @@
                 <Font name="Arial Black" size="12.0"/>
             </font>
         </Label>
-        <Label fx:id="state" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label fx:id="state" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
         <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="4"
                      GridPane.halignment="CENTER"/>

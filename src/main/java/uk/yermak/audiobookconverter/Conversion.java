@@ -62,6 +62,7 @@ public class Conversion {
         executorService.execute(conversionStrategy);
 
 
+/*
         status.addListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
@@ -71,6 +72,7 @@ public class Conversion {
                     conversionStrategy.paused();
             }
         });
+*/
     }
 
 
@@ -93,6 +95,10 @@ public class Conversion {
 
     public void finished() {
         status.set(ProgressStatus.FINISHED);
+    }
+
+    public void error(String message) {
+        status.set(ProgressStatus.ERROR);
     }
 }
 

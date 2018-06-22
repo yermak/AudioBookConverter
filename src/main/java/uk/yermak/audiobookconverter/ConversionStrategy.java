@@ -13,7 +13,4 @@ public interface ConversionStrategy extends Runnable {
 
     void setOutputDestination(String outputDestination);
 
-    void canceled();
-
-    void paused();
 }

@@ -17,7 +17,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
-    SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.STARTED);
+    SimpleObjectProperty<ProgressStatus> state;
     SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleDoubleProperty progress = new SimpleDoubleProperty();
 
@@ -87,7 +87,7 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-            state.set(ProgressStatus.COMPLETED);
+//            state.set(ProgressStatus.COMPLETED);
 //            infoText = "Updating media information...";
         }
         filesCount.set(completedFiles + "/" + totalFiles);

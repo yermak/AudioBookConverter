@@ -16,4 +16,8 @@ public interface ConversionStrategy extends Runnable {
     void setCallbacks(Map<String, ProgressCallback> progressCallbacks);
 
     void setOutputDestination(String outputDestination);
+
+    void canceled();
+
+    void paused();
 }

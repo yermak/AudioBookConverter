@@ -38,6 +38,9 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
                 case PAUSED:
                     paused = true;
                     break;
+                case IN_PROGRESS:
+                    paused = false;
+                    break;
             }
         });
     }

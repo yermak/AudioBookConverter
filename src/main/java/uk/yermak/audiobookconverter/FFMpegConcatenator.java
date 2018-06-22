@@ -40,6 +40,9 @@ public class FFMpegConcatenator implements Concatenator {
                 case PAUSED:
                     paused = true;
                     break;
+                case IN_PROGRESS:
+                    paused = false;
+                    break;
             }
         });
     }

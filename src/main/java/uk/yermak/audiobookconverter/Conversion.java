@@ -94,11 +94,15 @@ public class Conversion {
 
 
     public void finished() {
-        status.set(ProgressStatus.FINISHED);
+        status.set(FINISHED);
     }
 
     public void error(String message) {
-        status.set(ProgressStatus.ERROR);
+        status.set(ERROR);
+    }
+
+    public void resume() {
+        status.set(IN_PROGRESS);
     }
 }
 

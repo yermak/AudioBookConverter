@@ -31,6 +31,9 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
                 case PAUSED:
                     paused = true;
                     break;
+                case IN_PROGRESS:
+                    paused = false;
+                    break;
             }
         });
     }

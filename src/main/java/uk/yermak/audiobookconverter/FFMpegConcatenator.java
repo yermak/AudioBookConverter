@@ -59,7 +59,7 @@ public class FFMpegConcatenator implements Concatenator {
         } catch (URISyntaxException e) {
         }
 
-        Process ffmpegProcess = null;
+        Process process = null;
         try {
 
             ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
@@ -75,16 +75,18 @@ public class FFMpegConcatenator implements Concatenator {
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 
-            ffmpegProcess = ffmpegProcessBuilder.start();
+            process = ffmpegProcessBuilder.start();
 
-            StreamCopier.copy(ffmpegProcess.getInputStream(), System.out);
-            StreamCopier.copy(ffmpegProcess.getErrorStream(), System.err);
+            StreamCopier.copy(process.getInputStream(), System.out);
+            StreamCopier.copy(process.getErrorStream(), System.err);
 
-            for (boolean finished = false; !cancelled && !finished; finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS))
-                ;
+            boolean finished = false;
+            while (!cancelled && !finished) {
+                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+            }
 
         } finally {
-            Utils.closeSilently(ffmpegProcess);
+            Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
     }

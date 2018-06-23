@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 04-Jan-18.
@@ -67,7 +68,7 @@ public class Mp4v2ArtBuilder {
     }
 
     public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, InterruptedException {
-        Process artProcess = null;
+        Process process = null;
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                     "--art-index", String.valueOf(index),
@@ -75,13 +76,16 @@ public class Mp4v2ArtBuilder {
                     outputFileName);
 
 //            artProcessBuilder.redirectErrorStream();
-            artProcess = artProcessBuilder.start();
+            process = artProcessBuilder.start();
 
-            StreamCopier.copy(artProcess.getInputStream(), System.out);
-            StreamCopier.copy(artProcess.getErrorStream(), System.err);
-            artProcess.waitFor();
+            StreamCopier.copy(process.getInputStream(), System.out);
+            StreamCopier.copy(process.getErrorStream(), System.err);
+            boolean finished = false;
+            while (!cancelled && !finished) {
+                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+            }
         } finally {
-            Utils.closeSilently(artProcess);
+            Utils.closeSilently(process);
         }
     }
 }

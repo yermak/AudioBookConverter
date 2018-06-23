@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class Conversion {
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private ConversionMode mode = ConversionMode.PARALLEL;
     private AudioBookInfo bookInfo;
-    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", NOT_READY);
+    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
     public void setMode(ConversionMode mode) {
         this.mode = mode;
@@ -44,8 +43,9 @@ public class Conversion {
     }
 
     public void start(String outputDestination, Refreshable refreshable) {
+        status.set(IN_PROGRESS);
+
         Executors.newSingleThreadExecutor().execute(refreshable);
-        status.set(STARTED);
         ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
@@ -54,20 +54,25 @@ public class Conversion {
 
         conversionStrategy.setCallbacks(progressCallbacks);
 
-//        executorService.execute(refreshable);
-
         conversionStrategy.setOutputDestination(outputDestination);
         conversionStrategy.setBookInfo(bookInfo);
         conversionStrategy.setMedia(media);
 
 
         executorService.execute(conversionStrategy);
-        status.set(IN_PROGRESS);
+
+
+        status.addListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case CANCELLED:
+                    conversionStrategy.canceled();
+                    break;
+                case PAUSED:
+                    conversionStrategy.paused();
+            }
+        });
     }
 
-    public void addMediaChangeListener(ListChangeListener<MediaInfo> listener) {
-        media.addListener(listener);
-    }
 
     public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {
         status.addListener(listener);
@@ -78,6 +83,14 @@ public class Conversion {
     }
 
     public void stop() {
-        status.set(READY);
+        status.set(CANCELLED);
     }
+
+    public ProgressStatus getStatus() {
+        return status.get();
+    }
+
+
 }
+
+

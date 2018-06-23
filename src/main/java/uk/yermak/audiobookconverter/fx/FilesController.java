@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ import java.util.List;
  */
 public class FilesController {
 
+    private final ButtonStateMachineComposite buttonStateMachineComposite;
     @FXML
     public Button addButton;
     @FXML
@@ -47,6 +49,10 @@ public class FilesController {
 
     private final ContextMenu contextMenu = new ContextMenu();
 
+    public FilesController() {
+        buttonStateMachineComposite = new ButtonStateMachineComposite();
+    }
+
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
@@ -62,34 +68,19 @@ public class FilesController {
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case IN_PROGRESS:
-                case STARTED:
-                    updateFilesUI(true);
-                    break;
-                default:
-                    updateFilesUI(false);
-            }
-        });
+        context.getConversion().addStatusChangeListener((observable, oldValue, newValue) ->
+                buttonStateMachineComposite.updateUI(newValue, null, null)
+        );
 
-        media.addListener(new MediaInfoListChangeListener());
-        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-            boolean disableMovement = selectedIndices.size() != 1;
-            upButton.setDisable(disableMovement);
-            downButton.setDisable(disableMovement);
-        });
+        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), null));
 
-        context.getConversion().addMediaChangeListener(c -> updateProcessUI(c.getList().isEmpty()));
-    }
+        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), null, fileList.getSelectionModel().getSelectedIndices().size() == 1)
+        );
 
-    private void updateFilesUI(boolean disable) {
-        addButton.setDisable(disable);
-        removeButton.setDisable(disable);
-        clearButton.setDisable(disable);
-        upButton.setDisable(disable);
-        downButton.setDisable(disable);
+       /* context.getConversion().addMediaChangeListener(c ->
+                buttonStateMachineComposite.updateUI(null, null, c.getList().isEmpty(), null)
+        );*/
     }
 
     @FXML
@@ -171,23 +162,6 @@ public class FilesController {
 
     }
 
-    private class MediaInfoListChangeListener implements ListChangeListener<MediaInfo> {
-        @Override
-        public void onChanged(Change<? extends MediaInfo> c) {
-            boolean disable = c.getList().isEmpty();
-            removeButton.setDisable(disable);
-            clearButton.setDisable(disable);
-            upButton.setDisable(disable);
-            downButton.setDisable(disable);
-        }
-    }
-
-    private void updateProcessUI(boolean disable) {
-        startButton.setDisable(disable);
-        pauseButton.setDisable(!disable);
-        stopButton.setDisable(!disable);
-    }
-
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
         JfxEnv env = ConverterApplication.getEnv();
@@ -207,16 +181,8 @@ public class FilesController {
                 outputDestination = selectOutputFile(env, audioBookInfo, mediaInfo);
             }
             if (outputDestination != null) {
-                updateProcessUI(true);
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
-
-                conversionProgress.state.addListener((observable, oldValue, newValue) -> {
-                    if (newValue.equals(ProgressStatus.FINISHED) || newValue.equals(ProgressStatus.CANCELLED)) {
-                        updateProcessUI(false);
-                        updateFilesUI(false);
-                    }
-                });
 
                 context.startConversion(outputDestination, conversionProgress);
             }
@@ -243,9 +209,44 @@ public class FilesController {
     }
 
     public void stop(ActionEvent actionEvent) {
-        updateProcessUI(false);
         ConverterApplication.getContext().stopConversion();
     }
 
+    class ButtonStateMachineComposite {
+        void updateUI(ProgressStatus status, Boolean listEmpty, Boolean singleFileSelected) {
 
+            Platform.runLater(() -> {
+                switch (status) {
+                    case READY:
+                        if (listEmpty != null) {
+                            clearButton.setDisable(listEmpty);
+                            startButton.setDisable(listEmpty);
+                        }
+                        if (singleFileSelected != null) {
+                            upButton.setDisable(!singleFileSelected);
+                            downButton.setDisable(!singleFileSelected);
+                            removeButton.setDisable(!singleFileSelected);
+                        }
+                        pauseButton.setDisable(true);
+                        stopButton.setDisable(true);
+                        break;
+                    case IN_PROGRESS:
+                        addButton.setDisable(true);
+                        removeButton.setDisable(true);
+                        clearButton.setDisable(true);
+                        upButton.setDisable(true);
+                        downButton.setDisable(true);
+                        startButton.setDisable(true);
+                        pauseButton.setDisable(false);
+                        stopButton.setDisable(false);
+                        break;
+                    default: {
+                    }
+                }
+
+            });
+        }
+    }
 }
+
+

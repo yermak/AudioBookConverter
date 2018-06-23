@@ -76,6 +76,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
 
     @Override
     public void canceled() {
+        super.canceled();
         Utils.closeSilently(executorService);
     }
 

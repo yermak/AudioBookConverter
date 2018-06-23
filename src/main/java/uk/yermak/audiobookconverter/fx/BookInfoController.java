@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
@@ -50,7 +51,9 @@ public class BookInfoController {
         genre.getEditor().textProperty().addListener(o -> bookInfo.setGenre(genre.getEditor().getText()));
 
         series.textProperty().addListener(o -> bookInfo.setSeries(series.getText()));
-        bookNo.textProperty().addListener(o -> bookInfo.setBookNumber(Integer.parseInt(bookNo.getText())));
+        bookNo.textProperty().addListener(o -> {
+            if (StringUtils.isNotBlank(bookNo.getText())) bookInfo.setBookNumber(Integer.parseInt(bookNo.getText()));
+        });
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
@@ -71,7 +74,6 @@ public class BookInfoController {
         year.setText(bookInfo.getYear());
         comment.setText(bookInfo.getComment());
     }
-
 
 
 }

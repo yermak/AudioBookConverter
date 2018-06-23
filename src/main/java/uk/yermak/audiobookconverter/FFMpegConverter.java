@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -79,7 +80,10 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
             StreamCopier.copy(ffmpegIn, System.out);
             StreamCopier.copy(ffmpegErr, System.err);
 
-            process.waitFor();
+            boolean finished = false;
+            while (!cancelled && !finished) {
+                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+            }
 
             return new ConverterOutput(mediaInfo, outputFileName);
         } catch (CancellationException ce) {

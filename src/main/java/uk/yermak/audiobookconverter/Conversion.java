@@ -60,19 +60,6 @@ public class Conversion {
 
 
         executorService.execute(conversionStrategy);
-
-
-/*
-        status.addListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case CANCELLED:
-                    conversionStrategy.canceled();
-                    break;
-                case PAUSED:
-                    conversionStrategy.paused();
-            }
-        });
-*/
     }
 
 

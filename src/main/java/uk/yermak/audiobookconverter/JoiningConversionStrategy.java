@@ -14,6 +14,13 @@ import java.util.stream.IntStream;
 public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
 
+    private final StatusChangeListener listener;
+
+    public JoiningConversionStrategy() {
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+    }
+
     @Override
     protected String getTempFileName(long jobId, int index, String extension) {
         return media.get(index).getFileName();
@@ -32,13 +39,13 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
             metaFile = prepareMeta(jobId);
             fileListFile = prepareFiles(jobId);
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
             concatenator.concat();
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             artBuilder.coverArt(media, tempFile);
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
             ConverterApplication.getContext().finishedConversion();
         } catch (Exception e) {
@@ -49,6 +56,7 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         } finally {
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
         }
     }
 

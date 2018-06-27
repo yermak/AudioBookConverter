@@ -18,8 +18,14 @@ import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
+    private final StatusChangeListener listener;
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
+
+    public ParallelConversionStrategy() {
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+    }
 
     public void run() {
         List<Future<ConverterOutput>> futures = new ArrayList<>();
@@ -45,18 +51,18 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             }
 
             for (Future<ConverterOutput> future : futures) {
-                if (cancelled) return;
+                if (listener.isCancelled()) return;
                 future.get();
             }
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             artBuilder.coverArt(media, tempFile);
 
-            if (cancelled) return;
+            if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
             ConverterApplication.getContext().finishedConversion();
         } catch (InterruptedException | ExecutionException | IOException e) {
@@ -70,6 +76,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
         }
     }
 

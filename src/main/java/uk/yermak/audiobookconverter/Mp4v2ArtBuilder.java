@@ -6,8 +6,6 @@ import uk.yermak.audiobookconverter.fx.ConverterApplication;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,18 +13,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class Mp4v2ArtBuilder {
 
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
-    private boolean cancelled;
+    private final StatusChangeListener listener;
 
     public Mp4v2ArtBuilder() {
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case CANCELLED:
-                    cancelled = true;
-                    break;
-            }
-        });
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     private Collection<File> findPictures(File dir) {
@@ -43,7 +35,7 @@ public class Mp4v2ArtBuilder {
         try {
             int i = 0;
             for (String poster : posters.values()) {
-                if (cancelled) break;
+                if (listener.isCancelled()) break;
                 updateSinglePoster(poster, i++, outputFileName);
             }
         } finally {
@@ -81,7 +73,7 @@ public class Mp4v2ArtBuilder {
             StreamCopier.copy(process.getInputStream(), System.out);
             StreamCopier.copy(process.getErrorStream(), System.err);
             boolean finished = false;
-            while (!cancelled && !finished) {
+            while (!listener.isCancelled() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {

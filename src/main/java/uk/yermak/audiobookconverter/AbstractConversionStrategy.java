@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,29 +13,11 @@ import java.util.Map;
 
 public abstract class AbstractConversionStrategy implements ConversionStrategy {
     protected boolean finished;
-    protected boolean cancelled;
-    protected boolean paused;
     protected AudioBookInfo bookInfo;
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
     protected String outputDestination;
 
-
-    protected AbstractConversionStrategy() {
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case CANCELLED:
-                    cancelled = true;
-                    break;
-                case PAUSED:
-                    paused = true;
-                    break;
-                case IN_PROGRESS:
-                    paused = false;
-                    break;
-            }
-        });
-    }
 
     public void setBookInfo(AudioBookInfo audioBookInfo) {
         this.bookInfo = audioBookInfo;
@@ -50,10 +31,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     @Override
     public void setCallbacks(Map<String, ProgressCallback> progressCallbacks) {
         this.progressCallbacks = progressCallbacks;
-    }
-
-    public void setPaused(boolean paused) {
-        this.paused = paused;
     }
 
 

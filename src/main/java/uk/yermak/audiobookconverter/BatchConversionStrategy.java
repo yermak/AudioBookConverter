@@ -18,7 +18,13 @@ import java.util.stream.IntStream;
 
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
+    private final StatusChangeListener listener;
 
+
+    public BatchConversionStrategy() {
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+    }
 
     @Override
     protected String getTempFileName(long jobId, int index, String extension) {
@@ -45,12 +51,14 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
                     artBuilder.updateSinglePoster(artWork.getFileName(), 0, output.getOutputFileName());
                 }
             }
+            ConverterApplication.getContext().finishedConversion();
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
+        } finally {
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
         }
-        ConverterApplication.getContext().finishedConversion();
     }
 
     private String determineOutputFilename(String inputFilename) {

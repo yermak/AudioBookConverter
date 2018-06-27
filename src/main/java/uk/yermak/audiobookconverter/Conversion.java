@@ -91,6 +91,10 @@ public class Conversion {
     public void resume() {
         status.set(IN_PROGRESS);
     }
+
+    public void removeStatusChangeListener(ChangeListener<ProgressStatus> listener) {
+        if (listener != null) status.removeListener(listener);
+    }
 }
 
 

@@ -16,11 +16,10 @@ import java.util.concurrent.TimeUnit;
  * Created by Yermak on 29-Dec-17.
  */
 public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
+    private final StatusChangeListener listener;
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
-    private boolean cancelled;
-    private boolean paused;
     private Process process;
     private final static String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
     private ProgressParser progressParser = null;
@@ -30,26 +29,14 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
-
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case CANCELLED:
-                    cancelled = true;
-                    break;
-                case PAUSED:
-                    paused = true;
-                    break;
-                case IN_PROGRESS:
-                    paused = false;
-                    break;
-            }
-        });
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException {
         try {
-            if (cancelled) return null;
-            while (paused) Thread.sleep(1000);
+            if (listener.isCancelled()) return null;
+            while (listener.isCancelled()) Thread.sleep(1000);
 
 
             progressParser = new TcpProgressParser(progress -> {
@@ -81,7 +68,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
             StreamCopier.copy(ffmpegErr, System.err);
 
             boolean finished = false;
-            while (!cancelled && !finished) {
+            while (!listener.isCancelled() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
 
@@ -93,6 +80,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
         }
     }
 

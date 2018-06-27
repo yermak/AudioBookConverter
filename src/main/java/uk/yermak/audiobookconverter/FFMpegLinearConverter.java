@@ -6,8 +6,6 @@ import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,12 +14,10 @@ import java.util.concurrent.TimeUnit;
 public class FFMpegLinearConverter implements Concatenator {
 
     private final String outputFileName;
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    private final StatusChangeListener listener;
     private String metaDataFileName;
     private String fileListFileName;
     private MediaInfo mediaInfo;
-    private boolean cancelled = false;
-    private boolean paused = false;
     private Process ffmpegProcess;
     private ProgressParser progressParser;
     private ProgressCallback callback;
@@ -33,24 +29,13 @@ public class FFMpegLinearConverter implements Concatenator {
         this.fileListFileName = fileListFileName;
         this.mediaInfo = mediaInfo;
         this.callback = callback;
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case CANCELLED:
-                    cancelled = true;
-                    break;
-                case PAUSED:
-                    paused = true;
-                    break;
-                case IN_PROGRESS:
-                    paused = false;
-                    break;
-            }
-        });
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     public void concat() throws IOException, InterruptedException {
-        if (cancelled) return;
-        while (paused) Thread.sleep(1000);
+        if (listener.isCancelled()) return;
+        while (listener.isPaused()) Thread.sleep(1000);
 
         try {
             progressParser = new TcpProgressParser(progress -> {
@@ -88,7 +73,7 @@ public class FFMpegLinearConverter implements Concatenator {
             StreamCopier.copy(ffmpegProcess.getInputStream(), System.out);
             StreamCopier.copy(ffmpegProcess.getErrorStream(), System.err);
             boolean finished = false;
-            while (!cancelled && !finished) {
+            while (!listener.isCancelled() && !finished) {
                 finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {

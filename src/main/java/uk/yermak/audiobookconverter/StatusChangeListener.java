@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 class StatusChangeListener implements ChangeListener<ProgressStatus> {
     private boolean cancelled;
     private boolean paused;
+    private boolean finished;
 
     @Override
     public void changed(ObservableValue<? extends ProgressStatus> observable, ProgressStatus oldValue, ProgressStatus newValue) {
@@ -22,6 +23,9 @@ class StatusChangeListener implements ChangeListener<ProgressStatus> {
             case IN_PROGRESS:
                 paused = false;
                 break;
+            case FINISHED:
+                finished = true;
+                break;
         }
     }
 
@@ -31,5 +35,10 @@ class StatusChangeListener implements ChangeListener<ProgressStatus> {
 
     public boolean isPaused() {
         return paused;
+    }
+
+
+    public boolean isFinished() {
+        return finished;
     }
 }

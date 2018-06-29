@@ -18,12 +18,12 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
 public class Conversion {
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private ConversionMode mode = ConversionMode.PARALLEL;
+    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
     private AudioBookInfo bookInfo;
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
     public void setMode(ConversionMode mode) {
-        this.mode = mode;
+        this.mode.set(mode);
     }
 
     public void setBookInfo(AudioBookInfo bookInfo) {
@@ -35,7 +35,7 @@ public class Conversion {
     }
 
     public ConversionMode getMode() {
-        return mode;
+        return mode.get();
     }
 
     public AudioBookInfo getBookInfo() {
@@ -46,7 +46,7 @@ public class Conversion {
         status.set(IN_PROGRESS);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
-        ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
+        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy();
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
@@ -94,6 +94,10 @@ public class Conversion {
 
     public void removeStatusChangeListener(ChangeListener<ProgressStatus> listener) {
         if (listener != null) status.removeListener(listener);
+    }
+
+    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
+        mode.addListener(listener);
     }
 }
 

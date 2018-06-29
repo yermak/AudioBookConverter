@@ -7,6 +7,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
@@ -38,7 +39,7 @@ public class BookInfoController {
         AudioBookInfo bookInfo = new AudioBookInfo();
         ConverterApplication.getContext().setBookInfo(bookInfo);
 
-        genre.getItems().addAll("Fantasy", "Sci-fi");
+        genre.getItems().addAll("Audiobook", "Fantasy", "Sci-fi", "Novel");
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -58,34 +59,41 @@ public class BookInfoController {
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
-        media.addListener((InvalidationListener) observable -> copyTags((ObservableList<MediaInfo>) observable));
+        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+
+        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
     }
 
-
-    private void copyTags(ObservableList<MediaInfo> media) {
-        if (media.isEmpty()) {
-            title.setText("");
-            writer.setText("");
-            narrator.setText("");
-            genre.getEditor().setText("");
-            series.setText("");
-            bookNo.setText("");
-            year.setText("");
-            comment.setText("");
-
+    private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
+        if (clear) {
+            clearTags();
         } else {
-            MediaInfo mediaInfo = media.get(0);
-            AudioBookInfo bookInfo = mediaInfo.getBookInfo();
-            title.setText(bookInfo.getTitle());
-            writer.setText(bookInfo.getWriter());
-            narrator.setText(bookInfo.getNarrator());
-            genre.getEditor().setText(bookInfo.getGenre());
-            series.setText(bookInfo.getSeries());
-            bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
-            year.setText(bookInfo.getYear());
-            comment.setText(bookInfo.getComment());
+            copyTags(media.get(0));
         }
     }
 
+
+    private void copyTags(MediaInfo mediaInfo) {
+        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+        title.setText(bookInfo.getTitle());
+        writer.setText(bookInfo.getWriter());
+        narrator.setText(bookInfo.getNarrator());
+        genre.getEditor().setText(bookInfo.getGenre());
+        series.setText(bookInfo.getSeries());
+        bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+        year.setText(bookInfo.getYear());
+        comment.setText(bookInfo.getComment());
+    }
+
+    private void clearTags() {
+        title.setText("");
+        writer.setText("");
+        narrator.setText("");
+        genre.getEditor().setText("");
+        series.setText("");
+        bookNo.setText("");
+        year.setText("");
+        comment.setText("");
+    }
 
 }

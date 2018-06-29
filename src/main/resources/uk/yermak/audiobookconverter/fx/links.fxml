@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="0" gridLinesVisible="false"
-          fx:controller="uk.yermak.audiobookconverter.fx.LinksController">
+          fx:controller="uk.yermak.audiobookconverter.fx.LinksController" GridPane.rowIndex="0">
     <columnConstraints>
         <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>

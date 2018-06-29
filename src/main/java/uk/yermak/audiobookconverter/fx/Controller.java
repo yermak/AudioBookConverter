@@ -25,6 +25,7 @@ public class Controller implements Subscriber {
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
         context.subscribeForStart(this);
+
     }
 
     @Override
@@ -32,7 +33,7 @@ public class Controller implements Subscriber {
 //        Platform.runLater(() -> {
         ProgressComponent progressComponent = new ProgressComponent();
         progressComponent.setConversionProgress(conversionProgress);
-        progressQueue.getItems().add(progressComponent);
+        progressQueue.getItems().add(0, progressComponent);
         tabs.getSelectionModel().select(queueTab);
 //        });
     }

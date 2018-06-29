@@ -61,6 +61,8 @@ public class BookInfoController {
         media.addListener((InvalidationListener) observable -> copyTags((ObservableList<MediaInfo>) observable));
     }
 
+
+    //TODO clear tags on removal of the file and probably think about behaviour
     private void copyTags(ObservableList<MediaInfo> media) {
         if (media.isEmpty()) return;
         MediaInfo mediaInfo = media.get(0);

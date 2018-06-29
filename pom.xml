@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>2.1-alpha-1</version>
+    <version>2.1-beta-1</version>
 
 
     <properties>
@@ -144,7 +144,7 @@
                     <bundler>EXE</bundler>
 
                     <bundleArguments>
-                        <runtime>D:\Programs\Java\jre1.8.0_162</runtime>
+                        <runtime>${java.home}</runtime>
                     </bundleArguments>
                     <!--
                                         <additionalAppResources>

@@ -71,18 +71,15 @@ public class FilesController {
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         context.getConversion().addStatusChangeListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices().size())
+                buttonStateMachineComposite.updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices().size()));
+        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
         fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices().size())
+                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
 
-       /* context.getConversion().addMediaChangeListener(c ->
-                buttonStateMachineComposite.updateUI(null, null, c.getList().isEmpty(), null)
-        );*/
     }
 
     @FXML
@@ -147,6 +144,7 @@ public class FilesController {
             }
         }
     }
+
 
     public void moveDown(ActionEvent event) {
         ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
@@ -219,7 +217,7 @@ public class FilesController {
     }
 
     class ButtonStateMachineComposite {
-        void updateUI(ProgressStatus status, Boolean listEmpty, Integer selecteFiles) {
+        void updateUI(ProgressStatus status, Boolean listEmpty, ObservableList<Integer> selectedIndices) {
 
             Platform.runLater(() -> {
                 switch (status) {
@@ -232,15 +230,12 @@ public class FilesController {
                         pauseButton.setText("Pause");
 
                         addButton.setDisable(false);
-//                        if (listEmpty != null) {
                         clearButton.setDisable(listEmpty);
-                        startButton.setDisable(listEmpty);
-//                        }
-//                        if (selecteFiles != null) {
-                        upButton.setDisable(selecteFiles != 1);
-                        downButton.setDisable(selecteFiles != 1);
-                        removeButton.setDisable(selecteFiles < 1);
-//                        }
+
+                        upButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == 0);
+                        downButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == fileList.getItems().size() - 1);
+                        removeButton.setDisable(selectedIndices.size() < 1);
+
                         startButton.setDisable(listEmpty);
                         pauseButton.setDisable(true);
                         stopButton.setDisable(true);

@@ -62,19 +62,29 @@ public class BookInfoController {
     }
 
 
-    //TODO clear tags on removal of the file and probably think about behaviour
     private void copyTags(ObservableList<MediaInfo> media) {
-        if (media.isEmpty()) return;
-        MediaInfo mediaInfo = media.get(0);
-        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
-        title.setText(bookInfo.getTitle());
-        writer.setText(bookInfo.getWriter());
-        narrator.setText(bookInfo.getNarrator());
-        genre.getEditor().setText(bookInfo.getGenre());
-        series.setText(bookInfo.getSeries());
-        bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
-        year.setText(bookInfo.getYear());
-        comment.setText(bookInfo.getComment());
+        if (media.isEmpty()) {
+            title.setText("");
+            writer.setText("");
+            narrator.setText("");
+            genre.getEditor().setText("");
+            series.setText("");
+            bookNo.setText("");
+            year.setText("");
+            comment.setText("");
+
+        } else {
+            MediaInfo mediaInfo = media.get(0);
+            AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+            title.setText(bookInfo.getTitle());
+            writer.setText(bookInfo.getWriter());
+            narrator.setText(bookInfo.getNarrator());
+            genre.getEditor().setText(bookInfo.getGenre());
+            series.setText(bookInfo.getSeries());
+            bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+            year.setText(bookInfo.getYear());
+            comment.setText(bookInfo.getComment());
+        }
     }
 
 

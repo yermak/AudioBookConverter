@@ -25,7 +25,6 @@ import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
  */
 public class FilesController {
 
-    private final ButtonStateMachineComposite buttonStateMachineComposite;
     @FXML
     public Button addButton;
     @FXML
@@ -46,14 +45,8 @@ public class FilesController {
     public Button pauseButton;
     @FXML
     public Button stopButton;
-    @FXML
-//    public ProgressComponent progressBar;
 
     private final ContextMenu contextMenu = new ContextMenu();
-
-    public FilesController() {
-        buttonStateMachineComposite = new ButtonStateMachineComposite();
-    }
 
     @FXML
     public void initialize() {
@@ -71,16 +64,17 @@ public class FilesController {
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         context.getConversion().addStatusChangeListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
+                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
         fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                buttonStateMachineComposite.updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
+                updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
 
     }
+
 
     @FXML
     protected void addFiles(ActionEvent event) {
@@ -216,48 +210,48 @@ public class FilesController {
         ConverterApplication.getContext().stopConversion();
     }
 
-    class ButtonStateMachineComposite {
-        void updateUI(ProgressStatus status, Boolean listEmpty, ObservableList<Integer> selectedIndices) {
 
-            Platform.runLater(() -> {
-                switch (status) {
-                    case PAUSED:
-                        pauseButton.setText("Resume");
-                        break;
-                    case FINISHED:
-                    case CANCELLED:
-                    case READY:
-                        pauseButton.setText("Pause");
+    private void updateUI(ProgressStatus status, Boolean listEmpty, ObservableList<Integer> selectedIndices) {
 
-                        addButton.setDisable(false);
-                        clearButton.setDisable(listEmpty);
+        Platform.runLater(() -> {
+            switch (status) {
+                case PAUSED:
+                    pauseButton.setText("Resume");
+                    break;
+                case FINISHED:
+                case CANCELLED:
+                case READY:
+                    pauseButton.setText("Pause");
 
-                        upButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == 0);
-                        downButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == fileList.getItems().size() - 1);
-                        removeButton.setDisable(selectedIndices.size() < 1);
+                    addButton.setDisable(false);
+                    clearButton.setDisable(listEmpty);
 
-                        startButton.setDisable(listEmpty);
-                        pauseButton.setDisable(true);
-                        stopButton.setDisable(true);
-                        break;
-                    case IN_PROGRESS:
-                        pauseButton.setText("Pause");
-                        addButton.setDisable(true);
-                        removeButton.setDisable(true);
-                        clearButton.setDisable(true);
-                        upButton.setDisable(true);
-                        downButton.setDisable(true);
-                        startButton.setDisable(true);
-                        pauseButton.setDisable(false);
-                        stopButton.setDisable(false);
-                        break;
-                    default: {
-                    }
+                    upButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == 0);
+                    downButton.setDisable(selectedIndices.size() != 1 || selectedIndices.get(0) == fileList.getItems().size() - 1);
+                    removeButton.setDisable(selectedIndices.size() < 1);
+
+                    startButton.setDisable(listEmpty);
+                    pauseButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    break;
+                case IN_PROGRESS:
+                    pauseButton.setText("Pause");
+                    addButton.setDisable(true);
+                    removeButton.setDisable(true);
+                    clearButton.setDisable(true);
+                    upButton.setDisable(true);
+                    downButton.setDisable(true);
+                    startButton.setDisable(true);
+                    pauseButton.setDisable(false);
+                    stopButton.setDisable(false);
+                    break;
+                default: {
                 }
+            }
 
-            });
-        }
+        });
     }
+
 }
 
 

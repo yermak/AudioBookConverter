@@ -7,7 +7,7 @@
 #define MyAppPublisher "https://github.com/yermak"
 #define MyAppURL "https://github.com/yermak/AudioBookConverter"
 #define MyAppExeName "AudioBookConverter-2.1-beta-1.exe"
-#define MyAppIcoName "AudioBookConverter.ico"
+#define MyAppIcoName "audiobookconverter-2.1-beta-1.ico"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -21,7 +21,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-SetupIconFile=C:\Users\Yermak\Projects\AudioBookConverter\AudioBookConverter.ico
+SetupIconFile=C:\Users\Yermak\Projects\AudioBookConverter\src\main\deploy\package\windows\audiobookconverter-2.1-beta-1.ico
 
 PrivilegesRequired=lowest
 
@@ -65,7 +65,4 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFil
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
-
-[UninstallRun]
-Filename: "{app}\{#MyAppExeName} "; Parameters: "-uninstall -svcName {#MyAppExeName} -stopOnUninstall";
 

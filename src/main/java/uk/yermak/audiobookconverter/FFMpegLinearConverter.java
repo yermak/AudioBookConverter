@@ -77,6 +77,7 @@ public class FFMpegLinearConverter implements Concatenator {
                 finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
             Utils.closeSilently(ffmpegProcess);
             Utils.closeSilently(progressParser);
         }

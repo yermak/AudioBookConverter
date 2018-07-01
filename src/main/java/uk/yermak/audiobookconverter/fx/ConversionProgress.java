@@ -131,13 +131,13 @@ public class ConversionProgress implements Runnable, Refreshable {
     private void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
-        state.set("PAUSED");
+        state.set("Paused");
     }
 
     private void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
-        state.set("RUNNING");
+        state.set("Converting...");
     }
 
     public void reset() {

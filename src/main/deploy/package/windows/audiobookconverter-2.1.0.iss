@@ -3,11 +3,11 @@
 
 #define MyAppTitle "AudioBookConverterV2"
 #define MyAppName "AudioBookConverter"
-#define MyAppVersion "2.1-beta-1"
+#define MyAppVersion "2.1.0"
 #define MyAppPublisher "https://github.com/yermak"
 #define MyAppURL "https://github.com/yermak/AudioBookConverter"
-#define MyAppExeName "AudioBookConverter-2.1-beta-1.exe"
-#define MyAppIcoName "audiobookconverter-2.1-beta-1.ico"
+#define MyAppExeName "AudioBookConverter-2.1.0.exe"
+#define MyAppIcoName "audiobookconverter-2.1.0.ico"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -21,7 +21,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-SetupIconFile=C:\Users\Yermak\Projects\AudioBookConverter\src\main\deploy\package\windows\audiobookconverter-2.1-beta-1.ico
+SetupIconFile=C:\Users\Yermak\Projects\AudioBookConverter\src\main\deploy\package\windows\{#MyAppIcoName}
 
 PrivilegesRequired=lowest
 

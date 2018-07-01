@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
 /**
@@ -61,7 +62,21 @@ public class BookInfoController {
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
+        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> {
+            updateTags(media, ConversionMode.BATCH.equals(newValue));
+        });
+
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
+            title.setDisable(disable);
+                writer.setDisable(disable);
+                narrator.setDisable(disable);
+                genre.setDisable(disable);
+                series.setDisable(disable);
+                bookNo.setDisable(disable);
+                year.setDisable(disable);
+                comment.setDisable(disable);
+        });
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {

@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>2.1-beta-1</version>
+    <version>2.1.0</version>
 
 
     <properties>
@@ -16,7 +16,6 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
-        <app.main.class>com.freeipodsoftware.abc.MainWindow</app.main.class>
     </properties>
 
 
@@ -28,12 +27,6 @@
     </repositories>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
-            <version>4.6.1</version>
-        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>

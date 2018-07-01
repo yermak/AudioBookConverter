@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;
@@ -19,12 +18,12 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
 public class Conversion {
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private ConversionMode mode = ConversionMode.PARALLEL;
+    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
     private AudioBookInfo bookInfo;
-    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", NOT_READY);
+    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
     public void setMode(ConversionMode mode) {
-        this.mode = mode;
+        this.mode.set(mode);
     }
 
     public void setBookInfo(AudioBookInfo bookInfo) {
@@ -36,7 +35,7 @@ public class Conversion {
     }
 
     public ConversionMode getMode() {
-        return mode;
+        return mode.get();
     }
 
     public AudioBookInfo getBookInfo() {
@@ -44,9 +43,10 @@ public class Conversion {
     }
 
     public void start(String outputDestination, Refreshable refreshable) {
+        status.set(IN_PROGRESS);
+
         Executors.newSingleThreadExecutor().execute(refreshable);
-        status.set(STARTED);
-        ConversionStrategy conversionStrategy = mode.createConvertionStrategy();
+        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy();
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
@@ -54,20 +54,14 @@ public class Conversion {
 
         conversionStrategy.setCallbacks(progressCallbacks);
 
-//        executorService.execute(refreshable);
-
         conversionStrategy.setOutputDestination(outputDestination);
         conversionStrategy.setBookInfo(bookInfo);
         conversionStrategy.setMedia(media);
 
 
         executorService.execute(conversionStrategy);
-        status.set(IN_PROGRESS);
     }
 
-    public void addMediaChangeListener(ListChangeListener<MediaInfo> listener) {
-        media.addListener(listener);
-    }
 
     public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {
         status.addListener(listener);
@@ -78,6 +72,33 @@ public class Conversion {
     }
 
     public void stop() {
-        status.set(READY);
+        status.set(CANCELLED);
+    }
+
+    public ProgressStatus getStatus() {
+        return status.get();
+    }
+
+
+    public void finished() {
+        status.set(FINISHED);
+    }
+
+    public void error(String message) {
+        status.set(ERROR);
+    }
+
+    public void resume() {
+        status.set(IN_PROGRESS);
+    }
+
+    public void removeStatusChangeListener(ChangeListener<ProgressStatus> listener) {
+        if (listener != null) status.removeListener(listener);
+    }
+
+    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
+        mode.addListener(listener);
     }
 }
+
+

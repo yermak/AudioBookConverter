@@ -34,8 +34,8 @@ public class ConversionContext {
     }
 
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
-        conversion.start(outputDestination, conversionProgress);
         subscriber.addConversionProgress(conversionProgress);
+        conversion.start(outputDestination, conversionProgress);
     }
 
     public Conversion getConversion() {
@@ -52,5 +52,17 @@ public class ConversionContext {
 
     public void subscribeForStart(Subscriber subscriber) {
         this.subscriber = subscriber;
+    }
+
+    public void finishedConversion() {
+        conversion.finished();
+    }
+
+    public void error(String message) {
+        conversion.error(message);
+    }
+
+    public void resumeConversion() {
+        conversion.resume();
     }
 }

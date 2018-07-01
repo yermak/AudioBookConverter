@@ -1,26 +1,24 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 04-Jan-18.
  */
-public class Mp4v2ArtBuilder implements StateListener {
+public class Mp4v2ArtBuilder {
 
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
-    private boolean cancelled;
+    private final StatusChangeListener listener;
 
     public Mp4v2ArtBuilder() {
-        StateDispatcher.getInstance().addListener(this);
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     private Collection<File> findPictures(File dir) {
@@ -28,7 +26,7 @@ public class Mp4v2ArtBuilder implements StateListener {
     }
 
 
-    public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, ExecutionException, InterruptedException {
+    public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, InterruptedException {
         Map<Long, String> posters = new HashMap<>();
         Set<String> tempPosters = new HashSet<>();
 
@@ -37,7 +35,7 @@ public class Mp4v2ArtBuilder implements StateListener {
         try {
             int i = 0;
             for (String poster : posters.values()) {
-                if (cancelled) break;
+                if (listener.isCancelled()) break;
                 updateSinglePoster(poster, i++, outputFileName);
             }
         } finally {
@@ -61,56 +59,25 @@ public class Mp4v2ArtBuilder implements StateListener {
         });
     }
 
-    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, ExecutionException, InterruptedException {
-        Process artProcess = null;
+    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, InterruptedException {
+        Process process = null;
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                     "--art-index", String.valueOf(index),
                     "--add", "\"" + poster + "\"",
                     outputFileName);
 
-            artProcessBuilder.redirectErrorStream();
-            artProcess = artProcessBuilder.start();
+//            artProcessBuilder.redirectErrorStream();
+            process = artProcessBuilder.start();
 
-            StreamCopier artToOut = new StreamCopier(artProcess.getInputStream(), System.out);
-            Future<Long> artFuture = executorService.submit(artToOut);
-            artFuture.get();
+            StreamCopier.copy(process.getInputStream(), System.out);
+            StreamCopier.copy(process.getErrorStream(), System.err);
+            boolean finished = false;
+            while (!listener.isCancelled() && !finished) {
+                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+            }
         } finally {
-            Utils.closeSilently(artProcess);
+            Utils.closeSilently(process);
         }
-    }
-
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-
-    }
-
-    @Override
-    public void canceled() {
-        cancelled = true;
-        Utils.closeSilently(executorService);
-    }
-
-    @Override
-    public void paused() {
-    }
-
-    @Override
-    public void resumed() {
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
     }
 }

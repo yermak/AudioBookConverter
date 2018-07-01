@@ -3,31 +3,38 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<VBox fx:controller="uk.yermak.audiobookconverter.fx.Controller"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:id="root"
-      prefHeight="${screen.visualBounds.height * 0.65}" prefWidth="${screen.visualBounds.width * 0.30}"
-      minHeight="-Infinity" minWidth="-Infinity" maxHeight="-Infinity" maxWidth="-Infinity"
+<GridPane fx:controller="uk.yermak.audiobookconverter.fx.Controller"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:id="root"
+          prefHeight="${screen.visualBounds.height * 0.70}" prefWidth="${screen.visualBounds.width * 0.30}"
+
 >
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
 
+    <rowConstraints>
+        <RowConstraints vgrow="NEVER" fillHeight="false"/>
+        <RowConstraints vgrow="ALWAYS" prefHeight="${screen.visualBounds.height*0.45}" maxHeight="Infinity"/>
+        <RowConstraints vgrow="NEVER" fillHeight="false"/>
+    </rowConstraints>
 
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-
     <fx:include source="links.fxml"/>
 
-    <TitledPane text="Add MP3 files to convert and bring them in right order..." collapsible="false">
-        <fx:include source="files.fxml"/>
-    </TitledPane>
+    <!-- <TitledPane text="Add MP3 files to convert and bring them in right order..." collapsible="false"
+                 GridPane.rowIndex="1" GridPane.fillHeight="true">
+    -->
+    <fx:include source="files.fxml"/>
+    <!--</TitledPane>
+-->
 
-
-    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}" fx:id="tabs">
+    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}" fx:id="tabs"
+             GridPane.rowIndex="2" GridPane.fillHeight="false">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
@@ -38,10 +45,8 @@
             <fx:include source="conversion_mode.fxml"/>
         </Tab>
         <Tab text="Queue" closable="false" fx:id="queueTab">
-            <ListView fx:id="progressQueue"/>
+            <ListView fx:id="progressQueue" prefHeight="-Infinity"/>
         </Tab>
     </TabPane>
 
-
-
-</VBox>
+</GridPane>

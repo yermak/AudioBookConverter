@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +18,13 @@ import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy extends AbstractConversionStrategy implements Runnable {
 
+    private final StatusChangeListener listener;
     private ExecutorService executorService = Executors.newWorkStealingPool();
 
-    protected void startConversion() {
-        executorService.execute(this);
+
+    public ParallelConversionStrategy() {
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     public void run() {
@@ -31,10 +35,10 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
         File fileListFile = null;
         File metaFile = null;
-
-        MediaInfo maxMedia = maximiseEncodingParameters();
-
         try {
+            MediaInfo maxMedia = maximiseEncodingParameters();
+
+
             fileListFile = prepareFiles(jobId);
             metaFile = prepareMeta(jobId);
 
@@ -47,32 +51,32 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             }
 
             for (Future<ConverterOutput> future : futures) {
-                if (canceled) return;
+                if (listener.isCancelled()) return;
                 future.get();
             }
-
-            if (canceled) return;
+            if (listener.isCancelled()) return;
             Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
-            if (canceled) return;
+            if (listener.isCancelled()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
             artBuilder.coverArt(media, tempFile);
 
-            if (canceled) return;
+            if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
-
+            ConverterApplication.getContext().finishedConversion();
         } catch (InterruptedException | ExecutionException | IOException e) {
+            e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            StateDispatcher.getInstance().finishedWithError(e.getMessage() + "; " + sw.getBuffer().toString());
+            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            finilize();
             for (MediaInfo mediaInfo : media) {
                 FileUtils.deleteQuietly(new File(getTempFileName(jobId, mediaInfo.hashCode(), ".m4b")));
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
+            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
         }
     }
 
@@ -91,16 +95,6 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     protected String getTempFileName(long jobId, int index, String extension) {
         return Utils.getTmp(jobId, index, extension);
-    }
-
-    public String getAdditionalFinishedMessage() {
-        return "Ouput filename" + ":\n" + this.outputDestination;
-    }
-
-    @Override
-    public void canceled() {
-        canceled = true;
-        Utils.closeSilently(executorService);
     }
 
     @Override

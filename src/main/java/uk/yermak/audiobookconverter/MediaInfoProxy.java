@@ -19,6 +19,7 @@ public class MediaInfoProxy implements MediaInfo {
         try {
             return futureLoad.get();
         } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

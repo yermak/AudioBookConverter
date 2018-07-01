@@ -2,9 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import java.io.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -26,7 +23,7 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
         this.inputFileList = inputFileList;
     }
 
-    public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException, ExecutionException {
+    public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException {
         ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder("external/ffmpeg.exe",
                 "-protocol_whitelist", "file,pipe,concat",
                 "-f", "concat",
@@ -55,33 +52,27 @@ public class FFMpegFaacConverter implements Callable<ConverterOutput>, Converter
         OutputStream faacOut = faacProcess.getOutputStream();
         InputStream faacErr = faacProcess.getErrorStream();
 
-        StreamCopier ffmpegToFaac = new StreamCopier(ffmpegIn, faacOut);
-        Future<Long> ffmpegFuture = Executors.newWorkStealingPool().submit(ffmpegToFaac);
-        StreamCopier ffmpegToErr = new StreamCopier(ffmpegErr, System.err);
-        Future<Long> ffmpegErrFuture = Executors.newWorkStealingPool().submit(ffmpegToErr);
+        StreamCopier.copy(ffmpegIn, faacOut);
+        StreamCopier.copy(ffmpegErr, System.err);
 
-        StreamCopier faacToConsole = new StreamCopier(faacIn, System.out);
-        Future<Long> faacFuture = Executors.newWorkStealingPool().submit(faacToConsole);
-        StreamCopier faacToErr = new StreamCopier(faacErr, System.err);
-        Future<Long> faacErrFuture = Executors.newWorkStealingPool().submit(faacToErr);
+        StreamCopier.copy(faacIn, System.out);
+        StreamCopier.copy(faacErr, System.err);
 
 
         for (String inputFile : inputFileList) {
             ffmpegOut.println("file '" + inputFile + "'");
         }
         ffmpegOut.close();
-
-        Long totalBytes;
         try {
-            totalBytes = ffmpegFuture.get();
-            faacFuture.get();
+            faacProcess.waitFor();
+            ffmpegProcess.waitFor();
             return new ConverterOutput(new MediaInfoBean(inputFileList[0]), outputFileName);
-        } catch (InterruptedException | ExecutionException ignorable) {
-            ffmpegProcess.destroy();
-            faacProcess.destroy();
-            ffmpegFuture.cancel(true);
-            faacFuture.cancel(true);
+        } catch (InterruptedException ignorable) {
+            ignorable.printStackTrace();
             throw ignorable;
+        } finally {
+            Utils.closeSilently(ffmpegProcess);
+            Utils.closeSilently(faacProcess);
         }
     }
 

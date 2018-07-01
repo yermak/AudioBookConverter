@@ -2,24 +2,25 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ProgressStatus;
+import uk.yermak.audiobookconverter.Refreshable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Created by yermak on 08-Feb-18.
  */
-public class ConversionProgress implements Runnable, StateListener, Refreshable {
+public class ConversionProgress implements Runnable, Refreshable {
 
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
-    SimpleObjectProperty<ProgressStatus> state = new SimpleObjectProperty<>(ProgressStatus.STARTED);
     SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleDoubleProperty progress = new SimpleDoubleProperty();
+    SimpleStringProperty state = new SimpleStringProperty("");
 
     private long startTime;
     private boolean finished;
@@ -36,12 +37,31 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
     public ConversionProgress(int totalFiles, long totalDuration) {
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case CANCELLED:
+                    cancelled();
+                    break;
+                case PAUSED:
+                    paused();
+                    break;
+                case IN_PROGRESS:
+                    if (oldValue.equals(ProgressStatus.PAUSED)) {
+                        resumed();
+                    }
+                    break;
+                case FINISHED:
+                    finished();
+                    break;
+            }
+        });
     }
 
 
     public void run() {
+        state.set("Converting...");
         startTime = System.currentTimeMillis();
-        StateDispatcher.getInstance().addListener(this);
+
         filesCount.set(completedFiles + "/" + totalFiles);
         progress.set(0);
         remaining.set(10 * 60 * 1000);
@@ -87,26 +107,17 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-            state.set(ProgressStatus.COMPLETED);
-//            infoText = "Updating media information...";
+            state.set("Merging chapters...");
         }
         filesCount.set(completedFiles + "/" + totalFiles);
     }
 
-    @Override
-    public void finishedWithError(String error) {
+    private void finished() {
         finished = true;
+        state.set("Completed!");
     }
 
-    @Override
-    public void finished() {
-        finished = true;
-        state.set(ProgressStatus.FINISHED);
-        resetStats();
-    }
-
-    @Override
-    public void canceled() {
+    private void cancelled() {
         cancelled = true;
         durations.clear();
         sizes.clear();
@@ -114,36 +125,19 @@ public class ConversionProgress implements Runnable, StateListener, Refreshable 
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
-        state.set(ProgressStatus.CANCELLED);
-//        infoText = "Conversion was cancelled";
+        state.set("Cancelled");
     }
 
-    @Override
-    public void paused() {
+    private void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
+        state.set("PAUSED");
     }
 
-    @Override
-    public void resumed() {
+    private void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
-    }
-
-    @Override
-    public void fileListChanged() {
-        resetStats();
-    }
-
-    private void resetStats() {
-//        progress.set(0);
-//        elapsed.set(0);
-//        size.set(-1);
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-        resetStats();
+        state.set("RUNNING");
     }
 
     public void reset() {

@@ -43,8 +43,6 @@ public class ProgressComponent extends GridPane {
             throw new RuntimeException(exception);
         }
         progressBar.progressProperty().setValue(0);
-//        prefWidthProperty().bind(((VBox) getParent()).widthProperty().subtract(20));
-
         progressBar.setMaxWidth(Double.MAX_VALUE);
     }
 
@@ -55,7 +53,7 @@ public class ProgressComponent extends GridPane {
         conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(formatSize(newValue.longValue()))));
         conversionProgress.elapsed.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> elapsedTime.setText(formatTime(newValue.longValue()))));
         conversionProgress.remaining.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> remainingTime.setText(formatTime(newValue.longValue()))));
-        conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue.toString())));
+        conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue)));
     }
 
     private static String formatTime(long millis) {

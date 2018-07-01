@@ -4,6 +4,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,16 +16,21 @@ import java.util.concurrent.*;
 /**
  * Created by yermak on 1/10/2018.
  */
-public class MediaLoader implements StateListener {
+public class MediaLoader {
 
+    private final StatusChangeListener listener;
     private List<String> fileNames;
-    private static String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static ExecutorService executorService = Executors.newWorkStealingPool();
+    private static final String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
+    private static final ExecutorService mediaExecutor = Executors.newWorkStealingPool();
+    private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
 
     public MediaLoader(List<String> files) {
         this.fileNames = files;
         Collections.sort(fileNames);
-        StateDispatcher.getInstance().addListener(this);
+
+        //TODO add latch to remove listener at the end.
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
     public List<MediaInfo> loadMediaInfo() {
@@ -32,56 +38,21 @@ public class MediaLoader implements StateListener {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
-                Future futureLoad = executorService.submit(new MediaInfoCallable(ffprobe, fileName));
+                Future futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName));
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
             return media;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-
-    }
-
-    @Override
-    public void canceled() {
-        Utils.closeSilently(executorService);
-    }
-
-    @Override
-    public void paused() {
-
-    }
-
-    @Override
-    public void resumed() {
-
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
     }
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
         private final String filename;
         private FFprobe ffprobe;
-        private final static Semaphore mutex = new Semaphore(Runtime.getRuntime().availableProcessors() * 2);
 
         public MediaInfoCallable(FFprobe ffprobe, String filename) {
             this.ffprobe = ffprobe;
@@ -91,7 +62,6 @@ public class MediaLoader implements StateListener {
         @Override
         public MediaInfo call() throws Exception {
             try {
-                mutex.acquire();
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 FFmpegFormat format = probeResult.getFormat();
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
@@ -105,7 +75,8 @@ public class MediaLoader implements StateListener {
                         mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
                         mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
                     } else if ("mjpeg".equals(fFmpegStream.codec_name)) {
-                        Future futureLoad = executorService.submit(new ArtWorkCallable(mediaInfo, "jpg"));
+                        Future futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, "jpg"), 1, TimeUnit.MINUTES);
+//                        futureLoad.get();
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
                         mediaInfo.setArtWork(artWork);
                     }
@@ -114,18 +85,17 @@ public class MediaLoader implements StateListener {
                 mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
+                e.printStackTrace();
                 throw e;
-            } finally {
-                mutex.release();
             }
         }
-
-
     }
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
 
         private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+        private final StatusChangeListener listener;
+
 
         private MediaInfoBean mediaInfo;
         private String format;
@@ -133,31 +103,37 @@ public class MediaLoader implements StateListener {
         public ArtWorkCallable(MediaInfoBean mediaInfo, String format) {
             this.mediaInfo = mediaInfo;
             this.format = format;
+            listener = new StatusChangeListener();
+            ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
         }
 
         @Override
         public ArtWork call() throws Exception {
-            Process pictureProcess = null;
-
+            Process process = null;
             try {
+                if (listener.isCancelled()) throw new InterruptedException("ArtWork loading was cancelled");
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), "." + format);
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         poster);
-                pictureProcess = pictureProcessBuilder.start();
+                process = pictureProcessBuilder.start();
 
-                StreamCopier pictureToOut = new StreamCopier(pictureProcess.getInputStream(), System.out);
-                Future<Long> pictureFuture = executorService.submit(pictureToOut);
+                StreamCopier.copy(process.getInputStream(), System.out);
                 // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                StreamCopier pictureToErr = new StreamCopier(pictureProcess.getErrorStream(), System.out);
-                Future<Long> errFuture = executorService.submit(pictureToErr);
-                pictureFuture.get();
+                StreamCopier.copy(process.getErrorStream(), System.err);
+                boolean finished = false;
+                while (!listener.isCancelled() && !finished) {
+                    finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+                }
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);
                 return new ArtWorkBean(poster, format, crc32);
             } finally {
-                Utils.closeSilently(pictureProcess);
+                Utils.closeSilently(process);
+                ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
             }
         }
+
     }
+
 }

@@ -5,7 +5,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
@@ -37,7 +39,7 @@ public class BookInfoController {
         AudioBookInfo bookInfo = new AudioBookInfo();
         ConverterApplication.getContext().setBookInfo(bookInfo);
 
-        genre.getItems().addAll("Fantasy", "Sci-fi");
+        genre.getItems().addAll("Audiobook", "Fantasy", "Sci-fi", "Novel");
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -46,21 +48,32 @@ public class BookInfoController {
         writer.textProperty().addListener(o -> bookInfo.setWriter(writer.getText()));
         narrator.textProperty().addListener(o -> bookInfo.setNarrator(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.setGenre(genre.getValue().toString()));
+        genre.valueProperty().addListener(o -> bookInfo.setGenre(genre.getValue()));
         genre.getEditor().textProperty().addListener(o -> bookInfo.setGenre(genre.getEditor().getText()));
 
         series.textProperty().addListener(o -> bookInfo.setSeries(series.getText()));
-        bookNo.textProperty().addListener(o -> bookInfo.setBookNumber(Integer.parseInt(bookNo.getText())));
+        bookNo.textProperty().addListener(o -> {
+            if (StringUtils.isNotBlank(bookNo.getText())) bookInfo.setBookNumber(Integer.parseInt(bookNo.getText()));
+        });
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
-        media.addListener((InvalidationListener) observable -> copyTags((ObservableList<MediaInfo>) observable));
+        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+
+        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
     }
 
-    private void copyTags(ObservableList<MediaInfo> media) {
-        if (media.isEmpty()) return;
-        MediaInfo mediaInfo = media.get(0);
+    private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
+        if (clear) {
+            clearTags();
+        } else {
+            copyTags(media.get(0));
+        }
+    }
+
+
+    private void copyTags(MediaInfo mediaInfo) {
         AudioBookInfo bookInfo = mediaInfo.getBookInfo();
         title.setText(bookInfo.getTitle());
         writer.setText(bookInfo.getWriter());
@@ -72,6 +85,15 @@ public class BookInfoController {
         comment.setText(bookInfo.getComment());
     }
 
-
+    private void clearTags() {
+        title.setText("");
+        writer.setText("");
+        narrator.setText("");
+        genre.getEditor().setText("");
+        series.setText("");
+        bookNo.setText("");
+        year.setText("");
+        comment.setText("");
+    }
 
 }

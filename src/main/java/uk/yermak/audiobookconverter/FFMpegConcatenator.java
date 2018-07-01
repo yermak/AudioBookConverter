@@ -2,24 +2,23 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegConcatenator implements Concatenator, StateListener {
+public class FFMpegConcatenator implements Concatenator {
 
     private final String outputFileName;
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    private final StatusChangeListener listener;
     private String metaDataFileName;
     private String fileListFileName;
     private ProgressCallback callback;
-    private boolean cancelled;
-    private boolean paused;
     private ProgressParser progressParser;
     private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
 
@@ -29,13 +28,13 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
         this.callback = callback;
-        StateDispatcher.getInstance().addListener(this);
-
+        listener = new StatusChangeListener();
+        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
     }
 
-    public void concat() throws IOException, ExecutionException, InterruptedException {
-        if (cancelled) return;
-        while (paused) Thread.sleep(1000);
+    public void concat() throws IOException, InterruptedException {
+        if (listener.isCancelled()) return;
+        while (listener.isPaused()) Thread.sleep(1000);
         callback.reset();
         try {
             progressParser = new TcpProgressParser(progress -> {
@@ -45,7 +44,7 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
         } catch (URISyntaxException e) {
         }
 
-        Process ffmpegProcess = null;
+        Process process = null;
         try {
 
             ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
@@ -61,64 +60,19 @@ public class FFMpegConcatenator implements Concatenator, StateListener {
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 
-            ffmpegProcess = ffmpegProcessBuilder.start();
+            process = ffmpegProcessBuilder.start();
 
-            StreamCopier ffmpegToOut = new StreamCopier(ffmpegProcess.getInputStream(), System.out);
-            Future<Long> ffmpegFuture = executorService.submit(ffmpegToOut);
-            StreamCopier ffmpegToErr = new StreamCopier(ffmpegProcess.getErrorStream(), System.err);
-            Future<Long> ffmpegErrFuture = executorService.submit(ffmpegToErr);
+            StreamCopier.copy(process.getInputStream(), System.out);
+            StreamCopier.copy(process.getErrorStream(), System.err);
 
-            while (!cancelled) {
-                try {
-                    ffmpegFuture.get(500, TimeUnit.MILLISECONDS);
-                    break;
-                } catch (TimeoutException ignored) {
-                }
+            boolean finished = false;
+            while (!listener.isCancelled() && !finished) {
+                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
 
         } finally {
-            Utils.closeSilently(ffmpegProcess);
+            Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
-
-    }
-
-    @Override
-    public void finishedWithError(String error) {
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void finished() {
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void canceled() {
-        cancelled = true;
-        Utils.closeSilently(executorService);
-//        Utils.closeSilently(progressParser);
-    }
-
-    @Override
-    public void paused() {
-        paused = true;
-    }
-
-    @Override
-    public void resumed() {
-        paused = false;
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
     }
 }

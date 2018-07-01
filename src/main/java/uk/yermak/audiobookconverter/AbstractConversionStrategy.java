@@ -11,38 +11,17 @@ import java.util.Map;
 
 //import org.eclipse.swt.widgets.Shell;
 
-public abstract class AbstractConversionStrategy implements ConversionStrategy, StateListener {
+public abstract class AbstractConversionStrategy implements ConversionStrategy {
     protected boolean finished;
-    protected boolean canceled;
-    protected boolean paused;
     protected AudioBookInfo bookInfo;
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
     protected String outputDestination;
 
 
-    protected AbstractConversionStrategy() {
-    }
-
     public void setBookInfo(AudioBookInfo audioBookInfo) {
         this.bookInfo = audioBookInfo;
     }
-
-    @Override
-    public abstract String getAdditionalFinishedMessage();
-
-    public void start() {
-        this.canceled = false;
-        this.finished = false;
-        StateDispatcher.getInstance().addListener(this);
-        this.startConversion();
-    }
-
-
-    public abstract void setOutputDestination(String outputDestination);
-
-    protected abstract void startConversion();
-
 
     @Override
     public void setMedia(List<MediaInfo> media) {
@@ -54,44 +33,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         this.progressCallbacks = progressCallbacks;
     }
 
-    public void setPaused(boolean paused) {
-        this.paused = paused;
-    }
 
-    @Override
-    public void finishedWithError(String error) {
-
-    }
-
-    @Override
-    public void finished() {
-        finished=true;
-    }
-
-    @Override
-    public void canceled() {
-        canceled = true;
-    }
-
-    @Override
-    public void paused() {
-
-    }
-
-    @Override
-    public void resumed() {
-
-    }
-
-    @Override
-    public void fileListChanged() {
-
-    }
-
-    @Override
-    public void modeChanged(ConversionMode mode) {
-
-    }
 
     protected File prepareMeta(long jobId) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
@@ -148,13 +90,5 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy, 
         return mediaInfo;
     }
 
-    protected void finilize() {
-        if (canceled) {
-            StateDispatcher.getInstance().canceled();
-        } else {
-            this.finished = true;
-            StateDispatcher.getInstance().finished();
-        }
-    }
 
 }

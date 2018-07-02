@@ -13,13 +13,13 @@ Main features:
 * Smart artwork support: combined from MP3 artwork and cover files from MP3 directory
 * Unicode tags support: keep tags in own language
 * Chapters support: jump to the right chapter quickly
-* Simple UI (inherited from original version)
+* Simple and lightweigh user interface
 --------------
-This project is based on freeipodsoftware release of AudioBookConverter.
+This project was originally based on freeipodsoftware release of AudioBookConverter, starting from version 2.1 all internals were rewritten.
 
 ---------------------
 
-Original look and feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
+Original lighweigh style was preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
 All libraries and dependencies are refreshed to the latests version available at this moment.
 Project is tested on different sets of mp3 files and latest iOS devices.
 

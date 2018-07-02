@@ -14,13 +14,11 @@ Main features:
 * Unicode tags support: keep tags in own language
 * Chapters support: jump to the right chapter quickly
 * Simple and lightweigh user interface
---------------
 
 --------------
 <a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Wiki</a>
 --------------
 
---------------
 Major differences vs original version:
 --------------
 * Performance improved form 5 to 15x times (depending on numbers of cores), old version of Faac replaced with fresh FFMpeg.

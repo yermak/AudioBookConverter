@@ -16,7 +16,7 @@ Main features:
 * Simple and lightweigh user interface
 
 --------------
-<a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Wiki</a>
+<a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Read more on Wiki</a>
 --------------
 
 Major differences vs original version:

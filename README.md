@@ -15,13 +15,10 @@ Main features:
 * Chapters support: jump to the right chapter quickly
 * Simple and lightweigh user interface
 --------------
-This project was originally based on freeipodsoftware release of AudioBookConverter, starting from version 2.1 all internals were rewritten.
 
----------------------
-
-Original lighweigh style was preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
-All libraries and dependencies are refreshed to the latests version available at this moment.
-Project is tested on different sets of mp3 files and latest iOS devices.
+--------------
+<a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Wiki</a>
+--------------
 
 --------------
 Major differences vs original version:

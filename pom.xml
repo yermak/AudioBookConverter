@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>2.1.0</version>
+    <version>2.2-alpha-1</version>
 
 
     <properties>
@@ -53,7 +53,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -64,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -92,7 +92,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.freeipodsoftware.abc.MainWindow</mainClass>
+                            <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -102,7 +102,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <execution>
+                   <!-- <execution>
                         <id>zip</id>
                         <phase>package</phase>
                         <goals>
@@ -112,7 +112,7 @@
                             <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
                             <finalName>AudioBookConverter-${project.version}</finalName>
                         </configuration>
-                    </execution>
+                    </execution>-->
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>
@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.6.0</version>
+                <version>8.8.3</version>
                 <configuration>
                     <vendor>https://github.com/yermak</vendor>
                     <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>

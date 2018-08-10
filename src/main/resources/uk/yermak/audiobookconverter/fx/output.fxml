@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.Screen?>
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
+          fx:controller="uk.yermak.audiobookconverter.fx.OutputController"
+          gridLinesVisible="false">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
+    <children>
+
+        <Label text="Bitrate, kBs/s" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="Frequency, kHz" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="Channels" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="Quality" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+
+        <Spinner fx:id="bitRate" GridPane.columnIndex="1" GridPane.rowIndex="0" min="32" max="512" maxWidth="80"/>
+        <Spinner fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" min="22" max="44" maxWidth="80"/>
+        <Spinner fx:id="channels" GridPane.columnIndex="1" GridPane.rowIndex="2" min="1" max="2" maxWidth="80"/>
+        <!--<TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>-->
+        <Slider fx:id="quality" GridPane.columnIndex="1" GridPane.rowIndex="3" min="1" max="5"/>
+
+
+        <Label GridPane.rowSpan="4" text="Parts" GridPane.columnIndex="2" GridPane.rowIndex="0"
+               GridPane.halignment="RIGHT"/>
+
+        <Spinner GridPane.rowSpan="4" fx:id="parts" GridPane.columnIndex="3" GridPane.rowIndex="0" min="1" max="10"
+                 maxWidth="80"/>
+
+    </children>
+</GridPane>

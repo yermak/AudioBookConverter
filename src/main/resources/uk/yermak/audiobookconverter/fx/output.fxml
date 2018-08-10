@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
           fx:controller="uk.yermak.audiobookconverter.fx.OutputController"
           gridLinesVisible="false">
     <fx:define>
@@ -27,37 +27,40 @@
         </fx:define>
 
         <Label text="Split book into equal parts" GridPane.columnIndex="0" GridPane.rowIndex="0"
-               GridPane.halignment="RIGHT"/>
+               GridPane.halignment="LEFT"/>
+        <Label text="Frequency, kHz" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
 
-        <Label text="Use quality of source files" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
 
         <Spinner fx:id="parts" GridPane.columnIndex="1" GridPane.rowIndex="0" min="1" max="10"
                  maxWidth="80"/>
-        <CheckBox fx:id="auto" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-        <RadioButton fx:id="cbr" text="Constant bitrate" GridPane.rowSpan="2"
-                     GridPane.columnIndex="0" GridPane.rowIndex="2"
-                     toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true"/>
-        <RadioButton fx:id="vbr" text="Variable bitrate" GridPane.rowSpan="2"
-                     GridPane.columnIndex="1" GridPane.rowIndex="2"
-                     toggleGroup="$br" onAction="#vbr" wrapText="true" />
+        <Spinner fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" min="22" max="44" maxWidth="80"/>
 
 
-        <Label text="Frequency, kHz" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="Channels" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="Use quality of source files" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+
+        <Label text="Channels" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
 
 
-        <Spinner fx:id="frequency" GridPane.columnIndex="3" GridPane.rowIndex="0" min="22" max="44" maxWidth="80"/>
+        <CheckBox fx:id="auto" GridPane.columnIndex="3" GridPane.rowIndex="0" selected="true"/>
         <Spinner fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" min="1" max="2" maxWidth="80"/>
 
 
+        <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s" GridPane.columnSpan="2"
+                     GridPane.columnIndex="0" GridPane.rowIndex="2"
+                     toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT"/>
+        <RadioButton fx:id="vbr" text="Variable bitrate, Quality" GridPane.columnSpan="2"
+                     GridPane.columnIndex="2" GridPane.rowIndex="2"
+                     toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT"/>
 
-        <Label text="Bitrate, kBs/s" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="Quality" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
 
-        <Spinner fx:id="bitRate" GridPane.columnIndex="3" GridPane.rowIndex="2" min="32" max="512" maxWidth="80"/>
-        <Slider fx:id="quality" GridPane.columnIndex="3" GridPane.rowIndex="3" min="1" max="5"/>
+
+
+
+        <Spinner fx:id="bitRate" GridPane.columnIndex="0" GridPane.rowIndex="3" min="32" max="512" maxWidth="80" GridPane.columnSpan="2" GridPane.halignment="RIGHT"/>
+
+        <Slider fx:id="quality" GridPane.columnIndex="2" GridPane.rowIndex="3" min="1" max="5" GridPane.columnSpan="2"
+                showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"/>
 
     </children>
 </GridPane>

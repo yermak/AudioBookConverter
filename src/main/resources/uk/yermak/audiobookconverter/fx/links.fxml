@@ -13,7 +13,7 @@
         <ColumnConstraints hgrow="SOMETIMES"/>
     </columnConstraints>
     <children>
-        <Label text="AudioBookConverter v2.1"
+        <Label text="AudioBookConverter v2.2"
                GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="2" alignment="TOP_LEFT"
                GridPane.valignment="TOP">
             <font>

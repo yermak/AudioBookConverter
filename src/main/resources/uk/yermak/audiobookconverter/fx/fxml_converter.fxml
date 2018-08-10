@@ -44,6 +44,9 @@
         <Tab text="Conversion mode" closable="false">
             <fx:include source="conversion_mode.fxml"/>
         </Tab>
+        <Tab text="Output" closable="false">
+            <fx:include source="output.fxml"/>
+        </Tab>
         <Tab text="Queue" closable="false" fx:id="queueTab">
             <ListView fx:id="progressQueue" prefHeight="-Infinity"/>
         </Tab>

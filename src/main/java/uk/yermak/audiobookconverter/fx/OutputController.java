@@ -33,17 +33,30 @@ public class OutputController {
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
         quality.setDisable(true);
+        ConverterApplication.getContext().getOutputParameters().setCbr(true);
+
     }
 
     public void vbr(ActionEvent actionEvent) {
         bitRate.setDisable(true);
         quality.setDisable(false);
-
+        ConverterApplication.getContext().getOutputParameters().setCbr(false);
     }
 
     @FXML
     private void initialize() {
         OutputParameters params = new OutputParameters();
+        params.setAuto(auto.isSelected());
+        params.setBitRate(bitRate.getValue());
+        params.setFrequency(frequency.getValue());
+        params.setChannels(channels.getValue());
+        params.setCbr(cbr.isSelected());
+        params.setParts(parts.getValue());
+
+//        8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, and 96000
+//        frequency.getValueFactory().
+
+
         ConverterApplication.getContext().setOutputParameters(params);
         auto.selectedProperty().addListener((observable, oldValue, newValue) -> {
             bitRate.setDisable(newValue);

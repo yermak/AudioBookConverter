@@ -105,6 +105,10 @@ public class Conversion {
     public void setOutputParameters(OutputParameters params) {
         outputParameters = params;
     }
+
+    public OutputParameters getOutputParameters() {
+        return outputParameters;
+    }
 }
 
 

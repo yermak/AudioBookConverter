@@ -35,12 +35,12 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         File fileListFile = null;
 
         try {
-            MediaInfo maxMedia = maximiseEncodingParameters();
+            outputParameters.updateAuto(media);
 
             metaFile = prepareMeta(jobId);
             fileListFile = prepareFiles(jobId);
             if (listener.isCancelled()) return;
-            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), maxMedia, progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), outputParameters, progressCallbacks.get("output"));
             concatenator.concat();
             if (listener.isCancelled()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();

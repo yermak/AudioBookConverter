@@ -36,17 +36,18 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         File fileListFile = null;
         File metaFile = null;
         try {
-            MediaInfo maxMedia = maximiseEncodingParameters();
+//            MediaInfo maxMedia = maximiseEncodingParameters();
+            outputParameters.updateAuto(media);
 
 
             fileListFile = prepareFiles(jobId);
             metaFile = prepareMeta(jobId);
 
-            List<MediaInfo> prioritizedMedia = prioritiseMedia(maxMedia);
+            List<MediaInfo> prioritizedMedia = prioritiseMedia();
             for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(mediaInfo, tempOutput, callback));
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(outputParameters, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
@@ -80,13 +81,14 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
         }
     }
 
-    private List<MediaInfo> prioritiseMedia(MediaInfo maxMedia) {
-        List<MediaInfo> sortedMedia = new ArrayList<>();
+    private List<MediaInfo> prioritiseMedia() {
+        List<MediaInfo> sortedMedia = new ArrayList<>(media.size());
+
         for (MediaInfo mediaInfo : media) {
             sortedMedia.add(mediaInfo);
-            mediaInfo.setFrequency(maxMedia.getFrequency());
-            mediaInfo.setChannels(maxMedia.getChannels());
-            mediaInfo.setBitrate(maxMedia.getBitrate());
+//            mediaInfo.setFrequency(maxMedia.getFrequency());
+//            mediaInfo.setChannels(maxMedia.getChannels());
+//            mediaInfo.setBitrate(maxMedia.getBitrate());
         }
         Collections.sort(sortedMedia, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
         return sortedMedia;

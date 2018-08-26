@@ -13,4 +13,5 @@ public interface ConversionStrategy extends Runnable {
 
     void setOutputDestination(String outputDestination);
 
+    void setOutputParameters(OutputParameters outputParameters);
 }

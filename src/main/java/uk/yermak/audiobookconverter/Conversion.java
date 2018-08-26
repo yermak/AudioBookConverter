@@ -21,6 +21,7 @@ public class Conversion {
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
     private AudioBookInfo bookInfo;
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
+    private OutputParameters outputParameters;
 
     public void setMode(ConversionMode mode) {
         this.mode.set(mode);
@@ -57,6 +58,7 @@ public class Conversion {
         conversionStrategy.setOutputDestination(outputDestination);
         conversionStrategy.setBookInfo(bookInfo);
         conversionStrategy.setMedia(media);
+        conversionStrategy.setOutputParameters(outputParameters);
 
 
         executorService.execute(conversionStrategy);
@@ -98,6 +100,10 @@ public class Conversion {
 
     public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
         mode.addListener(listener);
+    }
+
+    public void setOutputParameters(OutputParameters params) {
+        outputParameters = params;
     }
 }
 

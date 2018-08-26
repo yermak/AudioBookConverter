@@ -32,8 +32,8 @@
 
 
         <Spinner fx:id="parts" GridPane.columnIndex="1" GridPane.rowIndex="0" min="1" max="10"
-                 maxWidth="80"/>
-        <Spinner fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" min="22" max="44" maxWidth="80"/>
+                 maxWidth="80" editable="true"/>
+        <Spinner fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" min="22" max="48" maxWidth="80" initialValue="44" editable="true"/>
 
 
         <Label text="Use quality of source files" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
@@ -42,7 +42,7 @@
 
 
         <CheckBox fx:id="auto" GridPane.columnIndex="3" GridPane.rowIndex="0" selected="true"/>
-        <Spinner fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" min="1" max="2" maxWidth="80"/>
+        <Spinner fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" min="1" max="2" maxWidth="80" initialValue="2"/>
 
 
         <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s" GridPane.columnSpan="2"
@@ -57,9 +57,10 @@
 
 
 
-        <Spinner fx:id="bitRate" GridPane.columnIndex="0" GridPane.rowIndex="3" min="32" max="512" maxWidth="80" GridPane.columnSpan="2" GridPane.halignment="RIGHT"/>
+        <Spinner fx:id="bitRate" GridPane.columnIndex="0" GridPane.rowIndex="3" min="32" max="512" initialValue="128"
+                 maxWidth="80" GridPane.columnSpan="2" GridPane.halignment="RIGHT" editable="true"/>
 
-        <Slider fx:id="quality" GridPane.columnIndex="2" GridPane.rowIndex="3" min="1" max="5" GridPane.columnSpan="2"
+        <Slider fx:id="quality" GridPane.columnIndex="2" GridPane.rowIndex="3" min="1" max="5" GridPane.columnSpan="2" value="4"
                 showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"/>
 
     </children>

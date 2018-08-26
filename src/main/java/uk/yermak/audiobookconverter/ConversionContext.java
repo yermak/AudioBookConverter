@@ -65,4 +65,8 @@ public class ConversionContext {
     public void resumeConversion() {
         conversion.resume();
     }
+
+    public void setOutputParameters(OutputParameters params) {
+        conversion.setOutputParameters(params);
+    }
 }

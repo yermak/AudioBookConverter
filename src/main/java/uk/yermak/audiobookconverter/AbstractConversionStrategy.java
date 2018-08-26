@@ -17,6 +17,7 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
     protected List<MediaInfo> media;
     protected Map<String, ProgressCallback> progressCallbacks;
     protected String outputDestination;
+    protected OutputParameters outputParameters;
 
 
     public void setBookInfo(AudioBookInfo audioBookInfo) {
@@ -33,6 +34,10 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         this.progressCallbacks = progressCallbacks;
     }
 
+    @Override
+    public void setOutputParameters(OutputParameters outputParameters) {
+        this.outputParameters = outputParameters;
+    }
 
 
     protected File prepareMeta(long jobId) throws IOException {
@@ -72,23 +77,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
 
     protected abstract String getTempFileName(long jobId, int index, String extension);
 
-    protected MediaInfo maximiseEncodingParameters() {
-        int maxChannels = 0;
-        int maxFrequency = 0;
-        int maxBitrate = 0;
-
-        for (MediaInfo mediaInfo : media) {
-            if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
-            if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
-            if (mediaInfo.getBitrate() > maxBitrate) maxBitrate = mediaInfo.getBitrate();
-        }
-
-        MediaInfoBean mediaInfo = new MediaInfoBean("");
-        mediaInfo.setBitrate(maxBitrate);
-        mediaInfo.setChannels(maxChannels);
-        mediaInfo.setFrequency(maxFrequency);
-        return mediaInfo;
-    }
 
 
 }

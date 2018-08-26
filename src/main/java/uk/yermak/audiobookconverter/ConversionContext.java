@@ -69,4 +69,8 @@ public class ConversionContext {
     public void setOutputParameters(OutputParameters params) {
         conversion.setOutputParameters(params);
     }
+
+    public OutputParameters getOutputParameters() {
+        return conversion.getOutputParameters();
+    }
 }

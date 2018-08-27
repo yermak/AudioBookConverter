@@ -60,6 +60,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
                     outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
                     "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
                     "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
+                    "-cutoff", "10000",
                     "-progress", progressParser.getUri().toString(),
                     outputFileName
             );

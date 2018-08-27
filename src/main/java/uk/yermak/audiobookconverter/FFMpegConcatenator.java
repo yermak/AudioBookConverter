@@ -57,6 +57,7 @@ public class FFMpegConcatenator implements Concatenator {
                     "-map_metadata", "1",
                     "-f", "ipod",
                     "-c:a", "copy",
+                    "-movflags", "+faststart",
                     "-progress", progressParser.getUri().toString(),
                     outputFileName);
 

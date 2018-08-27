@@ -68,11 +68,6 @@ public class Utils {
             builder
                     .append(" - [")
                     .append(StringUtils.trim(bookInfo.getSeries()));
-            if (bookInfo.getBookNumber() > 0) {
-                builder
-                        .append(" - ")
-                        .append(bookInfo.getBookNumber());
-            }
             builder.append("] ");
         }
         if (StringUtils.isNotBlank(bookInfo.getTitle())) {
@@ -86,6 +81,13 @@ public class Utils {
                     .append(StringUtils.trim(bookInfo.getNarrator()))
                     .append(")");
         }
+
+        if (bookInfo.getBookNumber() > 0) {
+            builder
+                    .append(", Part ")
+                    .append(bookInfo.getBookNumber());
+        }
+
         String result = builder.toString();
         String mp3Filename;
 

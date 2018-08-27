@@ -4,13 +4,13 @@ import java.util.List;
 
 public class OutputParameters {
 
-    private int bitRate;
-    private int frequency;
-    private int channels;
-    private int quality;
+    private int bitRate = 128;
+    private int frequency = 44100;
+    private int channels = 2;
+    private int quality = 3;
     private boolean cbr = true;
     private boolean auto = true;
-    private int parts;
+    private int parts = 1;
 
     public int getBitRate() {
         return bitRate;
@@ -84,7 +84,7 @@ public class OutputParameters {
         setFrequency(maxFrequency);
 
         if (cbr) {
-            setBitRate(maxBitrate);
+            setBitRate(maxBitrate / 1000);
         }
     }
 
@@ -96,11 +96,11 @@ public class OutputParameters {
     }
 
     public String getFFMpegQualityValue() {
-        return cbr ? String.valueOf(getBitRate())+"k" : String.valueOf(quality);
+        return cbr ? String.valueOf(getBitRate()) + "k" : String.valueOf(quality);
     }
 
     public String getFFMpegFrequencyValue() {
-        return getFrequency()+"000";
+        return String.valueOf(getFrequency());
     }
 
     public String getFFMpegChannelsValue() {

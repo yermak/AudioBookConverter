@@ -13,6 +13,8 @@ import uk.yermak.audiobookconverter.OutputParameters;
  */
 public class OutputController {
     @FXML
+    public Spinner<Integer> cutoff;
+    @FXML
     private Spinner<Integer> parts;
     @FXML
     private CheckBox auto;
@@ -59,7 +61,7 @@ public class OutputController {
         frequency.valueProperty().addListener(o -> params.setFrequency(frequency.getValue()));
         channels.valueProperty().addListener(o -> params.setChannels(channels.getValue()));
         quality.valueProperty().addListener(o -> params.setQuality((int) Math.round(quality.getValue())));
-
+        cutoff.valueProperty().addListener(o-> params.setQuality(cutoff.getValue()));
 
 //        params.setAuto(auto.isSelected());
 //        params.setBitRate(bitRate.getValue());
@@ -83,10 +85,13 @@ public class OutputController {
             if (!newValue) {
                 if (cbr.isSelected()) {
                     bitRate.setDisable(false);
+                    cutoff.setDisable(false);
                     quality.setDisable(true);
+
                 }
                 if (vbr.isSelected()) {
                     bitRate.setDisable(true);
+                    cutoff.setDisable(false);
                     quality.setDisable(false);
                 }
             }

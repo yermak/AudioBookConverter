@@ -46,20 +46,25 @@
         <Spinner fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" min="1" max="2" maxWidth="80" disable="true"/>
 
 
-        <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s" GridPane.columnSpan="2"
+        <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s"
                      GridPane.columnIndex="0" GridPane.rowIndex="2"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT" disable="true"/>
+
+        <Spinner fx:id="bitRate" GridPane.columnIndex="1" GridPane.rowIndex="2" min="32" max="512"
+                 maxWidth="80" GridPane.halignment="RIGHT" editable="true" disable="true"/>
+
         <RadioButton fx:id="vbr" text="Variable bitrate, Quality" GridPane.columnSpan="2"
                      GridPane.columnIndex="2" GridPane.rowIndex="2"
                      toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT" disable="true"/>
 
 
 
+        <Label text="Cut-off frequencies higher then" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
+        <Spinner fx:id="cutoff" GridPane.columnIndex="1" GridPane.rowIndex="3" min="8000" max="20000" initialValue="10000"
+                 maxWidth="80" GridPane.halignment="RIGHT" editable="true" disable="true"/>
 
 
 
-        <Spinner fx:id="bitRate" GridPane.columnIndex="0" GridPane.rowIndex="3" min="32" max="512"
-                 maxWidth="80" GridPane.columnSpan="2" GridPane.halignment="RIGHT" editable="true" disable="true"/>
 
         <Slider fx:id="quality" GridPane.columnIndex="2" GridPane.rowIndex="3" min="1" max="5" GridPane.columnSpan="2" value="4"
                 showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0" disable="true"/>

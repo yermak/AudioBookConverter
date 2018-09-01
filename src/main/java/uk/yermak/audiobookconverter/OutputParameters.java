@@ -11,6 +11,7 @@ public class OutputParameters {
     private boolean cbr = true;
     private boolean auto = true;
     private int parts = 1;
+    private int cutoff = 10000;
 
     public int getBitRate() {
         return bitRate;
@@ -105,5 +106,30 @@ public class OutputParameters {
 
     public String getFFMpegChannelsValue() {
         return String.valueOf(getChannels());
+    }
+
+    public String getCutoffValue() {
+        if (cbr) {
+            return String.valueOf(cutoff);
+        }
+        switch (quality) {
+            case 1:
+                return "5000";
+            case 2:
+                return "10000";
+            case 3:
+                return "13000";
+            case 4:
+                return "18000";
+        }
+        return "0";
+    }
+
+    public void setCutoff(int cutoff) {
+        this.bitRate = cutoff;
+    }
+
+    public int getCutoff() {
+        return bitRate;
     }
 }

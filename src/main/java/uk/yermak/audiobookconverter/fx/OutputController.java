@@ -34,6 +34,7 @@ public class OutputController {
 
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
+        cutoff.setDisable(false);
         quality.setDisable(true);
         ConverterApplication.getContext().getOutputParameters().setCbr(true);
 
@@ -41,6 +42,7 @@ public class OutputController {
 
     public void vbr(ActionEvent actionEvent) {
         bitRate.setDisable(true);
+        cutoff.setDisable(true);
         quality.setDisable(false);
         ConverterApplication.getContext().getOutputParameters().setCbr(false);
     }
@@ -61,17 +63,7 @@ public class OutputController {
         frequency.valueProperty().addListener(o -> params.setFrequency(frequency.getValue()));
         channels.valueProperty().addListener(o -> params.setChannels(channels.getValue()));
         quality.valueProperty().addListener(o -> params.setQuality((int) Math.round(quality.getValue())));
-        cutoff.valueProperty().addListener(o-> params.setQuality(cutoff.getValue()));
-
-//        params.setAuto(auto.isSelected());
-//        params.setBitRate(bitRate.getValue());
-//        if (frequency.getValue()!=null) {
-//            params.setFrequency(frequency.getValue());
-//        }
-//        params.setChannels(channels.getValue());
-//        params.setCbr(cbr.isSelected());
-//        params.setParts(parts.getValue());
-
+        cutoff.valueProperty().addListener(o -> params.setCutoff(cutoff.getValue()));
 
 
         auto.selectedProperty().addListener((observable, oldValue, newValue) -> {

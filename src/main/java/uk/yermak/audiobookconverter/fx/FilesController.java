@@ -84,11 +84,17 @@ public class FilesController {
 
     private void selectFolderDialog(Window window) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
+        String sourceFolder = AppProperties.getProperty("source.folder");
+        if (sourceFolder != null) {
+            directoryChooser.setInitialDirectory(new File(sourceFolder));
+        }
+
         directoryChooser.setTitle("Select folder with MP3 files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
             Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "wma"}, true);
             processFiles(files);
+            AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
     }
 
@@ -103,7 +109,10 @@ public class FilesController {
 
     private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
-//        fileChooser.setInitialDirectory();
+        String sourceFolder = AppProperties.getProperty("source.folder");
+        if (sourceFolder != null) {
+            fileChooser.setInitialDirectory(new File(sourceFolder));
+        }
         fileChooser.setTitle("Select MP3/WMA files for conversion");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("mp3", "*.mp3"),
@@ -112,6 +121,9 @@ public class FilesController {
         List<File> files = fileChooser.showOpenMultipleDialog(window);
         if (files != null) {
             processFiles(files);
+            File firstFile = files.get(0);
+            File parentFile = firstFile.getParentFile();
+            AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
         }
     }
 

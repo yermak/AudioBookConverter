@@ -9,9 +9,9 @@ import java.util.Properties;
 public class AppProperties {
     public static final String WEBSITE_URL = "https://github.com/yermak/AudioBookConverter";
     public static final String HELP_URL = "https://github.com/yermak/AudioBookConverter/";
-    private static final String APP_PROPERTIES = "app.properties";
+    private static final String APP_PROPERTIES = "AudioBookConverter-V2.properties";
     private static final String APPDATA = "APPDATA";
-    private static final String MP3TOI_POD_AUDIO_BOOK_CONVERTER = "MP3toiPodAudioBookConverter";
+    private static final String MP3TOI_POD_AUDIO_BOOK_CONVERTER = "AudioBookConverter-V2";
     public static final String STAY_UPDATED = "stayUpdated";
     public static final String NO_UPDATECHECK_UNTIL = "noUpdateCheckUntil";
 
@@ -25,7 +25,7 @@ public class AppProperties {
         Properties applicationProps = new Properties(defaultProperties);
 
         try {
-            FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "MP3toiPodAudioBookConverter"), "app.properties"));
+            FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "AudioBookConverter-V2"), "AudioBookConverter-V2.properties"));
             applicationProps.load(in);
             in.close();
         } catch (Exception var3) {
@@ -49,13 +49,12 @@ public class AppProperties {
         applicationProps.put(key, value);
 
         try {
-            File appDir = new File(new File(System.getenv("APPDATA")), "MP3toiPodAudioBookConverter");
+            File appDir = new File(new File(System.getenv("APPDATA")), "AudioBookConverter-V2");
             if (!appDir.exists()) {
                 boolean succ = appDir.mkdir();
                 System.out.println(succ);
             }
-
-            FileOutputStream out = new FileOutputStream(new File(appDir, "app.properties"));
+            FileOutputStream out = new FileOutputStream(new File(appDir, "AudioBookConverter-V2.properties"));
             applicationProps.store(out, "");
             out.close();
         } catch (Exception var5) {

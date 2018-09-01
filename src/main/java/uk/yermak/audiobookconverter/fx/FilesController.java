@@ -171,7 +171,6 @@ public class FilesController {
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
-        JfxEnv env = ConverterApplication.getEnv();
 
 
         List<MediaInfo> media = context.getConversion().getMedia();
@@ -180,12 +179,9 @@ public class FilesController {
             MediaInfo mediaInfo = media.get(0);
             String outputDestination = null;
             if (context.getMode().equals(ConversionMode.BATCH)) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setTitle("Select destination folder for encoded files");
-                File selectedDirectory = directoryChooser.showDialog(env.getWindow());
-                outputDestination = selectedDirectory.getPath();
+                outputDestination = selectOutputDirectory();
             } else {
-                outputDestination = selectOutputFile(env, audioBookInfo, mediaInfo);
+                outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
             }
             if (outputDestination != null) {
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
@@ -196,9 +192,30 @@ public class FilesController {
         }
     }
 
-    private String selectOutputFile(JfxEnv env, AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+    private String selectOutputDirectory() {
+        JfxEnv env = ConverterApplication.getEnv();
+
         String outputDestination;
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        String outputFolder = AppProperties.getProperty("output.folder");
+        if (outputFolder != null) {
+            directoryChooser.setInitialDirectory(new File(outputFolder));
+        }
+        directoryChooser.setTitle("Select destination folder for encoded files");
+        File selectedDirectory = directoryChooser.showDialog(env.getWindow());
+        AppProperties.setProperty("output.folder", selectedDirectory.getAbsolutePath());
+        outputDestination = selectedDirectory.getPath();
+        return outputDestination;
+    }
+
+    private String selectOutputFile(AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+        JfxEnv env = ConverterApplication.getEnv();
+
         final FileChooser fileChooser = new FileChooser();
+        String outputFolder = AppProperties.getProperty("output.folder");
+        if (outputFolder != null) {
+            fileChooser.setInitialDirectory(new File(outputFolder));
+        }
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(
@@ -206,8 +223,9 @@ public class FilesController {
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
-        outputDestination = file.getPath();
-        return outputDestination;
+        File parentFolder = file.getParentFile();
+        AppProperties.setProperty("output.folder", parentFolder.getAbsolutePath());
+        return file.getPath();
     }
 
 

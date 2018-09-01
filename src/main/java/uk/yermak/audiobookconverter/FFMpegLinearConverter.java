@@ -60,10 +60,9 @@ public class FFMpegLinearConverter implements Concatenator {
                     "-map_metadata", "1",
                     "-vn",
                     outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
-                    "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
-                    "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
-
-//                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
+                    "-ar", outputParameters.getFFMpegFrequencyValue(),
+                    "-ac", outputParameters.getFFMpegChannelsValue(),
+                    "-cutoff", outputParameters.getCutoffValue(),
                     "-f", "ipod",
                     "-codec:a", "libfdk_aac",
                     "-codec:v", "copy",

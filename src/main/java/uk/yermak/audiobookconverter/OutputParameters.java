@@ -121,8 +121,9 @@ public class OutputParameters {
                 return "13000";
             case 4:
                 return "18000";
+            default:
+                return "0";
         }
-        return "0";
     }
 
     public void setCutoff(int cutoff) {

@@ -5,7 +5,7 @@ Audio Book Converter V2
 * Convert mp3 to ipod format.
 * Convert mp3 to IBook (IPhone) format.
 
-<a href="https://github.com/yermak/AudioBookConverter/releases/download/version_2.0.1/AudioBookConverter-Installer-2.0.1.exe">Download</a>
+<a href="https://github.com/yermak/AudioBookConverter/releases/download/version_2.1.0/AudioBookConverter-Installer-2.1.0.exe">Download</a>
 -------------
 Main features:
 --------------
@@ -13,17 +13,12 @@ Main features:
 * Smart artwork support: combined from MP3 artwork and cover files from MP3 directory
 * Unicode tags support: keep tags in own language
 * Chapters support: jump to the right chapter quickly
-* Simple UI (inherited from original version)
---------------
-This project is based on freeipodsoftware release of AudioBookConverter.
-
----------------------
-
-Original look and feel is preserved, all internals were completely rewritten to use benefits of modern hardware: 64bits, multi-core processors.
-All libraries and dependencies are refreshed to the latests version available at this moment.
-Project is tested on different sets of mp3 files and latest iOS devices.
+* Simple and lightweigh user interface
 
 --------------
+<a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Read more on Wiki</a>
+--------------
+
 Major differences vs original version:
 --------------
 * Performance improved form 5 to 15x times (depending on numbers of cores), old version of Faac replaced with fresh FFMpeg.

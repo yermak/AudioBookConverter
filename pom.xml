@@ -95,9 +95,9 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                         </manifest>
-                        <manifestEntries>
-                            <Implementation-Build>${build.number}</Implementation-Build>
-                        </manifestEntries>
+                        <!--                 <manifestEntries>
+                                             <Implementation-Build>${build.number}</Implementation-Build>
+                                         </manifestEntries>-->
                     </archive>
 
                 </configuration>

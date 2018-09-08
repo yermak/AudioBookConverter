@@ -10,8 +10,8 @@
 
 
     <properties>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
@@ -25,16 +25,6 @@
             <url>http://maven-eclipse.github.io/maven</url>
         </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>oss-sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencies>
 
@@ -63,14 +53,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.7.0</version>
                 <configuration>
-                    <!--
-                                        <source>${maven.compiler.source}</source>
-                                        <target>${maven.compiler.target}</target>
-                    -->
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
-                    <release>10</release>
                 </configuration>
             </plugin>
 
@@ -100,7 +87,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.0.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -108,10 +95,6 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                         </manifest>
-                        <!--                 <manifestEntries>
-                                             <Implementation-Build>${build.number}</Implementation-Build>
-                                         </manifestEntries>
-                         -->
                     </archive>
 
                 </configuration>
@@ -149,7 +132,7 @@
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.9.0-SNAPSHOT</version>
+                <version>8.8.3</version>
                 <configuration>
                     <vendor>https://github.com/yermak</vendor>
                     <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>

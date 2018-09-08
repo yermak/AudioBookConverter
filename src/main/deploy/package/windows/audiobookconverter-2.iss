@@ -3,7 +3,7 @@
 
 #define MyAppTitle "AudioBookConverterV2"
 #define MyAppName "AudioBookConverter"
-#define MyAppVersion "2"
+#define MyAppVersion "2.0"
 #define MyAppPublisher "https://github.com/yermak"
 #define MyAppURL "https://github.com/yermak/AudioBookConverter"
 #define MyAppExeName "AudioBookConverter-2.exe"
@@ -13,7 +13,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId = {{E2A5A133-127D-4267-927F-2A5DC99F0B89}
+AppId = {E2A5A133-127D-4267-927F-2A5DC99F0B89}
 AppName = {#MyAppTitle}
 AppVersion = {#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}

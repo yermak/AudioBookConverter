@@ -5,7 +5,7 @@ Audio Book Converter V2
 * Convert mp3 to ipod format.
 * Convert mp3 to IBook (IPhone) format.
 
-<a href="https://github.com/yermak/AudioBookConverter/releases/download/version_2.1.0/AudioBookConverter-Installer-2.1.0.exe">Download</a>
+<a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 -------------
 Main features:
 --------------

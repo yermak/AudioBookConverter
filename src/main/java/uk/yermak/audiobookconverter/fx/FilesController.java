@@ -85,20 +85,23 @@ public class FilesController {
     private void selectFolderDialog(Window window) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        if (sourceFolder != null) {
-            File initialDirectory = new File(sourceFolder);
-            if (initialDirectory.exists()) {
-                directoryChooser.setInitialDirectory(initialDirectory);
-            }
-        }
+        directoryChooser.setInitialDirectory(getInitialDirecotory(sourceFolder));
 
-        directoryChooser.setTitle("Select folder with MP3 files for conversion");
+        directoryChooser.setTitle("Select folder with MP3/WMA files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
             Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "wma"}, true);
             processFiles(files);
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
+    }
+
+    private static File getInitialDirecotory(String sourceFolder) {
+        if (sourceFolder == null) {
+            return new File(System.getProperty("user.home"));
+        }
+        File file = new File(sourceFolder);
+        return file.exists() ? file : getInitialDirecotory(file.getParent());
     }
 
     private void processFiles(Collection<File> files) {
@@ -113,12 +116,7 @@ public class FilesController {
     private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        if (sourceFolder != null) {
-            File initialDirectory = new File(sourceFolder);
-            if (initialDirectory.exists()) {
-                fileChooser.setInitialDirectory(initialDirectory);
-            }
-        }
+        fileChooser.setInitialDirectory(getInitialDirecotory(sourceFolder));
         fileChooser.setTitle("Select MP3/WMA files for conversion");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("mp3", "*.mp3"),
@@ -204,12 +202,7 @@ public class FilesController {
         String outputDestination;
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        if (outputFolder != null) {
-            File initialDirectory = new File(outputFolder);
-            if (initialDirectory.exists()) {
-                directoryChooser.setInitialDirectory(initialDirectory);
-            }
-        }
+        directoryChooser.setInitialDirectory(getInitialDirecotory(outputFolder));
         directoryChooser.setTitle("Select destination folder for encoded files");
         File selectedDirectory = directoryChooser.showDialog(env.getWindow());
         AppProperties.setProperty("output.folder", selectedDirectory.getAbsolutePath());
@@ -222,12 +215,7 @@ public class FilesController {
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        if (outputFolder != null) {
-            File initialDirectory = new File(outputFolder);
-            if (initialDirectory.exists()) {
-                fileChooser.setInitialDirectory(initialDirectory);
-            }
-        }
+        fileChooser.setInitialDirectory(getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(

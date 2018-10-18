@@ -86,7 +86,10 @@ public class FilesController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         if (sourceFolder != null) {
-            directoryChooser.setInitialDirectory(new File(sourceFolder));
+            File initialDirectory = new File(sourceFolder);
+            if (initialDirectory.exists()) {
+                directoryChooser.setInitialDirectory(initialDirectory);
+            }
         }
 
         directoryChooser.setTitle("Select folder with MP3 files for conversion");
@@ -111,7 +114,10 @@ public class FilesController {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         if (sourceFolder != null) {
-            fileChooser.setInitialDirectory(new File(sourceFolder));
+            File initialDirectory = new File(sourceFolder);
+            if (initialDirectory.exists()) {
+                fileChooser.setInitialDirectory(initialDirectory);
+            }
         }
         fileChooser.setTitle("Select MP3/WMA files for conversion");
         fileChooser.getExtensionFilters().addAll(

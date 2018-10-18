@@ -205,7 +205,10 @@ public class FilesController {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
         if (outputFolder != null) {
-            directoryChooser.setInitialDirectory(new File(outputFolder));
+            File initialDirectory = new File(outputFolder);
+            if (initialDirectory.exists()) {
+                directoryChooser.setInitialDirectory(initialDirectory);
+            }
         }
         directoryChooser.setTitle("Select destination folder for encoded files");
         File selectedDirectory = directoryChooser.showDialog(env.getWindow());
@@ -220,7 +223,10 @@ public class FilesController {
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
         if (outputFolder != null) {
-            fileChooser.setInitialDirectory(new File(outputFolder));
+            File initialDirectory = new File(outputFolder);
+            if (initialDirectory.exists()) {
+                fileChooser.setInitialDirectory(initialDirectory);
+            }
         }
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");

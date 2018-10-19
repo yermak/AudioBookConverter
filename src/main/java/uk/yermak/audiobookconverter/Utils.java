@@ -62,7 +62,6 @@ public class Utils {
         if (StringUtils.isNotBlank(bookInfo.getWriter())) {
             builder
                     .append(StringUtils.trim(bookInfo.getWriter()));
-
         }
         if (StringUtils.isNotBlank(bookInfo.getSeries()) && !StringUtils.equals(bookInfo.getSeries(), bookInfo.getTitle())) {
             builder
@@ -89,6 +88,10 @@ public class Utils {
         }
 
         String result = builder.toString();
+        char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};
+        for (char c : toRemove) {
+            result = StringUtils.remove(result, c);
+        }
         String mp3Filename;
 
         if (StringUtils.isBlank(result)) {
@@ -133,5 +136,13 @@ public class Utils {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public static File getInitialDirecotory(String sourceFolder) {
+        if (sourceFolder == null) {
+            return new File(System.getProperty("user.home"));
+        }
+        File file = new File(sourceFolder);
+        return file.exists() ? file : getInitialDirecotory(file.getParent());
     }
 }

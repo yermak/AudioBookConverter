@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -275,6 +277,28 @@ public class FilesController {
         });
     }
 
+    public void play(ActionEvent actionEvent) {
+
+        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+
+        if (selectedIndices.size() == 1) {
+            ObservableList<MediaInfo> items = fileList.getItems();
+
+
+            String fileName = items.get(selectedIndices.get(0)).getFileName();
+            String source = new File(fileName).toURI().toString();
+
+            Media hit = new Media(source);
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.setOnError(() -> System.out.println("Error : " + mediaPlayer.getError().toString()));
+            mediaPlayer.play();
+            MediaPlayer.Status status = mediaPlayer.getStatus();
+            System.out.println("status = " + status);
+
+
+        }
+
+    }
 }
 
 

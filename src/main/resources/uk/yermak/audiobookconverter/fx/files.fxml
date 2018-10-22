@@ -94,6 +94,15 @@
             </tooltip>
         </Button>
 
+        <Button fx:id="playButton" text="Play" disable="false"
+                minWidth="${screen.visualBounds.width * 0.05}"
+                GridPane.columnIndex="1" GridPane.rowIndex="11"
+                onAction="#play">
+            <tooltip>
+                <Tooltip text="Start conversion of files"/>
+            </tooltip>
+        </Button>
+
 
     </children>
 </GridPane>

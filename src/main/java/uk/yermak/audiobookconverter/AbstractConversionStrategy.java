@@ -65,7 +65,8 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
             metaData.add("START=" + totalDuration);
             totalDuration += media.get(i).getDuration();
             metaData.add("END=" + totalDuration);
-            metaData.add("title=Chapter " + (i + 1));
+            metaData.add("title=" + (bookInfo.getBookNumber() != 0 ? (bookInfo.getBookNumber() + " ") : "") +
+                    (bookInfo.getTitle().equals(bookInfo.getSeries()) ? "Chapter " : bookInfo.getTitle() + " ") + (i + 1));
         }
         FileUtils.writeLines(metaFile, "UTF-8", metaData);
         return metaFile;
@@ -76,7 +77,6 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
 
 
     protected abstract String getTempFileName(long jobId, int index, String extension);
-
 
 
 }

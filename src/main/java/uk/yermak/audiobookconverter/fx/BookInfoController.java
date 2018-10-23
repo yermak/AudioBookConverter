@@ -6,11 +6,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.AudioBookInfo;
-import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.ProgressStatus;
+import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -40,7 +41,25 @@ public class BookInfoController {
         AudioBookInfo bookInfo = new AudioBookInfo();
         ConverterApplication.getContext().setBookInfo(bookInfo);
 
-        genre.getItems().addAll("Audiobook", "Fantasy", "Sci-fi", "Novel");
+        String genresProperty = AppProperties.getProperty("genres");
+        if (genresProperty != null) {
+            String[] genres = genresProperty.split("::");
+            Arrays.sort(genres);
+            genre.getItems().addAll(Arrays.asList(genres));
+        }
+
+
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
+                Set<String> g = new TreeSet<>(genre.getItems());
+                g.add(genre.getEditor().getText());
+                genre.getItems().clear();
+                genre.getItems().addAll(g);
+                StringBuffer sb = new StringBuffer();
+                g.forEach(s -> sb.append(s).append("::"));
+                AppProperties.setProperty("genres", sb.toString());
+            }
+        });
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -62,20 +81,18 @@ public class BookInfoController {
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> {
-            updateTags(media, ConversionMode.BATCH.equals(newValue));
-        });
+        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
         ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
             boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
             title.setDisable(disable);
-                writer.setDisable(disable);
-                narrator.setDisable(disable);
-                genre.setDisable(disable);
-                series.setDisable(disable);
-                bookNo.setDisable(disable);
-                year.setDisable(disable);
-                comment.setDisable(disable);
+            writer.setDisable(disable);
+            narrator.setDisable(disable);
+            genre.setDisable(disable);
+            series.setDisable(disable);
+            bookNo.setDisable(disable);
+            year.setDisable(disable);
+            comment.setDisable(disable);
         });
     }
 

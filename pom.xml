@@ -42,11 +42,75 @@
             <version>3.7</version>
             <scope>compile</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>net.bramp.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>0.6.2</version>
-        </dependency>-->
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.j2objc</groupId>
+                    <artifactId>j2objc-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.j2objc</groupId>
+                    <artifactId>j2objc-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>0.7.7</version>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -175,6 +239,165 @@
                                     </moduleInfo>
                                 </module>
 
+                                <module>
+                                    <artifact>
+                                        <groupId>com.google.guava</groupId>
+                                        <artifactId>guava</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>com.google.guava</name>
+                                        <exports>
+                                            com.google.common.collect;
+                                            com.google.common.base;
+                                            com.google.common.annotations;
+                                            com.google.common.cache;
+                                            com.google.common.escape;
+                                            com.google.common.primitives;
+                                            com.google.common.eventbus;
+                                            com.google.common.graph;
+                                            com.google.common.hash;
+                                            com.google.common.html;
+                                            com.google.common.io;
+                                            com.google.common.math;
+                                            com.google.common.net;
+                                            com.google.common.reflect;
+                                            com.google.common.util;
+                                            com.google.common.xml;
+                                        </exports>
+                                    </moduleInfo>
+                                </module>
+
+
+                                <module>
+                                    <artifact>
+                                        <groupId>com.google.code.gson</groupId>
+                                        <artifactId>gson</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>com.google.code.gson</name>
+                                        <requires>
+                                            transitive java.sql;
+                                        </requires>
+                                        <exports>
+                                            com.google.gson;
+                                            com.google.gson.annotations;
+                                            com.google.gson.internal;
+                                            com.google.gson.internal.bind;
+                                            com.google.gson.internal.bind.util;
+                                            com.google.gson.internal.reflect;
+                                            com.google.gson.reflect;
+                                            com.google.gson.stream;
+                                        </exports>
+                                    </moduleInfo>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>org.modelmapper</groupId>
+                                        <artifactId>modelmapper</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>org.modelmapper</name>
+                                        <requires>
+                                            java.management;
+                                            java.rmi;
+                                            jdk.unsupported;
+
+                                            transitive java.desktop;
+                                            transitive java.sql;
+                                            transitive java.xml;
+                                        </requires>
+                                        <exports>
+                                            org.apache.tools.ant;
+                                            org.apache.tools.ant.attribute;
+                                            org.apache.tools.ant.dispatch;
+                                            org.apache.tools.ant.filters;
+                                            org.apache.tools.ant.filters.util;
+                                            org.apache.tools.ant.helper;
+                                            org.apache.tools.ant.input;
+                                            org.apache.tools.ant.launch;
+                                            org.apache.tools.ant.listener;
+                                            org.apache.tools.ant.loader;
+                                            org.apache.tools.ant.property;
+                                            org.apache.tools.ant.taskdefs;
+                                            org.apache.tools.ant.taskdefs.compilers;
+                                            org.apache.tools.ant.taskdefs.condition;
+                                            org.apache.tools.ant.taskdefs.cvslib;
+                                            org.apache.tools.ant.taskdefs.email;
+                                            org.apache.tools.ant.taskdefs.launcher;
+                                            org.apache.tools.ant.taskdefs.optional;
+                                            org.apache.tools.ant.taskdefs.optional.ccm;
+                                            org.apache.tools.ant.taskdefs.optional.clearcase;
+                                            org.apache.tools.ant.taskdefs.optional.depend;
+                                            org.apache.tools.ant.taskdefs.optional.depend.constantpool;
+                                            org.apache.tools.ant.taskdefs.optional.ejb;
+                                            org.apache.tools.ant.taskdefs.optional.extension;
+                                            org.apache.tools.ant.taskdefs.optional.extension.resolvers;
+                                            org.apache.tools.ant.taskdefs.optional.i18n;
+                                            org.apache.tools.ant.taskdefs.optional.j2ee;
+                                            org.apache.tools.ant.taskdefs.optional.javacc;
+                                            org.apache.tools.ant.taskdefs.optional.javah;
+                                            org.apache.tools.ant.taskdefs.optional.jlink;
+                                            org.apache.tools.ant.taskdefs.optional.jsp;
+                                            org.apache.tools.ant.taskdefs.optional.jsp.compilers;
+                                            org.apache.tools.ant.taskdefs.optional.native2ascii;
+                                            org.apache.tools.ant.taskdefs.optional.net;
+                                            org.apache.tools.ant.taskdefs.optional.pvcs;
+                                            org.apache.tools.ant.taskdefs.optional.script;
+                                            org.apache.tools.ant.taskdefs.optional.sos;
+                                            org.apache.tools.ant.taskdefs.optional.testing;
+                                            org.apache.tools.ant.taskdefs.optional.unix;
+                                            org.apache.tools.ant.taskdefs.optional.vss;
+                                            org.apache.tools.ant.taskdefs.optional.windows;
+                                            org.apache.tools.ant.taskdefs.rmic;
+                                            org.apache.tools.ant.types;
+                                            org.apache.tools.ant.types.mappers;
+                                            org.apache.tools.ant.types.optional;
+                                            org.apache.tools.ant.types.optional.depend;
+                                            org.apache.tools.ant.types.resources;
+                                            org.apache.tools.ant.types.resources.comparators;
+                                            org.apache.tools.ant.types.resources.selectors;
+                                            org.apache.tools.ant.types.selectors;
+                                            org.apache.tools.ant.types.selectors.modifiedselector;
+                                            org.apache.tools.ant.types.spi;
+                                            org.apache.tools.ant.util;
+                                            org.apache.tools.ant.util.depend;
+                                            org.apache.tools.ant.util.facade;
+                                            org.apache.tools.ant.util.java15;
+                                            org.apache.tools.ant.util.optional;
+                                            org.apache.tools.ant.util.regexp;
+                                            org.apache.tools.bzip2;
+                                            org.apache.tools.mail;
+                                            org.apache.tools.tar;
+                                            org.apache.tools.zip;
+                                            org.modelmapper;
+                                            org.modelmapper.builder;
+                                            org.modelmapper.config;
+                                            org.modelmapper.convention;
+                                            org.modelmapper.internal;
+                                            org.modelmapper.internal.asm;
+                                            org.modelmapper.internal.asm.signature;
+                                            org.modelmapper.internal.asm.tree;
+                                            org.modelmapper.internal.cglib.core;
+                                            org.modelmapper.internal.cglib.core.internal;
+                                            org.modelmapper.internal.cglib.proxy;
+                                            org.modelmapper.internal.cglib.reflect;
+                                            org.modelmapper.internal.cglib.transform;
+                                            org.modelmapper.internal.converter;
+                                            org.modelmapper.internal.objenesis;
+                                            org.modelmapper.internal.objenesis.instantiator;
+                                            org.modelmapper.internal.objenesis.instantiator.android;
+                                            org.modelmapper.internal.objenesis.instantiator.basic;
+                                            org.modelmapper.internal.objenesis.instantiator.gcj;
+                                            org.modelmapper.internal.objenesis.instantiator.jrockit;
+                                            org.modelmapper.internal.objenesis.instantiator.perc;
+                                            org.modelmapper.internal.objenesis.instantiator.sun;
+                                            org.modelmapper.internal.objenesis.strategy;
+                                            org.modelmapper.internal.util;
+                                            org.modelmapper.internal.valueaccess;
+                                            org.modelmapper.spi;
+                                        </exports>
+                                    </moduleInfo>
+                                </module>
 
                             </modules>
 
@@ -196,6 +419,9 @@
                             <modules>
                                 <module>org.apache.commons.lang3</module>
                                 <module>org.apache.commons.io</module>
+                                <module>com.google.code.gson</module>
+                                <module>org.modelmapper</module>
+                                <module>com.google.guava</module>
                                 <module>uk.yermak.audiobookconverter</module>
                             </modules>
                             <launcher>

@@ -42,24 +42,172 @@
             <version>3.7</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>0.6.2</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11</version>
         </dependency>
 
     </dependencies>
-    <build>
-        <plugins>
 
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <release>11</release>
+                        <compilerArgs>
+                            <compilerArg>--module-path</compilerArg>
+                            <compilerArg>${project.build.directory}/modules</compilerArg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <release>10</release>
-                </configuration>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.Beta1</version>
+                <executions>
+                    <execution>
+                        <id>add-module-info-to-dependencies</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/modules</outputDirectory>
+                            <overwriteExistingFiles>true</overwriteExistingFiles>
+                            <module>
+                                <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
+                                <moduleInfo>
+                                    <name>uk.yermak.audiobookconverter</name>
+                                    <exports>
+                                        uk.yermak.audiobookconverter;
+                                        uk.yermak.audiobookconverter.fx;
+                                    </exports>
+                                    <requires>
+                                        javafx.graphics;
+                                        javafx.fxml;
+                                        javafx.media;
+                                        javafx.base;
+                                        javafx.scene;
+                                        java.xml;
+                                    </requires>
+                                    <opens>
+                                        uk.yermak.audiobookconverter;
+                                        uk.yermak.audiobookconverter.fx;
+                                    </opens>
+                                </moduleInfo>
+                            </module>
+                            <modules>
+                                <module>
+                                    <artifact>
+                                        <groupId>org.apache.commons</groupId>
+                                        <artifactId>commons-lang3</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>org.apache.commons.lang3</name>
+                                        <requires>
+                                            transitive java.desktop;
+                                        </requires>
+                                        <exports>
+                                            org.apache.commons.lang3;
+                                            org.apache.commons.lang3.arch;
+                                            org.apache.commons.lang3.builder;
+                                            org.apache.commons.lang3.concurrent;
+                                            org.apache.commons.lang3.event;
+                                            org.apache.commons.lang3.exception;
+                                            org.apache.commons.lang3.math;
+                                            org.apache.commons.lang3.mutable;
+                                            org.apache.commons.lang3.reflect;
+                                            org.apache.commons.lang3.text;
+                                            org.apache.commons.lang3.text.translate;
+                                            org.apache.commons.lang3.time;
+                                            org.apache.commons.lang3.tuple;
+                                        </exports>
+                                    </moduleInfo>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>commons-io</groupId>
+                                        <artifactId>commons-io</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>org.apache.commons.io</name>
+                                        <exports>
+                                            org.apache.commons.io;
+                                            org.apache.commons.io.comparator;
+                                            org.apache.commons.io.filefilter;
+                                            org.apache.commons.io.input;
+                                            org.apache.commons.io.monitor;
+                                            org.apache.commons.io.output;
+                                            org.apache.commons.io.serialization;
+                                        </exports>
+                                    </moduleInfo>
+                                </module>
+
+
+                            </modules>
+
+                        </configuration>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-runtime-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>create-runtime-image</goal>
+                        </goals>
+                        <configuration>
+                            <modulePath>
+                                <path>${project.build.directory}/modules</path>
+                            </modulePath>
+                            <modules>
+                                <module>org.apache.commons.lang3</module>
+                                <module>org.apache.commons.io</module>
+                                <module>uk.yermak.audiobookconverter</module>
+                            </modules>
+                            <launcher>
+                                <name>ConverterApplication</name>
+                                <module>uk.yermak.audiobookconverter</module>
+                            </launcher>
+                            <compression>2</compression>
+                            <stripDebug>false</stripDebug>
+                            <outputDirectory>${project.build.directory}/jlink-image</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
 
@@ -70,114 +218,19 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <outputDirectory>${project.build.directory}/modules</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
-                        </manifest>
-                    </archive>
-
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>installer</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
-                            <outputDirectory>target/dir</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.zenjava</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.9.0-SNAPSHOT</version>
-                <configuration>
-                    <vendor>https://github.com/yermak</vendor>
-                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
-                    <bundler>EXE</bundler>
-
-                    <bundleArguments>
-                        <runtime>${java.home}</runtime>
-                        <installdirChooser>true</installdirChooser>
-
-
-                        <!--<module-path>PATH_1;PATH_2;PATH_3</module-path>-->
-
-                        <!--<module>module1,module2,module3</module>-->
-
-                        <!--<add-modules>module1,module2,module3</add-modules>-->
-
-                        <!--<limit-modules>module1,module2,module3</limit-modules>-->
-                    </bundleArguments>
-                    <verbose>true</verbose>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- required before build-native -->
-                        <id>create-jfxjar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build-jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>create-native</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build-native</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <!--            <plugin>
-                            <groupId>de.dynamicfiles.projects.maven</groupId>
-                            <artifactId>distribution-bundle-plugin</artifactId>
-                            <version>1.0.0-SNAPSHOT</version>
-                            <executions>
-                                <execution>
-                                    <id>generate-java-bundle</id>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>java-app</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>-->
-
         </plugins>
     </build>
 

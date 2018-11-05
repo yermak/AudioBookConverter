@@ -177,6 +177,9 @@
                                     <exports>
                                         uk.yermak.audiobookconverter;
                                         uk.yermak.audiobookconverter.fx;
+                                        net.bramp.ffmpeg;
+                                        net.bramp.ffmpeg.probe;
+                                        net.bramp.ffmpeg.progress;
                                     </exports>
                                     <requires>
                                         javafx.graphics;
@@ -457,6 +460,30 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
+                            </descriptors>
+                            <finalName>AudioBookConverter-${project.version}</finalName>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+
         </plugins>
     </build>
 

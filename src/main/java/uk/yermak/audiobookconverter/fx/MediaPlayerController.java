@@ -88,7 +88,7 @@ public class MediaPlayerController {
         if (status == MediaPlayer.Status.READY
                 || status == MediaPlayer.Status.PAUSED
                 || status == MediaPlayer.Status.STOPPED) {
-            mediaPlayer.seek(new Duration(timelapse.getValue() * 1000));
+//            mediaPlayer.seek(new Duration(timelapse.getValue() * 1000));
             mediaPlayer.play();
         } else {
             mediaPlayer.pause();
@@ -105,6 +105,7 @@ public class MediaPlayerController {
 
         Media m = new Media(new File(selected.getFileName()).toURI().toASCIIString());
         mediaPlayer = new MediaPlayer(m);
+        mediaPlayer.setAutoPlay(true);
 
         MediaView mediaView = new MediaView(mediaPlayer);
         HBox box = (HBox) playButton.getParent();
@@ -112,29 +113,34 @@ public class MediaPlayerController {
 
 
         mediaPlayer.setOnReady(() -> {
-            updateValues();
+//            updateValues();
             timelapse.setMax(mediaPlayer.getMedia().getDuration().toSeconds());
+            mediaPlayer.play();
         });
 
-        mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
-        mediaPlayer.volumeProperty().set(0.2);
+//        mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
+//        mediaPlayer.volumeProperty().set(0.2);
 
-        mediaPlayer.currentTimeProperty().addListener(observable -> updateValues());
+//        mediaPlayer.currentTimeProperty().addListener(observable -> updateValues());
 
 
+/*
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
                 Duration duration = mediaPlayer.getMedia().getDuration();
                 mediaPlayer.seek(duration.multiply(timelapse.getValue() / 100.0));
             }
         });
+*/
 
+/*
         mediaPlayer.setOnEndOfMedia(() -> {
             mediaPlayer.volumeProperty().unbindBidirectional(volume.valueProperty());
             mediaPlayer.dispose();
             mediaPlayer = null;
             playMedias(findNext(selected));
         });
+*/
         toggleMediaPlayer();
 
     }

@@ -10,12 +10,7 @@
 
 
     <properties>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
-        <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
-        <compiler.max.memory>700m</compiler.max.memory>
-        <compiler.debug>on</compiler.debug>
-        <compiler.args.main></compiler.args.main>
+
     </properties>
 
     <pluginRepositories>
@@ -186,8 +181,9 @@
                                         javafx.fxml;
                                         javafx.media;
                                         javafx.base;
-                                        javafx.scene;
                                         java.xml;
+                                        org.apache.commons.lang3;
+                                        org.apache.commons.io;
                                     </requires>
                                     <opens>
                                         uk.yermak.audiobookconverter;

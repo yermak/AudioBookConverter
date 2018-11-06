@@ -7,8 +7,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
@@ -27,7 +29,7 @@ public class MediaPlayerController {
     @FXML
     public Slider volume;
 
-    private MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
 
     @FXML
@@ -103,6 +105,11 @@ public class MediaPlayerController {
 
         Media m = new Media(new File(selected.getFileName()).toURI().toASCIIString());
         mediaPlayer = new MediaPlayer(m);
+
+        MediaView mediaView = new MediaView(mediaPlayer);
+        HBox box = (HBox) playButton.getParent();
+        box.getChildren().add(mediaView);
+
 
         mediaPlayer.setOnReady(() -> {
             updateValues();

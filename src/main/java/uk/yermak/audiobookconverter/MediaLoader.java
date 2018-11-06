@@ -21,7 +21,7 @@ public class MediaLoader {
     private final StatusChangeListener listener;
     private List<String> fileNames;
     private static final String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
-    private static final ExecutorService mediaExecutor = Executors.newWorkStealingPool();
+    private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
 
     public MediaLoader(List<String> files) {

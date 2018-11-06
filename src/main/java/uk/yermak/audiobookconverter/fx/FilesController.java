@@ -35,6 +35,7 @@ public class FilesController {
     public Button upButton;
     @FXML
     public Button downButton;
+
     @FXML
     ListView<MediaInfo> fileList;
 
@@ -47,6 +48,7 @@ public class FilesController {
     public Button stopButton;
 
     private final ContextMenu contextMenu = new ContextMenu();
+
 
     @FXML
     public void initialize() {
@@ -69,10 +71,18 @@ public class FilesController {
 
         media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
-        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
+        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            List<MediaInfo> selectedMedia = context.getSelectedMedia();
+            selectedMedia.clear();
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
+        });
 
+        //TODO test it
+        context.getSelectedMedia().addListener((ListChangeListener<MediaInfo>) c -> {
+            fileList.getSelectionModel().clearSelection();
+            c.getList().forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+        });
     }
 
 
@@ -85,11 +95,9 @@ public class FilesController {
     private void selectFolderDialog(Window window) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        if (sourceFolder != null) {
-            directoryChooser.setInitialDirectory(new File(sourceFolder));
-        }
+        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
 
-        directoryChooser.setTitle("Select folder with MP3 files for conversion");
+        directoryChooser.setTitle("Select folder with MP3/WMA files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
             Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "wma"}, true);
@@ -110,9 +118,7 @@ public class FilesController {
     private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        if (sourceFolder != null) {
-            fileChooser.setInitialDirectory(new File(sourceFolder));
-        }
+        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
         fileChooser.setTitle("Select MP3/WMA files for conversion");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("mp3", "*.mp3"),
@@ -198,9 +204,7 @@ public class FilesController {
         String outputDestination;
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        if (outputFolder != null) {
-            directoryChooser.setInitialDirectory(new File(outputFolder));
-        }
+        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
         directoryChooser.setTitle("Select destination folder for encoded files");
         File selectedDirectory = directoryChooser.showDialog(env.getWindow());
         AppProperties.setProperty("output.folder", selectedDirectory.getAbsolutePath());
@@ -213,9 +217,7 @@ public class FilesController {
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        if (outputFolder != null) {
-            fileChooser.setInitialDirectory(new File(outputFolder));
-        }
+        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(

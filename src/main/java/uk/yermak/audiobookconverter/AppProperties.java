@@ -28,7 +28,7 @@ public class AppProperties {
             FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "AudioBookConverter-V2"), "AudioBookConverter-V2.properties"));
             applicationProps.load(in);
             in.close();
-        } catch (Exception var3) {
+        } catch (Exception e) {
         }
 
         return applicationProps;

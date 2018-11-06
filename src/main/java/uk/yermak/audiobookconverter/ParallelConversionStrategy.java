@@ -10,7 +10,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -66,7 +65,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
             ConverterApplication.getContext().finishedConversion();
-        } catch (InterruptedException | ExecutionException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

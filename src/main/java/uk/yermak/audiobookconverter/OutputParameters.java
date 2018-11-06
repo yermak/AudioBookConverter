@@ -114,13 +114,13 @@ public class OutputParameters {
         }
         switch (quality) {
             case 1:
-                return "5000";
+                return "13050";
             case 2:
-                return "10000";
+                return "13050";
             case 3:
-                return "13000";
+                return "14260";
             case 4:
-                return "18000";
+                return "15500";
             default:
                 return "0";
         }

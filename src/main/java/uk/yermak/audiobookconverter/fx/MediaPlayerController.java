@@ -7,10 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
@@ -107,15 +105,10 @@ public class MediaPlayerController {
         mediaPlayer = new MediaPlayer(m);
         mediaPlayer.setAutoPlay(true);
 
-        MediaView mediaView = new MediaView(mediaPlayer);
-        HBox box = (HBox) playButton.getParent();
-        box.getChildren().add(mediaView);
-
-
         mediaPlayer.setOnReady(() -> {
 //            updateValues();
             timelapse.setMax(mediaPlayer.getMedia().getDuration().toSeconds());
-            mediaPlayer.play();
+//            mediaPlayer.play();
         });
 
 //        mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());

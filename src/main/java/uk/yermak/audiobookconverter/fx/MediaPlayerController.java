@@ -33,11 +33,11 @@ public class MediaPlayerController {
     @FXML
     public void initialize() {
 
-        timelapse.valueProperty().addListener(o -> {
+    /*    timelapse.valueProperty().addListener(o -> {
             if (mediaPlayer != null) {
-                mediaPlayer.seek(new Duration(timelapse.getValue()));
+                mediaPlayer.seek(new Duration(timelapse.getValue()*1000));
             }
-        });
+        });*/
 
         ConversionContext context = ConverterApplication.getContext();
 
@@ -107,24 +107,20 @@ public class MediaPlayerController {
 
         mediaPlayer.setOnReady(() -> {
 //            updateValues();
-            timelapse.setMax(mediaPlayer.getMedia().getDuration().toSeconds());
-//            mediaPlayer.play();
+            timelapse.setMax(mediaPlayer.getMedia().getDuration().toMinutes());
         });
 
-//        mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
-//        mediaPlayer.volumeProperty().set(0.2);
+        mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
+        mediaPlayer.volumeProperty().set(0.2);
 
 //        mediaPlayer.currentTimeProperty().addListener(observable -> updateValues());
 
-
-/*
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
-                Duration duration = mediaPlayer.getMedia().getDuration();
-                mediaPlayer.seek(duration.multiply(timelapse.getValue() / 100.0));
+//                Duration duration = mediaPlayer.getMedia().getDuration();
+                mediaPlayer.seek(Duration.millis(timelapse.getValue() * 1000 * 60));
             }
         });
-*/
 
 /*
         mediaPlayer.setOnEndOfMedia(() -> {
@@ -151,7 +147,7 @@ public class MediaPlayerController {
         Platform.runLater(() -> {
             Duration currentTime = mediaPlayer.getCurrentTime();
             if (!timelapse.isValueChanging()) {
-                timelapse.setValue(currentTime.toSeconds());
+                timelapse.setValue(currentTime.toMinutes());
             }
         });
     }

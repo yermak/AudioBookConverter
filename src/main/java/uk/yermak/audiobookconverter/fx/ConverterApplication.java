@@ -26,14 +26,12 @@ public class ConverterApplication extends Application {
     public void start(Stage stage) {
         Parent root = null;
         try {
-            URL resource = getClass().getClassLoader().getResource("uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
+            URL resource = ConverterApplication.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
             root = FXMLLoader.load(resource);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         Scene scene = new Scene(root);
-
         stage.setTitle("AudioBookConverter " + Version.getVersionString());
         stage.setScene(scene);
         Screen primary = Screen.getPrimary();
@@ -47,10 +45,6 @@ public class ConverterApplication extends Application {
             ConverterApplication.getContext().stopConversion();
             System.exit(0);
         });
-
-       /* FolderDialog folderDialog = new FolderDialog();
-        folderDialog.showAndWait();*/
-
 
     }
 

@@ -35,7 +35,7 @@
         </ListView>
 
         <HBox GridPane.columnIndex="0" GridPane.rowIndex="11" GridPane.columnSpan="2">
-            <fx:include source="mediaplayer.fxml"/>
+            <fx:include source="/uk/yermak/audiobookconverter/fx/mediaplayer.fxml"/>
         </HBox>
 
         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}" onAction="#addFiles"

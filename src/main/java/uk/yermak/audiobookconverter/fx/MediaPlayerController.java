@@ -15,6 +15,9 @@ import uk.yermak.audiobookconverter.MediaInfo;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by yermak on 26-Oct-18.
@@ -29,18 +32,12 @@ public class MediaPlayerController {
 
     private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
+    private ScheduledExecutorService executorService;
 
     @FXML
     public void initialize() {
 
-    /*    timelapse.valueProperty().addListener(o -> {
-            if (mediaPlayer != null) {
-                mediaPlayer.seek(new Duration(timelapse.getValue()*1000));
-            }
-        });*/
-
         ConversionContext context = ConverterApplication.getContext();
-
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
         selectedMedia.addListener((InvalidationListener) observable -> {
             updateUI(selectedMedia.isEmpty() && mediaPlayer == null);
@@ -65,6 +62,7 @@ public class MediaPlayerController {
                 return;
             }
             if (playingTrack != selectedMedia.get(0)) {
+                executorService.shutdown();
                 mediaPlayer.stop();
                 mediaPlayer.dispose();
                 mediaPlayer = null;
@@ -86,7 +84,6 @@ public class MediaPlayerController {
         if (status == MediaPlayer.Status.READY
                 || status == MediaPlayer.Status.PAUSED
                 || status == MediaPlayer.Status.STOPPED) {
-//            mediaPlayer.seek(new Duration(timelapse.getValue() * 1000));
             mediaPlayer.play();
         } else {
             mediaPlayer.pause();
@@ -104,32 +101,28 @@ public class MediaPlayerController {
         Media m = new Media(new File(selected.getFileName()).toURI().toASCIIString());
         mediaPlayer = new MediaPlayer(m);
         mediaPlayer.setAutoPlay(true);
-
+        executorService = Executors.newScheduledThreadPool(1);
         mediaPlayer.setOnReady(() -> {
-//            updateValues();
             timelapse.setMax(mediaPlayer.getMedia().getDuration().toMinutes());
+            executorService.schedule(() -> updateValues(), 1, TimeUnit.SECONDS);
         });
 
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(0.2);
 
-//        mediaPlayer.currentTimeProperty().addListener(observable -> updateValues());
-
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
-//                Duration duration = mediaPlayer.getMedia().getDuration();
                 mediaPlayer.seek(Duration.millis(timelapse.getValue() * 1000 * 60));
             }
         });
 
-/*
         mediaPlayer.setOnEndOfMedia(() -> {
+            executorService.shutdown();
             mediaPlayer.volumeProperty().unbindBidirectional(volume.valueProperty());
             mediaPlayer.dispose();
             mediaPlayer = null;
             playMedias(findNext(selected));
         });
-*/
         toggleMediaPlayer();
 
     }

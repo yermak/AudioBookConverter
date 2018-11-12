@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -79,9 +80,14 @@ public class FilesController {
         });
 
         //TODO test it
-        context.getSelectedMedia().addListener((ListChangeListener<MediaInfo>) c -> {
-            fileList.getSelectionModel().clearSelection();
-            c.getList().forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+        context.getSelectedMedia().addListener((InvalidationListener) observable -> {
+            if (context.getSelectedMedia().isEmpty()) return;
+            List<MediaInfo> change = new ArrayList<>(context.getSelectedMedia());
+            List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
+            if (!change.containsAll(selection) || !selection.containsAll(change)) {
+                fileList.getSelectionModel().clearSelection();
+                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+            }
         });
     }
 

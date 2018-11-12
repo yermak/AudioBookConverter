@@ -6,12 +6,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -24,11 +26,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class MediaPlayerController {
     @FXML
-    public Button playButton;
+    private Button playButton;
     @FXML
-    public Slider timelapse;
+    private Slider timelapse;
     @FXML
-    public Slider volume;
+    private Slider volume;
+    @FXML
+    private Label playTime;
+    @FXML
+    private Label totalTime;
 
     private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
@@ -101,18 +107,21 @@ public class MediaPlayerController {
         Media m = new Media(new File(selected.getFileName()).toURI().toASCIIString());
         mediaPlayer = new MediaPlayer(m);
         mediaPlayer.setAutoPlay(true);
-        executorService = Executors.newScheduledThreadPool(1);
+        executorService = Executors.newSingleThreadScheduledExecutor();
         mediaPlayer.setOnReady(() -> {
-            timelapse.setMax(mediaPlayer.getMedia().getDuration().toMinutes());
-            executorService.schedule(() -> updateValues(), 1, TimeUnit.SECONDS);
+            Duration duration = mediaPlayer.getMedia().getDuration();
+            timelapse.setMax(duration.toSeconds());
+            totalTime.setText(Utils.formatTime(duration.toMillis()));
+            executorService.scheduleAtFixedRate(() -> updateValues(), 1, 1, TimeUnit.SECONDS);
         });
 
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
-        mediaPlayer.volumeProperty().set(0.2);
+        mediaPlayer.volumeProperty().set(1.0);
 
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
-                mediaPlayer.seek(Duration.millis(timelapse.getValue() * 1000 * 60));
+                playTime.setText(Utils.formatTime(timelapse.getValue() * 1000));
+                mediaPlayer.seek(Duration.seconds(timelapse.getValue()));
             }
         });
 
@@ -121,7 +130,15 @@ public class MediaPlayerController {
             mediaPlayer.volumeProperty().unbindBidirectional(volume.valueProperty());
             mediaPlayer.dispose();
             mediaPlayer = null;
-            playMedias(findNext(selected));
+            totalTime.setText("00:00:00");
+            playTime.setText("00:00:00");
+
+            MediaInfo next = findNext(selected);
+
+            context.getSelectedMedia().clear();
+            context.getSelectedMedia().add(next);
+
+            playMedias(next);
         });
         toggleMediaPlayer();
 
@@ -140,7 +157,8 @@ public class MediaPlayerController {
         Platform.runLater(() -> {
             Duration currentTime = mediaPlayer.getCurrentTime();
             if (!timelapse.isValueChanging()) {
-                timelapse.setValue(currentTime.toMinutes());
+                timelapse.setValue(currentTime.toSeconds());
+                playTime.setText(Utils.formatTime(currentTime.toMillis()));
             }
         });
     }

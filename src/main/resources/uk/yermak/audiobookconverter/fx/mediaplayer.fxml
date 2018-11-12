@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<HBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController">
+<GridPane xmlns:fx="http://javafx.com/fxml"
+          fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 
     </fx:define>
 
     <Slider fx:id="timelapse" minorTickCount="4" disable="true" HBox.hgrow="ALWAYS"
-            minWidth="${screen.visualBounds.width * 0.25}" maxWidth="Infinity" majorTickUnit="1"/>
-    <Slider fx:id="volume" orientation="VERTICAL" disable="true" maxHeight="10" min="0.0" max="1.0" value="0.5"/>
+            minWidth="${screen.visualBounds.width * 0.25}" maxWidth="Infinity" majorTickUnit="1"
+            GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+    <Slider fx:id="volume" orientation="VERTICAL" disable="true" maxHeight="10"
+            min="0" max="1.0" value="1.0"
+            GridPane.rowIndex="0" GridPane.columnIndex="2" GridPane.rowSpan="2"/>
     <Button fx:id="playButton" text="Play/Pause" disable="true"
             minWidth="${screen.visualBounds.width * 0.05}"
-            onAction="#play">
+            onAction="#play"
+            GridPane.rowIndex="0" GridPane.columnIndex="3" GridPane.rowSpan="2">
         <tooltip>
             <Tooltip text="Play selected media file"/>
         </tooltip>
     </Button>
-</HBox>
+    <Label fx:id="playTime" text="00:00:00"
+           GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="LEFT"/>
+    <Label fx:id="totalTime" text="00:00:00"
+           GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="RIGHT"/>
+
+</GridPane>

@@ -79,10 +79,10 @@ public class FilesController {
         });
 
         //TODO test it
-//        context.getSelectedMedia().addListener((ListChangeListener<MediaInfo>) c -> {
-//            fileList.getSelectionModel().clearSelection();
-//            c.getList().forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
-//        });
+        context.getSelectedMedia().addListener((ListChangeListener<MediaInfo>) c -> {
+            fileList.getSelectionModel().clearSelection();
+            c.getList().forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+        });
     }
 
 

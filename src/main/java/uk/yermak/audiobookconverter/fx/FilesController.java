@@ -79,7 +79,6 @@ public class FilesController {
             fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
         });
 
-        //TODO test it
         context.getSelectedMedia().addListener((InvalidationListener) observable -> {
             if (context.getSelectedMedia().isEmpty()) return;
             List<MediaInfo> change = new ArrayList<>(context.getSelectedMedia());

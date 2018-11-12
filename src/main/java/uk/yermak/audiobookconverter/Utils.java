@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,7 +127,7 @@ public class Utils {
                 throw new RuntimeException("Cannot use filename" + " " + filename);
             }
         } else {
-            throw new RuntimeException("Cannot use filename"+ " " + filename + " (2)");
+            throw new RuntimeException("Cannot use filename" + " " + filename + " (2)");
         }
     }
 
@@ -144,5 +146,25 @@ public class Utils {
         }
         File file = new File(sourceFolder);
         return file.exists() ? file : getInitialDirecotory(file.getParent());
+    }
+
+    public static String formatTime(double millis) {
+        return formatTime((long) millis);
+    }
+
+    public static String formatTime(long millis) {
+        String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
+        return hms;
+    }
+
+    public static String formatSize(long bytes) {
+        if (bytes == -1L) {
+            return "---";
+        } else {
+            DecimalFormat mbFormat = new DecimalFormat("0");
+            return mbFormat.format((double) bytes / 1048576.0D) + " MB";
+        }
     }
 }

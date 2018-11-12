@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -35,6 +36,7 @@ public class FilesController {
     public Button upButton;
     @FXML
     public Button downButton;
+
     @FXML
     ListView<MediaInfo> fileList;
 
@@ -47,6 +49,7 @@ public class FilesController {
     public Button stopButton;
 
     private final ContextMenu contextMenu = new ContextMenu();
+
 
     @FXML
     public void initialize() {
@@ -69,10 +72,23 @@ public class FilesController {
 
         media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
-        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
+        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            List<MediaInfo> selectedMedia = context.getSelectedMedia();
+            selectedMedia.clear();
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
+        });
 
+        //TODO test it
+        context.getSelectedMedia().addListener((InvalidationListener) observable -> {
+            if (context.getSelectedMedia().isEmpty()) return;
+            List<MediaInfo> change = new ArrayList<>(context.getSelectedMedia());
+            List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
+            if (!change.containsAll(selection) || !selection.containsAll(change)) {
+                fileList.getSelectionModel().clearSelection();
+                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+            }
+        });
     }
 
 

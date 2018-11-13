@@ -1,5 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.ObservableMap;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -62,6 +65,18 @@ public class MediaLoader {
         @Override
         public MediaInfo call() throws Exception {
             try {
+
+                Media m = new Media(new File(filename).toURI().toASCIIString());
+                MediaPlayer mediaPlayer = new MediaPlayer(m);
+                mediaPlayer.setOnReady(new Runnable() {
+                    @Override
+                    public void run() {
+                        ObservableMap<String, Object> metadata = m.getMetadata();
+                        System.out.println("metadata = " + metadata);
+                    }
+                });
+
+
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 FFmpegFormat format = probeResult.getFormat();
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);

@@ -104,7 +104,9 @@ public class BookInfoController {
 
     private void saveGenres() {
         Set<String> uniqueGenres = new TreeSet<>(genre.getItems());
-        uniqueGenres.add(genre.getEditor().getText());
+        if (StringUtils.isNotEmpty(genre.getEditor().getText())) {
+            uniqueGenres.add(genre.getEditor().getText());
+        }
         genre.getItems().clear();
         genre.getItems().addAll(uniqueGenres);
         StringBuffer sb = new StringBuffer();

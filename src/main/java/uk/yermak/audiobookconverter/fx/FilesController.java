@@ -54,7 +54,7 @@ public class FilesController {
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
-
+//        new PopOver()
 
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));

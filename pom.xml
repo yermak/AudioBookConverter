@@ -45,6 +45,11 @@
             <artifactId>ffmpeg</artifactId>
             <version>0.6.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>8.40.14</version>
+        </dependency>
 
     </dependencies>
     <build>

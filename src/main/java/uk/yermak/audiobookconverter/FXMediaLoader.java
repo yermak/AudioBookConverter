@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.collections.ObservableMap;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Track;
@@ -62,6 +63,14 @@ public class FXMediaLoader implements MediaLoader {
             track.getMetadata();
             mediaInfo.setDuration((long) m.getDuration().toMillis());
         }
+        if (metadata.get("image") != null) {
+            Image image = (Image) metadata.get("image");
+
+            mediaInfo.setArtWork(new ArtWorkImage(image));
+
+
+        }
+
         completableFuture.complete(mediaInfo);
     }
 

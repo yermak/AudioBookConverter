@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -38,40 +37,32 @@ public class FXMediaLoader implements MediaLoader {
         for (String fileName : fileNames) {
 
             CompletableFuture completableFuture = new CompletableFuture();
-
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Media m = new Media(new File(fileName).toURI().toASCIIString());
-                    MediaPlayer mediaPlayer = new MediaPlayer(m);
-
-                    mediaPlayer.setOnReady(new Runnable() {
-                        @Override
-                        public void run() {
-                            ObservableMap<String, Object> metadata = m.getMetadata();
-
-                            MediaInfoBean mediaInfo = new MediaInfoBean(fileName);
-
-                            AudioBookInfo bookInfo = createAudioBookInfo(metadata);
-                            System.out.println("bookInfo = " + bookInfo.getTitle());
-                            mediaInfo.setBookInfo(bookInfo);
-                            if (!m.getTracks().isEmpty()) {
-                                Track track = m.getTracks().get(0);
-                                track.getMetadata();
-                                mediaInfo.setDuration((long) m.getDuration().toMillis());
-                            }
-                            completableFuture.complete(mediaInfo);
-
-                        }
-                    });
-                }
-            });
-
-//            Future futureLoad = mediaExecutor.submit(new MediaInfoCallable(fileName));
             MediaInfo mediaInfo = new MediaInfoProxy(fileName, completableFuture);
             media.add(mediaInfo);
+
+//            Executors.newSingleThreadExecutor().submit(() -> {
+            Media m = new Media(new File(fileName).toURI().toASCIIString());
+            MediaPlayer mediaPlayer = new MediaPlayer(m);
+            mediaPlayer.setOnReady(() -> loadMetadata(m, fileName, completableFuture));
+//            });
+
         }
         return media;
+    }
+
+    private void loadMetadata(Media m, String fileName, CompletableFuture completableFuture) {
+        ObservableMap<String, Object> metadata = m.getMetadata();
+
+        MediaInfoBean mediaInfo = new MediaInfoBean(fileName);
+        AudioBookInfo bookInfo = createAudioBookInfo(metadata);
+        System.out.println("bookInfo = " + bookInfo.getTitle());
+        mediaInfo.setBookInfo(bookInfo);
+        if (!m.getTracks().isEmpty()) {
+            Track track = m.getTracks().get(0);
+            track.getMetadata();
+            mediaInfo.setDuration((long) m.getDuration().toMillis());
+        }
+        completableFuture.complete(mediaInfo);
     }
 
     static class MediaInfoCallable implements Callable<MediaInfo> {

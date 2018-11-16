@@ -3,7 +3,11 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.*;
@@ -41,23 +45,25 @@ public class BookInfoController {
         AudioBookInfo bookInfo = new AudioBookInfo();
         ConverterApplication.getContext().setBookInfo(bookInfo);
 
-        String genresProperty = AppProperties.getProperty("genres");
-        if (genresProperty != null) {
-            String[] genres = genresProperty.split("::");
-            Arrays.sort(genres);
-            genre.getItems().addAll(Arrays.asList(genres));
-        }
+        reloadGenres();
 
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> {
+            genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
+            saveGenres();
+        });
+        ContextMenu contextMenu = new ContextMenu(menuItem);
+
+        genre.setOnContextMenuRequested(event -> {
+            if (!genre.getSelectionModel().isEmpty()) {
+                contextMenu.show((Node) event.getSource(), Side.RIGHT, 0, 0);
+            }
+            genre.hide();
+        });
 
         ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
             if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
-                Set<String> g = new TreeSet<>(genre.getItems());
-                g.add(genre.getEditor().getText());
-                genre.getItems().clear();
-                genre.getItems().addAll(g);
-                StringBuffer sb = new StringBuffer();
-                g.forEach(s -> sb.append(s).append("::"));
-                AppProperties.setProperty("genres", sb.toString());
+                saveGenres();
             }
         });
 
@@ -94,6 +100,27 @@ public class BookInfoController {
             year.setDisable(disable);
             comment.setDisable(disable);
         });
+    }
+
+    private void saveGenres() {
+        Set<String> uniqueGenres = new TreeSet<>(genre.getItems());
+        if (StringUtils.isNotEmpty(genre.getEditor().getText())) {
+            uniqueGenres.add(genre.getEditor().getText());
+        }
+        genre.getItems().clear();
+        genre.getItems().addAll(uniqueGenres);
+        StringBuffer sb = new StringBuffer();
+        uniqueGenres.forEach(s -> sb.append(s).append("::"));
+        AppProperties.setProperty("genres", sb.toString());
+    }
+
+    private void reloadGenres() {
+        String genresProperty = AppProperties.getProperty("genres");
+        if (genresProperty != null) {
+            String[] genres = genresProperty.split("::");
+            Arrays.sort(genres);
+            genre.getItems().addAll(Arrays.asList(genres));
+        }
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {

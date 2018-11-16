@@ -106,15 +106,15 @@ public class BookInfoController {
 
 
     private void copyTags(MediaInfo mediaInfo) {
-        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
-        title.setText(bookInfo.getTitle());
-        writer.setText(bookInfo.getWriter());
-        narrator.setText(bookInfo.getNarrator());
-        genre.getEditor().setText(bookInfo.getGenre());
-        series.setText(bookInfo.getSeries());
-        bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
-        year.setText(bookInfo.getYear());
-        comment.setText(bookInfo.getComment());
+//        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+//        title.setText(bookInfo.getTitle());
+//        writer.setText(bookInfo.getWriter());
+//        narrator.setText(bookInfo.getNarrator());
+//        genre.getEditor().setText(bookInfo.getGenre());
+//        series.setText(bookInfo.getSeries());
+//        bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+//        year.setText(bookInfo.getYear());
+//        comment.setText(bookInfo.getComment());
     }
 
     private void clearTags() {

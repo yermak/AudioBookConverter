@@ -53,6 +53,7 @@ public class FXMediaLoader implements MediaLoader {
                             MediaInfoBean mediaInfo = new MediaInfoBean(fileName);
 
                             AudioBookInfo bookInfo = createAudioBookInfo(metadata);
+                            System.out.println("bookInfo = " + bookInfo.getTitle());
                             mediaInfo.setBookInfo(bookInfo);
                             if (!m.getTracks().isEmpty()) {
                                 Track track = m.getTracks().get(0);
@@ -121,7 +122,7 @@ public class FXMediaLoader implements MediaLoader {
             audioBookInfo.setWriter((String) tags.get("artist"));
             audioBookInfo.setNarrator((String) tags.get("album artist"));
             audioBookInfo.setSeries((String) tags.get("album"));
-            audioBookInfo.setYear((String) tags.get("year"));
+            audioBookInfo.setYear((String.valueOf(tags.get("year"))));
             audioBookInfo.setComment((String) tags.get("comment-0"));
             audioBookInfo.setGenre((String) tags.get("genre"));
             int trackNumber = (int) tags.get("track number");

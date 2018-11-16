@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,6 +17,7 @@ import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -127,13 +129,18 @@ public class BookInfoController {
         if (clear) {
             clearTags();
         } else {
-            copyTags(media.get(0));
+            Executors.newSingleThreadExecutor().submit(() -> {
+                //getBookInfo is proxied blocking method should be executed outside of UI thread,
+                // when info become available - scheduling update in UI thread.
+                AudioBookInfo info = media.get(0).getBookInfo();
+                Platform.runLater(() -> copyTags(info));
+
+            });
         }
     }
 
 
-    private void copyTags(MediaInfo mediaInfo) {
-        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+    private void copyTags(AudioBookInfo bookInfo) {
         title.setText(bookInfo.getTitle());
         writer.setText(bookInfo.getWriter());
         narrator.setText(bookInfo.getNarrator());

@@ -5,13 +5,19 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
+import org.controlsfx.control.PopOver;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
@@ -39,6 +45,7 @@ public class FilesController {
 
     @FXML
     ListView<MediaInfo> fileList;
+    TreeView<MediaInfo> chapters;
 
 
     @FXML
@@ -48,14 +55,11 @@ public class FilesController {
     @FXML
     public Button stopButton;
 
-    private final ContextMenu contextMenu = new ContextMenu();
-
-
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
-//        new PopOver()
 
+        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
@@ -88,7 +92,23 @@ public class FilesController {
                 change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
             }
         });
+
+     /*   fileList.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+            @Override
+            public void handle(ContextMenuEvent event) {
+                PopOver editor = new PopOver();
+                ObservableList<MediaInfo> selectedItems = fileList.getSelectionModel().getSelectedItems();
+                if (selectedItems.size()==1) {
+                    MediaInfo mediaInfo = selectedItems.get(0);
+//                    editor
+                    editor.show(fileList);
+                }
+            }
+        });
+    */
     }
+
+    private final ContextMenu contextMenu = new ContextMenu();
 
 
     @FXML
@@ -294,6 +314,47 @@ public class FilesController {
         });
     }
 
+    private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
+        @Override
+        public ListCell<MediaInfo> call(ListView<MediaInfo> param) {
+            ListCell<MediaInfo> mediaCell = new DefaultListCell<>();
+            mediaCell.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent event) {
+                    GridPane content = new GridPane();
+                    content.add(new Label("1"), 0, 0);
+                    content.add(new Label("2"), 1, 0);
+                    PopOver editor = new PopOver(content);
+                    editor.setDetachable(false);
+                    editor.show(mediaCell);
+                }
+
+            });
+            return mediaCell;
+        }
+    }
+
+    static class DefaultListCell<T> extends ListCell<T> {
+        @Override
+        public void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else if (item instanceof Node) {
+                setText(null);
+                Node currentNode = getGraphic();
+                Node newNode = (Node) item;
+                if (currentNode == null || !currentNode.equals(newNode)) {
+                    setGraphic(newNode);
+                }
+            } else {
+                setText(item == null ? "null" : item.toString());
+                setGraphic(null);
+            }
+        }
+    }
 }
 
 

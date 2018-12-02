@@ -125,10 +125,14 @@ public class FXMediaLoader implements MediaLoader {
             audioBookInfo.setYear((String.valueOf(tags.get("year"))));
             audioBookInfo.setComment((String) tags.get("comment-0"));
             audioBookInfo.setGenre((String) tags.get("genre"));
-            int trackNumber = (int) tags.get("track number");
-            int trackCount = (int) tags.get("track count");
-            audioBookInfo.setBookNumber(trackNumber);
-            audioBookInfo.setTotalTracks(trackCount);
+            Object trackNumber = tags.get("track number");
+            if (trackNumber != null) {
+                audioBookInfo.setBookNumber((int) trackNumber);
+            }
+            Object trackCount = tags.get("track count");
+            if (trackCount != null) {
+                audioBookInfo.setTotalTracks((int) trackCount);
+            }
         }
         return audioBookInfo;
     }

@@ -115,9 +115,13 @@ public class FilesController {
 
         List<String> fileNames = new ArrayList<>();
         files.forEach(f -> fileNames.add(f.getPath()));
-        List<MediaInfo> addedMedia = new MediaLoader(fileNames).loadMediaInfo();
+        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
 
         fileList.getItems().addAll(addedMedia);
+    }
+
+    private MediaLoader createMediaLoader(List<String> fileNames) {
+        return new FXMediaLoader(fileNames);
     }
 
     private void selectFilesDialog(Window window) {

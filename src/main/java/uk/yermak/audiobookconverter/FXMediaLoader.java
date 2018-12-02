@@ -41,11 +41,11 @@ public class FXMediaLoader implements MediaLoader {
             MediaInfo mediaInfo = new MediaInfoProxy(fileName, completableFuture);
             media.add(mediaInfo);
 
-//            Executors.newSingleThreadExecutor().submit(() -> {
-            Media m = new Media(new File(fileName).toURI().toASCIIString());
+            String source = new File(fileName).toURI().toASCIIString();
+
+            Media m = new Media(source);
             MediaPlayer mediaPlayer = new MediaPlayer(m);
             mediaPlayer.setOnReady(() -> loadMetadata(m, fileName, completableFuture));
-//            });
 
         }
         return media;

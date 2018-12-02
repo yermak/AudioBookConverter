@@ -32,7 +32,7 @@ public class ConverterApplication extends Application {
             e.printStackTrace();
         }
         Scene scene = new Scene(root);
-        stage.setTitle("AudioBookConverter " + Version.getVersionString());
+        stage.setTitle(Version.getVersionString());
         stage.setScene(scene);
         Screen primary = Screen.getPrimary();
         stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);

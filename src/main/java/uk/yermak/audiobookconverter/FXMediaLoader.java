@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.image.Image;
@@ -11,7 +12,10 @@ import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by yermak on 1/10/2018.
@@ -66,12 +70,8 @@ public class FXMediaLoader implements MediaLoader {
 
             ArtWorkImage artWork = new ArtWorkImage(image);
             mediaInfo.setArtWork(artWork);
-
             ObservableList<ArtWork> posters = ConverterApplication.getContext().getConversion().getPosters();
-
-            addPosterIfMissing(artWork, posters);
-
-
+            Platform.runLater(() -> addPosterIfMissing(artWork, posters));
         }
 
         completableFuture.complete(mediaInfo);
@@ -81,47 +81,6 @@ public class FXMediaLoader implements MediaLoader {
         if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
             posters.add(artWork);
         }
-    }
-
-    static class MediaInfoCallable implements Callable<MediaInfo> {
-        private String fileName;
-
-        public MediaInfoCallable(String fileName) {
-            this.fileName = fileName;
-        }
-
-        @Override
-        public MediaInfo call() throws Exception {
-
-
-            boolean ready = false;
-            while (!ready) {
-                Media m = new Media(new File(fileName).toURI().toASCIIString());
-                MediaPlayer mediaPlayer = new MediaPlayer(m);
-
-                ready = mediaPlayer.getStatus() == MediaPlayer.Status.READY;
-                if (ready) {
-
-                } else {
-                    Thread.sleep(100);
-                }
-            }
-
-            return null;
-//
-//            mediaInfo.setChannels(fFmpegStream.channels);
-//            mediaInfo.setFrequency(fFmpegStream.sample_rate);
-//            mediaInfo.setBitrate((int) fFmpegStream.bit_rate);
-//            mediaInfo.setDuration((long) fFmpegStream.duration * 1000);
-////                 Future futureLoad = artExecutor.schedule(new FFMediaLoader.ArtWorkCallable(mediaInfo, "jpg"), 1, TimeUnit.MINUTES);
-////                        futureLoad.get();
-//            ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, "jpg");
-//            mediaInfo.setArtWork(artWork);
-
-
-        }
-
-
     }
 
     public AudioBookInfo createAudioBookInfo(Map tags) {

@@ -13,9 +13,6 @@ import uk.yermak.audiobookconverter.fx.ConverterApplication;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by yermak on 1/10/2018.
@@ -24,8 +21,6 @@ public class FXMediaLoader implements MediaLoader {
 
     private final StatusChangeListener listener;
     private List<String> fileNames;
-    private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
-    private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
 
     public FXMediaLoader(List<String> files) {
         this.fileNames = files;

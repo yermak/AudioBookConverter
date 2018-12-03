@@ -8,9 +8,7 @@
 <GridPane fx:controller="uk.yermak.audiobookconverter.fx.Controller"
           xmlns:fx="http://javafx.com/fxml"
           fx:id="root"
-          prefHeight="${screen.visualBounds.height * 0.70}" prefWidth="${screen.visualBounds.width * 0.30}"
-
->
+          prefHeight="${screen.visualBounds.height * 0.70}" prefWidth="${screen.visualBounds.width * 0.30}">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
@@ -24,12 +22,12 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <fx:include source="links.fxml"/>
+    <fx:include source="/uk/yermak/audiobookconverter/fx/links.fxml"/>
 
     <!-- <TitledPane text="Add MP3 files to convert and bring them in right order..." collapsible="false"
                  GridPane.rowIndex="1" GridPane.fillHeight="true">
     -->
-    <fx:include source="files.fxml"/>
+    <fx:include source="/uk/yermak/audiobookconverter/fx/files.fxml"/>
     <!--</TitledPane>
 -->
 
@@ -39,13 +37,16 @@
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
         <Tab text="Book Info" closable="false" >
-            <fx:include source="book_info.fxml"/>
+            <fx:include source="/uk/yermak/audiobookconverter/fx/book_info.fxml"/>
         </Tab>
         <Tab text="Conversion mode" closable="false">
-            <fx:include source="conversion_mode.fxml"/>
+            <fx:include source="/uk/yermak/audiobookconverter/fx/conversion_mode.fxml"/>
+        </Tab>
+        <Tab text="Art Work" closable="false">
+            <fx:include source="/uk/yermak/audiobookconverter/fx/art_work.fxml"/>
         </Tab>
         <Tab text="Output" closable="false">
-            <fx:include source="output.fxml"/>
+            <fx:include source="/uk/yermak/audiobookconverter/fx/output.fxml"/>
         </Tab>
         <Tab text="Queue" closable="false" fx:id="queueTab">
             <ListView fx:id="progressQueue" prefHeight="-Infinity"/>

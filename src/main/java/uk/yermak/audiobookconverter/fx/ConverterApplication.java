@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import uk.yermak.audiobookconverter.ConversionContext;
+import uk.yermak.audiobookconverter.Version;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,15 +26,13 @@ public class ConverterApplication extends Application {
     public void start(Stage stage) {
         Parent root = null;
         try {
-            URL resource = getClass().getClassLoader().getResource("uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
+            URL resource = ConverterApplication.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
             root = FXMLLoader.load(resource);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         Scene scene = new Scene(root);
-
-        stage.setTitle("AudioBookConverter V2");
+        stage.setTitle(Version.getVersionString());
         stage.setScene(scene);
         Screen primary = Screen.getPrimary();
         stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);
@@ -46,10 +45,6 @@ public class ConverterApplication extends Application {
             ConverterApplication.getContext().stopConversion();
             System.exit(0);
         });
-
-       /* FolderDialog folderDialog = new FolderDialog();
-        folderDialog.showAndWait();*/
-
 
     }
 

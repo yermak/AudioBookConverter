@@ -109,6 +109,6 @@ public class FXMediaLoader implements MediaLoader {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), "png", Utils.checksumCRC32(f)), posters)));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), Utils.checksumCRC32(f)), posters)));
     }
 }

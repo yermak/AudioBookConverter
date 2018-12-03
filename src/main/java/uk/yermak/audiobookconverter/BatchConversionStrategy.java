@@ -48,7 +48,7 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
                 ConverterOutput output = future.get();
                 ArtWork artWork = output.getMediaInfo().getArtWork();
                 if (artWork != null) {
-                    artBuilder.updateSinglePoster(artWork.getFileName(), 0, output.getOutputFileName());
+                    artBuilder.updateSinglePoster(artWork, 0, output.getOutputFileName());
                 }
             }
             ConverterApplication.getContext().finishedConversion();

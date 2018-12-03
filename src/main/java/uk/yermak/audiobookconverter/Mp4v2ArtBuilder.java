@@ -1,11 +1,11 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.ObservableList;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,14 +27,14 @@ public class Mp4v2ArtBuilder {
 
 
     public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, InterruptedException {
-        Map<Long, String> posters = ConverterApplication.getContext().getConversion().getPosters();
+        ObservableList<ArtWork> posters = ConverterApplication.getContext().getConversion().getPosters();
         /*Set<String> tempPosters = new HashSet<>();
 
         searchForPosters(media, posters, tempPosters);*/
 
         try {
             int i = 0;
-            for (String poster : posters.values()) {
+            for (ArtWork poster : posters) {
                 if (listener.isCancelled()) break;
                 updateSinglePoster(poster, i++, outputFileName);
             }
@@ -59,12 +59,12 @@ public class Mp4v2ArtBuilder {
          });
      }
  */
-    public void updateSinglePoster(String poster, int index, String outputFileName) throws IOException, InterruptedException {
+    public void updateSinglePoster(ArtWork poster, int index, String outputFileName) throws IOException, InterruptedException {
         Process process = null;
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
                     "--art-index", String.valueOf(index),
-                    "--add", "\"" + poster + "\"",
+                    "--add", "\"" + poster.getFileName() + "\"",
                     outputFileName);
 
 //            artProcessBuilder.redirectErrorStream();

@@ -8,6 +8,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import uk.yermak.audiobookconverter.ArtWork;
 import uk.yermak.audiobookconverter.ConversionContext;
 
 import java.io.FileInputStream;
@@ -20,31 +21,29 @@ public class ArtWorkController {
 
     @FXML
     private ListView imageList;
-    @FXML
-    private ImageView artWork;
 
     @FXML
     private void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-        ObservableList<String> items = FXCollections.observableArrayList(
-                "RUBY", "APPLE"
-        );
-        imageList.setItems(items);
+        ObservableList<ArtWork> posters = FXCollections.observableArrayList();
+        context.getConversion().getBookInfo().setPosters(posters);
 
-        imageList.setCellFactory(param -> new ListCell<String>() {
+        imageList.setItems(posters);
+
+        imageList.setCellFactory(param -> new ListCell<ArtWork>() {
             private ImageView imageView = new ImageView();
 
             @Override
-            public void updateItem(String name, boolean empty) {
-                super.updateItem(name, empty);
+            public void updateItem(ArtWork artWork, boolean empty) {
+                super.updateItem(artWork, empty);
                 if (empty) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     try {
-                        imageView.setImage(new Image(new FileInputStream("C:\\TEMP\\aclass\\NexusOne\\P1130003.JPG ")));
-                        imageView.setFitWidth(120);
+                        imageView.setImage(new Image(new FileInputStream(artWork.getFileName())));
+                        imageView.setFitHeight(120);
                         imageView.setPreserveRatio(true);
                         imageView.setSmooth(true);
                     } catch (FileNotFoundException e) {

@@ -111,7 +111,7 @@ public class Conversion {
         return outputParameters;
     }
 
-    public Map<Long, String> getPosters() {
+    public ObservableList<ArtWork> getPosters() {
         return bookInfo.getPosters();
     }
 }

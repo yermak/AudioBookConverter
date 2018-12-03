@@ -1,16 +1,23 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.AudioBookInfo;
-import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.ProgressStatus;
+import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -40,7 +47,27 @@ public class BookInfoController {
         AudioBookInfo bookInfo = new AudioBookInfo();
         ConverterApplication.getContext().setBookInfo(bookInfo);
 
-        genre.getItems().addAll("Audiobook", "Fantasy", "Sci-fi", "Novel");
+        reloadGenres();
+
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> {
+            genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
+            saveGenres();
+        });
+        ContextMenu contextMenu = new ContextMenu(menuItem);
+
+        genre.setOnContextMenuRequested(event -> {
+            if (!genre.getSelectionModel().isEmpty()) {
+                contextMenu.show((Node) event.getSource(), Side.RIGHT, 0, 0);
+            }
+            genre.hide();
+        });
+
+        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
+                saveGenres();
+            }
+        });
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -62,34 +89,58 @@ public class BookInfoController {
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> {
-            updateTags(media, ConversionMode.BATCH.equals(newValue));
-        });
+        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
         ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
             boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
             title.setDisable(disable);
-                writer.setDisable(disable);
-                narrator.setDisable(disable);
-                genre.setDisable(disable);
-                series.setDisable(disable);
-                bookNo.setDisable(disable);
-                year.setDisable(disable);
-                comment.setDisable(disable);
+            writer.setDisable(disable);
+            narrator.setDisable(disable);
+            genre.setDisable(disable);
+            series.setDisable(disable);
+            bookNo.setDisable(disable);
+            year.setDisable(disable);
+            comment.setDisable(disable);
         });
+    }
+
+    private void saveGenres() {
+        Set<String> uniqueGenres = new TreeSet<>(genre.getItems());
+        if (StringUtils.isNotEmpty(genre.getEditor().getText())) {
+            uniqueGenres.add(genre.getEditor().getText());
+        }
+        genre.getItems().clear();
+        genre.getItems().addAll(uniqueGenres);
+        StringBuffer sb = new StringBuffer();
+        uniqueGenres.forEach(s -> sb.append(s).append("::"));
+        AppProperties.setProperty("genres", sb.toString());
+    }
+
+    private void reloadGenres() {
+        String genresProperty = AppProperties.getProperty("genres");
+        if (genresProperty != null) {
+            String[] genres = genresProperty.split("::");
+            Arrays.sort(genres);
+            genre.getItems().addAll(Arrays.asList(genres));
+        }
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
         if (clear) {
             clearTags();
         } else {
-            copyTags(media.get(0));
+            Executors.newSingleThreadExecutor().submit(() -> {
+                //getBookInfo is proxied blocking method should be executed outside of UI thread,
+                // when info become available - scheduling update in UI thread.
+                AudioBookInfo info = media.get(0).getBookInfo();
+                Platform.runLater(() -> copyTags(info));
+
+            });
         }
     }
 
 
-    private void copyTags(MediaInfo mediaInfo) {
-        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+    private void copyTags(AudioBookInfo bookInfo) {
         title.setText(bookInfo.getTitle());
         writer.setText(bookInfo.getWriter());
         narrator.setText(bookInfo.getNarrator());

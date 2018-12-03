@@ -50,20 +50,31 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
             });
             progressParser.start();
 
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
-                    "-i", mediaInfo.getFileName(),
-                    "-vn",
-                    "-codec:a", "libfdk_aac",
-                    "-f", "ipod",
-//                    "-vbr","3 ",
-//                    "-b:a", String.valueOf(mediaInfo.getBitrate()),
-                    outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
-                    "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
-                    "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
-                    "-cutoff", outputParameters.getCutoffValue(),
-                    "-progress", progressParser.getUri().toString(),
-                    outputFileName
-            );
+            ProcessBuilder ffmpegProcessBuilder;
+            if (outputParameters.isAuto()) {
+                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-i", mediaInfo.getFileName(),
+                        "-vn",
+                        "-codec:a", "libfdk_aac",
+                        "-f", "ipod",
+                        "-progress", progressParser.getUri().toString(),
+                        outputFileName
+                );
+            } else {
+                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-i", mediaInfo.getFileName(),
+                        "-vn",
+                        "-codec:a", "libfdk_aac",
+                        "-f", "ipod",
+                        outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
+                        "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
+                        "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
+                        "-cutoff", outputParameters.getCutoffValue(),
+                        "-progress", progressParser.getUri().toString(),
+                        outputFileName
+                );
+
+            }
 
             process = ffmpegProcessBuilder.start();
 

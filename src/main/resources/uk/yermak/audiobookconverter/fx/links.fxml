@@ -4,8 +4,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import uk.yermak.audiobookconverter.Version?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="0" gridLinesVisible="false"
           fx:controller="uk.yermak.audiobookconverter.fx.LinksController" GridPane.rowIndex="0">
+    <fx:define>
+        <Version fx:factory="getVersionString" fx:id="version"/>
+    </fx:define>
+
+
     <columnConstraints>
         <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>
@@ -13,7 +19,8 @@
         <ColumnConstraints hgrow="SOMETIMES"/>
     </columnConstraints>
     <children>
-        <Label text="AudioBookConverter v2"
+        <Label text="${version}"
+
                GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="2" alignment="TOP_LEFT"
                GridPane.valignment="TOP">
             <font>

@@ -23,6 +23,7 @@ public class Conversion {
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
     private OutputParameters outputParameters;
 
+
     public void setMode(ConversionMode mode) {
         this.mode.set(mode);
     }
@@ -108,6 +109,10 @@ public class Conversion {
 
     public OutputParameters getOutputParameters() {
         return outputParameters;
+    }
+
+    public ObservableList<ArtWork> getPosters() {
+        return bookInfo.getPosters();
     }
 }
 

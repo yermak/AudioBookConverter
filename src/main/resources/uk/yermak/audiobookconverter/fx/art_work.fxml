@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.Screen?>
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
+          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController"
+          gridLinesVisible="false">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
+    <children>
+        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3"
+                  orientation="HORIZONTAL"/>
+
+        <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"
+                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
+            <tooltip>
+                <Tooltip text="Add files for conversion to the list"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
+                onAction="#removeImage"
+                GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2">
+            <tooltip>
+                <Tooltip text="Add files for conversion to the list"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="left" text="&lt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#left"
+                GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip text="Previous"/>
+            </tooltip>
+        </Button>
+
+        <Button fx:id="right" text="&gt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#right"
+                GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip text="Previous"/>
+            </tooltip>
+        </Button>
+    </children>
+</GridPane>

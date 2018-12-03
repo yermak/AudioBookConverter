@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
 
 import java.util.LinkedList;
@@ -12,6 +14,8 @@ public class ConversionContext {
     private LinkedList<Conversion> conversionQueue = new LinkedList<>();
     private Conversion conversion = new Conversion();
     private Subscriber subscriber;
+    private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
+
 
     public ConversionContext() {
     }
@@ -72,5 +76,9 @@ public class ConversionContext {
 
     public OutputParameters getOutputParameters() {
         return conversion.getOutputParameters();
+    }
+
+    public ObservableList<MediaInfo> getSelectedMedia() {
+        return selectedMedia;
     }
 }

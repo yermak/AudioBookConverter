@@ -1,8 +1,6 @@
 package uk.yermak.audiobookconverter;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Map;
+import javafx.collections.ObservableList;
 
 public class AudioBookInfo {
     private String writer = "";
@@ -16,33 +14,11 @@ public class AudioBookInfo {
     private String comment = "";
     private String longDescription = "";
 
+    private ObservableList<ArtWork> posters;
+
     public AudioBookInfo() {
     }
 
-    public AudioBookInfo(Map<String, String> tags) {
-        if (tags != null) {
-            setTitle(tags.get("title"));
-            setWriter(tags.get("artist"));
-            setNarrator(tags.get("album_artist"));
-            setSeries(tags.get("album"));
-            setYear(tags.get("year"));
-            setComment(tags.get("comment"));
-            setGenre(tags.get("genre"));
-
-            String track = tags.get("track");
-
-            if (StringUtils.isNotBlank(track)) {
-                String[] split = track.split("/");
-
-                if (split.length > 0 && StringUtils.isNumeric(split[0])) {
-                    setBookNumber(Integer.parseInt(split[0]));
-                }
-                if (split.length > 1 && StringUtils.isNumeric(split[1])) {
-                    setTotalTracks(Integer.parseInt(split[1]));
-                }
-            }
-        }
-    }
 
     public String getSeries() {
         if (series == null) return title;
@@ -123,5 +99,13 @@ public class AudioBookInfo {
 
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
+    }
+
+    public ObservableList<ArtWork> getPosters() {
+        return posters;
+    }
+
+    public void setPosters(ObservableList<ArtWork> posters) {
+        this.posters = posters;
     }
 }

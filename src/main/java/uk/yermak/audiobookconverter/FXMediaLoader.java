@@ -72,11 +72,7 @@ public class FXMediaLoader implements MediaLoader {
         completableFuture.complete(mediaInfo);
     }
 
-    static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
-        if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
-            posters.add(artWork);
-        }
-    }
+
 
     public AudioBookInfo createAudioBookInfo(Map tags) {
         AudioBookInfo audioBookInfo = new AudioBookInfo();
@@ -101,14 +97,20 @@ public class FXMediaLoader implements MediaLoader {
     }
 
 
-    private Collection<File> findPictures(File dir) {
+    static Collection<File> findPictures(File dir) {
         return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
     }
 
-    private void searchForPosters(List<MediaInfo> media, ObservableList<ArtWork> posters) {
+    static void searchForPosters(List<MediaInfo> media, ObservableList<ArtWork> posters) {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
         searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), Utils.checksumCRC32(f)), posters)));
+    }
+
+    static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
+        if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
+            posters.add(artWork);
+        }
     }
 }

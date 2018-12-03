@@ -105,17 +105,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <!-- <execution>
-                         <id>zip</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>single</goal>
-                         </goals>
-                         <configuration>
-                             <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
-                             <finalName>AudioBookConverter-${project.version}</finalName>
-                         </configuration>
-                     </execution>-->
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>

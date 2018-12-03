@@ -40,6 +40,12 @@
             <version>3.7</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.9.13</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <build>

@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
-import java.util.HashMap;
-import java.util.Map;
+import javafx.collections.ObservableList;
 
 public class AudioBookInfo {
     private String writer = "";
@@ -15,7 +14,7 @@ public class AudioBookInfo {
     private String comment = "";
     private String longDescription = "";
 
-    private Map<Long, String> posters = new HashMap<>();
+    private ObservableList<ArtWork> posters;
 
     public AudioBookInfo() {
     }
@@ -102,7 +101,11 @@ public class AudioBookInfo {
         this.longDescription = longDescription;
     }
 
-    public Map<Long, String> getPosters() {
+    public ObservableList<ArtWork> getPosters() {
         return posters;
+    }
+
+    public void setPosters(ObservableList<ArtWork> posters) {
+        this.posters = posters;
     }
 }

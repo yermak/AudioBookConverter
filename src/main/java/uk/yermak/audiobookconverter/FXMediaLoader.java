@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
@@ -66,11 +67,20 @@ public class FXMediaLoader implements MediaLoader {
             ArtWorkImage artWork = new ArtWorkImage(image);
             mediaInfo.setArtWork(artWork);
 
-            Map<Long, String> posters = ConverterApplication.getContext().getConversion().getPosters();
-            posters.putIfAbsent(artWork.getCrc32(), artWork.getFileName());
+            ObservableList<ArtWork> posters = ConverterApplication.getContext().getConversion().getPosters();
+
+            addPosterIfMissing(artWork, posters);
+
+
         }
 
         completableFuture.complete(mediaInfo);
+    }
+
+    static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
+        if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
+            posters.add(artWork);
+        }
     }
 
     static class MediaInfoCallable implements Callable<MediaInfo> {
@@ -132,8 +142,6 @@ public class FXMediaLoader implements MediaLoader {
             if (trackCount != null) {
                 audioBookInfo.setTotalTracks((int) trackCount);
             }
-
-
         }
         return audioBookInfo;
     }
@@ -143,9 +151,10 @@ public class FXMediaLoader implements MediaLoader {
         return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
     }
 
-    private void searchForPosters(List<MediaInfo> media, Map<Long, String> posters) {
+    private void searchForPosters(List<MediaInfo> media, ObservableList<ArtWork> posters) {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> posters.putIfAbsent(Utils.checksumCRC32(f), f.getPath())));
+
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), "png", Utils.checksumCRC32(f)), posters)));
     }
 }

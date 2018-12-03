@@ -41,13 +41,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--
-                <dependency>
-                     <groupId>net.bramp.ffmpeg</groupId>
-                     <artifactId>ffmpeg</artifactId>
-                     <version>0.6.2</version>
-                 </dependency>
-        -->
     </dependencies>
     <build>
         <plugins>
@@ -143,11 +136,6 @@
                     <bundleArguments>
                         <runtime>${java.home}</runtime>
                     </bundleArguments>
-                    <!--
-                                        <additionalAppResources>
-                                            ${project.build.directory}/${project.artifactId}-${project.version}/${project.artifactId}-${project.version}
-                                        </additionalAppResources>
-                    -->
                     <verbose>true</verbose>
                 </configuration>
                 <executions>

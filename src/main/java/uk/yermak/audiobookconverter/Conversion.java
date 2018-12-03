@@ -110,6 +110,10 @@ public class Conversion {
     public OutputParameters getOutputParameters() {
         return outputParameters;
     }
+
+    public Map<Long, String> getPosters() {
+        return bookInfo.getPosters();
+    }
 }
 
 

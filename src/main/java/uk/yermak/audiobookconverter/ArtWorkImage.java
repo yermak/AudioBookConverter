@@ -26,6 +26,7 @@ public class ArtWorkImage implements ArtWork {
         String poster = Utils.getTmp(image.hashCode(), image.hashCode(), "." + "png");
         try {
             File posterFile = new File(poster);
+            posterFile.deleteOnExit();
             ImageIO.write(bImage, "png", posterFile);
             long crc32 = Utils.checksumCRC32(posterFile);
             bean = new ArtWorkBean(poster, "png", crc32);

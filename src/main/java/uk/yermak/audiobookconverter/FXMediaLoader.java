@@ -5,13 +5,11 @@ import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Track;
+import org.apache.commons.io.FileUtils;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -41,13 +39,12 @@ public class FXMediaLoader implements MediaLoader {
             MediaInfo mediaInfo = new MediaInfoProxy(fileName, completableFuture);
             media.add(mediaInfo);
 
-//            Executors.newSingleThreadExecutor().submit(() -> {
             Media m = new Media(new File(fileName).toURI().toASCIIString());
             MediaPlayer mediaPlayer = new MediaPlayer(m);
             mediaPlayer.setOnReady(() -> loadMetadata(m, fileName, completableFuture));
-//            });
-
         }
+
+        searchForPosters(media, ConverterApplication.getContext().getConversion().getPosters());
         return media;
     }
 
@@ -66,9 +63,11 @@ public class FXMediaLoader implements MediaLoader {
         if (metadata.get("image") != null) {
             Image image = (Image) metadata.get("image");
 
-            mediaInfo.setArtWork(new ArtWorkImage(image));
+            ArtWorkImage artWork = new ArtWorkImage(image);
+            mediaInfo.setArtWork(artWork);
 
-
+            Map<Long, String> posters = ConverterApplication.getContext().getConversion().getPosters();
+            posters.putIfAbsent(artWork.getCrc32(), artWork.getFileName());
         }
 
         completableFuture.complete(mediaInfo);
@@ -133,8 +132,20 @@ public class FXMediaLoader implements MediaLoader {
             if (trackCount != null) {
                 audioBookInfo.setTotalTracks((int) trackCount);
             }
+
+
         }
         return audioBookInfo;
     }
 
+
+    private Collection<File> findPictures(File dir) {
+        return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
+    }
+
+    private void searchForPosters(List<MediaInfo> media, Map<Long, String> posters) {
+        Set<File> searchDirs = new HashSet<>();
+        media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> posters.putIfAbsent(Utils.checksumCRC32(f), f.getPath())));
+    }
 }

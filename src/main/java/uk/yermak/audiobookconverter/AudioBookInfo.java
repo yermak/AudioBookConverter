@@ -1,5 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AudioBookInfo {
     private String writer = "";
     private String narrator = "";
@@ -11,6 +14,8 @@ public class AudioBookInfo {
     private int totalTracks;
     private String comment = "";
     private String longDescription = "";
+
+    private Map<Long, String> posters = new HashMap<>();
 
     public AudioBookInfo() {
     }
@@ -95,5 +100,9 @@ public class AudioBookInfo {
 
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
+    }
+
+    public Map<Long, String> getPosters() {
+        return posters;
     }
 }

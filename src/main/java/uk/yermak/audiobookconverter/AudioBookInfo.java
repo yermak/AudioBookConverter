@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.ObservableList;
+
 public class AudioBookInfo {
     private String writer = "";
     private String narrator = "";
@@ -11,6 +13,8 @@ public class AudioBookInfo {
     private int totalTracks;
     private String comment = "";
     private String longDescription = "";
+
+    private ObservableList<ArtWork> posters;
 
     public AudioBookInfo() {
     }
@@ -95,5 +99,13 @@ public class AudioBookInfo {
 
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
+    }
+
+    public ObservableList<ArtWork> getPosters() {
+        return posters;
+    }
+
+    public void setPosters(ObservableList<ArtWork> posters) {
+        this.posters = posters;
     }
 }

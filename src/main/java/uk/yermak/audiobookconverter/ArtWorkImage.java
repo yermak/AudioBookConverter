@@ -26,23 +26,14 @@ public class ArtWorkImage implements ArtWork {
         String poster = Utils.getTmp(image.hashCode(), image.hashCode(), "." + "png");
         try {
             File posterFile = new File(poster);
+            posterFile.deleteOnExit();
             ImageIO.write(bImage, "png", posterFile);
             long crc32 = Utils.checksumCRC32(posterFile);
-            bean = new ArtWorkBean(poster, "png", crc32);
+            bean = new ArtWorkBean(poster, crc32);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return bean;
-    }
-
-    @Override
-    public String getFormat() {
-        return getBean().getFormat();
-    }
-
-    @Override
-    public void setFormat(String format) {
-        getBean().setFormat(format);
     }
 
     @Override

@@ -110,6 +110,10 @@ public class Conversion {
     public OutputParameters getOutputParameters() {
         return outputParameters;
     }
+
+    public ObservableList<ArtWork> getPosters() {
+        return bookInfo.getPosters();
+    }
 }
 
 

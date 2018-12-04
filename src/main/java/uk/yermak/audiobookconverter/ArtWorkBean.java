@@ -6,23 +6,11 @@ package uk.yermak.audiobookconverter;
 public class ArtWorkBean implements ArtWork {
 
     private String fileName;
-    private String format;
     private long crc32;
 
-    public ArtWorkBean(String fileName, String format, long crc32) {
+    public ArtWorkBean(String fileName, long crc32) {
         this.fileName = fileName;
-        this.format = format;
         this.crc32 = crc32;
-    }
-
-    @Override
-    public String getFormat() {
-        return format;
-    }
-
-    @Override
-    public void setFormat(String format) {
-        this.format = format;
     }
 
     @Override

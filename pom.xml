@@ -46,6 +46,13 @@
             <version>8.40.14</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.9.13</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -104,17 +111,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <!-- <execution>
-                         <id>zip</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>single</goal>
-                         </goals>
-                         <configuration>
-                             <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
-                             <finalName>AudioBookConverter-${project.version}</finalName>
-                         </configuration>
-                     </execution>-->
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>
@@ -141,11 +137,6 @@
                     <bundleArguments>
                         <runtime>${java.home}</runtime>
                     </bundleArguments>
-                    <!--
-                                        <additionalAppResources>
-                                            ${project.build.directory}/${project.artifactId}-${project.version}/${project.artifactId}-${project.version}
-                                        </additionalAppResources>
-                    -->
                     <verbose>true</verbose>
                 </configuration>
                 <executions>

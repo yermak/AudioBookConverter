@@ -202,7 +202,6 @@ public class FilesController {
                 fileList.getSelectionModel().clearAndSelect(selected + 1);
             }
         }
-
     }
 
     public void start(ActionEvent actionEvent) {

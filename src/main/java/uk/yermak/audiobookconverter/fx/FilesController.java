@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
 import uk.yermak.audiobookconverter.*;
 
@@ -221,10 +222,23 @@ public class FilesController {
             if (outputDestination != null) {
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
+                String finalOutputDestination = outputDestination;
+                context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+                    if (ProgressStatus.FINISHED.equals(newValue)) {
+                        Platform.runLater(() -> showNotification(finalOutputDestination));
+                    }
+                });
 
                 context.startConversion(outputDestination, conversionProgress);
+
             }
         }
+    }
+
+    private void showNotification(String finalOutputDestination) {
+        Notifications.create()
+                .title("AudioBookConverter: Conversion is completed")
+                .text(finalOutputDestination).show();
     }
 
     private String selectOutputDirectory() {

@@ -36,7 +36,7 @@ public class ConverterApplication extends Application {
         stage.setScene(scene);
         Screen primary = Screen.getPrimary();
         stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);
-        stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.3);
+        stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
         stage.show();
         env = new JfxEnv(scene, getHostServices());
 
@@ -45,6 +45,7 @@ public class ConverterApplication extends Application {
             ConverterApplication.getContext().stopConversion();
             System.exit(0);
         });
+
 
     }
 

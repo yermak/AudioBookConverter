@@ -8,9 +8,15 @@
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 
     </fx:define>
+    <columnConstraints>
+        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
 
-    <Slider fx:id="timelapse" minorTickCount="4" disable="true" HBox.hgrow="ALWAYS"
-            minWidth="${screen.visualBounds.width * 0.25}" maxWidth="Infinity" majorTickUnit="1"
+    <Slider fx:id="timelapse" minorTickCount="4" disable="true" GridPane.hgrow="ALWAYS"
+            minWidth="${screen.visualBounds.width * 0.35}" majorTickUnit="1"
             GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
     <Slider fx:id="volume" orientation="VERTICAL" disable="true" maxHeight="10"
             min="0" max="1.0" value="1.0"

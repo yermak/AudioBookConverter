@@ -6,7 +6,7 @@ import javafx.beans.value.ObservableValue;
 /**
  * Created by yermak on 06/23/2018.
  */
-class StatusChangeListener implements ChangeListener<ProgressStatus> {
+public class StatusChangeListener implements ChangeListener<ProgressStatus> {
     private boolean cancelled;
     private boolean paused;
     private boolean finished;

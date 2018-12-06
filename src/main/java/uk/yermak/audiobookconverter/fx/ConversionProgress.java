@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public class ConversionProgress implements Runnable, Refreshable {
 
+    String fileName;
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
@@ -34,9 +35,10 @@ public class ConversionProgress implements Runnable, Refreshable {
     private long pausePeriod;
     private long pauseTime;
 
-    public ConversionProgress(int totalFiles, long totalDuration) {
+    public ConversionProgress(int totalFiles, long totalDuration, String fileName) {
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
+        this.fileName = fileName;
         ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:

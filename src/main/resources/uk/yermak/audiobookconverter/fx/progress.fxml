@@ -13,7 +13,7 @@
     </columnConstraints>
 
     <children>
-        <Label text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0"
+        <Label fx:id="title" text="Progress" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="3"
                GridPane.valignment="TOP">
             <font>
                 <Font name="Arial Black" size="12.0"/>

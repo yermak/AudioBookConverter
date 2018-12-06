@@ -5,15 +5,23 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
+import org.controlsfx.control.Notifications;
+import org.controlsfx.control.PopOver;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
@@ -41,6 +49,7 @@ public class FilesController {
 
     @FXML
     ListView<MediaInfo> fileList;
+    TreeView<MediaInfo> chapters;
 
 
     @FXML
@@ -50,14 +59,11 @@ public class FilesController {
     @FXML
     public Button stopButton;
 
-    private final ContextMenu contextMenu = new ContextMenu();
-
-
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-
+//        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
@@ -90,7 +96,23 @@ public class FilesController {
                 change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
             }
         });
+
+     /*   fileList.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+            @Override
+            public void handle(ContextMenuEvent event) {
+                PopOver editor = new PopOver();
+                ObservableList<MediaInfo> selectedItems = fileList.getSelectionModel().getSelectedItems();
+                if (selectedItems.size()==1) {
+                    MediaInfo mediaInfo = selectedItems.get(0);
+//                    editor
+                    editor.show(fileList);
+                }
+            }
+        });
+    */
     }
+
+    private final ContextMenu contextMenu = new ContextMenu();
 
 
     @FXML
@@ -201,11 +223,24 @@ public class FilesController {
             }
             if (outputDestination != null) {
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
+                String finalName = new File(outputDestination).getName();
+                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration, finalName);
+                context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+                    if (ProgressStatus.FINISHED.equals(newValue)) {
+                        Platform.runLater(() -> showNotification(finalName));
+                    }
+                });
 
                 context.startConversion(outputDestination, conversionProgress);
+
             }
         }
+    }
+
+    private static void showNotification(String finalOutputDestination) {
+        Notifications.create()
+                .title("AudioBookConverter: Conversion is completed")
+                .text(finalOutputDestination).show();
     }
 
     private String selectOutputDirectory() {
@@ -295,6 +330,57 @@ public class FilesController {
         });
     }
 
+    private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
+        @Override
+        public ListCell<MediaInfo> call(ListView<MediaInfo> param) {
+            ListCell<MediaInfo> mediaCell = new DefaultListCell<>();
+            mediaCell.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent event) {
+                    GridPane content = new GridPane();
+                    content.setHgap(5);
+                    content.setVgap(5);
+                    content.setPadding(new Insets(10, 10, 10, 10));
+                    content.setPrefWidth(200);
+                    content.setPrefHeight(200);
+                    content.add(new Label("11111111111"), 0, 0);
+                    content.add(new Label("222222222222222"), 1, 0);
+                    PopOver editor = new PopOver(content);
+//                    editor.setWidth(200);
+//                    editor.setHeight(200);
+                    editor.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                    editor.setTitle(mediaCell.getItem().getBookInfo().getTitle());
+                    editor.setHeaderAlwaysVisible(true);
+                    editor.setDetachable(false);
+                    editor.show(mediaCell);
+                }
+
+            });
+            return mediaCell;
+        }
+    }
+
+    static class DefaultListCell<T> extends ListCell<T> {
+        @Override
+        public void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else if (item instanceof Node) {
+                setText(null);
+                Node currentNode = getGraphic();
+                Node newNode = (Node) item;
+                if (currentNode == null || !currentNode.equals(newNode)) {
+                    setGraphic(newNode);
+                }
+            } else {
+                setText(item == null ? "null" : item.toString());
+                setGraphic(null);
+            }
+        }
+    }
     public void play(ActionEvent actionEvent) {
 
         ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();

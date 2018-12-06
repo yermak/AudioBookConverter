@@ -16,6 +16,9 @@ import java.io.IOException;
 public class ProgressComponent extends GridPane {
 
     @FXML
+    private Label title;
+
+    @FXML
     public Label elapsedTime;
     @FXML
     public Label remainingTime;
@@ -47,6 +50,7 @@ public class ProgressComponent extends GridPane {
 
 
     public void setConversionProgress(ConversionProgress conversionProgress) {
+        title.setText(conversionProgress.fileName);
         conversionProgress.filesCount.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> filesCount.setText(newValue)));
         conversionProgress.progress.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> progressBar.progressProperty().set(newValue.doubleValue())));
         conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(Utils.formatSize(newValue.longValue()))));

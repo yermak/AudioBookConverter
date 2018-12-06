@@ -28,7 +28,7 @@ public class ConversionModeController {
 
     @FXML
     public void initialize() {
-        mode.addListener((observable, oldValue, newValue) -> ConverterApplication.getContext().setMode(newValue));
+        mode.addListener((observable, oldValue, newValue) -> ConverterApplication.getContext().getConversion().setMode(newValue));
         ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
             boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
             parallel.setDisable(disable);

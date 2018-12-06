@@ -11,8 +11,8 @@ public enum ConversionMode {
         }
 
         @Override
-        public JoiningConversionStrategy createConvertionStrategy() {
-            return new JoiningConversionStrategy();
+        public JoiningConversionStrategy createConvertionStrategy(Conversion conversion) {
+            return new JoiningConversionStrategy(conversion);
         }
     }, BATCH {
         @Override
@@ -21,8 +21,8 @@ public enum ConversionMode {
         }
 
         @Override
-        public ConversionStrategy createConvertionStrategy() {
-            return new BatchConversionStrategy();
+        public ConversionStrategy createConvertionStrategy(Conversion conversion) {
+            return new BatchConversionStrategy(conversion);
         }
     }, PARALLEL {
         @Override
@@ -31,12 +31,12 @@ public enum ConversionMode {
         }
 
         @Override
-        public ConversionStrategy createConvertionStrategy() {
-            return new ParallelConversionStrategy();
+        public ConversionStrategy createConvertionStrategy(Conversion conversion) {
+            return new ParallelConversionStrategy(conversion);
         }
     };
 
     public abstract boolean supportTags();
 
-    public abstract ConversionStrategy createConvertionStrategy();
+    public abstract ConversionStrategy createConvertionStrategy(Conversion conversion);
 }

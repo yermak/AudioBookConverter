@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +18,13 @@ import java.util.stream.IntStream;
 public class BatchConversionStrategy extends AbstractConversionStrategy implements Runnable {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
     private final StatusChangeListener listener;
+    private Conversion conversion;
 
 
-    public BatchConversionStrategy() {
+    public BatchConversionStrategy(Conversion conversion) {
+        this.conversion = conversion;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     @Override
@@ -39,11 +40,11 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
                 String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
                 Future<ConverterOutput> converterFuture =
                         executorService
-                                .submit(new FFMpegConverter(outputParameters, mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
+                                .submit(new FFMpegConverter(conversion, outputParameters, mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
                 futures.add(converterFuture);
             }
 
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
             for (Future<ConverterOutput> future : futures) {
                 ConverterOutput output = future.get();
                 ArtWork artWork = output.getMediaInfo().getArtWork();
@@ -51,13 +52,13 @@ public class BatchConversionStrategy extends AbstractConversionStrategy implemen
                     artBuilder.updateSinglePoster(artWork, 0, output.getOutputFileName());
                 }
             }
-            ConverterApplication.getContext().finishedConversion();
+            conversion.finished();
         } catch (InterruptedException | ExecutionException | IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
+            conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
+            conversion.removeStatusChangeListener(listener);
         }
     }
 

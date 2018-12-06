@@ -40,12 +40,16 @@ public class BookInfoController {
     private TextField year;
     @FXML
     private TextField comment;
+    private Conversion conversion;
 
 
     @FXML
     private void initialize() {
+        conversion = ConverterApplication.getContext().getConversion();
+
+
         AudioBookInfo bookInfo = new AudioBookInfo();
-        ConverterApplication.getContext().setBookInfo(bookInfo);
+        ConverterApplication.getContext().getConversion().setBookInfo(bookInfo);
 
         reloadGenres();
 
@@ -63,7 +67,7 @@ public class BookInfoController {
             genre.hide();
         });
 
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
                 saveGenres();
             }
@@ -86,12 +90,12 @@ public class BookInfoController {
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
+        ObservableList<MediaInfo> media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
+        conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
             title.setDisable(disable);
             writer.setDisable(disable);

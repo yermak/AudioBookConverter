@@ -48,7 +48,7 @@ public class Conversion {
         status.set(IN_PROGRESS);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
-        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy();
+        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy(this);
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));

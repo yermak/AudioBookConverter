@@ -59,9 +59,12 @@ public class FilesController {
     @FXML
     public Button stopButton;
 
+    private Conversion conversion;
+
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
+        conversion = context.getConversion();
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -70,18 +73,18 @@ public class FilesController {
         item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
         contextMenu.getItems().addAll(item1, item2);
 
-        ObservableList<MediaInfo> media = context.getConversion().getMedia();
+        ObservableList<MediaInfo> media = conversion.getMedia();
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        context.getConversion().addStatusChangeListener((observable, oldValue, newValue) ->
+        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
                 updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(context.getConversion().getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
         fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            updateUI(context.getConversion().getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            updateUI(conversion.getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
             List<MediaInfo> selectedMedia = context.getSelectedMedia();
             selectedMedia.clear();
             fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
@@ -145,7 +148,7 @@ public class FilesController {
     }
 
     private MediaLoader createMediaLoader(List<String> fileNames) {
-        return new FXMediaLoader(fileNames);
+        return new FXMediaLoader(fileNames, conversion);
     }
 
     private void selectFilesDialog(Window window) {
@@ -211,12 +214,12 @@ public class FilesController {
         ConversionContext context = ConverterApplication.getContext();
 
 
-        List<MediaInfo> media = context.getConversion().getMedia();
+        List<MediaInfo> media = conversion.getMedia();
         if (media.size() > 0) {
-            AudioBookInfo audioBookInfo = context.getBookInfo();
+            AudioBookInfo audioBookInfo = conversion.getBookInfo();
             MediaInfo mediaInfo = media.get(0);
             String outputDestination = null;
-            if (context.getMode().equals(ConversionMode.BATCH)) {
+            if (conversion.getMode().equals(ConversionMode.BATCH)) {
                 outputDestination = selectOutputDirectory();
             } else {
                 outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
@@ -224,8 +227,8 @@ public class FilesController {
             if (outputDestination != null) {
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 String finalName = new File(outputDestination).getName();
-                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration, finalName);
-                context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
+                conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
                     if (ProgressStatus.FINISHED.equals(newValue)) {
                         Platform.runLater(() -> showNotification(finalName));
                     }
@@ -277,15 +280,15 @@ public class FilesController {
 
 
     public void pause(ActionEvent actionEvent) {
-        if (ConverterApplication.getContext().getConversion().getStatus().equals(PAUSED)) {
-            ConverterApplication.getContext().resumeConversion();
+        if (conversion.getStatus().equals(PAUSED)) {
+            conversion.resume();
         } else {
-            ConverterApplication.getContext().pauseConversion();
+            conversion.resume();
         }
     }
 
     public void stop(ActionEvent actionEvent) {
-        ConverterApplication.getContext().stopConversion();
+        ConverterApplication.getContext().stopConversions();
     }
 
 

@@ -8,7 +8,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Track;
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.util.*;
@@ -21,13 +20,15 @@ public class FXMediaLoader implements MediaLoader {
 
     private final StatusChangeListener listener;
     private List<String> fileNames;
+    private Conversion conversion;
 
-    public FXMediaLoader(List<String> files) {
+    public FXMediaLoader(List<String> files, Conversion conversion) {
         this.fileNames = files;
+        this.conversion = conversion;
         Collections.sort(fileNames);
 
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class FXMediaLoader implements MediaLoader {
             mediaPlayer.setOnReady(() -> loadMetadata(m, fileName, completableFuture));
         }
 
-        searchForPosters(media, ConverterApplication.getContext().getConversion().getPosters());
+        searchForPosters(media, conversion.getPosters());
         return media;
     }
 
@@ -65,7 +66,7 @@ public class FXMediaLoader implements MediaLoader {
 
             ArtWorkImage artWork = new ArtWorkImage(image);
             mediaInfo.setArtWork(artWork);
-            ObservableList<ArtWork> posters = ConverterApplication.getContext().getConversion().getPosters();
+            ObservableList<ArtWork> posters = conversion.getPosters();
             Platform.runLater(() -> addPosterIfMissing(artWork, posters));
         }
 

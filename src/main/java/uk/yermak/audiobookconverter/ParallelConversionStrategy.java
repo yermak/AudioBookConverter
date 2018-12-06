@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +18,13 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
 
     private final StatusChangeListener listener;
     private ExecutorService executorService = Executors.newWorkStealingPool();
+    private Conversion conversion;
 
 
-    public ParallelConversionStrategy() {
+    public ParallelConversionStrategy(Conversion conversion) {
+        this.conversion = conversion;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     public void run() {
@@ -46,7 +47,7 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
             for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(outputParameters, mediaInfo, tempOutput, callback));
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(conversion, outputParameters, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
@@ -55,28 +56,28 @@ public class ParallelConversionStrategy extends AbstractConversionStrategy imple
                 future.get();
             }
             if (listener.isCancelled()) return;
-            Concatenator concatenator = new FFMpegConcatenator(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (listener.isCancelled()) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
             artBuilder.coverArt(media, tempFile);
 
             if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
-            ConverterApplication.getContext().finishedConversion();
+            conversion.finished();
         } catch (Exception e) {
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
+            conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             for (MediaInfo mediaInfo : media) {
                 FileUtils.deleteQuietly(new File(getTempFileName(jobId, mediaInfo.hashCode(), ".m4b")));
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
-            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
+            conversion.removeStatusChangeListener(listener);
         }
     }
 

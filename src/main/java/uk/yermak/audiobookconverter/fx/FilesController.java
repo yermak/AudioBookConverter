@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -60,7 +61,7 @@ public class FilesController {
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-        fileList.setCellFactory(new ListViewListCellCallback());
+//        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
@@ -220,11 +221,11 @@ public class FilesController {
             }
             if (outputDestination != null) {
                 long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration);
-                String finalOutputDestination = outputDestination;
+                String finalName = new File(outputDestination).getName();
+                ConversionProgress conversionProgress = new ConversionProgress(media.size(), totalDuration, finalName);
                 context.getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
                     if (ProgressStatus.FINISHED.equals(newValue)) {
-                        Platform.runLater(() -> showNotification(finalOutputDestination));
+                        Platform.runLater(() -> showNotification(finalName));
                     }
                 });
 
@@ -234,7 +235,7 @@ public class FilesController {
         }
     }
 
-    private void showNotification(String finalOutputDestination) {
+    private static void showNotification(String finalOutputDestination) {
         Notifications.create()
                 .title("AudioBookConverter: Conversion is completed")
                 .text(finalOutputDestination).show();
@@ -335,9 +336,19 @@ public class FilesController {
                 @Override
                 public void handle(ContextMenuEvent event) {
                     GridPane content = new GridPane();
-                    content.add(new Label("1"), 0, 0);
-                    content.add(new Label("2"), 1, 0);
+                    content.setHgap(5);
+                    content.setVgap(5);
+                    content.setPadding(new Insets(10, 10, 10, 10));
+                    content.setPrefWidth(200);
+                    content.setPrefHeight(200);
+                    content.add(new Label("11111111111"), 0, 0);
+                    content.add(new Label("222222222222222"), 1, 0);
                     PopOver editor = new PopOver(content);
+//                    editor.setWidth(200);
+//                    editor.setHeight(200);
+                    editor.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                    editor.setTitle(mediaCell.getItem().getBookInfo().getTitle());
+                    editor.setHeaderAlwaysVisible(true);
                     editor.setDetachable(false);
                     editor.show(mediaCell);
                 }

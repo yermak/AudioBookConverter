@@ -42,7 +42,7 @@ public class ConverterApplication extends Application {
 
 
         stage.setOnCloseRequest(event -> {
-            ConverterApplication.getContext().stopConversion();
+            ConverterApplication.getContext().stopConversions();
             System.exit(0);
         });
 

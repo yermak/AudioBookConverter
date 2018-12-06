@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +14,12 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
 
 
     private final StatusChangeListener listener;
+    private Conversion conversion;
 
-    public JoiningConversionStrategy() {
+    public JoiningConversionStrategy(Conversion conversion) {
+        this.conversion = conversion;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     @Override
@@ -40,23 +41,23 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
             metaFile = prepareMeta(jobId);
             fileListFile = prepareFiles(jobId);
             if (listener.isCancelled()) return;
-            Concatenator concatenator = new FFMpegLinearConverter(tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), outputParameters, progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegLinearConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), outputParameters, progressCallbacks.get("output"));
             concatenator.concat();
             if (listener.isCancelled()) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder();
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
             artBuilder.coverArt(media, tempFile);
             if (listener.isCancelled()) return;
             FileUtils.moveFile(new File(tempFile), new File(outputDestination));
-            ConverterApplication.getContext().finishedConversion();
+            conversion.finished();
         } catch (Exception e) {
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            ConverterApplication.getContext().error(e.getMessage() + "; " + sw.getBuffer().toString());
+            conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
-            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
+            conversion.removeStatusChangeListener(listener);
         }
     }
 

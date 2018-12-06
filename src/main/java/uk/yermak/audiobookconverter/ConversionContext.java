@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
@@ -12,70 +13,33 @@ import java.util.LinkedList;
 public class ConversionContext {
 
     private LinkedList<Conversion> conversionQueue = new LinkedList<>();
-    private Conversion conversion = new Conversion();
+    private SimpleObjectProperty<Conversion> conversion = new SimpleObjectProperty<>();
+
     private Subscriber subscriber;
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
 
 
     public ConversionContext() {
+        conversionQueue.add(conversion.get());
     }
 
-    public void setMode(ConversionMode mode) {
-        conversion.setMode(mode);
-    }
-
-    public void setBookInfo(AudioBookInfo bookInfo) {
-        conversion.setBookInfo(bookInfo);
-    }
-
-    public AudioBookInfo getBookInfo() {
-        return conversion.getBookInfo();
-    }
-
-
-    public ConversionMode getMode() {
-        return conversion.getMode();
-    }
 
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
         subscriber.addConversionProgress(conversionProgress);
-        conversion.start(outputDestination, conversionProgress);
+        conversion.get().start(outputDestination, conversionProgress);
     }
 
+    @Deprecated
     public Conversion getConversion() {
-        return conversion;
+        return conversion.get();
     }
 
-    public void pauseConversion() {
-        conversion.pause();
-    }
-
-    public void stopConversion() {
-        conversion.stop();
+    public void stopConversions() {
+        conversionQueue.forEach(c -> c.stop());
     }
 
     public void subscribeForStart(Subscriber subscriber) {
         this.subscriber = subscriber;
-    }
-
-    public void finishedConversion() {
-        conversion.finished();
-    }
-
-    public void error(String message) {
-        conversion.error(message);
-    }
-
-    public void resumeConversion() {
-        conversion.resume();
-    }
-
-    public void setOutputParameters(OutputParameters params) {
-        conversion.setOutputParameters(params);
-    }
-
-    public OutputParameters getOutputParameters() {
-        return conversion.getOutputParameters();
     }
 
     public ObservableList<MediaInfo> getSelectedMedia() {

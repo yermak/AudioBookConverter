@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FFMpegConcatenator implements Concatenator {
 
+    private Conversion conversion;
     private final String outputFileName;
     private final StatusChangeListener listener;
     private String metaDataFileName;
@@ -23,13 +23,14 @@ public class FFMpegConcatenator implements Concatenator {
     private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
 
 
-    public FFMpegConcatenator(String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
+    public FFMpegConcatenator(Conversion conversion, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
+        this.conversion = conversion;
         this.outputFileName = outputFileName;
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
         this.callback = callback;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     public void concat() throws IOException, InterruptedException {

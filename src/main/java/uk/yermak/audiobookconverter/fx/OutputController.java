@@ -36,7 +36,7 @@ public class OutputController {
         bitRate.setDisable(false);
         cutoff.setDisable(false);
         quality.setDisable(true);
-        ConverterApplication.getContext().getOutputParameters().setCbr(true);
+        ConverterApplication.getContext().getConversion().getOutputParameters().setCbr(true);
 
     }
 
@@ -44,14 +44,14 @@ public class OutputController {
         bitRate.setDisable(true);
         cutoff.setDisable(true);
         quality.setDisable(false);
-        ConverterApplication.getContext().getOutputParameters().setCbr(false);
+        ConverterApplication.getContext().getConversion().getOutputParameters().setCbr(false);
     }
 
     @FXML
     private void initialize() {
 
         OutputParameters params = new OutputParameters();
-        ConverterApplication.getContext().setOutputParameters(params);
+        ConverterApplication.getContext().getConversion().setOutputParameters(params);
 
 
         frequency.getItems().addAll( 8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);

@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Refreshable;
 
@@ -25,6 +26,7 @@ public class ConversionProgress implements Runnable, Refreshable {
 
     private long startTime;
     private boolean finished;
+    private Conversion conversion;
     private int totalFiles;
     private int completedFiles;
     private long totalDuration;
@@ -35,11 +37,12 @@ public class ConversionProgress implements Runnable, Refreshable {
     private long pausePeriod;
     private long pauseTime;
 
-    public ConversionProgress(int totalFiles, long totalDuration, String fileName) {
+    public ConversionProgress(Conversion conversion, int totalFiles, long totalDuration, String fileName) {
+        this.conversion = conversion;
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
         this.fileName = fileName;
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
                     cancelled();

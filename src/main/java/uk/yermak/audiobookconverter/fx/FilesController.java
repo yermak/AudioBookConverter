@@ -314,10 +314,11 @@ public class FilesController implements ConversionSubscriber {
         ObservableList<MediaInfo> media = conversion.getMedia();
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+/* TODO fix buttons behaviour
         conversion.addStatusChangeListener((observable, oldValue, newValue) ->
                 updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
         );
+*/
 
         media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 

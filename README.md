@@ -15,6 +15,7 @@ Main features:
 * Unicode tags support: keep tags in own language
 * Chapters support: jump to the right chapter quickly
 * Flexible quality management: find balance between size and quality
+* Instant playback: listen what you are going to encode
 * Simple and lightweigh user interface: Convert a book with few clicks
 
 --------------

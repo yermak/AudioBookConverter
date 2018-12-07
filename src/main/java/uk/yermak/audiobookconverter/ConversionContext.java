@@ -13,7 +13,8 @@ import java.util.LinkedList;
 public class ConversionContext {
 
     private LinkedList<Conversion> conversionQueue = new LinkedList<>();
-    private SimpleObjectProperty<Conversion> conversion = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<Conversion> conversion = new SimpleObjectProperty<>(new Conversion());
+
 
     private Subscriber subscriber;
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
@@ -24,14 +25,10 @@ public class ConversionContext {
     }
 
 
+    //TODO simplify Subscriber
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
         subscriber.addConversionProgress(conversionProgress);
         conversion.get().start(outputDestination, conversionProgress);
-    }
-
-    @Deprecated
-    public Conversion getConversion() {
-        return conversion.get();
     }
 
     public void stopConversions() {
@@ -44,5 +41,10 @@ public class ConversionContext {
 
     public ObservableList<MediaInfo> getSelectedMedia() {
         return selectedMedia;
+    }
+
+    public Conversion registerForConversion(ConversionSubscriber conversionSubscriber) {
+        conversion.addListener((observable, oldValue, newValue) -> conversionSubscriber.resetForNewConversion(newValue));
+        return conversion.get();
     }
 }

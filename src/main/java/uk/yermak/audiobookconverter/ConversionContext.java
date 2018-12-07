@@ -29,6 +29,7 @@ public class ConversionContext {
     public void startConversion(String outputDestination, ConversionProgress conversionProgress) {
         subscriber.addConversionProgress(conversionProgress);
         conversion.get().start(outputDestination, conversionProgress);
+        conversion.set(new Conversion());
     }
 
     public void stopConversions() {

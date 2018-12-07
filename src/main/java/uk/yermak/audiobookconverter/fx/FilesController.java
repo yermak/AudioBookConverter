@@ -34,7 +34,7 @@ import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController {
+public class FilesController implements ConversionSubscriber {
 
     @FXML
     public Button addButton;
@@ -60,11 +60,11 @@ public class FilesController {
     public Button stopButton;
 
     private Conversion conversion;
+    private ObservableList<MediaInfo> selectedMedia;
 
     @FXML
     public void initialize() {
-        ConversionContext context = ConverterApplication.getContext();
-        conversion = context.getConversion();
+
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -73,46 +73,20 @@ public class FilesController {
         item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
         contextMenu.getItems().addAll(item1, item2);
 
-        ObservableList<MediaInfo> media = conversion.getMedia();
-        fileList.setItems(media);
-        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        ConversionContext context = ConverterApplication.getContext();
+        selectedMedia = context.getSelectedMedia();
 
-        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
-                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
+        resetForNewConversion(context.registerForConversion(this));
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-
-        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            updateUI(conversion.getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
-            List<MediaInfo> selectedMedia = context.getSelectedMedia();
-            selectedMedia.clear();
-            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
-        });
-
-        context.getSelectedMedia().addListener((InvalidationListener) observable -> {
-            if (context.getSelectedMedia().isEmpty()) return;
-            List<MediaInfo> change = new ArrayList<>(context.getSelectedMedia());
+        selectedMedia.addListener((InvalidationListener) observable -> {
+            if (selectedMedia.isEmpty()) return;
+            List<MediaInfo> change = new ArrayList<>(selectedMedia);
             List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
             if (!change.containsAll(selection) || !selection.containsAll(change)) {
                 fileList.getSelectionModel().clearSelection();
-                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+                change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
             }
         });
-
-     /*   fileList.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-            @Override
-            public void handle(ContextMenuEvent event) {
-                PopOver editor = new PopOver();
-                ObservableList<MediaInfo> selectedItems = fileList.getSelectionModel().getSelectedItems();
-                if (selectedItems.size()==1) {
-                    MediaInfo mediaInfo = selectedItems.get(0);
-//                    editor
-                    editor.show(fileList);
-                }
-            }
-        });
-    */
     }
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -333,6 +307,29 @@ public class FilesController {
         });
     }
 
+    @Override
+    public void resetForNewConversion(Conversion conversion) {
+        this.conversion = conversion;
+
+        ObservableList<MediaInfo> media = conversion.getMedia();
+        fileList.setItems(media);
+        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
+                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
+        );
+
+        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+
+        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            updateUI(conversion.getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            selectedMedia.clear();
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
+        });
+
+
+    }
+
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
         @Override
         public ListCell<MediaInfo> call(ListView<MediaInfo> param) {
@@ -384,6 +381,7 @@ public class FilesController {
             }
         }
     }
+
     public void play(ActionEvent actionEvent) {
 
         ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();

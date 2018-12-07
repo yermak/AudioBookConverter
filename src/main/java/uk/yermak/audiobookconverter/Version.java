@@ -1,8 +1,8 @@
 package uk.yermak.audiobookconverter;
 
 public class Version {
-    public static final int MAJOR = 2;
-    public static final int MINOR = 11;
+    public static final int MAJOR = 3;
+    public static final int MINOR = 0;
     public static final int BUILD = 0;
 
     public Version() {

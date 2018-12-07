@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class BookInfoController {
+public class BookInfoController implements ConversionSubscriber {
 
     @FXML
     private TextField title;
@@ -40,17 +40,10 @@ public class BookInfoController {
     private TextField year;
     @FXML
     private TextField comment;
-    private Conversion conversion;
 
 
     @FXML
     private void initialize() {
-        conversion = ConverterApplication.getContext().getConversion();
-
-
-        AudioBookInfo bookInfo = new AudioBookInfo();
-        ConverterApplication.getContext().getConversion().setBookInfo(bookInfo);
-
         reloadGenres();
 
         MenuItem menuItem = new MenuItem("Remove");
@@ -66,6 +59,13 @@ public class BookInfoController {
             }
             genre.hide();
         });
+
+        resetForNewConversion(ConverterApplication.getContext().registerForConversion(this));
+    }
+
+    public void resetForNewConversion(Conversion conversion) {
+        AudioBookInfo bookInfo = new AudioBookInfo();
+        conversion.setBookInfo(bookInfo);
 
         conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             if (newValue.equals(ProgressStatus.IN_PROGRESS)) {

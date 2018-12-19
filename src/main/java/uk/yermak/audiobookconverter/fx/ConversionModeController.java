@@ -8,7 +8,6 @@ import javafx.scene.control.ToggleGroup;
 import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.ConversionSubscriber;
-import uk.yermak.audiobookconverter.ProgressStatus;
 
 import static uk.yermak.audiobookconverter.ConversionMode.*;
 
@@ -36,12 +35,6 @@ public class ConversionModeController implements ConversionSubscriber {
 
     public void resetForNewConversion(Conversion conversion) {
         mode.addListener((observable, oldValue, newValue) -> conversion.setMode(newValue));
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-            boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
-            parallel.setDisable(disable);
-            batch.setDisable(disable);
-            join.setDisable(disable);
-        });
     }
 
     public void parallelMode(ActionEvent actionEvent) {

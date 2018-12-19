@@ -16,7 +16,10 @@ import java.util.Map;
  */
 public class ConversionProgress implements Runnable, Refreshable {
 
+
+    //TODO move to Conversion class
     String fileName;
+
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
@@ -151,4 +154,17 @@ public class ConversionProgress implements Runnable, Refreshable {
         progress.set(0);
         remaining.set(60 * 1000);
     }
+
+    public void stop() {
+        conversion.stop();
+    }
+
+    public void pause() {
+        conversion.pause();
+    }
+
+    public Conversion getConversion() {
+        return conversion;
+    }
+
 }

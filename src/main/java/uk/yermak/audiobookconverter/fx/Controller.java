@@ -31,8 +31,7 @@ public class Controller implements Subscriber {
     @Override
     public void addConversionProgress(ConversionProgress conversionProgress) {
 //        Platform.runLater(() -> {
-        ProgressComponent progressComponent = new ProgressComponent();
-        progressComponent.setConversionProgress(conversionProgress);
+        ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
         progressQueue.getItems().add(0, progressComponent);
         tabs.getSelectionModel().select(queueTab);
 //        });

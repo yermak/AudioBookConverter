@@ -3,12 +3,17 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
+import uk.yermak.audiobookconverter.Conversion;
+import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;
 
 import java.io.IOException;
+
+import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
 
 /**
  * Created by yermak on 08-Feb-18.
@@ -17,13 +22,12 @@ public class ProgressComponent extends GridPane {
 
     @FXML
     private Label title;
-
     @FXML
-    public Label elapsedTime;
+    private Label elapsedTime;
     @FXML
-    public Label remainingTime;
+    private Label remainingTime;
     @FXML
-    public Label estimatedSize;
+    private Label estimatedSize;
     @FXML
     private Label state;
     @FXML
@@ -31,10 +35,17 @@ public class ProgressComponent extends GridPane {
     @FXML
     private ProgressBar progressBar;
 
+    @FXML
+    private Button pauseButton;
+
+    @FXML
+    private Button stopButton;
+
 
     private ConversionProgress conversionProgress;
 
-    public ProgressComponent() {
+
+    public ProgressComponent(ConversionProgress conversionProgress) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
                 "progress.fxml"));
         fxmlLoader.setRoot(this);
@@ -46,11 +57,57 @@ public class ProgressComponent extends GridPane {
         }
         progressBar.progressProperty().setValue(0);
         progressBar.setMaxWidth(Double.MAX_VALUE);
+        title.setText(conversionProgress.fileName);
+
+        pauseButton.setOnAction(event -> pause());
+        stopButton.setOnAction(event -> stop());
+        this.conversionProgress = conversionProgress;
+
+        assignListeners(conversionProgress);
+        Conversion conversion = conversionProgress.getConversion();
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
+    }
+
+    private void updateButtons(ProgressStatus newValue) {
+        Platform.runLater(() -> {
+            switch (newValue) {
+                case PAUSED:
+                    pauseButton.setText("Resume");
+                    break;
+                case FINISHED:
+                    pauseButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    break;
+                case CANCELLED:
+                    pauseButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    break;
+                case IN_PROGRESS:
+                    pauseButton.setText("Pause");
+                    pauseButton.setDisable(false);
+                    stopButton.setDisable(false);
+                    break;
+                default: {
+                }
+            }
+        });
+    }
+
+    private void stop() {
+        conversionProgress.getConversion().stop();
+    }
+
+    private void pause() {
+        Conversion conversion = conversionProgress.getConversion();
+        if (conversion.getStatus().equals(PAUSED)) {
+            conversion.resume();
+        } else {
+            conversion.pause();
+        }
     }
 
 
-    public void setConversionProgress(ConversionProgress conversionProgress) {
-        title.setText(conversionProgress.fileName);
+    void assignListeners(ConversionProgress conversionProgress) {
         conversionProgress.filesCount.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> filesCount.setText(newValue)));
         conversionProgress.progress.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> progressBar.progressProperty().set(newValue.doubleValue())));
         conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(Utils.formatSize(newValue.longValue()))));

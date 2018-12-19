@@ -81,7 +81,7 @@
                 <Tooltip text="Start conversion of files"/>
             </tooltip>
         </Button>
-        <Button fx:id="pauseButton" text="Pause" disable="true"
+        <Button fx:id="pauseButton" text="Pause all"
                 minWidth="${screen.visualBounds.width * 0.05}"
                 GridPane.columnIndex="1" GridPane.rowIndex="9"
                 GridPane.fillHeight="true"
@@ -90,7 +90,7 @@
                 <Tooltip text="Pause conversion of files"/>
             </tooltip>
         </Button>
-        <Button fx:id="stopButton" text="Stop" disable="true"
+        <Button fx:id="stopButton" text="Stop all"
                 minWidth="${screen.visualBounds.width * 0.05}"
                 GridPane.columnIndex="1" GridPane.rowIndex="10"
                 onAction="#stop">

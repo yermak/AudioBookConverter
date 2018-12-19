@@ -70,6 +70,7 @@ public class BookInfoController implements ConversionSubscriber {
         conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
                 saveGenres();
+                clearTags();
             }
         });
 
@@ -95,17 +96,6 @@ public class BookInfoController implements ConversionSubscriber {
 
         conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-            boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
-            title.setDisable(disable);
-            writer.setDisable(disable);
-            narrator.setDisable(disable);
-            genre.setDisable(disable);
-            series.setDisable(disable);
-            bookNo.setDisable(disable);
-            year.setDisable(disable);
-            comment.setDisable(disable);
-        });
     }
 
     private void saveGenres() {

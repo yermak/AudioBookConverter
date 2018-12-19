@@ -57,7 +57,11 @@ public class ProgressComponent extends GridPane {
         }
         progressBar.progressProperty().setValue(0);
         progressBar.setMaxWidth(Double.MAX_VALUE);
-        title.setText(conversionProgress.fileName);
+        String fileName = conversionProgress.fileName;
+        if (fileName.length() > 80) {
+            fileName = fileName.substring(0, 80) + "...";
+        }
+        title.setText(fileName);
 
         pauseButton.setOnAction(event -> pause());
         stopButton.setOnAction(event -> stop());

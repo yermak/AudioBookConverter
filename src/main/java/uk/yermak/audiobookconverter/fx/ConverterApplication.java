@@ -43,6 +43,11 @@ public class ConverterApplication extends Application {
 
         stage.setOnCloseRequest(event -> {
             ConverterApplication.getContext().stopConversions();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.exit(0);
         });
 

@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
-
 /**
  * Created by Yermak on 04-Feb-18.
  */
@@ -199,15 +197,15 @@ public class FilesController implements ConversionSubscriber {
                 outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
             }
             if (outputDestination != null) {
-                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
                 String finalName = new File(outputDestination).getName();
-                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
                 conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
                     if (ProgressStatus.FINISHED.equals(newValue)) {
                         Platform.runLater(() -> showNotification(finalName));
                     }
                 });
 
+                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
+                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
                 context.startConversion(outputDestination, conversionProgress);
 
             }
@@ -254,10 +252,13 @@ public class FilesController implements ConversionSubscriber {
 
 
     public void pause(ActionEvent actionEvent) {
-        if (conversion.getStatus().equals(PAUSED)) {
-            conversion.resume();
+        ConversionContext context = ConverterApplication.getContext();
+        if (context.isPaused()) {
+            context.resumeConversions();
+            pauseButton.setText("Pause all");
         } else {
-            conversion.resume();
+            context.pauseConversions();
+            pauseButton.setText("Resume all");
         }
     }
 
@@ -267,17 +268,12 @@ public class FilesController implements ConversionSubscriber {
 
 
     private void updateUI(ProgressStatus status, Boolean listEmpty, ObservableList<Integer> selectedIndices) {
-
         Platform.runLater(() -> {
             switch (status) {
                 case PAUSED:
-                    pauseButton.setText("Resume");
-                    break;
                 case FINISHED:
                 case CANCELLED:
                 case READY:
-                    pauseButton.setText("Pause");
-
                     addButton.setDisable(false);
                     clearButton.setDisable(listEmpty);
 
@@ -286,19 +282,14 @@ public class FilesController implements ConversionSubscriber {
                     removeButton.setDisable(selectedIndices.size() < 1);
 
                     startButton.setDisable(listEmpty);
-                    pauseButton.setDisable(true);
-                    stopButton.setDisable(true);
                     break;
                 case IN_PROGRESS:
-                    pauseButton.setText("Pause");
                     addButton.setDisable(true);
                     removeButton.setDisable(true);
                     clearButton.setDisable(true);
                     upButton.setDisable(true);
                     downButton.setDisable(true);
                     startButton.setDisable(true);
-                    pauseButton.setDisable(false);
-                    stopButton.setDisable(false);
                     break;
                 default: {
                 }

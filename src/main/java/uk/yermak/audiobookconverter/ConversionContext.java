@@ -14,7 +14,7 @@ public class ConversionContext {
 
     private LinkedList<Conversion> conversionQueue = new LinkedList<>();
     private SimpleObjectProperty<Conversion> conversion = new SimpleObjectProperty<>(new Conversion());
-
+    private boolean paused;
 
     private Subscriber subscriber;
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
@@ -35,7 +35,7 @@ public class ConversionContext {
     }
 
     public void stopConversions() {
-        conversionQueue.forEach(c -> c.stop());
+        conversionQueue.forEach(Conversion::stop);
     }
 
     public void subscribeForStart(Subscriber subscriber) {
@@ -49,5 +49,19 @@ public class ConversionContext {
     public Conversion registerForConversion(ConversionSubscriber conversionSubscriber) {
         conversion.addListener((observable, oldValue, newValue) -> conversionSubscriber.resetForNewConversion(newValue));
         return conversion.get();
+    }
+
+    public void pauseConversions() {
+        conversionQueue.forEach(Conversion::pause);
+        paused = true;
+    }
+
+    public void resumeConversions() {
+        conversionQueue.forEach(Conversion::resume);
+        paused = false;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 }

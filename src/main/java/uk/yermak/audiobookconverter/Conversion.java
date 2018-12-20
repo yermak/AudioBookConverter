@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import com.sun.javaws.progress.Progress;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -19,9 +20,11 @@ public class Conversion {
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
-    private AudioBookInfo bookInfo;
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
+
+    private AudioBookInfo bookInfo;
     private OutputParameters outputParameters;
+    private String outputDestination;
 
 
     public void setMode(ConversionMode mode) {
@@ -45,24 +48,20 @@ public class Conversion {
     }
 
     public void start(String outputDestination, Refreshable refreshable) {
-        status.set(IN_PROGRESS);
+        setOutputDestination(outputDestination);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
-        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy(this);
+
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
 
-        conversionStrategy.setCallbacks(progressCallbacks);
-
-        conversionStrategy.setOutputDestination(outputDestination);
-        conversionStrategy.setBookInfo(bookInfo);
-        conversionStrategy.setMedia(media);
-        conversionStrategy.setOutputParameters(outputParameters);
+        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy(this, progressCallbacks);
 
 
         executorService.execute(conversionStrategy);
+        status.set(IN_PROGRESS);
     }
 
 
@@ -71,11 +70,15 @@ public class Conversion {
     }
 
     public void pause() {
-        status.set(PAUSED);
+        if (status.get().equals(IN_PROGRESS)) {
+            status.set(PAUSED);
+        }
     }
 
     public void stop() {
-        status.set(CANCELLED);
+        if (!status.get().equals(FINISHED)) {
+            status.set(CANCELLED);
+        }
     }
 
     public ProgressStatus getStatus() {
@@ -92,7 +95,9 @@ public class Conversion {
     }
 
     public void resume() {
-        status.set(IN_PROGRESS);
+        if (status.get().equals(PAUSED)) {
+            status.set(IN_PROGRESS);
+        }
     }
 
     public void removeStatusChangeListener(ChangeListener<ProgressStatus> listener) {
@@ -113,6 +118,14 @@ public class Conversion {
 
     public ObservableList<ArtWork> getPosters() {
         return bookInfo.getPosters();
+    }
+
+    public String getOutputDestination() {
+        return outputDestination;
+    }
+
+    public void setOutputDestination(String outputDestination) {
+        this.outputDestination = outputDestination;
     }
 }
 

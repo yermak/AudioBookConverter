@@ -7,24 +7,26 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class JoiningConversionStrategy extends AbstractConversionStrategy implements Runnable {
+public class JoiningConversionStrategy implements ConversionStrategy {
 
 
     private final StatusChangeListener listener;
     private Conversion conversion;
+    private Map<String, ProgressCallback> progressCallbacks;
 
-    public JoiningConversionStrategy(Conversion conversion) {
+    public JoiningConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
         this.conversion = conversion;
+        this.progressCallbacks = progressCallbacks;
         listener = new StatusChangeListener();
         conversion.addStatusChangeListener(listener);
     }
 
-    @Override
     protected String getTempFileName(long jobId, int index, String extension) {
-        return media.get(index).getFileName();
+        return conversion.getMedia().get(index).getFileName();
     }
 
     public void run() {
@@ -36,18 +38,18 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
         File fileListFile = null;
 
         try {
-            outputParameters.updateAuto(media);
+            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
-            metaFile = prepareMeta(jobId);
+            metaFile = MetadataBuilder.prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
             fileListFile = prepareFiles(jobId);
             if (listener.isCancelled()) return;
-            Concatenator concatenator = new FFMpegLinearConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), outputParameters, progressCallbacks.get("output"));
+            Concatenator concatenator = new FFMpegLinearConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), conversion.getOutputParameters(), progressCallbacks.get("output"));
             concatenator.concat();
             if (listener.isCancelled()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
-            artBuilder.coverArt(media, tempFile);
+            artBuilder.coverArt(conversion.getMedia(), tempFile);
             if (listener.isCancelled()) return;
-            FileUtils.moveFile(new File(tempFile), new File(outputDestination));
+            FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
             conversion.finished();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,18 +64,10 @@ public class JoiningConversionStrategy extends AbstractConversionStrategy implem
     }
 
 
-    @Override
-    public void setOutputDestination(String outputDestination) {
-        if (new File(outputDestination).exists()) {
-            this.outputDestination = Utils.makeFilenameUnique(outputDestination);
-        } else {
-            this.outputDestination = outputDestination;
-        }
-    }
 
     protected File prepareFiles(long jobId) throws IOException {
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = IntStream.range(0, media.size()).mapToObj(i -> "file '" + getTempFileName(jobId, i, ".m4b") + "'").collect(Collectors.toList());
+        List<String> outFiles = IntStream.range(0, conversion.getMedia().size()).mapToObj(i -> "file '" + getTempFileName(jobId, i, ".m4b") + "'").collect(Collectors.toList());
 
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
 

@@ -27,14 +27,17 @@ public class ConversionModeController implements ConversionSubscriber {
     @FXML
     private ToggleGroup modeGroup;
 
+    private Conversion conversion;
+
     @FXML
     public void initialize() {
         Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
         resetForNewConversion(conversion);
+        mode.addListener((observable, oldValue, newValue) -> conversion.setMode(newValue));
     }
 
     public void resetForNewConversion(Conversion conversion) {
-        mode.addListener((observable, oldValue, newValue) -> conversion.setMode(newValue));
+        this.conversion = conversion;
     }
 
     public void parallelMode(ActionEvent actionEvent) {

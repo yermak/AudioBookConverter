@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.Map;
+
 /**
  * Created by Yermak on 28-Dec-17.
  */
@@ -11,8 +13,8 @@ public enum ConversionMode {
         }
 
         @Override
-        public JoiningConversionStrategy createConvertionStrategy(Conversion conversion) {
-            return new JoiningConversionStrategy(conversion);
+        public JoiningConversionStrategy createConvertionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
+            return new JoiningConversionStrategy(conversion, progressCallbacks);
         }
     }, BATCH {
         @Override
@@ -21,8 +23,8 @@ public enum ConversionMode {
         }
 
         @Override
-        public ConversionStrategy createConvertionStrategy(Conversion conversion) {
-            return new BatchConversionStrategy(conversion);
+        public ConversionStrategy createConvertionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
+            return new BatchConversionStrategy(conversion, progressCallbacks);
         }
     }, PARALLEL {
         @Override
@@ -31,12 +33,12 @@ public enum ConversionMode {
         }
 
         @Override
-        public ConversionStrategy createConvertionStrategy(Conversion conversion) {
-            return new ParallelConversionStrategy(conversion);
+        public ConversionStrategy createConvertionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
+            return new ParallelConversionStrategy(conversion, progressCallbacks);
         }
     };
 
     public abstract boolean supportTags();
 
-    public abstract ConversionStrategy createConvertionStrategy(Conversion conversion);
+    public abstract ConversionStrategy createConvertionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks);
 }

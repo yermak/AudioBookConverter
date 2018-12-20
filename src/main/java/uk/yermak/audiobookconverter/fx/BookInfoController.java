@@ -40,6 +40,7 @@ public class BookInfoController implements ConversionSubscriber {
     private TextField year;
     @FXML
     private TextField comment;
+    private AudioBookInfo bookInfo;
 
 
     @FXML
@@ -60,19 +61,8 @@ public class BookInfoController implements ConversionSubscriber {
             genre.hide();
         });
 
-        resetForNewConversion(ConverterApplication.getContext().registerForConversion(this));
-    }
-
-    public void resetForNewConversion(Conversion conversion) {
-        AudioBookInfo bookInfo = new AudioBookInfo();
-        conversion.setBookInfo(bookInfo);
-
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
-                saveGenres();
-                clearTags();
-            }
-        });
+        Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
+        resetForNewConversion(conversion);
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -91,11 +81,24 @@ public class BookInfoController implements ConversionSubscriber {
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
+    }
+
+    public void resetForNewConversion(Conversion conversion) {
+        bookInfo = new AudioBookInfo();
+        conversion.setBookInfo(bookInfo);
+
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
+                saveGenres();
+            }
+        });
+
         ObservableList<MediaInfo> media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
         conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
+        clearTags();
     }
 
     private void saveGenres() {

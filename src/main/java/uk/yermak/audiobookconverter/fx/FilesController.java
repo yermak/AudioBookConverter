@@ -2,6 +2,8 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -59,6 +61,7 @@ public class FilesController implements ConversionSubscriber {
 
     private Conversion conversion;
     private ObservableList<MediaInfo> selectedMedia;
+    private MediaInfoChangeListener listener;
 
     @FXML
     public void initialize() {
@@ -302,7 +305,7 @@ public class FilesController implements ConversionSubscriber {
     public void resetForNewConversion(Conversion conversion) {
         this.conversion = conversion;
 
-        ObservableList<MediaInfo> media = conversion.getMedia();
+        ObservableList<MediaInfo> media = this.conversion.getMedia();
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 /* TODO fix buttons behaviour
@@ -311,15 +314,13 @@ public class FilesController implements ConversionSubscriber {
         );
 */
 
-        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+//        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
 
-        fileList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            updateUI(conversion.getStatus(), media.isEmpty(), fileList.getSelectionModel().getSelectedIndices());
-            selectedMedia.clear();
-            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(media.get(i)));
-        });
-
-
+        if (listener != null) {
+            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
+        }
+        listener = new MediaInfoChangeListener(conversion);
+        fileList.getSelectionModel().selectedItemProperty().addListener(listener);
     }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
@@ -395,6 +396,21 @@ public class FilesController implements ConversionSubscriber {
 
         }
 
+    }
+
+    private class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
+        private Conversion conversion;
+
+        public MediaInfoChangeListener(Conversion conversion) {
+            this.conversion = conversion;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
+//            updateUI(conversion.getStatus(), conversion.getMedia().isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            selectedMedia.clear();
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(conversion.getMedia().get(i)));
+        }
     }
 }
 

@@ -34,6 +34,7 @@ public class OutputController implements ConversionSubscriber {
     @FXML
     private Slider quality;
     private OutputParameters params;
+    private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
@@ -56,26 +57,6 @@ public class OutputController implements ConversionSubscriber {
         frequency.getSelectionModel().select(8);
 
         resetForNewConversion(ConverterApplication.getContext().registerForConversion(this));
-    }
-
-    private void updateParameters(ObservableList<MediaInfo> media, boolean empty) {
-        if (!empty) {
-            params.updateAuto(media);
-            copyParameters(params);
-        }
-    }
-
-    private void copyParameters(OutputParameters params) {
-        frequency.setValue(params.getFrequency());
-        bitRate.getValueFactory().setValue(params.getBitRate());
-        channels.getValueFactory().setValue(params.getChannels());
-        quality.setValue(params.getQuality());
-    }
-
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        params = new OutputParameters();
-        conversion.setOutputParameters(params);
 
         auto.selectedProperty().addListener(o -> params.setAuto(auto.isSelected()));
         bitRate.valueProperty().addListener(o -> params.setBitRate(bitRate.getValue()));
@@ -109,8 +90,28 @@ public class OutputController implements ConversionSubscriber {
 
         });
 
-        ObservableList<MediaInfo> media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
 
+    }
+
+    private void updateParameters(ObservableList<MediaInfo> media, boolean empty) {
+        if (!empty) {
+            params.updateAuto(media);
+            copyParameters(params);
+        }
+    }
+
+    private void copyParameters(OutputParameters params) {
+        frequency.setValue(params.getFrequency());
+        bitRate.getValueFactory().setValue(params.getBitRate());
+        channels.getValueFactory().setValue(params.getChannels());
+        quality.setValue(params.getQuality());
+    }
+
+    @Override
+    public void resetForNewConversion(Conversion conversion) {
+        params = new OutputParameters();
+        conversion.setOutputParameters(params);
+        media = conversion.getMedia();
     }
 }

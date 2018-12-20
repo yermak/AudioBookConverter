@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.sun.javaws.progress.Progress;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;

@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>2</version>
+    <version>3</version>
 
 
     <properties>

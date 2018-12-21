@@ -18,43 +18,23 @@ import java.io.FileNotFoundException;
 /**
  * Created by yermak on 03-Dec-18.
  */
-public class ArtWorkController {
+public class ArtWorkController implements ConversionSubscriber {
 
     @FXML
     private ListView imageList;
 
     @FXML
     private void initialize() {
+        imageList.setCellFactory(param -> new ArtWorkListCell());
+
         ConversionContext context = ConverterApplication.getContext();
+        resetForNewConversion(context.registerForConversion(this));
+    }
 
+    public void resetForNewConversion(Conversion conversion) {
         ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-        context.getConversion().getBookInfo().setPosters(posters);
-
+        conversion.getBookInfo().setPosters(posters);
         imageList.setItems(posters);
-
-        imageList.setCellFactory(param -> new ListCell<ArtWork>() {
-            private ImageView imageView = new ImageView();
-
-            @Override
-            public void updateItem(ArtWork artWork, boolean empty) {
-                super.updateItem(artWork, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    try {
-                        imageView.setImage(new Image(new FileInputStream(artWork.getFileName())));
-                        imageView.setFitHeight(110);
-                        imageView.setPreserveRatio(true);
-                        imageView.setSmooth(true);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    setGraphic(imageView);
-                }
-            }
-        });
-
     }
 
     @FXML
@@ -113,6 +93,29 @@ public class ArtWorkController {
                 items.set(selected, lower);
                 items.set(selected + 1, upper);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
+            }
+        }
+    }
+
+    private static class ArtWorkListCell extends ListCell<ArtWork> {
+        private ImageView imageView = new ImageView();
+
+        @Override
+        public void updateItem(ArtWork artWork, boolean empty) {
+            super.updateItem(artWork, empty);
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                try {
+                    imageView.setImage(new Image(new FileInputStream(artWork.getFileName())));
+                    imageView.setFitHeight(110);
+                    imageView.setPreserveRatio(true);
+                    imageView.setSmooth(true);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                setGraphic(imageView);
             }
         }
     }

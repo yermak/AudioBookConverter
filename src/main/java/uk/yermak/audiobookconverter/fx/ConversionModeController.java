@@ -5,15 +5,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.ProgressStatus;
+import uk.yermak.audiobookconverter.ConversionSubscriber;
 
 import static uk.yermak.audiobookconverter.ConversionMode.*;
 
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class ConversionModeController {
+public class ConversionModeController implements ConversionSubscriber {
 
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(this, "mode", PARALLEL);
 
@@ -26,15 +27,17 @@ public class ConversionModeController {
     @FXML
     private ToggleGroup modeGroup;
 
+    private Conversion conversion;
+
     @FXML
     public void initialize() {
-        mode.addListener((observable, oldValue, newValue) -> ConverterApplication.getContext().setMode(newValue));
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
-            parallel.setDisable(disable);
-            batch.setDisable(disable);
-            join.setDisable(disable);
-        });
+        Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
+        resetForNewConversion(conversion);
+        mode.addListener((observable, oldValue, newValue) -> conversion.setMode(newValue));
+    }
+
+    public void resetForNewConversion(Conversion conversion) {
+        this.conversion = conversion;
     }
 
     public void parallelMode(ActionEvent actionEvent) {

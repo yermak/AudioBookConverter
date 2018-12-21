@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class BookInfoController {
+public class BookInfoController implements ConversionSubscriber {
 
     @FXML
     private TextField title;
@@ -40,13 +40,11 @@ public class BookInfoController {
     private TextField year;
     @FXML
     private TextField comment;
+    private AudioBookInfo bookInfo;
 
 
     @FXML
     private void initialize() {
-        AudioBookInfo bookInfo = new AudioBookInfo();
-        ConverterApplication.getContext().setBookInfo(bookInfo);
-
         reloadGenres();
 
         MenuItem menuItem = new MenuItem("Remove");
@@ -63,11 +61,8 @@ public class BookInfoController {
             genre.hide();
         });
 
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
-                saveGenres();
-            }
-        });
+        Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
+        resetForNewConversion(conversion);
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -86,22 +81,24 @@ public class BookInfoController {
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
+    }
+
+    public void resetForNewConversion(Conversion conversion) {
+        bookInfo = new AudioBookInfo();
+        conversion.setBookInfo(bookInfo);
+
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
+                saveGenres();
+            }
+        });
+
+        ObservableList<MediaInfo> media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        ConverterApplication.getContext().getConversion().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
+        conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
-            boolean disable = newValue.equals(ProgressStatus.IN_PROGRESS);
-            title.setDisable(disable);
-            writer.setDisable(disable);
-            narrator.setDisable(disable);
-            genre.setDisable(disable);
-            series.setDisable(disable);
-            bookNo.setDisable(disable);
-            year.setDisable(disable);
-            comment.setDisable(disable);
-        });
+        clearTags();
     }
 
     private void saveGenres() {

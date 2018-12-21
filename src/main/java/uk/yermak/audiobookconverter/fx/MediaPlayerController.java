@@ -11,9 +11,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import uk.yermak.audiobookconverter.ConversionContext;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
 import java.util.List;
@@ -24,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by yermak on 26-Oct-18.
  */
-public class MediaPlayerController {
+public class MediaPlayerController implements ConversionSubscriber {
     @FXML
     private Button playButton;
     @FXML
@@ -39,12 +37,16 @@ public class MediaPlayerController {
     private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
     private ScheduledExecutorService executorService;
+    private ObservableList<MediaInfo> media;
 
     @FXML
     public void initialize() {
 
         ConversionContext context = ConverterApplication.getContext();
+
+        resetForNewConversion(context.registerForConversion(this));
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
+
         selectedMedia.addListener((InvalidationListener) observable -> {
             updateUI(selectedMedia.isEmpty() && mediaPlayer == null);
         });
@@ -100,7 +102,6 @@ public class MediaPlayerController {
         playingTrack = selected;
         ConversionContext context = ConverterApplication.getContext();
 
-        ObservableList<MediaInfo> media = context.getConversion().getMedia();
         if (media.indexOf(selected) > media.size() - 1) return;
         timelapse.setValue(0);
 
@@ -145,7 +146,6 @@ public class MediaPlayerController {
     }
 
     private MediaInfo findNext(MediaInfo selected) {
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().getConversion().getMedia();
         int i = media.indexOf(selected);
         if (i < media.size()) {
             return media.get(i + 1);
@@ -164,4 +164,9 @@ public class MediaPlayerController {
     }
 
 
+    @Override
+    public void resetForNewConversion(Conversion conversion) {
+        media = conversion.getMedia();
+        ConverterApplication.getContext().getSelectedMedia().clear();
+    }
 }

@@ -10,10 +10,13 @@ Audio Book Converter V2
 Main features:
 --------------
 * Parallel encoding: more cores - faster results
+* Parallel processing of conversions queue: prepare next book while encoding another
 * Smart artwork support: combined from MP3 artwork and cover files from MP3 directory
 * Unicode tags support: keep tags in own language
 * Chapters support: jump to the right chapter quickly
-* Simple and lightweigh user interface
+* Flexible quality management: find balance between size and quality
+* Instant playback: listen what you are going to encode
+* Simple and lightweigh user interface: Convert a book with few clicks
 
 --------------
 <a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Read more on Wiki</a>
@@ -25,6 +28,8 @@ Major differences vs original version:
 * Added super-fast mode of parallel encoding of MP3 files.
 * Added Artwork support, smart combination of MP3 images and all images in MP3 folders.
 * Added Chapters support, based on MP3 files.
+* Added Qualtity management.
+* Parallel conversion of queue of several books.
 * Improved (both speed and quality) of mp3 decoding due to switch to ffmpeg from java based decoder.
 * Improved tags support according to MP4 specification.
 * Fixed tags encoding issues due caused by legacy MP3 problems.

@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Refreshable;
 
@@ -15,7 +16,10 @@ import java.util.Map;
  */
 public class ConversionProgress implements Runnable, Refreshable {
 
+
+    //TODO move to Conversion class
     String fileName;
+
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
     SimpleLongProperty size = new SimpleLongProperty();
@@ -25,6 +29,7 @@ public class ConversionProgress implements Runnable, Refreshable {
 
     private long startTime;
     private boolean finished;
+    private Conversion conversion;
     private int totalFiles;
     private int completedFiles;
     private long totalDuration;
@@ -35,11 +40,12 @@ public class ConversionProgress implements Runnable, Refreshable {
     private long pausePeriod;
     private long pauseTime;
 
-    public ConversionProgress(int totalFiles, long totalDuration, String fileName) {
+    public ConversionProgress(Conversion conversion, int totalFiles, long totalDuration, String fileName) {
+        this.conversion = conversion;
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
         this.fileName = fileName;
-        ConverterApplication.getContext().getConversion().addStatusChangeListener((observable, oldValue, newValue) -> {
+        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
                     cancelled();
@@ -148,4 +154,17 @@ public class ConversionProgress implements Runnable, Refreshable {
         progress.set(0);
         remaining.set(60 * 1000);
     }
+
+    public void stop() {
+        conversion.stop();
+    }
+
+    public void pause() {
+        conversion.pause();
+    }
+
+    public Conversion getConversion() {
+        return conversion;
+    }
+
 }

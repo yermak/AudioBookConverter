@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.collections.ObservableList;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +14,12 @@ public class Mp4v2ArtBuilder {
 
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
     private final StatusChangeListener listener;
+    private Conversion conversion;
 
-    public Mp4v2ArtBuilder() {
+    public Mp4v2ArtBuilder(Conversion conversion) {
+        this.conversion = conversion;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
    /* private Collection<File> findPictures(File dir) {
@@ -27,7 +28,7 @@ public class Mp4v2ArtBuilder {
 
 
     public void coverArt(List<MediaInfo> media, String outputFileName) throws IOException, InterruptedException {
-        ObservableList<ArtWork> posters = ConverterApplication.getContext().getConversion().getPosters();
+        ObservableList<ArtWork> posters = conversion.getPosters();
         /*Set<String> tempPosters = new HashSet<>();
 
         searchForPosters(media, posters, tempPosters);*/

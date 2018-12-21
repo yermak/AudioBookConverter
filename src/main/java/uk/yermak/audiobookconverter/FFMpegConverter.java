@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
     private final StatusChangeListener listener;
+    private Conversion conversion;
     private OutputParameters outputParameters;
     private MediaInfo mediaInfo;
     private final String outputFileName;
@@ -26,13 +26,14 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
     private ProgressParser progressParser = null;
 
 
-    public FFMpegConverter(OutputParameters outputParameters, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+    public FFMpegConverter(Conversion conversion, OutputParameters outputParameters, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+        this.conversion = conversion;
         this.outputParameters = outputParameters;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
 
     }
 
@@ -97,7 +98,7 @@ public class FFMpegConverter implements Callable<ConverterOutput>, Converter {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
-            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
+            conversion.removeStatusChangeListener(listener);
         }
     }
 

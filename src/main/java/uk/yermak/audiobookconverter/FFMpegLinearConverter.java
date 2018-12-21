@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FFMpegLinearConverter implements Concatenator {
 
+    private Conversion conversion;
     private final String outputFileName;
     private final StatusChangeListener listener;
     private String metaDataFileName;
@@ -23,14 +23,15 @@ public class FFMpegLinearConverter implements Concatenator {
     private ProgressCallback callback;
 
 
-    public FFMpegLinearConverter(String outputFileName, String metaDataFileName, String fileListFileName, OutputParameters outputParameters, ProgressCallback callback) {
+    public FFMpegLinearConverter(Conversion conversion, String outputFileName, String metaDataFileName, String fileListFileName, OutputParameters outputParameters, ProgressCallback callback) {
+        this.conversion = conversion;
         this.outputFileName = outputFileName;
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
         this.outputParameters = outputParameters;
         this.callback = callback;
         listener = new StatusChangeListener();
-        ConverterApplication.getContext().getConversion().addStatusChangeListener(listener);
+        conversion.addStatusChangeListener(listener);
     }
 
     public void concat() throws IOException, InterruptedException {
@@ -78,7 +79,7 @@ public class FFMpegLinearConverter implements Concatenator {
                 finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {
-            ConverterApplication.getContext().getConversion().removeStatusChangeListener(listener);
+            conversion.removeStatusChangeListener(listener);
             Utils.closeSilently(ffmpegProcess);
             Utils.closeSilently(progressParser);
         }

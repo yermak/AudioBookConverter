@@ -7,40 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-//import org.eclipse.swt.widgets.Shell;
+public class MetadataBuilder {
 
-public abstract class AbstractConversionStrategy implements ConversionStrategy {
-    protected boolean finished;
-    protected AudioBookInfo bookInfo;
-    protected List<MediaInfo> media;
-    protected Map<String, ProgressCallback> progressCallbacks;
-    protected String outputDestination;
-    protected OutputParameters outputParameters;
-
-
-    public void setBookInfo(AudioBookInfo audioBookInfo) {
-        this.bookInfo = audioBookInfo;
-    }
-
-    @Override
-    public void setMedia(List<MediaInfo> media) {
-        this.media = media;
-    }
-
-    @Override
-    public void setCallbacks(Map<String, ProgressCallback> progressCallbacks) {
-        this.progressCallbacks = progressCallbacks;
-    }
-
-    @Override
-    public void setOutputParameters(OutputParameters outputParameters) {
-        this.outputParameters = outputParameters;
-    }
-
-
-    protected File prepareMeta(long jobId) throws IOException {
+    protected static File prepareMeta(long jobId, AudioBookInfo bookInfo, List<MediaInfo> media) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
         List<String> metaData = new ArrayList<>();
 
@@ -72,11 +42,4 @@ public abstract class AbstractConversionStrategy implements ConversionStrategy {
         return metaFile;
 
     }
-
-    protected abstract File prepareFiles(long jobId) throws IOException;
-
-
-    protected abstract String getTempFileName(long jobId, int index, String extension);
-
-
 }

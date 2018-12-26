@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetadataBuilder {
+public class MetadataBuilder1 {
 
     protected static File prepareMeta(long jobId, AudioBookInfo bookInfo, List<MediaInfo> media) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);

@@ -44,7 +44,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
 
 
             fileListFile = prepareFiles(jobId);
-            metaFile = MetadataBuilder.prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
+            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
             for (MediaInfo mediaInfo : prioritizedMedia) {

@@ -40,7 +40,7 @@ public class JoiningConversionStrategy implements ConversionStrategy {
         try {
             conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
-            metaFile = MetadataBuilder.prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
+            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
             fileListFile = prepareFiles(jobId);
             if (listener.isCancelled()) return;
             Concatenator concatenator = new FFMpegLinearConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), conversion.getOutputParameters(), progressCallbacks.get("output"));

@@ -16,6 +16,7 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
+        <version-scala>2.12.8</version-scala>
     </properties>
 
 
@@ -27,6 +28,12 @@
     </repositories>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${version-scala}</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -55,7 +62,52 @@
 
     </dependencies>
     <build>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>3.4.4</version>
+
+                    <configuration>
+                        <scalaVersion>${version-scala}</scalaVersion>
+                        <args>
+                            <arg>-deprecation</arg>
+                            <arg>-explaintypes</arg>
+                            <arg>-feature</arg>
+                            <arg>-optimise</arg>
+                            <arg>-unchecked</arg>
+                        </args>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>scala-compile</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-compile-tests</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
+
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -45,7 +45,7 @@ class MetadataBuilder {
       metaData.add("[CHAPTER]")
       metaData.add("TIMEBASE=1/1000")
       metaData.add("START=" + totalDuration)
-      totalDuration += m.getDuration()
+      totalDuration += m.getDuration
       metaData.add("END=" + totalDuration)
 
       if (bookInfo.getBookNumber != 0) {

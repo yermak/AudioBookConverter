@@ -35,7 +35,7 @@ public class MetadataBuilder {
             metaData.add("START=" + totalDuration);
             totalDuration += media.get(i).getDuration();
             metaData.add("END=" + totalDuration);
-            metaData.add("title=" + (bookInfo.getBookNumber() != 0 ? (bookInfo.getBookNumber() + " ") : "") +
+            metaData.add("title=" + (bookInfo.getBookNumber() != 0 ? ("Book "+ bookInfo.getBookNumber() + " :") : "") +
                     (bookInfo.getTitle().equals(bookInfo.getSeries()) ? "Chapter " : bookInfo.getTitle() + " ") + (i + 1));
         }
         FileUtils.writeLines(metaFile, "UTF-8", metaData);

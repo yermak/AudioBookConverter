@@ -8,8 +8,9 @@ class MediaInfoBean(var fileName: String) extends MediaInfo {
   private var frequency = 44100
   private var bitrate = 128000
   private var duration = 0L
-  private var bookInfo:AudioBookInfo = null
-  private var artWork:ArtWork = null
+  private var bookInfo: AudioBookInfo = null
+  private var artWork: ArtWork = null
+  private var codec: String = "";
 
   override def setChannels(channels: Int): Unit = this.channels = channels
 
@@ -36,4 +37,8 @@ class MediaInfoBean(var fileName: String) extends MediaInfo {
   override def getArtWork: ArtWork = artWork
 
   override def setArtWork(artWork: ArtWork): Unit = this.artWork = artWork
+
+  override def getCodec: String = codec
+
+  override def setCodec(codec: String): Unit = this.codec = codec
 }

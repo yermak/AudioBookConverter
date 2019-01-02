@@ -76,8 +76,6 @@ public class OutputParameters {
         int maxFrequency = 0;
         int maxBitrate = 0;
 
-        //TODO try to get source media quality parameter
-        /*
         for (MediaInfo mediaInfo : media) {
             if (mediaInfo.getChannels() > maxChannels) maxChannels = mediaInfo.getChannels();
             if (mediaInfo.getFrequency() > maxFrequency) maxFrequency = mediaInfo.getFrequency();
@@ -89,7 +87,6 @@ public class OutputParameters {
         if (cbr) {
             setBitRate(maxBitrate / 1000);
         }
-        */
     }
 
     public String getFFMpegQualityParameter() {

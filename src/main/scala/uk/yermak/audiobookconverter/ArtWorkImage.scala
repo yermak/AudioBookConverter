@@ -21,7 +21,7 @@ class ArtWorkImage(var image: Image) extends ArtWork {
       posterFile.deleteOnExit()
       ImageIO.write(bImage, "png", posterFile)
       val crc32 = Utils.checksumCRC32(posterFile)
-      bean = new ArtWorkBean(poster, crc32)
+      bean = new ArtWorkBean(poster, "png", crc32)
     } catch {
       case e: IOException =>
         e.printStackTrace()
@@ -37,4 +37,8 @@ class ArtWorkImage(var image: Image) extends ArtWork {
 
   override def setFileName(fileName: String): Unit =
     getBean.setFileName(fileName)
+
+  override def getFormat: String = getBean.getFormat
+
+  override def setFormat(format: String): Unit = getBean.setFormat(format)
 }

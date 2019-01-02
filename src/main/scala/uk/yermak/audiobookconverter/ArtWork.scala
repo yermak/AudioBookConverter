@@ -11,4 +11,9 @@ trait ArtWork {
   def getFileName: String
 
   def setFileName(fileName: String): Unit
+
+  def getFormat: String
+
+  def setFormat(format: String): Unit
+
 }

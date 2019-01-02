@@ -14,18 +14,18 @@ public class FXMediaLoaderTest {
     public void testAddPosterIfMissing() {
         ObservableList<ArtWork> posters = FXCollections.observableArrayList();
 
-        ArtWorkBean art1 = new ArtWorkBean("", 1);
+        ArtWorkBean art1 = new ArtWorkBean("","", 1);
         FXMediaLoader.addPosterIfMissing(art1, posters);
         assertTrue(posters.contains(art1));
         assertEquals(posters.size(), 1);
 
-        ArtWorkBean art2 = new ArtWorkBean("", 2);
+        ArtWorkBean art2 = new ArtWorkBean("","",  2);
 
         FXMediaLoader.addPosterIfMissing(art2, posters);
         assertTrue(posters.contains(art2));
         assertEquals(posters.size(), 2);
 
-        ArtWorkBean art22 = new ArtWorkBean("", 2);
+        ArtWorkBean art22 = new ArtWorkBean("", "", 2);
 
         FXMediaLoader.addPosterIfMissing(art22, posters);
         assertFalse(posters.contains(art22));

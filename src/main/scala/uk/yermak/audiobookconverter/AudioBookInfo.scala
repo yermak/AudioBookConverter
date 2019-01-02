@@ -13,7 +13,7 @@ class AudioBookInfo() {
   private var totalTracks = 0
   private var comment = ""
   private var longDescription = ""
-  private var posters:ObservableList[ArtWork] = null
+  private var posters: ObservableList[ArtWork] = null
 
   def getSeries: String = {
     if (series == null) return title
@@ -61,4 +61,27 @@ class AudioBookInfo() {
   def getPosters: ObservableList[ArtWork] = posters
 
   def setPosters(posters: ObservableList[ArtWork]): Unit = this.posters = posters
+
+
+}
+
+object AudioBookInfo {
+
+  def instance(tags: java.util.Map[String, Object]): AudioBookInfo = {
+    val audioBookInfo = new AudioBookInfo
+    if (tags != null) {
+      audioBookInfo.setTitle(tags.get("title").asInstanceOf[String])
+      audioBookInfo.setWriter(tags.get("artist").asInstanceOf[String])
+      audioBookInfo.setNarrator(tags.get("album_artist").asInstanceOf[String])
+      audioBookInfo.setSeries(tags.get("album").asInstanceOf[String])
+      audioBookInfo.setYear(tags.get("year").asInstanceOf[String])
+      audioBookInfo.setComment(tags.get("comment-0").asInstanceOf[String])
+      audioBookInfo.setGenre(tags.get("genre").asInstanceOf[String])
+      val trackNumber = tags.get("track number")
+      if (trackNumber != null) audioBookInfo.setBookNumber(trackNumber.asInstanceOf[Int])
+      val trackCount = tags.get("track count")
+      if (trackCount != null) audioBookInfo.setTotalTracks(trackCount.asInstanceOf[Int])
+    }
+    audioBookInfo
+  }
 }

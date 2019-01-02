@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -104,10 +103,10 @@ public class FilesController implements ConversionSubscriber {
         String sourceFolder = AppProperties.getProperty("source.folder");
         directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
 
-        directoryChooser.setTitle("Select folder with MP3/WMA files for conversion");
+        directoryChooser.setTitle("Select folder with MP3/WMA/M4A/M4B files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
-            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "wma"}, true);
+            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "m4a", "m4b", "wma"}, true);
             processFiles(files);
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
@@ -123,16 +122,17 @@ public class FilesController implements ConversionSubscriber {
     }
 
     private MediaLoader createMediaLoader(List<String> fileNames) {
-        return new FXMediaLoader(fileNames, conversion);
+        return new FFMediaLoader(fileNames, conversion);
     }
 
     private void selectFilesDialog(Window window) {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-        fileChooser.setTitle("Select MP3/WMA files for conversion");
+        fileChooser.setTitle("Select MP3/WMA/M4A/M4B files for conversion");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("mp3", "*.mp3"),
+                new FileChooser.ExtensionFilter("m4a; m4b", "*.m4a", "*.m4b"),
                 new FileChooser.ExtensionFilter("wma", "*.wma")
         );
         List<File> files = fileChooser.showOpenMultipleDialog(window);

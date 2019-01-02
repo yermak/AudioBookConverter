@@ -44,8 +44,7 @@ public class ArtWorkController implements ConversionSubscriber {
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
         fileChooser.setTitle("Select JPG or PNG file");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("jpg", "*.jpg"),
-                new FileChooser.ExtensionFilter("jpg", "*.jpeg"),
+                new FileChooser.ExtensionFilter("jpg", "*.jpg", "jpeg", "jfif"),
                 new FileChooser.ExtensionFilter("png", "*.png"),
                 new FileChooser.ExtensionFilter("bmp", "*.bmp")
         );

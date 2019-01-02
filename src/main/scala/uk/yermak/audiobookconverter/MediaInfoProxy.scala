@@ -40,4 +40,8 @@ class MediaInfoProxy(val filename: String, val futureLoad: Future[MediaInfo]) ex
   override def setArtWork(artWork: ArtWork): Unit = getMediaInfo.setArtWork(artWork)
 
   override def toString: String = filename
+
+  override def getCodec: String = getMediaInfo.getCodec
+
+  override def setCodec(codec: String): Unit = getMediaInfo.setCodec(codec)
 }

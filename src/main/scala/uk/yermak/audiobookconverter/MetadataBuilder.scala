@@ -38,7 +38,7 @@ class MetadataBuilder {
     metaData.add("media_type=2")
     metaData.add("genre=" + bookInfo.getGenre)
     metaData.add("encoder=" + "https://github.com/yermak/AudioBookConverter")
-    var totalDuration:Long = 0
+    var totalDuration: Long = 0
     var i = 1
 
     for (m <- media) {
@@ -49,10 +49,10 @@ class MetadataBuilder {
       metaData.add("END=" + totalDuration)
 
       if (bookInfo.getBookNumber != 0) {
-        metaData.add("title=Book " + bookInfo.getBookNumber + " : Chapter: " + i)
+        metaData.add("title=" + bookInfo.getBookNumber + ". " + bookInfo.getTitle + ": " + i + ". " + m.getBookInfo.getTitle)
       }
       else {
-        metaData.add("title=Chapter: " + i)
+        metaData.add("title=" + i + ". " + m.getBookInfo.getTitle)
       }
       i += 1
     }

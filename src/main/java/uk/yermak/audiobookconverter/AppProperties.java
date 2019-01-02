@@ -15,7 +15,7 @@ public class AppProperties {
         Properties applicationProps = new Properties(defaultProperties);
 
         try {
-            FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "AudioBookConverter-V2"), "AudioBookConverter-V3.properties"));
+            FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "AudioBookConverter-V3"), "AudioBookConverter-V3.properties"));
             applicationProps.load(in);
             in.close();
         } catch (Exception e) {

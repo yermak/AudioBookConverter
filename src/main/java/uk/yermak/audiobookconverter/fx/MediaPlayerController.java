@@ -47,9 +47,7 @@ public class MediaPlayerController implements ConversionSubscriber {
         resetForNewConversion(context.registerForConversion(this));
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
-        selectedMedia.addListener((InvalidationListener) observable -> {
-            updateUI(selectedMedia.isEmpty() && mediaPlayer == null);
-        });
+        selectedMedia.addListener((InvalidationListener) observable -> updateUI(selectedMedia.isEmpty() && mediaPlayer == null));
 
     }
 

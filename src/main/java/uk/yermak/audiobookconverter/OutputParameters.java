@@ -124,10 +124,10 @@ public class OutputParameters {
     }
 
     public void setCutoff(int cutoff) {
-        this.bitRate = cutoff;
+        this.cutoff = cutoff;
     }
 
     public int getCutoff() {
-        return bitRate;
+        return cutoff;
     }
 }

@@ -29,4 +29,8 @@ trait MediaInfo {
   def getArtWork: ArtWork
 
   def setArtWork(artWork: ArtWork): Unit
+
+  def getCodec: String
+
+  def setCodec(codec: String): Unit
 }

@@ -44,13 +44,13 @@ public class ParallelConversionStrategy implements ConversionStrategy {
 
 
             fileListFile = prepareFiles(jobId);
-            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
+
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
             for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegConverter(conversion, conversion.getOutputParameters(), mediaInfo, tempOutput, callback));
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, conversion.getOutputParameters(), mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
@@ -59,6 +59,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
                 future.get();
             }
             if (listener.isCancelled()) return;
+            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
             Concatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 

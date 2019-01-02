@@ -52,8 +52,9 @@ public class FXMediaLoader implements MediaLoader {
     private void loadMetadata(Media m, String fileName, CompletableFuture completableFuture) {
         ObservableMap<String, Object> metadata = m.getMetadata();
 
+
         MediaInfoBean mediaInfo = new MediaInfoBean(fileName);
-        AudioBookInfo bookInfo = createAudioBookInfo(metadata);
+        AudioBookInfo bookInfo = AudioBookInfo.instance(new HashMap<>(metadata));
         System.out.println("bookInfo = " + bookInfo.getTitle());
         mediaInfo.setBookInfo(bookInfo);
         if (!m.getTracks().isEmpty()) {
@@ -74,30 +75,6 @@ public class FXMediaLoader implements MediaLoader {
     }
 
 
-
-    public AudioBookInfo createAudioBookInfo(Map tags) {
-        AudioBookInfo audioBookInfo = new AudioBookInfo();
-        if (tags != null) {
-            audioBookInfo.setTitle((String) tags.get("title"));
-            audioBookInfo.setWriter((String) tags.get("artist"));
-            audioBookInfo.setNarrator((String) tags.get("album artist"));
-            audioBookInfo.setSeries((String) tags.get("album"));
-            audioBookInfo.setYear((String.valueOf(tags.get("year"))));
-            audioBookInfo.setComment((String) tags.get("comment-0"));
-            audioBookInfo.setGenre((String) tags.get("genre"));
-            Object trackNumber = tags.get("track number");
-            if (trackNumber != null) {
-                audioBookInfo.setBookNumber((int) trackNumber);
-            }
-            Object trackCount = tags.get("track count");
-            if (trackCount != null) {
-                audioBookInfo.setTotalTracks((int) trackCount);
-            }
-        }
-        return audioBookInfo;
-    }
-
-
     static Collection<File> findPictures(File dir) {
         return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
     }
@@ -106,12 +83,17 @@ public class FXMediaLoader implements MediaLoader {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), Utils.checksumCRC32(f)), posters)));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(f.getPath(), extension(f.getName()), Utils.checksumCRC32(f)), posters)));
     }
 
     static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
         if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
             posters.add(artWork);
         }
+    }
+
+    static String extension(String fileName) {
+        int i = fileName.lastIndexOf('.');
+        return fileName.substring(i);
     }
 }

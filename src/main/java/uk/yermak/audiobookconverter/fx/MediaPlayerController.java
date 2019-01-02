@@ -113,7 +113,7 @@ public class MediaPlayerController implements ConversionSubscriber {
             Duration duration = mediaPlayer.getMedia().getDuration();
             timelapse.setMax(duration.toSeconds());
             totalTime.setText(Utils.formatTime(duration.toMillis()));
-            executorService.scheduleAtFixedRate(() -> updateValues(), 1, 1, TimeUnit.SECONDS);
+            executorService.scheduleAtFixedRate(this::updateValues, 1, 1, TimeUnit.SECONDS);
         });
 
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());

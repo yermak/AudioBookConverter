@@ -155,14 +155,6 @@ public class ConversionProgress implements Runnable, Refreshable {
         remaining.set(60 * 1000);
     }
 
-    public void stop() {
-        conversion.stop();
-    }
-
-    public void pause() {
-        conversion.pause();
-    }
-
     public Conversion getConversion() {
         return conversion;
     }

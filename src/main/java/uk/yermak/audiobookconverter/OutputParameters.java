@@ -94,7 +94,7 @@ public class OutputParameters {
     }
 
     public String getFFMpegQualityValue() {
-        return cbr ? String.valueOf(getBitRate()) + "k" : String.valueOf(quality);
+        return cbr ? getBitRate() + "k" : String.valueOf(quality);
     }
 
     public String getFFMpegFrequencyValue() {

@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 /**
  * Created by yermak on 1/10/2018.
  */
-public class FFMediaLoader implements MediaLoader {
+public class FFMediaLoader {
 
     private List<String> fileNames;
     private Conversion conversion;
@@ -75,8 +75,8 @@ public class FFMediaLoader implements MediaLoader {
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
 
                 List<FFmpegStream> streams = probeResult.getStreams();
-                for (int i = 0; i < streams.size(); i++) {
-                    FFmpegStream ffMpegStream = streams.get(i);
+
+                for (FFmpegStream ffMpegStream : streams) {
                     if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
                         mediaInfo.setCodec(ffMpegStream.codec_name);
                         mediaInfo.setChannels(ffMpegStream.channels);

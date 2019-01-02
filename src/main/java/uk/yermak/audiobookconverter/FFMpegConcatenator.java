@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegConcatenator implements Concatenator {
+public class FFMpegConcatenator {
 
     private Conversion conversion;
     private final String outputFileName;
-    private final StatusChangeListener listener;
+
     private String metaDataFileName;
     private String fileListFileName;
     private ProgressCallback callback;
@@ -29,18 +29,14 @@ public class FFMpegConcatenator implements Concatenator {
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
         this.callback = callback;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
     }
 
     public void concat() throws IOException, InterruptedException {
-        if (listener.isCancelled()) return;
-        while (listener.isPaused()) Thread.sleep(1000);
+        if (conversion.getStatus().isOver()) return;
+        while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
         callback.reset();
         try {
-            progressParser = new TcpProgressParser(progress -> {
-                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-            });
+            progressParser = new TcpProgressParser(progress -> callback.converted(progress.out_time_ns / 1000000, progress.total_size));
             progressParser.start();
         } catch (URISyntaxException e) {
         }
@@ -68,7 +64,7 @@ public class FFMpegConcatenator implements Concatenator {
             StreamCopier.copy(process.getErrorStream(), System.err);
 
             boolean finished = false;
-            while (!listener.isCancelled() && !finished) {
+            while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
 

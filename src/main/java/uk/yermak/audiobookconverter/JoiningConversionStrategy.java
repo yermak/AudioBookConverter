@@ -13,16 +13,12 @@ import java.util.stream.IntStream;
 
 public class JoiningConversionStrategy implements ConversionStrategy {
 
-
-    private final StatusChangeListener listener;
     private Conversion conversion;
     private Map<String, ProgressCallback> progressCallbacks;
 
     public JoiningConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
         this.conversion = conversion;
         this.progressCallbacks = progressCallbacks;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
     }
 
     protected String getTempFileName(long jobId, int index, String extension) {
@@ -42,13 +38,13 @@ public class JoiningConversionStrategy implements ConversionStrategy {
 
             metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
             fileListFile = prepareFiles(jobId);
-            if (listener.isCancelled()) return;
-            Concatenator concatenator = new FFMpegLinearNativeConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), conversion.getOutputParameters(), progressCallbacks.get("output"));
+            if (conversion.getStatus().isOver()) return;
+            FFMpegLinearNativeConverter concatenator = new FFMpegLinearNativeConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), conversion.getOutputParameters(), progressCallbacks.get("output"));
             concatenator.concat();
-            if (listener.isCancelled()) return;
+            if (conversion.getStatus().isOver()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
-            artBuilder.coverArt(conversion.getMedia(), tempFile);
-            if (listener.isCancelled()) return;
+            artBuilder.coverArt(tempFile);
+            if (conversion.getStatus().isOver()) return;
             FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
             conversion.finished();
         } catch (Exception e) {
@@ -59,7 +55,6 @@ public class JoiningConversionStrategy implements ConversionStrategy {
         } finally {
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
-            conversion.removeStatusChangeListener(listener);
         }
     }
 

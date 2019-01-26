@@ -13,6 +13,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -21,14 +22,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -62,12 +67,44 @@ public class FilesController implements ConversionSubscriber {
     private ObservableList<MediaInfo> selectedMedia;
     private MediaInfoChangeListener listener;
 
+    private final static String[] FileExtensions = new String[]{"mp3", "m4a", "m4b", "wma"};
+    private final static List<String> FileExtensionsList = Arrays.asList(FileExtensions);
+    
     @FXML
     public void initialize() {
+     
+    	fileList.setOnDragOver(new EventHandler <DragEvent>() {
+    		public void handle(DragEvent event) {
+    			System.out.println("onDragOver");
+    			if (event.getGestureSource() != fileList &&
+    					event.getDragboard().hasFiles()) {
+    				event.acceptTransferModes(TransferMode.ANY);
+    			}
 
+    			event.consume();
+    		}
+    	});
+
+    	fileList.setOnDragDropped(new EventHandler<DragEvent>() {
+    		@Override
+    		public void handle(DragEvent event) {
+    			System.out.println("drop");
+    			ArrayList<File> files = new ArrayList();
+    			for (File file: event.getDragboard().getFiles()) {
+    				if (file.isDirectory()) {
+    					files.addAll(FileUtils.listFiles(file, FileExtensions, true));
+    	                processFiles(files);
+    				}
+    			}
+    					
+    			processFiles(event.getDragboard().getFiles());
+    			event.setDropCompleted(true);
+    			event.consume();
+    		}
+    	});
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
-        MenuItem item1 = new MenuItem("Files");
+    	MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
         MenuItem item2 = new MenuItem("Folder");
         item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
@@ -87,6 +124,9 @@ public class FilesController implements ConversionSubscriber {
                 change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
             }
         });
+        
+        
+
     }
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -103,19 +143,27 @@ public class FilesController implements ConversionSubscriber {
         String sourceFolder = AppProperties.getProperty("source.folder");
         directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
 
-        directoryChooser.setTitle("Select folder with MP3/WMA/M4A/M4B files for conversion");
+        StringJoiner filetypes = new StringJoiner("/");    
+        FileExtensionsList.forEach(f -> filetypes.add(f.toUpperCase()));
+        directoryChooser.setTitle("Select folder with "+ filetypes.toString() +" files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
-            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "m4a", "m4b", "wma"}, true);
-            processFiles(files);
+            processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
     }
-
+   
+    
     private void processFiles(Collection<File> files) {
-
         List<String> fileNames = new ArrayList<>();
-        files.forEach(f -> fileNames.add(f.getPath()));
+        for (File file: files) {
+        	if (file.isDirectory()) {
+        		processFiles(FileUtils.listFiles(file, FileExtensions, true));
+        	}
+        	else if (FileExtensionsList.contains(FilenameUtils.getExtension(file.getName()))) {
+        		fileNames.add(file.getPath());
+        	}
+        }
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
 
         fileList.getItems().addAll(addedMedia);
@@ -129,12 +177,19 @@ public class FilesController implements ConversionSubscriber {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-        fileChooser.setTitle("Select MP3/WMA/M4A/M4B files for conversion");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("mp3", "*.mp3"),
-                new FileChooser.ExtensionFilter("m4a; m4b", "*.m4a", "*.m4b"),
-                new FileChooser.ExtensionFilter("wma", "*.wma")
-        );
+        StringJoiner filetypes = new StringJoiner("/");    
+        FileExtensionsList.forEach(f -> filetypes.add(f.toUpperCase()));
+        fileChooser.setTitle("Select "+ filetypes.toString() +" files for conversion");
+        
+        for (int i = 0; i < FileExtensions.length; i++) {
+        	if (i != 1) {
+        		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(FileExtensions[i], "*."+FileExtensions[i]));
+        	}
+        	else {
+        		fileChooser.getExtensionFilters().add( new FileChooser.ExtensionFilter(FileExtensions[1] +"; "+FileExtensions[2], "*"+FileExtensions[1], "*."+FileExtensions[2]));
+        		i++;
+        	}
+        }
         List<File> files = fileChooser.showOpenMultipleDialog(window);
         if (files != null) {
             processFiles(files);
@@ -413,5 +468,3 @@ public class FilesController implements ConversionSubscriber {
         }
     }
 }
-
-

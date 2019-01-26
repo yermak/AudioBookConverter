@@ -13,6 +13,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -21,14 +22,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -62,9 +62,25 @@ public class FilesController implements ConversionSubscriber {
     private ObservableList<MediaInfo> selectedMedia;
     private MediaInfoChangeListener listener;
 
+    private static final String M4B = "m4b";
+    private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+
     @FXML
     public void initialize() {
 
+        fileList.setOnDragOver(event -> {
+            if (event.getGestureSource() != fileList && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.ANY);
+            }
+
+            event.consume();
+        });
+
+        fileList.setOnDragDropped(event -> {
+            processFiles(event.getDragboard().getFiles());
+            event.setDropCompleted(true);
+            event.consume();
+        });
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -87,6 +103,7 @@ public class FilesController implements ConversionSubscriber {
                 change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
             }
         });
+
     }
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -103,19 +120,31 @@ public class FilesController implements ConversionSubscriber {
         String sourceFolder = AppProperties.getProperty("source.folder");
         directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
 
-        directoryChooser.setTitle("Select folder with MP3/WMA/M4A/M4B files for conversion");
+        StringJoiner filetypes = new StringJoiner("/");
+
+        Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
+
+        directoryChooser.setTitle("Select folder with " + filetypes.toString() + " files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
         if (selectedDirectory != null) {
-            Collection<File> files = FileUtils.listFiles(selectedDirectory, new String[]{"mp3", "m4a", "m4b", "wma"}, true);
-            processFiles(files);
+            processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
     }
 
-    private void processFiles(Collection<File> files) {
 
+    private void processFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
-        files.forEach(f -> fileNames.add(f.getPath()));
+        for (File file : files) {
+            if (file.isDirectory()) {
+                processFiles(FileUtils.listFiles(file, FILE_EXTENSIONS, true));
+            } else {
+                boolean contains = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
+                if (contains) {
+                    fileNames.add(file.getPath());
+                }
+            }
+        }
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
 
         fileList.getItems().addAll(addedMedia);
@@ -129,12 +158,16 @@ public class FilesController implements ConversionSubscriber {
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-        fileChooser.setTitle("Select MP3/WMA/M4A/M4B files for conversion");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("mp3", "*.mp3"),
-                new FileChooser.ExtensionFilter("m4a; m4b", "*.m4a", "*.m4b"),
-                new FileChooser.ExtensionFilter("wma", "*.wma")
-        );
+        StringJoiner filetypes = new StringJoiner("/");
+
+        Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
+
+        fileChooser.setTitle("Select " + filetypes.toString() + " files for conversion");
+
+        for (String fileExtension : FILE_EXTENSIONS) {
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(fileExtension, "*." + fileExtension));
+        }
+
         List<File> files = fileChooser.showOpenMultipleDialog(window);
         if (files != null) {
             processFiles(files);
@@ -244,7 +277,7 @@ public class FilesController implements ConversionSubscriber {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("m4b", "*.m4b")
+                new FileChooser.ExtensionFilter(M4B, "*."+M4B)
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
@@ -413,5 +446,3 @@ public class FilesController implements ConversionSubscriber {
         }
     }
 }
-
-

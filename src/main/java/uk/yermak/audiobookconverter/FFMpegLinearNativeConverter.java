@@ -10,11 +10,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegLinearNativeConverter implements Concatenator {
+public class FFMpegLinearNativeConverter {
 
     private Conversion conversion;
     private final String outputFileName;
-    private final StatusChangeListener listener;
     private String metaDataFileName;
     private String fileListFileName;
     private Process ffmpegProcess;
@@ -30,13 +29,12 @@ public class FFMpegLinearNativeConverter implements Concatenator {
         this.fileListFileName = fileListFileName;
         this.outputParameters = outputParameters;
         this.callback = callback;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
     }
 
     public void concat() throws IOException, InterruptedException {
-        if (listener.isCancelled()) return;
-        while (listener.isPaused()) Thread.sleep(1000);
+        if (conversion.getStatus().isOver()) return;
+        while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
+
 
         try {
             progressParser = new TcpProgressParser(progress -> {
@@ -109,11 +107,10 @@ public class FFMpegLinearNativeConverter implements Concatenator {
             StreamCopier.copy(ffmpegProcess.getInputStream(), System.out);
             StreamCopier.copy(ffmpegProcess.getErrorStream(), System.err);
             boolean finished = false;
-            while (!listener.isCancelled() && !finished) {
+            while (!conversion.getStatus().isOver() && !finished) {
                 finished = ffmpegProcess.waitFor(500, TimeUnit.MILLISECONDS);
             }
         } finally {
-            conversion.removeStatusChangeListener(listener);
             Utils.closeSilently(ffmpegProcess);
             Utils.closeSilently(progressParser);
         }

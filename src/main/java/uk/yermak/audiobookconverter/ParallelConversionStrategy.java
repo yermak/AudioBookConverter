@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy implements ConversionStrategy {
 
-    private final StatusChangeListener listener;
     private static ExecutorService executorService = Executors.newWorkStealingPool();
     private Conversion conversion;
     private Map<String, ProgressCallback> progressCallbacks;
@@ -26,8 +25,6 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     public ParallelConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
         this.conversion = conversion;
         this.progressCallbacks = progressCallbacks;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
     }
 
     public void run() {
@@ -55,19 +52,19 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             }
 
             for (Future<ConverterOutput> future : futures) {
-                if (listener.isCancelled()) return;
+                if (conversion.getStatus().isOver()) return;
                 future.get();
             }
-            if (listener.isCancelled()) return;
+            if (conversion.getStatus().isOver()) return;
             metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
-            Concatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
-            if (listener.isCancelled()) return;
+            if (conversion.getStatus().isOver()) return;
             Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
-            artBuilder.coverArt(conversion.getMedia(), tempFile);
+            artBuilder.coverArt(tempFile);
 
-            if (listener.isCancelled()) return;
+            if (conversion.getStatus().isOver()) return;
             FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
             conversion.finished();
         } catch (Exception e) {
@@ -81,7 +78,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
-            conversion.removeStatusChangeListener(listener);
+            if (conversion.getStatus().isOver()) return;
         }
     }
 

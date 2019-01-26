@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 
 public class BatchConversionStrategy implements ConversionStrategy {
     private final ExecutorService executorService = Executors.newWorkStealingPool();
-    private final StatusChangeListener listener;
     private Conversion conversion;
 
     protected Map<String, ProgressCallback> progressCallbacks;
@@ -27,8 +26,6 @@ public class BatchConversionStrategy implements ConversionStrategy {
     public BatchConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
         this.conversion = conversion;
         this.progressCallbacks = progressCallbacks;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
     }
 
     protected String getTempFileName(long jobId, int index, String extension) {
@@ -60,8 +57,6 @@ public class BatchConversionStrategy implements ConversionStrategy {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
-        } finally {
-            conversion.removeStatusChangeListener(listener);
         }
     }
 

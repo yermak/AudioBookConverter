@@ -99,10 +99,6 @@ public class Conversion {
         }
     }
 
-    public void removeStatusChangeListener(ChangeListener<ProgressStatus> listener) {
-        if (listener != null) status.removeListener(listener);
-    }
-
     public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
         mode.addListener(listener);
     }

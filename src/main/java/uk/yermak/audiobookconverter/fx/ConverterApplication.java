@@ -28,30 +28,30 @@ public class ConverterApplication extends Application {
         try {
             URL resource = ConverterApplication.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
             root = FXMLLoader.load(resource);
+
+            Scene scene = new Scene(root);
+            stage.setTitle(Version.getVersionString());
+            stage.setScene(scene);
+            Screen primary = Screen.getPrimary();
+            stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);
+            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
+            stage.show();
+            env = new JfxEnv(scene, getHostServices());
+
+
+            stage.setOnCloseRequest(event -> {
+                ConverterApplication.getContext().stopConversions();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.exit(0);
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Scene scene = new Scene(root);
-        stage.setTitle(Version.getVersionString());
-        stage.setScene(scene);
-        Screen primary = Screen.getPrimary();
-        stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.5);
-        stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
-        stage.show();
-        env = new JfxEnv(scene, getHostServices());
-
-
-        stage.setOnCloseRequest(event -> {
-            ConverterApplication.getContext().stopConversions();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.exit(0);
-        });
-
-
     }
 
     public static ConversionContext getContext() {

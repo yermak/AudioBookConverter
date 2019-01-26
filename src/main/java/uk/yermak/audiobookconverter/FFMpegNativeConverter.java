@@ -14,8 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegNativeConverter implements Callable<ConverterOutput>, Converter {
-    private final StatusChangeListener listener;
+public class FFMpegNativeConverter implements Callable<ConverterOutput> {
     private Conversion conversion;
     private OutputParameters outputParameters;
     private MediaInfo mediaInfo;
@@ -32,15 +31,13 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput>, Convert
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
-        listener = new StatusChangeListener();
-        conversion.addStatusChangeListener(listener);
-
     }
 
     public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException {
         try {
-            if (listener.isCancelled()) return null;
-            while (listener.isCancelled()) Thread.sleep(1000);
+            if (conversion.getStatus().isOver()) return null;
+            while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
+
 
 
             progressParser = new TcpProgressParser(progress -> {
@@ -97,7 +94,7 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput>, Convert
             StreamCopier.copy(ffmpegErr, System.err);
 
             boolean finished = false;
-            while (!listener.isCancelled() && !finished) {
+            while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
 
@@ -109,7 +106,6 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput>, Convert
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
-            conversion.removeStatusChangeListener(listener);
         }
     }
 

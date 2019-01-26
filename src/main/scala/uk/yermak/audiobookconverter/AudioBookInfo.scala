@@ -56,12 +56,13 @@ class AudioBookInfo() {
 
   def getLongDescription: String = longDescription
 
-  def setLongDescription(longDescription: String): Unit = this.longDescription = longDescription
+  def setLongDescription(longDescription: String): Unit =
+    this.longDescription = longDescription
 
   def getPosters: ObservableList[ArtWork] = posters
 
-  def setPosters(posters: ObservableList[ArtWork]): Unit = this.posters = posters
-
+  def setPosters(posters: ObservableList[ArtWork]): Unit =
+    this.posters = posters
 
 }
 
@@ -78,9 +79,11 @@ object AudioBookInfo {
       audioBookInfo.setComment(tags.get("comment-0").asInstanceOf[String])
       audioBookInfo.setGenre(tags.get("genre").asInstanceOf[String])
       val trackNumber = tags.get("track number")
-      if (trackNumber != null) audioBookInfo.setBookNumber(trackNumber.asInstanceOf[Int])
+      if (trackNumber != null)
+        audioBookInfo.setBookNumber(trackNumber.asInstanceOf[Int])
       val trackCount = tags.get("track count")
-      if (trackCount != null) audioBookInfo.setTotalTracks(trackCount.asInstanceOf[Int])
+      if (trackCount != null)
+        audioBookInfo.setTotalTracks(trackCount.asInstanceOf[Int])
     }
     audioBookInfo
   }

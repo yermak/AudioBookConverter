@@ -150,7 +150,7 @@ public class FilesController implements ConversionSubscriber {
         fileList.getItems().addAll(addedMedia);
     }
 
-    private MediaLoader createMediaLoader(List<String> fileNames) {
+    private FFMediaLoader createMediaLoader(List<String> fileNames) {
         return new FFMediaLoader(fileNames, conversion);
     }
 
@@ -226,7 +226,7 @@ public class FilesController implements ConversionSubscriber {
         if (media.size() > 0) {
             AudioBookInfo audioBookInfo = conversion.getBookInfo();
             MediaInfo mediaInfo = media.get(0);
-            String outputDestination = null;
+            String outputDestination;
             if (conversion.getMode().equals(ConversionMode.BATCH)) {
                 outputDestination = selectOutputDirectory();
             } else {

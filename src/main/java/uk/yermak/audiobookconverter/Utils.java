@@ -28,7 +28,7 @@ public class Utils {
     }
 
     public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v2-" + jobId + "-" + index + extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-v3-" + jobId + "-" + index + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {

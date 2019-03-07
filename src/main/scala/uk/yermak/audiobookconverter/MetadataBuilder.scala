@@ -10,9 +10,9 @@ import scala.collection.JavaConverters._
 
 class MetadataBuilder {
   @throws[IOException]
-  protected def prepareMeta(jobId: Long,
-                            bookInfo: AudioBookInfo,
-                            inputMedia: util.List[MediaInfo]): File = {
+  def prepareMeta(jobId: Long,
+                  bookInfo: AudioBookInfo,
+                  inputMedia: util.List[MediaInfo]): File = {
     val metaFile =
       new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId)
 

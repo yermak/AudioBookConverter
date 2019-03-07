@@ -9,14 +9,12 @@ import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ConversionMode;
 import uk.yermak.audiobookconverter.ConversionSubscriber;
 
-import static uk.yermak.audiobookconverter.ConversionMode.*;
-
 /**
  * Created by Yermak on 04-Feb-18.
  */
 public class ConversionModeController implements ConversionSubscriber {
 
-    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(this, "mode", PARALLEL);
+    private SimpleObjectProperty<scala.Enumeration.Value> mode = new SimpleObjectProperty<>(this, "mode", ConversionMode.PARALLEL());
 
     @FXML
     public RadioButton parallel;
@@ -41,14 +39,14 @@ public class ConversionModeController implements ConversionSubscriber {
     }
 
     public void parallelMode(ActionEvent actionEvent) {
-        mode.set(PARALLEL);
+        mode.set(ConversionMode.PARALLEL());
     }
 
     public void batchMode(ActionEvent actionEvent) {
-        mode.set(BATCH);
+        mode.set(ConversionMode.BATCH());
     }
 
     public void joinMode(ActionEvent actionEvent) {
-        mode.set(SINGLE);
+        mode.set(ConversionMode.SINGLE());
     }
 }

@@ -41,7 +41,6 @@ public class OutputController implements ConversionSubscriber {
         cutoff.setDisable(false);
         quality.setDisable(true);
         params.setCbr(true);
-
     }
 
     public void vbr(ActionEvent actionEvent) {
@@ -108,9 +107,8 @@ public class OutputController implements ConversionSubscriber {
         quality.setValue(params.getQuality());
     }
 
-    @Override
     public void resetForNewConversion(Conversion conversion) {
-        params = new OutputParameters();
+        params = OutputParameters.instance();
         conversion.setOutputParameters(params);
         media = conversion.getMedia();
     }

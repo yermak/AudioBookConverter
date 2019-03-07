@@ -2,6 +2,8 @@ package uk.yermak.audiobookconverter
 
 import javafx.collections.ObservableList
 
+import scala.collection.mutable
+
 class AudioBookInfo() {
   private var writer = ""
   private var narrator = ""
@@ -13,7 +15,7 @@ class AudioBookInfo() {
   private var totalTracks = 0
   private var comment = ""
   private var longDescription = ""
-  private var posters: ObservableList[ArtWork] = null
+  private var posters: ObservableList[ArtWork] = _
 
   def getSeries: String = {
     if (series == null) return title
@@ -68,20 +70,20 @@ class AudioBookInfo() {
 
 object AudioBookInfo {
 
-  def instance(tags: java.util.Map[String, Object]): AudioBookInfo = {
+  def instance(tags: mutable.Map[String, String]): AudioBookInfo = {
     val audioBookInfo = new AudioBookInfo
     if (tags != null) {
-      audioBookInfo.setTitle(tags.get("title").asInstanceOf[String])
-      audioBookInfo.setWriter(tags.get("artist").asInstanceOf[String])
-      audioBookInfo.setNarrator(tags.get("album_artist").asInstanceOf[String])
-      audioBookInfo.setSeries(tags.get("album").asInstanceOf[String])
-      audioBookInfo.setYear(tags.get("year").asInstanceOf[String])
-      audioBookInfo.setComment(tags.get("comment-0").asInstanceOf[String])
-      audioBookInfo.setGenre(tags.get("genre").asInstanceOf[String])
-      val trackNumber = tags.get("track number")
+      audioBookInfo.setTitle(tags("title"))
+      audioBookInfo.setWriter(tags("artist"))
+      audioBookInfo.setNarrator(tags("album_artist"))
+      audioBookInfo.setSeries(tags("album"))
+      audioBookInfo.setYear(tags("year"))
+      audioBookInfo.setComment(tags("comment-0"))
+      audioBookInfo.setGenre(tags("genre"))
+      val trackNumber = tags("track number")
       if (trackNumber != null)
         audioBookInfo.setBookNumber(trackNumber.asInstanceOf[Int])
-      val trackCount = tags.get("track count")
+      val trackCount = tags("track count")
       if (trackCount != null)
         audioBookInfo.setTotalTracks(trackCount.asInstanceOf[Int])
     }

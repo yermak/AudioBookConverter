@@ -227,7 +227,7 @@ public class FilesController implements ConversionSubscriber {
             AudioBookInfo audioBookInfo = conversion.getBookInfo();
             MediaInfo mediaInfo = media.get(0);
             String outputDestination;
-            if (conversion.getMode().equals(ConversionMode.BATCH)) {
+            if (conversion.getMode().equals(ConversionMode.BATCH())) {
                 outputDestination = selectOutputDirectory();
             } else {
                 outputDestination = selectOutputFile(audioBookInfo, mediaInfo);

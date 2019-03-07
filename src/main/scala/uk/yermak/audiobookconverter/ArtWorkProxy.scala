@@ -6,12 +6,14 @@ import java.util.concurrent.{ExecutionException, Future}
   * Created by yermak on 1/11/2018.
   */
 class ArtWorkProxy(val futureLoad: Future[ArtWork], var format: String) extends ArtWork {
-  private def getArtWork = try futureLoad.get
-  catch {
-    case e@(_: InterruptedException | _: ExecutionException) =>
-      e.printStackTrace()
-      throw new RuntimeException(e)
-  }
+  private def getArtWork =
+    try
+      futureLoad.get
+    catch {
+      case e@(_: InterruptedException | _: ExecutionException) =>
+        e.printStackTrace()
+        throw new RuntimeException(e)
+    }
 
   override def getFormat: String = format
 

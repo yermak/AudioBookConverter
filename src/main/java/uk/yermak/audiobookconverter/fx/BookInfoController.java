@@ -64,6 +64,7 @@ public class BookInfoController implements ConversionSubscriber {
         Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
         resetForNewConversion(conversion);
 
+
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
@@ -96,7 +97,7 @@ public class BookInfoController implements ConversionSubscriber {
         ObservableList<MediaInfo> media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
-        conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
+        conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH().equals(newValue)));
 
         clearTags();
     }

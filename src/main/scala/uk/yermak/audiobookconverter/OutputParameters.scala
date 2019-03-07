@@ -2,91 +2,75 @@ package uk.yermak.audiobookconverter
 
 import java.util
 
-class OutputParameters {
-  private var bitRate = 128
-  private var frequency = 44100
-  private var channels = 2
-  private var quality = 3
-  private var cbr = true
-  private var auto = true
-  private var parts = 1
-  private var cutoff = 10000
+import scala.collection.JavaConverters
+
+class OutputParameters(var bitRate: Int = 128,
+                       var frequency: Int = 44100,
+                       var channels: Int = 2,
+                       var quality: Int = 3,
+                       var cbr: Boolean = true,
+                       var auto: Boolean = true,
+                       var parts: Int = 1,
+                       var cutoff: Int = 10000,
+                      ) {
+
+  val cuttoffs = Map(1 -> "13050", 2 -> "13050", 3 -> "14260", 4 -> "15500")
 
   def getBitRate: Int = bitRate
 
-  def setBitRate(bitRate: Int): Unit = this.bitRate = bitRate
+  def setBitRate(bitRate: Int) = this.bitRate = bitRate
 
   def getFrequency: Int = frequency
 
-  def setFrequency(frequency: Int): Unit = this.frequency = frequency
+  def setFrequency(frequency: Int) = this.frequency = frequency
 
   def getChannels: Int = channels
 
-  def setChannels(channels: Int): Unit = this.channels = channels
+  def setChannels(channels: Int) = this.channels = channels
 
   def getQuality: Int = quality
 
-  def setQuality(quality: Int): Unit = this.quality = quality
+  def setQuality(quality: Int) = this.quality = quality
 
   def isCbr: Boolean = cbr
 
-  def setCbr(cbr: Boolean): Unit = this.cbr = cbr
+  def setCbr(cbr: Boolean) = this.cbr = cbr
 
   def isAuto: Boolean = auto
 
-  def setAuto(auto: Boolean): Unit = this.auto = auto
+  def setAuto(auto: Boolean) = this.auto = auto
 
   def getParts: Int = parts
 
-  def setParts(parts: Int): Unit = this.parts = parts
-
-  def updateAuto(media: util.List[MediaInfo]): Unit = {
-    if (!auto) return
-    var maxChannels = 0
-    var maxFrequency = 0
-    var maxBitrate = 0
-    import scala.collection.JavaConversions._
-    for (mediaInfo <- media) {
-      if (mediaInfo.getChannels > maxChannels)
-        maxChannels = mediaInfo.getChannels
-      if (mediaInfo.getFrequency > maxFrequency)
-        maxFrequency = mediaInfo.getFrequency
-      if (mediaInfo.getBitrate > maxBitrate) maxBitrate = mediaInfo.getBitrate
-    }
-    setChannels(maxChannels)
-    setFrequency(maxFrequency)
-    if (cbr) setBitRate(maxBitrate / 1000)
-  }
-
-  def getFFMpegQualityParameter: String =
-    if (cbr) "-b:a"
-    else "-vbr"
-
-  def getFFMpegQualityValue: String =
-    if (cbr) getBitRate + "k"
-    else String.valueOf(quality)
-
-  def getFFMpegFrequencyValue: String = String.valueOf(getFrequency)
-
-  def getFFMpegChannelsValue: String = String.valueOf(getChannels)
-
-  def getCutoffValue: String = {
-    if (cbr) return String.valueOf(cutoff)
-    quality match {
-      case 1 =>
-        "13050"
-      case 2 =>
-        "13050"
-      case 3 =>
-        "14260"
-      case 4 =>
-        "15500"
-      case _ =>
-        "0"
-    }
-  }
-
-  def setCutoff(cutoff: Int): Unit = this.cutoff = cutoff
+  def setParts(parts: Int) = this.parts = parts
 
   def getCutoff: Int = cutoff
+
+  def setCutoff(cutOff: Int) = this.cutoff = cutOff
+
+  def updateAuto(mediaList: util.List[MediaInfo]): Unit = {
+    if (auto) {
+      val media = JavaConverters.iterableAsScalaIterable(mediaList)
+      channels = media.maxBy(mediaInfo => mediaInfo.getChannels).getChannels
+      frequency = media.maxBy(mediaInfo => mediaInfo.getFrequency).getFrequency
+      if (cbr) bitRate = media.maxBy(mediaInfo => mediaInfo.getBitrate).getBitrate
+    }
+  }
+
+  def getFFMpegQualityParameter: String = if (cbr) "-b:a" else "-vbr"
+
+  def getFFMpegQualityValue: String = if (cbr) getBitRate + "k" else quality.toString
+
+  def getFFMpegFrequencyValue: String = getFrequency.toString
+
+  def getFFMpegChannelsValue: String = getChannels.toString
+
+  def getCutoffValue: String = {
+    if (cbr) cutoff.toString
+    else cuttoffs.getOrElse(quality, "0")
+  }
+}
+
+object OutputParameters {
+  def instance() = new OutputParameters()
 }

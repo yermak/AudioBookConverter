@@ -44,10 +44,11 @@ public class ParallelConversionStrategy implements ConversionStrategy {
 
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
-            for (MediaInfo mediaInfo : prioritizedMedia) {
+            OutputParameters finalParameters = conversion.getOutputParameters().copy();
+                    for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, conversion.getOutputParameters(), mediaInfo, tempOutput, callback));
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, finalParameters, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 

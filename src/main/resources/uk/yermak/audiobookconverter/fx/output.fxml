@@ -37,21 +37,20 @@
         <ComboBox fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" disable="true"/>
 
 
-        <Label text="Use quality of source files" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+        <Label text="Use auto quality settings" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
 
         <Label text="Channels" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
 
 
-        <CheckBox fx:id="auto" GridPane.columnIndex="3" GridPane.rowIndex="0" selected="true"/>
-        <Spinner fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" min="1" max="2" maxWidth="80" disable="true"/>
+        <CheckBox fx:id="auto" GridPane.columnIndex="3" GridPane.rowIndex="0" selected="true" GridPane.halignment="RIGHT"/>
+        <ComboBox fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" disable="true"/>
 
 
         <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s"
                      GridPane.columnIndex="0" GridPane.rowIndex="2"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT" disable="true"/>
 
-        <Spinner fx:id="bitRate" GridPane.columnIndex="1" GridPane.rowIndex="2" min="32" max="512"
-                 maxWidth="80" GridPane.halignment="RIGHT" editable="true" disable="true"/>
+        <ComboBox fx:id="bitRate" GridPane.columnIndex="1" GridPane.rowIndex="2" disable="true" GridPane.halignment="RIGHT"/>
 
         <RadioButton fx:id="vbr" text="Variable bitrate, Quality" GridPane.columnSpan="2"
                      GridPane.columnIndex="2" GridPane.rowIndex="2"
@@ -60,8 +59,7 @@
 
 
         <Label text="Cut-off frequencies higher then" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
-        <Spinner fx:id="cutoff" GridPane.columnIndex="1" GridPane.rowIndex="3" min="8000" max="20000" initialValue="10000"
-                 maxWidth="80" GridPane.halignment="RIGHT" editable="true" disable="true"/>
+        <ComboBox fx:id="cutoff" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="RIGHT" disable="true"/>
 
 
 

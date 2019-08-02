@@ -89,4 +89,18 @@ class OutputParameters {
   def setCutoff(cutoff: Int): Unit = this.cutoff = cutoff
 
   def getCutoff: Int = cutoff
+
+  //TODO replace with copy
+  def copy(): OutputParameters = {
+    var op = new OutputParameters()
+    op.bitRate = bitRate
+    op.frequency = frequency
+    op.channels = channels
+    op.quality = quality
+    op.cbr = cbr
+    op.auto = auto
+    op.parts = parts
+    op.cutoff = cutoff
+    op
+  }
 }

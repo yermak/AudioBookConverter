@@ -20,12 +20,12 @@
     </properties>
 
 
-    <repositories>
+    <!--<repositories>
         <repository>
             <id>maven-eclipse-repo</id>
             <url>http://maven-eclipse.github.io/maven</url>
         </repository>
-    </repositories>
+    </repositories>-->
 
     <dependencies>
 
@@ -57,6 +57,13 @@
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>0.6.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.antlr/ST4 -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>4.1</version>
         </dependency>
 
         <dependency>

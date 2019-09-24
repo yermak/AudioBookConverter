@@ -1,9 +1,12 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +17,7 @@ import java.util.concurrent.Future;
  * Created by Yermak on 27-Dec-17.
  */
 public class StreamCopier implements Callable<Long> {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ExecutorService executorService = Executors.newCachedThreadPool();
     private final InputStream in;

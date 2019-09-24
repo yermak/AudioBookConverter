@@ -1,14 +1,18 @@
 package uk.yermak.audiobookconverter
 
 import java.io.{File, IOException}
+import java.lang.invoke.MethodHandles
 import java.util
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
 class MetadataBuilder {
+  private val logger = LoggerFactory.getLogger(MethodHandles.lookup.lookupClass)
+
   @throws[IOException]
   protected def prepareMeta(jobId: Long,
                             bookInfo: AudioBookInfo,

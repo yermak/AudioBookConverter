@@ -1,11 +1,14 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ParallelConversionStrategy implements ConversionStrategy {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ExecutorService executorService = Executors.newWorkStealingPool();
     private Conversion conversion;
@@ -69,6 +73,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
             conversion.finished();
         } catch (Exception e) {
+            logger.error("Error during parallel conversion", e);
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

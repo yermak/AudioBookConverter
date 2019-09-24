@@ -1,15 +1,19 @@
 package uk.yermak.audiobookconverter
 
 import java.io.{File, IOException}
+import java.lang.invoke.MethodHandles
 
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.image.Image
 import javax.imageio.ImageIO
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by yermak on 16-Nov-18.
   */
 class ArtWorkImage(var image: Image) extends ArtWork {
+  private val logger = LoggerFactory.getLogger(MethodHandles.lookup.lookupClass)
+
   private var bean: ArtWork = null
 
   private def getBean: ArtWork = {
@@ -24,6 +28,7 @@ class ArtWorkImage(var image: Image) extends ArtWork {
       bean = new ArtWorkBean(poster, "png", crc32)
     } catch {
       case e: IOException =>
+        logger.error("Error during parallel conversion", e)
         e.printStackTrace()
     }
     bean

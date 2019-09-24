@@ -10,8 +10,11 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 
 public class ConverterApplication extends Application {
@@ -21,10 +24,14 @@ public class ConverterApplication extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void start(Stage stage) {
         Parent root = null;
+
+        logger.info("Initialising application");
+
         try {
             URL resource = ConverterApplication.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
             root = FXMLLoader.load(resource);
@@ -50,6 +57,7 @@ public class ConverterApplication extends Application {
             });
 
         } catch (IOException e) {
+            logger.error("Error initiating application", e);
             e.printStackTrace();
         }
     }

@@ -5,15 +5,21 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ConversionSubscriber;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.OutputParameters;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Created by yermak on 08/09/2018.
  */
 public class OutputController implements ConversionSubscriber {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     @FXML
     public ComboBox<Integer> cutoff;
     @FXML

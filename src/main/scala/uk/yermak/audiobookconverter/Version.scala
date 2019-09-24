@@ -2,7 +2,7 @@ package uk.yermak.audiobookconverter
 
 object Version {
   val MAJOR = 3
-  val MINOR = 3
+  val MINOR = 4
   val BUILD = 0
 
   def getVersionString: String = { //TODO add load version from the build number.

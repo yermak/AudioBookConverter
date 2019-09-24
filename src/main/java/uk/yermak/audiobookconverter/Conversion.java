@@ -4,7 +4,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +19,8 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
  * Created by Yermak on 06-Feb-18.
  */
 public class Conversion {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);

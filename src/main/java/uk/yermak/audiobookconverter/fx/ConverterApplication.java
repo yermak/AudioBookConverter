@@ -47,6 +47,7 @@ public class ConverterApplication extends Application {
 
 
             stage.setOnCloseRequest(event -> {
+                logger.info("Closing application");
                 ConverterApplication.getContext().stopConversions();
                 try {
                     Thread.sleep(500);

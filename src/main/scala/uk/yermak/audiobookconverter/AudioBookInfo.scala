@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter
 
+import com.google.gson.Gson
 import javafx.collections.ObservableList
 
 class AudioBookInfo() {
@@ -64,6 +65,10 @@ class AudioBookInfo() {
   def setPosters(posters: ObservableList[ArtWork]): Unit =
     this.posters = posters
 
+  override def toString(): String = {
+    val gson = new Gson
+    gson.toJson(this)
+  }
 }
 
 object AudioBookInfo {

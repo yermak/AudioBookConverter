@@ -37,6 +37,7 @@ public class FFMediaLoader {
     }
 
     public List<MediaInfo> loadMediaInfo() {
+        logger.info("Loading media info");
         try {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
@@ -76,29 +77,39 @@ public class FFMediaLoader {
                 if (conversion.getStatus().isOver())
                     throw new InterruptedException("Media Info Loading was interrupted");
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
+                logger.debug("Extracted ffprobe error: {}", probeResult.getError());
                 FFmpegFormat format = probeResult.getFormat();
+                logger.debug("Extracted track format: {}", format.format_name);
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
 
                 List<FFmpegStream> streams = probeResult.getStreams();
+                logger.debug("Found {} streams in {}", streams.size(), filename);
 
                 for (FFmpegStream ffMpegStream : streams) {
                     if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
+                        logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                         mediaInfo.setCodec(ffMpegStream.codec_name);
                         mediaInfo.setChannels(ffMpegStream.channels);
                         mediaInfo.setFrequency(ffMpegStream.sample_rate);
                         mediaInfo.setBitrate((int) ffMpegStream.bit_rate);
                         mediaInfo.setDuration((long) ffMpegStream.duration * 1000);
                     } else if (ART_WORK_CODECS.keySet().contains(ffMpegStream.codec_name)) {
+                        logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                         Future futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, ART_WORK_CODECS.get(ffMpegStream.codec_name));
                         mediaInfo.setArtWork(artWork);
                     }
                 }
+                logger.debug("Found tags: {} in {}", format.tags, filename);
+
                 AudioBookInfo bookInfo = AudioBookInfo.instance(new HashMap<>(format.tags));
+
+                logger.info("Created AudioBookInfo {}", bookInfo);
 
                 mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
+                logger.error("Failed to load media info", e);
                 e.printStackTrace();
                 throw e;
             }

@@ -1,11 +1,16 @@
 package uk.yermak.audiobookconverter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public class AppProperties {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public AppProperties() {
     }
@@ -19,6 +24,7 @@ public class AppProperties {
             applicationProps.load(in);
             in.close();
         } catch (Exception e) {
+            logger.error("Error during loading properties", e);
         }
 
         return applicationProps;
@@ -42,7 +48,8 @@ public class AppProperties {
             FileOutputStream out = new FileOutputStream(new File(appDir, "AudioBookConverter-V3.properties"));
             applicationProps.store(out, "");
             out.close();
-        } catch (Exception var5) {
+        } catch (Exception e) {
+            logger.error("Error during saving propertie", e);
         }
 
     }

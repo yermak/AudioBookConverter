@@ -2,10 +2,13 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -15,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Yermak on 29-Dec-17.
  */
 public class FFMpegNativeConverter implements Callable<ConverterOutput> {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Conversion conversion;
     private OutputParameters outputParameters;
     private MediaInfo mediaInfo;

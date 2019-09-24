@@ -3,10 +3,13 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Refreshable;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +18,7 @@ import java.util.Map;
  * Created by yermak on 08-Feb-18.
  */
 public class ConversionProgress implements Runnable, Refreshable {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     //TODO move to Conversion class

@@ -1,11 +1,14 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class BatchConversionStrategy implements ConversionStrategy {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ExecutorService executorService = Executors.newWorkStealingPool();
     private Conversion conversion;
 
@@ -54,6 +58,7 @@ public class BatchConversionStrategy implements ConversionStrategy {
             }
             conversion.finished();
         } catch (InterruptedException | ExecutionException | IOException e) {
+            logger.error("Error during batch conversion", e);
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());

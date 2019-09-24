@@ -1,17 +1,21 @@
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class JoiningConversionStrategy implements ConversionStrategy {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Conversion conversion;
     private Map<String, ProgressCallback> progressCallbacks;
@@ -48,6 +52,7 @@ public class JoiningConversionStrategy implements ConversionStrategy {
             FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
             conversion.finished();
         } catch (Exception e) {
+            logger.error("Error during joining conversion", e);
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

@@ -25,15 +25,19 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 /**
  * Created by Yermak on 04-Feb-18.
  */
 public class FilesController implements ConversionSubscriber {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     public Button addButton;

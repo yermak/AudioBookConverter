@@ -11,9 +11,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,6 +26,7 @@ import java.util.concurrent.Executors;
  * Created by Yermak on 04-Feb-18.
  */
 public class BookInfoController implements ConversionSubscriber {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     private TextField title;

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -13,12 +14,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
 
 /**
  * Created by Yermak on 29-Dec-17.
  */
 public class Utils {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     static String determineTempFilename(String inputFilename, final String extension, String prefix, final String suffix, boolean uniqie, String folder) {
         File file = new File(inputFilename);
         File outFile = new File(folder, prefix + file.getName());

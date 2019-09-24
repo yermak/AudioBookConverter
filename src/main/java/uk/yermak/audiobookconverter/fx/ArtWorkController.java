@@ -9,16 +9,20 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Created by yermak on 03-Dec-18.
  */
 public class ArtWorkController implements ConversionSubscriber {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     private ListView imageList;
@@ -53,6 +57,8 @@ public class ArtWorkController implements ConversionSubscriber {
             try {
                 imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(file))));
             } catch (FileNotFoundException e) {
+                logger.error("Error during building artwork", e);
+
                 e.printStackTrace();
             }
         }

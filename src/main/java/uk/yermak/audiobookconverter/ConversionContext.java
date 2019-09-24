@@ -3,14 +3,19 @@ package uk.yermak.audiobookconverter;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 
 /**
  * Created by yermak on 06-Feb-18.
  */
 public class ConversionContext {
+
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private LinkedList<Conversion> conversionQueue = new LinkedList<>();
     private SimpleObjectProperty<Conversion> conversion = new SimpleObjectProperty<>(new Conversion());

@@ -9,9 +9,12 @@ import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -19,6 +22,7 @@ import java.util.concurrent.*;
  * Created by yermak on 1/10/2018.
  */
 public class FFMediaLoader {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private List<String> fileNames;
     private Conversion conversion;
@@ -46,6 +50,7 @@ public class FFMediaLoader {
 
             return media;
         } catch (Exception e) {
+            logger.error("Error during loading media info", e);
             e.printStackTrace();
             throw new RuntimeException(e);
         }

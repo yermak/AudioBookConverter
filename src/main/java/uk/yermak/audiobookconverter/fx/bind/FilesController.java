@@ -39,19 +39,19 @@ import java.util.*;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController implements ConversionSubscriber {
+public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    private FilesDelegate delegate = new FilesDelegate(this);
     @FXML
-    public Button addButton;
+    Button addButton;
     @FXML
-    public Button removeButton;
+    Button removeButton;
     @FXML
-    public Button clearButton;
+    Button clearButton;
     @FXML
-    public Button upButton;
+    Button upButton;
     @FXML
-    public Button downButton;
+    Button downButton;
 
     @FXML
     ListView<MediaInfo> fileList;
@@ -59,254 +59,64 @@ public class FilesController implements ConversionSubscriber {
 
 
     @FXML
-    public Button startButton;
+    Button startButton;
     @FXML
-    public Button pauseButton;
+    Button pauseButton;
     @FXML
-    public Button stopButton;
+    Button stopButton;
 
-    private Conversion conversion;
-    private ObservableList<MediaInfo> selectedMedia;
-    private MediaInfoChangeListener listener;
+    final ContextMenu contextMenu = new ContextMenu();
+
+    Conversion conversion;
+    ObservableList<MediaInfo> selectedMedia;
+    MediaInfoChangeListener listener;
 
     private static final String M4B = "m4b";
     private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
 
     @FXML
-    public void initialize() {
-
-        fileList.setOnDragOver(event -> {
-            if (event.getGestureSource() != fileList && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.ANY);
-            }
-
-            event.consume();
-        });
-
-        fileList.setOnDragDropped(event -> {
-            processFiles(event.getDragboard().getFiles());
-            event.setDropCompleted(true);
-            event.consume();
-        });
-
-//        fileList.setCellFactory(new ListViewListCellCallback());
-        MenuItem item1 = new MenuItem("Files");
-        item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
-        MenuItem item2 = new MenuItem("Folder");
-        item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
-        contextMenu.getItems().addAll(item1, item2);
-
-        ConversionContext context = ConverterApplication.getContext();
-        selectedMedia = context.getSelectedMedia();
-
-        resetForNewConversion(context.registerForConversion(this));
-
-        selectedMedia.addListener((InvalidationListener) observable -> {
-            if (selectedMedia.isEmpty()) return;
-            List<MediaInfo> change = new ArrayList<>(selectedMedia);
-            List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
-            if (!change.containsAll(selection) || !selection.containsAll(change)) {
-                fileList.getSelectionModel().clearSelection();
-                change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
-            }
-        });
-
+    private void initialize() {
+        delegate.initialize();
     }
-
-    private final ContextMenu contextMenu = new ContextMenu();
-
 
     @FXML
     protected void addFiles(ActionEvent event) {
-        Button node = (Button) event.getSource();
-        contextMenu.show(node, Side.RIGHT, 0, 0);
+        delegate.addFiles(event);
     }
 
-    private void selectFolderDialog(Window window) {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-
-        StringJoiner filetypes = new StringJoiner("/");
-
-        Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
-
-        directoryChooser.setTitle("Select folder with " + filetypes.toString() + " files for conversion");
-        File selectedDirectory = directoryChooser.showDialog(window);
-        if (selectedDirectory != null) {
-            processFiles(Collections.singleton(selectedDirectory));
-            AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
-        }
+    @FXML
+    private void removeFiles(ActionEvent event) {
+        delegate.removeFiles(event);
     }
 
-
-    private void processFiles(Collection<File> files) {
-        List<String> fileNames = new ArrayList<>();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                processFiles(FileUtils.listFiles(file, FILE_EXTENSIONS, true));
-            } else {
-                boolean contains = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
-                if (contains) {
-                    fileNames.add(file.getPath());
-                }
-            }
-        }
-        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
-
-        fileList.getItems().addAll(addedMedia);
+    @FXML
+    private void clear(ActionEvent event) {
+        delegate.clear(event);
     }
 
-    private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, conversion);
+    @FXML
+    private void moveUp(ActionEvent event) {
+        delegate.moveUp(event);
     }
 
-    private void selectFilesDialog(Window window) {
-        final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-        StringJoiner filetypes = new StringJoiner("/");
-
-        Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
-
-        fileChooser.setTitle("Select " + filetypes.toString() + " files for conversion");
-
-        for (String fileExtension : FILE_EXTENSIONS) {
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(fileExtension, "*." + fileExtension));
-        }
-
-        List<File> files = fileChooser.showOpenMultipleDialog(window);
-        if (files != null) {
-            processFiles(files);
-            File firstFile = files.get(0);
-            File parentFile = firstFile.getParentFile();
-            AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
-        }
+    @FXML
+    private void moveDown(ActionEvent event) {
+        delegate.moveDown(event);
     }
 
-    public void removeFiles(ActionEvent event) {
-        ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
-        fileList.getItems().removeAll(selected);
+    @FXML
+    private void start(ActionEvent actionEvent) {
+       delegate.start(actionEvent);
     }
 
-    public void clear(ActionEvent event) {
-        fileList.getItems().clear();
-
+    @FXML
+    private void pause(ActionEvent actionEvent) {
+        delegate.pause(actionEvent);
     }
 
-    public void moveUp(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected > 0) {
-                MediaInfo upper = items.get(selected - 1);
-                MediaInfo lower = items.get(selected);
-                items.set(selected - 1, lower);
-                items.set(selected, upper);
-                fileList.getSelectionModel().clearAndSelect(selected - 1);
-            }
-        }
-    }
-
-
-    public void moveDown(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected < items.size() - 1) {
-                MediaInfo lower = items.get(selected + 1);
-                MediaInfo upper = items.get(selected);
-                items.set(selected, lower);
-                items.set(selected + 1, upper);
-                fileList.getSelectionModel().clearAndSelect(selected + 1);
-            }
-        }
-    }
-
-    public void start(ActionEvent actionEvent) {
-        ConversionContext context = ConverterApplication.getContext();
-
-
-        List<MediaInfo> media = conversion.getMedia();
-        if (media.size() > 0) {
-            AudioBookInfo audioBookInfo = conversion.getBookInfo();
-            MediaInfo mediaInfo = media.get(0);
-            String outputDestination;
-            if (conversion.getMode().equals(ConversionMode.BATCH)) {
-                outputDestination = selectOutputDirectory();
-            } else {
-                outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
-            }
-            if (outputDestination != null) {
-                String finalName = new File(outputDestination).getName();
-                conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-                    if (ProgressStatus.FINISHED.equals(newValue)) {
-                        Platform.runLater(() -> showNotification(finalName));
-                    }
-                });
-
-                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
-                context.startConversion(outputDestination, conversionProgress);
-
-            }
-        }
-    }
-
-    private static void showNotification(String finalOutputDestination) {
-        Notifications.create()
-                .title("AudioBookConverter: Conversion is completed")
-                .text(finalOutputDestination).show();
-    }
-
-    private String selectOutputDirectory() {
-        JfxEnv env = ConverterApplication.getEnv();
-
-        String outputDestination;
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        String outputFolder = AppProperties.getProperty("output.folder");
-        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
-        directoryChooser.setTitle("Select destination folder for encoded files");
-        File selectedDirectory = directoryChooser.showDialog(env.getWindow());
-        AppProperties.setProperty("output.folder", selectedDirectory.getAbsolutePath());
-        outputDestination = selectedDirectory.getPath();
-        return outputDestination;
-    }
-
-    private String selectOutputFile(AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
-        JfxEnv env = ConverterApplication.getEnv();
-
-        final FileChooser fileChooser = new FileChooser();
-        String outputFolder = AppProperties.getProperty("output.folder");
-        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
-        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
-        fileChooser.setTitle("Save AudioBook");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(M4B, "*."+M4B)
-        );
-        File file = fileChooser.showSaveDialog(env.getWindow());
-        if (file == null) return null;
-        File parentFolder = file.getParentFile();
-        AppProperties.setProperty("output.folder", parentFolder.getAbsolutePath());
-        return file.getPath();
-    }
-
-
-    public void pause(ActionEvent actionEvent) {
-        ConversionContext context = ConverterApplication.getContext();
-        if (context.isPaused()) {
-            context.resumeConversions();
-            pauseButton.setText("Pause all");
-        } else {
-            context.pauseConversions();
-            pauseButton.setText("Resume all");
-        }
-    }
-
-    public void stop(ActionEvent actionEvent) {
-        ConverterApplication.getContext().stopConversions();
+    @FXML
+    private void stop(ActionEvent actionEvent) {
+        delegate.stop(actionEvent);
     }
 
 
@@ -341,27 +151,7 @@ public class FilesController implements ConversionSubscriber {
         });
     }
 
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        this.conversion = conversion;
 
-        ObservableList<MediaInfo> media = this.conversion.getMedia();
-        fileList.setItems(media);
-        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-/* TODO fix buttons behaviour
-        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
-                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
-*/
-
-//        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-
-        if (listener != null) {
-            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
-        }
-        listener = new MediaInfoChangeListener(conversion);
-        fileList.getSelectionModel().selectedItemProperty().addListener(listener);
-    }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
         @Override
@@ -438,7 +228,7 @@ public class FilesController implements ConversionSubscriber {
 
     }
 
-    private class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
+    class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
         private Conversion conversion;
 
         public MediaInfoChangeListener(Conversion conversion) {

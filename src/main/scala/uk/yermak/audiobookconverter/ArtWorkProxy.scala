@@ -1,14 +1,21 @@
 package uk.yermak.audiobookconverter
 
+import java.lang.invoke.MethodHandles
 import java.util.concurrent.{ExecutionException, Future}
+
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by yermak on 1/11/2018.
   */
 class ArtWorkProxy(val futureLoad: Future[ArtWork], var format: String) extends ArtWork {
-  private def getArtWork = try futureLoad.get
+  private val logger: Logger = LoggerFactory.getLogger(MethodHandles.lookup.lookupClass)
+
+  private def getArtWork = try
+    futureLoad.get
   catch {
     case e@(_: InterruptedException | _: ExecutionException) =>
+      logger.error("Failed to load ArtWork Proxy:", e)
       e.printStackTrace()
       throw new RuntimeException(e)
   }

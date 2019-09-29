@@ -4,9 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
-          fx:controller="uk.yermak.audiobookconverter.fx.BookInfoController"
-          gridLinesVisible="false">
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" fx:controller="uk.yermak.audiobookconverter.fx.bind.BookInfoController" gridLinesVisible="false">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
@@ -33,7 +31,6 @@
         <TextField fx:id="narrator" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
         <!--<TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>-->
         <ComboBox fx:id="genre" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true"/>
-
 
         <Label text="Series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
         <Label text="Book #" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>

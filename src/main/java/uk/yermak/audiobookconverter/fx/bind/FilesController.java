@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter.fx;
+package uk.yermak.audiobookconverter.fx.bind;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -28,6 +28,9 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.fx.ConversionProgress;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
+import uk.yermak.audiobookconverter.fx.JfxEnv;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;

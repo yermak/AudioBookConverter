@@ -2,11 +2,11 @@ package uk.yermak.audiobookconverter.fx.bind
 
 import java.io.File
 import java.util
-import java.util.{ArrayList, Collections, StringJoiner}
+import java.util.StringJoiner
 
 import javafx.application.Platform
 import javafx.beans.{InvalidationListener, Observable}
-import javafx.beans.value.ObservableValue
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.geometry.Side
@@ -19,10 +19,13 @@ import org.controlsfx.control.Notifications
 import uk.yermak.audiobookconverter.fx.{ConversionProgress, ConverterApplication}
 import uk.yermak.audiobookconverter._
 
-class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
+class FilesDelegate(controller: FilesController) extends ConversionSubscriber {
   private val M4B = "m4b"
   private val FILE_EXTENSIONS = Array[String]("mp3", "m4a", M4B, "wma")
 
+  private var conversion: Conversion = null
+  private var selectedMedia: ObservableList[MediaInfo] = null
+  private var listener: MediaInfoChangeListener = null
 
   private[bind] def initialize(): Unit = {
     controller.fileList.setOnDragOver((event: DragEvent) => {
@@ -37,7 +40,8 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
     })
     controller.fileList.setOnDragDropped((event: DragEvent) => {
       def foo(event: DragEvent) = {
-        processFiles(event.getDragboard.getFiles)
+        import scala.collection.JavaConverters._
+        processFiles(event.getDragboard.getFiles.asScala.toList)
         event.setDropCompleted(true)
         event.consume()
       }
@@ -51,17 +55,17 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
     item2.setOnAction((e: ActionEvent) => selectFolderDialog(ConverterApplication.getEnv.getWindow))
     controller.contextMenu.getItems.addAll(item1, item2)
     val context = ConverterApplication.getContext
-    controller.selectedMedia = context.getSelectedMedia
+    selectedMedia = context.getSelectedMedia
     resetForNewConversion(context.registerForConversion(this))
 
-    controller.selectedMedia.addListener(new InvalidationListener {
+    selectedMedia.addListener(new InvalidationListener {
       override def invalidated(observable: Observable): Unit = {
-        if (controller.selectedMedia.isEmpty) return null
-        val change = new util.ArrayList[MediaInfo](controller.selectedMedia)
+        if (selectedMedia.isEmpty) return null
+        val change = new util.ArrayList[MediaInfo](selectedMedia)
         val selection = new util.ArrayList[MediaInfo](controller.fileList.getSelectionModel.getSelectedItems)
         if (!change.containsAll(selection) || !selection.containsAll(change)) {
           controller.fileList.getSelectionModel.clearSelection()
-          change.forEach((m: MediaInfo) => controller.fileList.getSelectionModel.select(controller.conversion.getMedia.indexOf(m)))
+          change.forEach((m: MediaInfo) => controller.fileList.getSelectionModel.select(conversion.getMedia.indexOf(m)))
         }
       }
     })
@@ -83,26 +87,27 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
     directoryChooser.setTitle("Select folder with " + filetypes.toString + " files for conversion")
     val selectedDirectory: File = directoryChooser.showDialog(window)
     if (selectedDirectory != null) {
-      processFiles(Collections.singleton(selectedDirectory))
+      processFiles(List[File] {
+        selectedDirectory
+      })
       AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath)
     }
   }
 
-  private[bind] def processFiles(files: util.Collection[File]): Unit = {
+  private[bind] def processFiles(files: List[File]): Unit = {
     val fileNames = new util.ArrayList[String]
-    import scala.collection.JavaConverters._
-    for (file <- files.asScala.toList) {
-      if (file.isDirectory) processFiles(FileUtils.listFiles(file, FILE_EXTENSIONS, true))
+    for (file <- files) {
+      if (file.isDirectory) {processFiles(UIUtils.listFiles(file, FILE_EXTENSIONS))
+      }
       else {
-        val contains = util.Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName))
-        if (contains) fileNames.add(file.getPath)
+        if (FILE_EXTENSIONS.contains(FilenameUtils.getExtension(file.getName))) fileNames.add(file.getPath)
       }
     }
     val addedMedia = createMediaLoader(fileNames).loadMediaInfo
     controller.fileList.getItems.addAll(addedMedia)
   }
 
-  private[bind] def createMediaLoader(fileNames: util.List[String]) = new FFMediaLoader(fileNames, controller.conversion)
+  private[bind] def createMediaLoader(fileNames: util.List[String]) = new FFMediaLoader(fileNames, conversion)
 
   private[bind] def selectOutputDirectory: String = {
     val env = ConverterApplication.getEnv
@@ -172,7 +177,8 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
 
     val files = fileChooser.showOpenMultipleDialog(window)
     if (files != null) {
-      processFiles(files)
+      import scala.collection.JavaConverters._
+      processFiles(files.asScala.toList)
       val firstFile = files.get(0)
       val parentFile = firstFile.getParentFile
       AppProperties.setProperty("source.folder", parentFile.getAbsolutePath)
@@ -212,16 +218,16 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
 
   private[bind] def start(actionEvent: ActionEvent): Unit = {
     val context = ConverterApplication.getContext
-    val media = controller.conversion.getMedia
+    val media = conversion.getMedia
     if (media.size > 0) {
-      val audioBookInfo = controller.conversion.getBookInfo
+      val audioBookInfo = conversion.getBookInfo
       val mediaInfo = media.get(0)
       var outputDestination: String = null
-      if (controller.conversion.getMode == ConversionMode.BATCH) outputDestination = selectOutputDirectory
+      if (conversion.getMode == ConversionMode.BATCH) outputDestination = selectOutputDirectory
       else outputDestination = selectOutputFile(audioBookInfo, mediaInfo)
       if (outputDestination != null) {
         val finalName = new File(outputDestination).getName
-        controller.conversion.addStatusChangeListener((observable: ObservableValue[_ <: ProgressStatus], oldValue: ProgressStatus, newValue: ProgressStatus) => {
+        conversion.addStatusChangeListener((observable: ObservableValue[_ <: ProgressStatus], oldValue: ProgressStatus, newValue: ProgressStatus) => {
           def foo(observable: ObservableValue[_ <: ProgressStatus], oldValue: ProgressStatus, newValue: ProgressStatus) = {
             if (ProgressStatus.FINISHED == newValue) Platform.runLater(() => showNotification(finalName))
           }
@@ -235,15 +241,15 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
         var totalDuration: Long = 0;
         mediaList.foreach(media => totalDuration += media.getDuration)
         //        val totalDuration = media.stream.mapToLong(MediaInfo.getDuration).sum
-        val conversionProgress = new ConversionProgress(controller.conversion, media.size, totalDuration, finalName)
+        val conversionProgress = new ConversionProgress(conversion, media.size, totalDuration, finalName)
         context.startConversion(outputDestination, conversionProgress)
       }
     }
   }
 
-  override def resetForNewConversion(conversion: Conversion): Unit = {
-    controller.conversion = conversion
-    val media = controller.conversion.getMedia
+  override def resetForNewConversion(c: Conversion): Unit = {
+    conversion = c
+    val media = conversion.getMedia
     controller.fileList.setItems(media)
     controller.fileList.getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
     /* TODO fix buttons behaviour
@@ -252,9 +258,17 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber{
             );
     */
     //        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-    if (controller.listener != null) controller.fileList.getSelectionModel.selectedItemProperty.removeListener(controller.listener)
-    controller.listener = new controller.MediaInfoChangeListener(conversion)
-    controller.fileList.getSelectionModel.selectedItemProperty.addListener(controller.listener)
+    if (listener != null) controller.fileList.getSelectionModel.selectedItemProperty.removeListener(listener)
+    listener = new MediaInfoChangeListener(conversion)
+    controller.fileList.getSelectionModel.selectedItemProperty.addListener(listener)
+  }
+
+  private[bind] class MediaInfoChangeListener(var conversion: Conversion) extends ChangeListener[MediaInfo] {
+    override def changed(observable: ObservableValue[_ <: MediaInfo], oldValue: MediaInfo, newValue: MediaInfo): Unit = {
+      //            updateUI(conversion.getStatus(), conversion.getMedia().isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+      selectedMedia.clear
+      controller.fileList.getSelectionModel.getSelectedIndices.forEach((i: Integer) => selectedMedia.add(conversion.getMedia.get(i)))
+    }
   }
 
 }

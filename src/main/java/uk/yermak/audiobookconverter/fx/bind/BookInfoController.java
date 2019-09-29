@@ -46,7 +46,6 @@ public class BookInfoController {
     TextField year;
     @FXML
     TextField comment;
-    AudioBookInfo bookInfo;
 
     @FXML
     private void initialize() {

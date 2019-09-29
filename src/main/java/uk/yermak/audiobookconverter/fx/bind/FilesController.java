@@ -67,12 +67,8 @@ public class FilesController {
 
     final ContextMenu contextMenu = new ContextMenu();
 
-    Conversion conversion;
-    ObservableList<MediaInfo> selectedMedia;
-    MediaInfoChangeListener listener;
 
-    private static final String M4B = "m4b";
-    private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+
 
     @FXML
     private void initialize() {
@@ -222,24 +218,9 @@ public class FilesController {
             mediaPlayer.play();
             MediaPlayer.Status status = mediaPlayer.getStatus();
             System.out.println("status = " + status);
-
-
         }
 
     }
 
-    class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
-        private Conversion conversion;
 
-        public MediaInfoChangeListener(Conversion conversion) {
-            this.conversion = conversion;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
-//            updateUI(conversion.getStatus(), conversion.getMedia().isEmpty(), fileList.getSelectionModel().getSelectedIndices());
-            selectedMedia.clear();
-            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(conversion.getMedia().get(i)));
-        }
-    }
 }

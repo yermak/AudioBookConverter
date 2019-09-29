@@ -4,6 +4,7 @@ import java.io.File
 import java.lang.invoke.MethodHandles
 
 import javafx.stage.FileChooser
+import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
 import uk.yermak.audiobookconverter.AppProperties
 import uk.yermak.audiobookconverter.fx.ConverterApplication
@@ -35,6 +36,11 @@ object UIUtils {
     val file = new File(sourceFolder)
     if (file.exists) file
     else getInitialDirecotory(file.getParent)
+  }
+
+  def listFiles(directory: File, exts: Array[String]): List[File] = {
+    import scala.collection.JavaConverters._
+    FileUtils.listFiles(directory, exts, true).asScala.toList
   }
 
 }

@@ -97,11 +97,8 @@ class FilesDelegate(controller: FilesController) extends ConversionSubscriber {
   private[bind] def processFiles(files: List[File]): Unit = {
     val fileNames = new util.ArrayList[String]
     for (file <- files) {
-      if (file.isDirectory) {processFiles(UIUtils.listFiles(file, FILE_EXTENSIONS))
-      }
-      else {
-        if (FILE_EXTENSIONS.contains(FilenameUtils.getExtension(file.getName))) fileNames.add(file.getPath)
-      }
+      if (file.isDirectory) processFiles(UIUtils.listFiles(file, FILE_EXTENSIONS))
+      else if (FILE_EXTENSIONS.contains(FilenameUtils.getExtension(file.getName))) fileNames.add(file.getPath)
     }
     val addedMedia = createMediaLoader(fileNames).loadMediaInfo
     controller.fileList.getItems.addAll(addedMedia)

@@ -39,7 +39,7 @@ public class OutputController implements ConversionSubscriber {
     private RadioButton vbr;
     @FXML
     private Slider quality;
-    private OutputParameters params = new OutputParameters();
+    private OutputParameters params;
     private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
@@ -126,7 +126,7 @@ public class OutputController implements ConversionSubscriber {
 
     @Override
     public void resetForNewConversion(Conversion conversion) {
-        conversion.setOutputParameters(params);
+        params = conversion.getOutputParameters();
         media = conversion.getMedia();
         media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
     }

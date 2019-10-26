@@ -11,6 +11,9 @@ class OutputParameters {
   private var auto = true
   private var parts = 1
   private var cutoff = 10000
+  private var volume = 100;
+  private var filters: String = ""
+
 
   def getBitRate: Int = bitRate
 
@@ -90,6 +93,19 @@ class OutputParameters {
 
   def getCutoff: Int = cutoff
 
+  def setVolume(volume: Int): Unit = this.volume = volume
+
+  def getVolume: Int = volume
+
+  def getVolumeValue: String = {
+    String.valueOf(256 * volume / 100)
+  }
+
+  def getFiltersValue: String = {
+    filters
+  }
+
+
   //TODO replace with copy
   def copy(): OutputParameters = {
     var op = new OutputParameters()
@@ -101,6 +117,8 @@ class OutputParameters {
     op.auto = auto
     op.parts = parts
     op.cutoff = cutoff
+    op.volume = volume
+    op.filters = filters
     op
   }
 }

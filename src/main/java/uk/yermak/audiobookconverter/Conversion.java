@@ -27,7 +27,7 @@ public class Conversion {
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
     private AudioBookInfo bookInfo;
-    private OutputParameters outputParameters;
+    private OutputParameters outputParameters = new OutputParameters();
     private String outputDestination;
 
 

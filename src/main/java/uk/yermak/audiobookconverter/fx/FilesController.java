@@ -63,7 +63,7 @@ public class FilesController implements ConversionSubscriber {
     ListView<MediaInfo> fileList;
 
     @FXML
-    TreeTableView<Chapter> chapters;
+    TreeTableView<Organisable> chapters;
 
     @FXML
     public Button startButton;
@@ -291,7 +291,7 @@ public class FilesController implements ConversionSubscriber {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(M4B, "*."+M4B)
+                new FileChooser.ExtensionFilter(M4B, "*." + M4B)
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
@@ -371,15 +371,19 @@ public class FilesController implements ConversionSubscriber {
     }
 
     public void importChapters(ActionEvent actionEvent) {
-        if (fileList.getItems().isEmpty()){
+        if (fileList.getItems().isEmpty()) {
             return;
         }
         chaptersTab.setDisable(false);
+        chapters.setShowRoot(false);
+        TreeItem<Organisable> bookItem = new TreeItem<>(new Book());
+        chapters.setRoot(bookItem);
+        bookItem.getChildren().add(new TreeItem<>(new Part(1)));
 
         ObservableList<MediaInfo> items = fileList.getItems();
-        items.forEach(mediaInfo -> {
-            chapters.getRoot().getChildren().add(new TreeItem<>(new Chapter(mediaInfo)));
-        });
+//        items.forEach(mediaInfo -> {
+//            chapters.getRoot().getChildren().add(new TreeItem<>(new Chapter(mediaInfo)));
+//        });
 
     }
 

@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 
-public class Part {
+public class Part implements Organisable {
     private SimpleStringProperty title;
 
     private ObservableList<MediaInfo> media = new SimpleListProperty<>();

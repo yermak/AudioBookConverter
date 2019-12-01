@@ -45,7 +45,7 @@
             <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
                 <TreeTableView fx:id="chapters">
                     <columns>
-                        <TreeTableColumn text="Chapter Title" fx:id="chapterColumn"/>
+                        <TreeTableColumn text="Title" fx:id="chapterColumn"/>
                         <TreeTableColumn text="File Name" fx:id="fileColumn"/>
                     </columns>
                 </TreeTableView>

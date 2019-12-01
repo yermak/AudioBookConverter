@@ -41,7 +41,7 @@
                 <ListView fx:id="fileList" GridPane.valignment="TOP">
                 </ListView>
             </Tab>
-            <Tab text="Organise chapters..." closable="false">
+            <Tab text="Organise chapters..." closable="false" disable="true">
                 <TreeTableView fx:id="chapters">
                     <columns>
                         <TreeTableColumn text="Chapter Title" fx:id="chapterColumn"/>
@@ -105,8 +105,8 @@
                     <VBox spacing="5">
 
                     <Button fx:id="importButton" text="Import" minWidth="${screen.visualBounds.width * 0.05}"
-                            onAction="#moveDown"
-                            disable="false" GridPane.valignment="TOP"
+                            onAction="#importChapters"
+                            GridPane.valignment="TOP"
                             >
                         <tooltip>
                             <Tooltip text="Move selected file down"/>

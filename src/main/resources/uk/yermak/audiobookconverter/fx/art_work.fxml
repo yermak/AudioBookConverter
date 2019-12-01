@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
-          fx:controller="uk.yermak.audiobookconverter.fx.bind.ArtWorkController"
+          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController"
           gridLinesVisible="false">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>

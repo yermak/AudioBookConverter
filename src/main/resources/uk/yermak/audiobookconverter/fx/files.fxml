@@ -2,9 +2,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
+<?import javafx.geometry.Insets?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="false" GridPane.rowIndex="1"
           GridPane.fillHeight="true"
-          fx:controller="uk.yermak.audiobookconverter.fx.bind.FilesController">
+          fx:controller="uk.yermak.audiobookconverter.fx.FilesController">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 
@@ -29,10 +30,28 @@
         <RowConstraints vgrow="NEVER"/>
     </rowConstraints>
     <children>
-        <Label GridPane.rowIndex="0">Add MP3 files to convert and bring them in right order...</Label>
-        <ListView GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="10" fx:id="fileList"
-                  GridPane.valignment="TOP">
-        </ListView>
+
+        <TabPane minHeight="${screen.visualBounds.height*0.50}" prefHeight="${screen.visualBounds.height*0.25}"
+                 fx:id="files_chapters"
+                 GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="10" GridPane.fillHeight="false">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Tab text="Add MP3 files to convert and bring them in right order..." closable="false">
+                <ListView fx:id="fileList" GridPane.valignment="TOP">
+                </ListView>
+            </Tab>
+            <Tab text="Organise chapters..." closable="false">
+                <TreeTableView fx:id="chapters">
+                    <columns>
+                        <TreeTableColumn text="Chapter Title" fx:id="chapterColumn"/>
+                        <TreeTableColumn text="File Name" fx:id="fileColumn"/>
+                    </columns>
+                </TreeTableView>
+
+            </Tab>
+        </TabPane>
+
 
         <HBox GridPane.columnIndex="0" GridPane.rowIndex="11" GridPane.columnSpan="2">
             <fx:include source="/uk/yermak/audiobookconverter/fx/mediaplayer.fxml"/>

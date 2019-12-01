@@ -56,6 +56,8 @@ public class FilesController implements ConversionSubscriber {
 
     @FXML
     public Tab chaptersTab;
+    @FXML
+    public TabPane filesChapters;
 
     @FXML
     ListView<MediaInfo> fileList;
@@ -65,9 +67,9 @@ public class FilesController implements ConversionSubscriber {
     @FXML
     private TreeTableColumn<Organisable, String> chapterColumn;
     @FXML
-    private TreeTableColumn<Organisable, String> fileColumn;
-    @FXML
     private TreeTableColumn<Organisable, String> durationColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> detailsColumn;
 
     @FXML
     public Button startButton;
@@ -124,7 +126,7 @@ public class FilesController implements ConversionSubscriber {
         });
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
-        fileColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
+        detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
     }
 
@@ -390,12 +392,14 @@ public class FilesController implements ConversionSubscriber {
         bookItem.getChildren().add(partItem);
 
         ObservableList<MediaInfo> items = fileList.getItems();
-        items.forEach(mediaInfo -> {
-            TreeItem<Organisable> chapterItem = new TreeItem<>(new Chapter(mediaInfo.getBookInfo().getTitle()));
+        for (int i = 0; i < items.size(); i++) {
+            MediaInfo mediaInfo = items.get(i);
+            TreeItem<Organisable> chapterItem = new TreeItem<>(new Chapter(i + 1, mediaInfo));
             partItem.getChildren().add(chapterItem);
             chapterItem.getChildren().add(new TreeItem<>(mediaInfo));
-        });
-
+        }
+        partItem.setExpanded(true);
+        filesChapters.getSelectionModel().select(chaptersTab);
     }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {

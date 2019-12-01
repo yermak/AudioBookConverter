@@ -4,10 +4,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 
 public class Chapter implements Organisable {
-    private SimpleStringProperty title = new SimpleStringProperty();
+    private String title;
     private ObservableList<MediaInfo> media;
 
-    public SimpleStringProperty getTitle() {
+    public String getTitle() {
         return title;
+    }
+
+    @Override
+    public String getDetails() {
+        return "";
+    }
+
+    @Override
+    public String getDuration() {
+        return "0";
     }
 }

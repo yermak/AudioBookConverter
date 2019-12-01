@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -28,9 +29,6 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
-import uk.yermak.audiobookconverter.fx.ConversionProgress;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
-import uk.yermak.audiobookconverter.fx.JfxEnv;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -64,6 +62,12 @@ public class FilesController implements ConversionSubscriber {
 
     @FXML
     TreeTableView<Organisable> chapters;
+    @FXML
+    private TreeTableColumn<Organisable, String> chapterColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> fileColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> durationColumn;
 
     @FXML
     public Button startButton;
@@ -78,6 +82,7 @@ public class FilesController implements ConversionSubscriber {
 
     private static final String M4B = "m4b";
     private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+
 
     @FXML
     public void initialize() {
@@ -118,6 +123,9 @@ public class FilesController implements ConversionSubscriber {
             }
         });
 
+        chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
+        fileColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
+        durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDuration()));
     }
 
     private final ContextMenu contextMenu = new ContextMenu();

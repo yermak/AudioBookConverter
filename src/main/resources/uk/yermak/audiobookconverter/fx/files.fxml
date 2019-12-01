@@ -33,7 +33,7 @@
     <children>
 
         <TabPane minHeight="${screen.visualBounds.height*0.50}" prefHeight="${screen.visualBounds.height*0.25}"
-                 fx:id="files_chapters"
+                 fx:id="filesChapters"
                  GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.fillHeight="false">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
@@ -45,9 +45,9 @@
             <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
                 <TreeTableView fx:id="chapters">
                     <columns>
-                        <TreeTableColumn text="Title" fx:id="chapterColumn"/>
-                        <TreeTableColumn text="Duration" fx:id="durationColumn"/>
-                        <TreeTableColumn text="File Name" fx:id="fileColumn" prefWidth="${screen.visualBounds.width * 0.2}" />
+                        <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false" prefWidth="${screen.visualBounds.width * 0.1}" />
+                        <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
+                        <TreeTableColumn text="Details" fx:id="detailsColumn"  sortable="false" prefWidth="${screen.visualBounds.width * 0.2}" />
                     </columns>
                 </TreeTableView>
 

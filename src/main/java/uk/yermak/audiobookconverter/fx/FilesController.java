@@ -367,6 +367,10 @@ public class FilesController implements ConversionSubscriber {
         fileList.getSelectionModel().selectedItemProperty().addListener(listener);
     }
 
+    public void importChapters(ActionEvent actionEvent) {
+
+    }
+
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
         @Override
         public ListCell<MediaInfo> call(ListView<MediaInfo> param) {

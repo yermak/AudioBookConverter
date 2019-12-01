@@ -47,7 +47,7 @@ public class OutputParameters {
     }
 
     public int getBitRate() {
-        return this.getBitRate();
+        return bitRate;
     }
 
     public void setBitRate(final int bitRate) {

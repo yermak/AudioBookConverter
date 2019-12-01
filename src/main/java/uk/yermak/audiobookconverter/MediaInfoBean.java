@@ -70,6 +70,16 @@ public class MediaInfoBean implements MediaInfo {
         return this.bitrate();
     }
 
+    @Override
+    public String getTitle() {
+        return this.getBookInfo().getTitle();
+    }
+
+    @Override
+    public String getDetails() {
+        return this.getFileName();
+    }
+
     public long getDuration() {
         return this.duration();
     }

@@ -25,8 +25,8 @@ public class Part implements Organisable {
     }
 
     @Override
-    public String getDuration() {
-        return null;
+    public long getDuration() {
+        return 0;
     }
 
 }

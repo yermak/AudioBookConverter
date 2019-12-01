@@ -1,6 +1,6 @@
 package uk.yermak.audiobookconverter;
 
-public interface MediaInfo {
+public interface MediaInfo extends Organisable {
     void setChannels(final int channels);
 
     void setFrequency(final int frequency);

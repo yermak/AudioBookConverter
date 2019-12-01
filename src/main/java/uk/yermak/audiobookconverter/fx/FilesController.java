@@ -125,7 +125,7 @@ public class FilesController implements ConversionSubscriber {
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         fileColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
-        durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDuration()));
+        durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
     }
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -386,12 +386,15 @@ public class FilesController implements ConversionSubscriber {
         chapters.setShowRoot(false);
         TreeItem<Organisable> bookItem = new TreeItem<>(new Book());
         chapters.setRoot(bookItem);
-        bookItem.getChildren().add(new TreeItem<>(new Part(1)));
+        TreeItem<Organisable> partItem = new TreeItem<>(new Part(1));
+        bookItem.getChildren().add(partItem);
 
         ObservableList<MediaInfo> items = fileList.getItems();
-//        items.forEach(mediaInfo -> {
-//            chapters.getRoot().getChildren().add(new TreeItem<>(new Chapter(mediaInfo)));
-//        });
+        items.forEach(mediaInfo -> {
+            TreeItem<Organisable> chapterItem = new TreeItem<>(new Chapter(mediaInfo.getBookInfo().getTitle()));
+            partItem.getChildren().add(chapterItem);
+            chapterItem.getChildren().add(new TreeItem<>(mediaInfo));
+        });
 
     }
 

@@ -7,6 +7,10 @@ public class Chapter implements Organisable {
     private String title;
     private ObservableList<MediaInfo> media;
 
+    public Chapter(String title) {
+        this.title = title;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -17,7 +21,7 @@ public class Chapter implements Organisable {
     }
 
     @Override
-    public String getDuration() {
-        return "0";
+    public long getDuration() {
+        return 0L;
     }
 }

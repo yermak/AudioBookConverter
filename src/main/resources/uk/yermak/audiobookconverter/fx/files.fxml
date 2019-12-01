@@ -46,8 +46,8 @@
                 <TreeTableView fx:id="chapters">
                     <columns>
                         <TreeTableColumn text="Title" fx:id="chapterColumn"/>
-                        <TreeTableColumn text="File Name" fx:id="fileColumn"/>
                         <TreeTableColumn text="Duration" fx:id="durationColumn"/>
+                        <TreeTableColumn text="File Name" fx:id="fileColumn" prefWidth="${screen.visualBounds.width * 0.2}" />
                     </columns>
                 </TreeTableView>
 

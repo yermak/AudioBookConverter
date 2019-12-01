@@ -5,6 +5,6 @@ public interface Organisable {
 
     String getDetails();
 
-    String getDuration();
+    long getDuration();
 
 }

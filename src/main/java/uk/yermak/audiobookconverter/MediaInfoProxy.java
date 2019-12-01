@@ -42,6 +42,16 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getBitrate();
     }
 
+    @Override
+    public String getTitle() {
+        return this.getMediaInfo().getTitle();
+    }
+
+    @Override
+    public String getDetails() {
+        return this.getMediaInfo().getDetails();
+    }
+
     public long getDuration() {
         return this.getMediaInfo().getDuration();
     }

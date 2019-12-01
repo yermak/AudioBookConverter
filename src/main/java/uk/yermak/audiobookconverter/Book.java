@@ -12,7 +12,7 @@ public class Book implements Organisable {
     }
 
     @Override
-    public String getDuration() {
-        return "0";
+    public long getDuration() {
+        return 0;
     }
 }

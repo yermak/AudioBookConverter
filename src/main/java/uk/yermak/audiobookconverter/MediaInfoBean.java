@@ -1,5 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 public class MediaInfoBean implements MediaInfo {
     private String fileName;
     private int channels;

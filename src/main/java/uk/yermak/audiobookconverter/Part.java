@@ -1,32 +1,40 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Part implements Organisable {
     private String title;
-
-    private ObservableList<MediaInfo> media = new SimpleListProperty<>();
     private int number;
 
-    public Part(int number) {
+    private ObservableList<Chapter> chapters = FXCollections.observableArrayList();
+
+
+    public Part(int number, ObservableList<MediaInfo> media) {
         this.number = number;
-        title = "Part " + number;
+        for (int i = 0; i < media.size(); i++) {
+            MediaInfo mediaInfo = media.get(i);
+            chapters.add(new Chapter(i + 1, mediaInfo));
+        }
     }
 
     public String getTitle() {
-        return title;
+        return "Part " + number;
     }
 
     @Override
     public String getDetails() {
-        return null;
+        return title;
     }
 
     @Override
     public long getDuration() {
-        return 0;
+        return chapters.stream().mapToLong(Chapter::getDuration).sum();
+
+    }
+
+    public ObservableList<Chapter> getChapters() {
+        return chapters;
     }
 
 }

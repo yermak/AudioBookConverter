@@ -54,9 +54,13 @@ public class FilesController implements ConversionSubscriber {
     public Button downButton;
 
     @FXML
-    ListView<MediaInfo> fileList;
-    TreeView<MediaInfo> chapters;
+    public Button importButton;
 
+    @FXML
+    ListView<MediaInfo> fileList;
+
+    @FXML
+    TreeTableView<MediaInfo> chapters;
 
     @FXML
     public Button startButton;

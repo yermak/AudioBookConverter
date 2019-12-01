@@ -12,10 +12,10 @@
     </fx:define>
 
     <columnConstraints>
-        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
     </columnConstraints>
+<!--
     <rowConstraints>
         <RowConstraints vgrow="NEVER"/>
         <RowConstraints vgrow="NEVER"/>
@@ -29,11 +29,12 @@
         <RowConstraints vgrow="NEVER"/>
         <RowConstraints vgrow="NEVER"/>
     </rowConstraints>
+-->
     <children>
 
         <TabPane minHeight="${screen.visualBounds.height*0.50}" prefHeight="${screen.visualBounds.height*0.25}"
                  fx:id="files_chapters"
-                 GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="10" GridPane.fillHeight="false">
+                 GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.fillHeight="false">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
@@ -41,7 +42,7 @@
                 <ListView fx:id="fileList" GridPane.valignment="TOP">
                 </ListView>
             </Tab>
-            <Tab text="Organise chapters..." closable="false" disable="true">
+            <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
                 <TreeTableView fx:id="chapters">
                     <columns>
                         <TreeTableColumn text="Chapter Title" fx:id="chapterColumn"/>
@@ -53,11 +54,11 @@
         </TabPane>
 
 
-        <HBox GridPane.columnIndex="0" GridPane.rowIndex="11" GridPane.columnSpan="2">
+        <HBox GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
             <fx:include source="/uk/yermak/audiobookconverter/fx/mediaplayer.fxml"/>
         </HBox>
 
-        <Accordion GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="10" expandedPane="$filePane">
+        <Accordion GridPane.columnIndex="1" GridPane.rowIndex="1" expandedPane="$filePane">
             <panes>
                 <TitledPane fx:id="filePane" text="Files" >
                     <VBox spacing="5">

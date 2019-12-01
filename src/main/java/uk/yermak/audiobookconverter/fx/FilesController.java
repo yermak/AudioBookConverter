@@ -57,10 +57,13 @@ public class FilesController implements ConversionSubscriber {
     public Button importButton;
 
     @FXML
+    public Tab chaptersTab;
+
+    @FXML
     ListView<MediaInfo> fileList;
 
     @FXML
-    TreeTableView<MediaInfo> chapters;
+    TreeTableView<Chapter> chapters;
 
     @FXML
     public Button startButton;
@@ -368,6 +371,15 @@ public class FilesController implements ConversionSubscriber {
     }
 
     public void importChapters(ActionEvent actionEvent) {
+        if (fileList.getItems().isEmpty()){
+            return;
+        }
+        chaptersTab.setDisable(false);
+
+        ObservableList<MediaInfo> items = fileList.getItems();
+        items.forEach(mediaInfo -> {
+            chapters.getRoot().getChildren().add(new TreeItem<>(new Chapter(mediaInfo)));
+        });
 
     }
 

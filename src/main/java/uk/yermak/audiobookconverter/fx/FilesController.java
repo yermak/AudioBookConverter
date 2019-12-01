@@ -386,19 +386,27 @@ public class FilesController implements ConversionSubscriber {
         }
         chaptersTab.setDisable(false);
         chapters.setShowRoot(false);
-        TreeItem<Organisable> bookItem = new TreeItem<>(new Book());
-        chapters.setRoot(bookItem);
-        TreeItem<Organisable> partItem = new TreeItem<>(new Part(1));
-        bookItem.getChildren().add(partItem);
 
-        ObservableList<MediaInfo> items = fileList.getItems();
-        for (int i = 0; i < items.size(); i++) {
-            MediaInfo mediaInfo = items.get(i);
-            TreeItem<Organisable> chapterItem = new TreeItem<>(new Chapter(i + 1, mediaInfo));
-            partItem.getChildren().add(chapterItem);
-            chapterItem.getChildren().add(new TreeItem<>(mediaInfo));
-        }
-        partItem.setExpanded(true);
+
+        Book book = new Book(fileList.getItems());
+
+
+        TreeItem<Organisable> bookItem = new TreeItem<>(book);
+        chapters.setRoot(bookItem);
+
+        book.getParts().forEach(p -> {
+            TreeItem<Organisable> partItem = new TreeItem<>(p);
+            bookItem.getChildren().add(partItem);
+            p.getChapters().forEach(c -> {
+                TreeItem<Organisable> chapterItem = new TreeItem<>(c);
+                partItem.getChildren().add(chapterItem);
+                c.getMedia().forEach(m -> {
+                    chapterItem.getChildren().add(new TreeItem<>(m));
+                });
+            });
+        });
+
+        bookItem.setExpanded(true);
         filesChapters.getSelectionModel().select(chaptersTab);
     }
 

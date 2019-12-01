@@ -30,4 +30,8 @@ public class Chapter implements Organisable {
     public long getDuration() {
         return media.stream().mapToLong(MediaInfo::getDuration).sum();
     }
+
+    public ObservableList<MediaInfo> getMedia() {
+        return media;
+    }
 }

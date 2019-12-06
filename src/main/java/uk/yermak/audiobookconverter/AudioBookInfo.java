@@ -1,10 +1,11 @@
-//decompiled from AudioBookInfo$.class
 package uk.yermak.audiobookconverter;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.google.gson.Gson;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class AudioBookInfo {
@@ -18,7 +19,7 @@ public class AudioBookInfo {
     private int totalTracks = 0;
     private String comment = "";
     private String longDescription = "";
-    private ObservableList posters;
+
 
     public static AudioBookInfo instance(final Map tags) {
         AudioBookInfo audioBookInfo = new AudioBookInfo();
@@ -80,10 +81,6 @@ public class AudioBookInfo {
 
     private String longDescription() {
         return this.longDescription;
-    }
-
-    private ObservableList posters() {
-        return this.posters;
     }
 
     public String getSeries() {
@@ -164,14 +161,6 @@ public class AudioBookInfo {
 
     public void setLongDescription(final String longDescription) {
         this.longDescription = longDescription;
-    }
-
-    public ObservableList getPosters() {
-        return this.posters();
-    }
-
-    public void setPosters(final ObservableList posters) {
-        this.posters = posters;
     }
 
     public String toString() {

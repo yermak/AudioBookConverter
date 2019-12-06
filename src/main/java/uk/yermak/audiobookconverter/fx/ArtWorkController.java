@@ -19,7 +19,7 @@ import java.lang.invoke.MethodHandles;
 /**
  * Created by yermak on 03-Dec-18.
  */
-public class ArtWorkController implements ConversionSubscriber {
+public class ArtWorkController {
 
     @FXML
     ListView<ArtWork> imageList;
@@ -29,8 +29,8 @@ public class ArtWorkController implements ConversionSubscriber {
     @FXML
     private void initialize() {
         ConversionContext context = ConverterApplication.getContext();
-        this.resetForNewConversion(context.registerForConversion(this));
         imageList.setCellFactory(param -> new ArtWorkListCell());
+        imageList.setItems(context.getPosters());
     }
 
     @FXML
@@ -68,7 +68,7 @@ public class ArtWorkController implements ConversionSubscriber {
     private void left(ActionEvent actionEvent) {
         ObservableList selectedIndices = imageList.getSelectionModel().getSelectedIndices();
         if (selectedIndices.size() == 1) {
-            ObservableList items =imageList.getItems();
+            ObservableList items = imageList.getItems();
             Integer selected = (Integer) selectedIndices.get(0);
             if (selected > 0) {
                 moveLeft(items, selected);
@@ -86,7 +86,6 @@ public class ArtWorkController implements ConversionSubscriber {
         return (ArtWork) items.set(selected, upper);
     }
 
-
     @FXML
     private void right(ActionEvent actionEvent) {
         ObservableList selectedIndices = imageList.getSelectionModel().getSelectedIndices();
@@ -99,13 +98,5 @@ public class ArtWorkController implements ConversionSubscriber {
                 logger.debug("Image {} moved right", new Object[]{selected});
             }
         }
-
     }
-    public void resetForNewConversion(final Conversion conversion) {
-        ObservableList posters = FXCollections.observableArrayList();
-        conversion.getBookInfo().setPosters(posters);
-        imageList.setItems(posters);
-    }
-
-
 }

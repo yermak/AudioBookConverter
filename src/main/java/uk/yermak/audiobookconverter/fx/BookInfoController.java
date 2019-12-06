@@ -11,18 +11,17 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.ConversionMode;
+import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.Executors;
 
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class BookInfoController implements ConversionSubscriber {
+public class BookInfoController {
 
     @FXML
     private TextField title;
@@ -40,17 +39,14 @@ public class BookInfoController implements ConversionSubscriber {
     private TextField year;
     @FXML
     private TextField comment;
-    private AudioBookInfo bookInfo;
-
 
     @FXML
     private void initialize() {
-        reloadGenres();
 
         MenuItem menuItem = new MenuItem("Remove");
         menuItem.setOnAction(event -> {
             genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
-            saveGenres();
+            ConverterApplication.getContext().saveGenres();
         });
         ContextMenu contextMenu = new ContextMenu(menuItem);
 
@@ -61,8 +57,14 @@ public class BookInfoController implements ConversionSubscriber {
             genre.hide();
         });
 
-        Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
-        resetForNewConversion(conversion);
+        ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
+        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+
+        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
+
+//        clearTags();
+
+        AudioBookInfo bookInfo = ConverterApplication.getContext().getBookInfo();
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -81,45 +83,6 @@ public class BookInfoController implements ConversionSubscriber {
         year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
 
-    }
-
-    public void resetForNewConversion(Conversion conversion) {
-        bookInfo = new AudioBookInfo();
-        conversion.setBookInfo(bookInfo);
-
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-            if (newValue.equals(ProgressStatus.IN_PROGRESS)) {
-                saveGenres();
-            }
-        });
-
-        ObservableList<MediaInfo> media = conversion.getMedia();
-        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
-
-        conversion.addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
-
-        clearTags();
-    }
-
-    private void saveGenres() {
-        Set<String> uniqueGenres = new TreeSet<>(genre.getItems());
-        if (StringUtils.isNotEmpty(genre.getEditor().getText())) {
-            uniqueGenres.add(genre.getEditor().getText());
-        }
-        genre.getItems().clear();
-        genre.getItems().addAll(uniqueGenres);
-        StringBuffer sb = new StringBuffer();
-        uniqueGenres.forEach(s -> sb.append(s).append("::"));
-        AppProperties.setProperty("genres", sb.toString());
-    }
-
-    private void reloadGenres() {
-        String genresProperty = AppProperties.getProperty("genres");
-        if (genresProperty != null) {
-            String[] genres = genresProperty.split("::");
-            Arrays.sort(genres);
-            genre.getItems().addAll(Arrays.asList(genres));
-        }
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {

@@ -12,6 +12,8 @@ public interface ArtWork {
     String getFormat();
 
     void setFormat(final String format);
+
+    boolean matchCrc32(long crc32);
 }
 
         

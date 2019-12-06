@@ -43,7 +43,7 @@
                 </ListView>
             </Tab>
             <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
-                <TreeTableView fx:id="chapters">
+                <TreeTableView fx:id="bookStructure">
                     <columns>
                         <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false" prefWidth="${screen.visualBounds.width * 0.1}" />
                         <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>

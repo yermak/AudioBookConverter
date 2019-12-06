@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.controlsfx.control.Notifications;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.Version;
 import org.slf4j.Logger;
@@ -69,5 +70,11 @@ public class ConverterApplication extends Application {
 
     public static JfxEnv getEnv() {
         return env;
+    }
+
+    public static void showNotification(String finalOutputDestination) {
+        Notifications.create()
+                .title("AudioBookConverter: Conversion is completed")
+                .text(finalOutputDestination).show();
     }
 }

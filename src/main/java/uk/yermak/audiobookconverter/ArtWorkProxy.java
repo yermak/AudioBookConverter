@@ -41,6 +41,11 @@ public class ArtWorkProxy implements ArtWork {
         this.getArtWork().setFormat(format);
     }
 
+    @Override
+    public boolean matchCrc32(long crc32) {
+        return this.getArtWork().matchCrc32(crc32);
+    }
+
     public long getCrc32() {
         return this.getArtWork().getCrc32();
     }

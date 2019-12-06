@@ -44,7 +44,7 @@ public class BatchConversionStrategy implements ConversionStrategy {
                 String outputFileName = this.determineOutputFilename(mediaInfo.getFileName());
                 Future<ConverterOutput> converterFuture =
                         executorService
-                                .submit(new FFMpegNativeConverter(conversion, conversion.getOutputParameters(), mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
+                                .submit(new FFMpegNativeConverter(conversion, mediaInfo, outputFileName, progressCallbacks.get(mediaInfo.getFileName())));
                 futures.add(converterFuture);
             }
 

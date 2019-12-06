@@ -3,6 +3,9 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Part implements Organisable {
     private String title;
     private int number;
@@ -37,4 +40,8 @@ public class Part implements Organisable {
         return chapters;
     }
 
+    public List<MediaInfo> getChaptersMedia() {
+        List<MediaInfo> media = chapters.stream().flatMap(chapter -> chapter.getMedia().stream()).collect(Collectors.toList());
+        return media;
+    }
 }

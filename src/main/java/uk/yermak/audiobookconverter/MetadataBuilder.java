@@ -16,7 +16,7 @@ public class MetadataBuilder {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
-    public File prepareMeta(final long jobId, final AudioBookInfo bookInfo, final List<MediaInfo> inputMedia) throws IOException {
+    public File prepareMeta(final long jobId, final AudioBookInfo bookInfo, Part part) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
         List<String> metaData = new ArrayList<>();
         metaData.add(";FFMETADATA1");
@@ -38,28 +38,14 @@ public class MetadataBuilder {
         metaData.add("genre=" + bookInfo.getGenre());
         metaData.add("encoder=https://github.com/yermak/AudioBookConverter");
         long totalDuration = 0;
-        int i = 1;
 
-        for (MediaInfo media : inputMedia) {
+        for (Chapter chapter : part.getChapters()) {
             metaData.add("[CHAPTER]");
             metaData.add("TIMEBASE=1/1000");
             metaData.add("START=" + totalDuration);
-            totalDuration += media.getDuration();
+            totalDuration += chapter.getDuration();
             metaData.add("END=" + totalDuration);
-            if (bookInfo.getBookNumber() != 0) {
-                String chapter = "title=" + bookInfo.getBookNumber() + ". " + bookInfo.getTitle() + ": ";
-                if (media.getBookInfo().getTitle() == null) {
-                    chapter = chapter + "Chapter " + i;
-                } else {
-                    chapter = chapter + i + ". " + media.getBookInfo().getTitle();
-                }
-                metaData.add(chapter);
-            } else if (media.getBookInfo().getTitle() == null) {
-                metaData.add("title=Chapter " + i);
-            } else {
-                metaData.add("title=" + i + ". " + media.getBookInfo().getTitle());
-            }
-            i++;
+            metaData.add("title= "+Utils.formatChapter(bookInfo, chapter));
         }
         FileUtils.writeLines(metaFile, "UTF-8", metaData);
         return metaFile;

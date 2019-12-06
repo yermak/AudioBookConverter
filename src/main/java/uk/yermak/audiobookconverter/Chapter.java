@@ -10,6 +10,7 @@ public class Chapter implements Organisable {
     private final int number;
     private String details;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+    private String customTitle;
 
     public Chapter(int number, MediaInfo mediaInfo) {
         this.number = number;
@@ -18,7 +19,14 @@ public class Chapter implements Organisable {
     }
 
     public String getTitle() {
+        if (customTitle != null) {
+            return number + ":" + customTitle;
+        }
         return "Chapter " + number;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
     @Override
@@ -33,5 +41,13 @@ public class Chapter implements Organisable {
 
     public ObservableList<MediaInfo> getMedia() {
         return media;
+    }
+
+    public String getCustomTitle() {
+        return customTitle;
+    }
+
+    public void setCustomTitle(String customTitle) {
+        this.customTitle = customTitle;
     }
 }

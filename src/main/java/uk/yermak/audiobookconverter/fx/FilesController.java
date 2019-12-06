@@ -276,9 +276,8 @@ public class FilesController {
             });*/
             Book book = context.getBook();
             book.getParts().forEach(part -> {
-                String output = finalName + ", " + part.getTitle();
-                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), output);
-                context.startConversion(part, output, conversionProgress);
+                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), finalName);
+                context.startConversion(part, outputDestination, conversionProgress);
             });
         }
     }

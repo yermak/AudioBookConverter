@@ -66,10 +66,27 @@ public class Utils {
         }
     }
 
+    public static String formatChapter(AudioBookInfo bookInfo, Chapter chapter) {
+        String chapterFormat = AppProperties.getProperty("chapter_format");
+        if (chapterFormat == null) {
+            chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>: <CHAPTER_TITLE><endif> - <DURATION>";
+            AppProperties.setProperty("filename_format", chapterFormat);
+        }
+
+        ST chapterTemplate = new ST(chapterFormat);
+        chapterTemplate.add("BOOK_NUMBER", bookInfo.getBookNumber() == 0 ? null : bookInfo.getBookNumber());
+        chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
+        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getCustomTitle()) ? null : chapter.getCustomTitle());
+        chapterTemplate.add("DURATION", chapter.getDuration());
+        return chapterTemplate.render();
+
+    }
+
+
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif><if(NUMBER)>, Part <NUMBER><endif>";
+            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif><if(NUMBER)> , Part <NUMBER><endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 

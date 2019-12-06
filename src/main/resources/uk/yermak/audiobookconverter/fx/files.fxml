@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="false" GridPane.rowIndex="1"
           GridPane.fillHeight="true"
           fx:controller="uk.yermak.audiobookconverter.fx.FilesController">
@@ -15,21 +16,7 @@
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="SOMETIMES"/>
     </columnConstraints>
-<!--
-    <rowConstraints>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="ALWAYS"/>
 
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-        <RowConstraints vgrow="NEVER"/>
-    </rowConstraints>
--->
     <children>
 
         <TabPane minHeight="${screen.visualBounds.height*0.50}" prefHeight="${screen.visualBounds.height*0.25}"
@@ -38,16 +25,18 @@
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Tab text="Add MP3 files to convert and bring them in right order..." closable="false">
+            <Tab fx:id="filesTab" text="Add MP3 files to convert and bring them in right order..." closable="false">
                 <ListView fx:id="fileList" GridPane.valignment="TOP">
                 </ListView>
             </Tab>
             <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
                 <TreeTableView fx:id="bookStructure">
                     <columns>
-                        <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false" prefWidth="${screen.visualBounds.width * 0.1}" />
+                        <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
+                                         prefWidth="${screen.visualBounds.width * 0.1}"/>
                         <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
-                        <TreeTableColumn text="Details" fx:id="detailsColumn"  sortable="false" prefWidth="${screen.visualBounds.width * 0.2}" />
+                        <TreeTableColumn text="Details" fx:id="detailsColumn" sortable="false"
+                                         prefWidth="${screen.visualBounds.width * 0.2}"/>
                     </columns>
                 </TreeTableView>
 
@@ -61,18 +50,18 @@
 
         <Accordion GridPane.columnIndex="1" GridPane.rowIndex="1" expandedPane="$filePane">
             <panes>
-                <TitledPane fx:id="filePane" text="Files" >
+                <TitledPane fx:id="filePane" text="Organise">
                     <VBox spacing="5">
                         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#addFiles"
-                                >
+                        >
                             <tooltip>
                                 <Tooltip text="Add files for conversion to the list"/>
                             </tooltip>
                         </Button>
                         <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#removeFiles" disable="false"
-                                >
+                        >
                             <tooltip>
                                 <Tooltip text="Removes selected files from the list"/>
                             </tooltip>
@@ -80,7 +69,7 @@
                         <Button fx:id="clearButton" text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#clear"
                                 disable="false"
-                                >
+                        >
                             <tooltip>
                                 <Tooltip text="Remove all files from the list"/>
                             </tooltip>
@@ -88,7 +77,7 @@
                         <Button fx:id="upButton" text="Up" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#moveUp"
                                 disable="false"
-                                >
+                        >
                             <tooltip>
                                 <Tooltip text="Move selected file up"/>
                             </tooltip>
@@ -96,51 +85,75 @@
                         <Button fx:id="downButton" text="Down" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#moveDown"
                                 disable="false" GridPane.valignment="TOP"
-                                >
+                        >
                             <tooltip>
                                 <Tooltip text="Move selected file down"/>
                             </tooltip>
                         </Button>
+
+                        <SplitPane/>
+                        <Label text="Advanced" textAlignment="CENTER" alignment="CENTER">
+                            <font>
+                                <Font name="Arial Black" size="12.0"/>
+                            </font>
+                        </Label>
+                        <SplitPane/>
+
+                        <Button fx:id="importButton" text="Chapters" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#importChapters"
+                                GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Import files into chapters"/>
+                            </tooltip>
+                        </Button>
+
+                        <Button fx:id="combineButton" text="Combine" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#combine"
+                                disable="false"
+                        >
+                            <tooltip>
+                                <Tooltip text="Combine selected"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="splitButton" text="Split" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#split"
+                                disable="false" GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Split here"/>
+                            </tooltip>
+                        </Button>
+
+
                     </VBox>
                 </TitledPane>
-                <TitledPane fx:id="chapterPane" text="Chapters">
+
+                <TitledPane fx:id="jobPanes" text="Convert">
                     <VBox spacing="5">
 
-                    <Button fx:id="importButton" text="Import" minWidth="${screen.visualBounds.width * 0.05}"
-                            onAction="#importChapters"
-                            GridPane.valignment="TOP"
-                            >
-                        <tooltip>
-                            <Tooltip text="Move selected file down"/>
-                        </tooltip>
-                    </Button>
-                    </VBox>
-                </TitledPane>
-                <TitledPane fx:id="jobPanes" text="Jobs">
-                    <VBox spacing="5">
-
-                    <Button fx:id="startButton" text="Start" disable="false"
-                            minWidth="${screen.visualBounds.width * 0.05}"
-                            onAction="#start">
-                        <tooltip>
-                            <Tooltip text="Start conversion of files"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="pauseButton" text="Pause all"
-                            minWidth="${screen.visualBounds.width * 0.05}"
-                            GridPane.fillHeight="true"
-                            onAction="#pause">
-                        <tooltip>
-                            <Tooltip text="Pause conversion of files"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="stopButton" text="Stop all"
-                            minWidth="${screen.visualBounds.width * 0.05}"
-                            onAction="#stop">
-                        <tooltip>
-                            <Tooltip text="Stop conversion of files"/>
-                        </tooltip>
-                    </Button>
+                        <Button fx:id="startButton" text="Start" disable="false"
+                                minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#start">
+                            <tooltip>
+                                <Tooltip text="Start conversion of files"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="pauseButton" text="Pause all"
+                                minWidth="${screen.visualBounds.width * 0.05}"
+                                GridPane.fillHeight="true"
+                                onAction="#pause">
+                            <tooltip>
+                                <Tooltip text="Pause conversion of files"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="stopButton" text="Stop all"
+                                minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#stop">
+                            <tooltip>
+                                <Tooltip text="Stop conversion of files"/>
+                            </tooltip>
+                        </Button>
                     </VBox>
                 </TitledPane>
 

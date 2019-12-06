@@ -57,6 +57,8 @@ public class FilesController {
     public Tab chaptersTab;
     @FXML
     public TabPane filesChapters;
+    @FXML
+    public Tab filesTab;
 
     @FXML
     ListView<MediaInfo> fileList;
@@ -140,6 +142,7 @@ public class FilesController {
         listener = new MediaInfoChangeListener(conversion);
         fileList.getSelectionModel().selectedItemProperty().addListener(listener);*/
 
+        filesChapters.getTabs().remove(chaptersTab);
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
@@ -258,9 +261,12 @@ public class FilesController {
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
+        if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
+        if (context.getBook() == null) {
+            context.setBook(new Book(fileList.getItems()));
+        }
 
-//        List<MediaInfo> media = conversion.getMedia();
         String outputDestination;
         if (ConverterApplication.getContext().getMode().equals(ConversionMode.BATCH)) {
             outputDestination = selectOutputDirectory();
@@ -269,11 +275,7 @@ public class FilesController {
         }
         if (outputDestination != null) {
             String finalName = new File(outputDestination).getName();
-           /* conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-                if (ProgressStatus.FINISHED.equals(newValue)) {
-                    Platform.runLater(() -> showNotification(finalName));
-                }
-            });*/
+
             Book book = context.getBook();
             book.getParts().forEach(part -> {
                 ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), finalName);
@@ -368,6 +370,9 @@ public class FilesController {
             return;
         }
         chaptersTab.setDisable(false);
+        filesChapters.getTabs().add(chaptersTab);
+        filesChapters.getTabs().remove(filesTab);
+
         bookStructure.setShowRoot(false);
 
 
@@ -392,7 +397,17 @@ public class FilesController {
         bookItem.setExpanded(true);
         ConverterApplication.getContext().setBook(book);
         filesChapters.getSelectionModel().select(chaptersTab);
+        fileList.getItems().clear();
     }
+
+    public void combine(ActionEvent actionEvent) {
+
+    }
+
+    public void split(ActionEvent actionEvent) {
+
+    }
+
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
         @Override

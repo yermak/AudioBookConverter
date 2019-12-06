@@ -60,7 +60,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
                 future.get();
             }
             if (conversion.getStatus().isOver()) return;
-            metaFile = new MetadataBuilder().prepareMeta(jobId, ConverterApplication.getContext().getBookInfo(), conversion.getMedia());
+            metaFile = new MetadataBuilder().prepareMeta(jobId, ConverterApplication.getContext().getBookInfo(), conversion.getPart());
             FFMpegConcatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 

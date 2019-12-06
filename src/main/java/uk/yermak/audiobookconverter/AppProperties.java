@@ -40,12 +40,12 @@ public class AppProperties {
         applicationProps.put(key, value);
 
         try {
-            File appDir = new File(new File(System.getenv("APPDATA")), "AudioBookConverter-V3");
+            File appDir = new File(new File(System.getenv("APPDATA")), "AudioBookConverter-V4");
             if (!appDir.exists()) {
                 boolean succ = appDir.mkdir();
                 System.out.println(succ);
             }
-            FileOutputStream out = new FileOutputStream(new File(appDir, "AudioBookConverter-V3.properties"));
+            FileOutputStream out = new FileOutputStream(new File(appDir, "AudioBookConverter-V4.properties"));
             applicationProps.store(out, "");
             out.close();
         } catch (Exception e) {

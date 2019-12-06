@@ -11,6 +11,7 @@ import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class FFMediaLoader {
                 media.add(mediaInfo);
             }
 
-            searchForPosters(media, conversion.getPosters());
+            searchForPosters(media, ConverterApplication.getContext().getPosters());
 
             return media;
         } catch (Exception e) {
@@ -151,7 +152,10 @@ public class FFMediaLoader {
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster, format, crc32);
-                Platform.runLater(() -> addPosterIfMissing(artWorkBean, conversion.getPosters()));
+                Platform.runLater(() -> {
+                    if (!conversion.getStatus().isOver())
+                        addPosterIfMissing(artWorkBean, ConverterApplication.getContext().getPosters());
+                });
                 return artWorkBean;
             } finally {
                 Utils.closeSilently(process);
@@ -174,7 +178,7 @@ public class FFMediaLoader {
     }
 
     static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
-        if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
+        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
             posters.add(artWork);
         }
     }

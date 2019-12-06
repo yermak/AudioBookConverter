@@ -18,7 +18,7 @@ import static uk.yermak.audiobookconverter.ConversionMode.*;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class ConversionModeController implements ConversionSubscriber {
+public class ConversionModeController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(this, "mode", PARALLEL);
@@ -32,17 +32,9 @@ public class ConversionModeController implements ConversionSubscriber {
     @FXML
     private ToggleGroup modeGroup;
 
-    private Conversion conversion;
-
     @FXML
     public void initialize() {
-        Conversion conversion = ConverterApplication.getContext().registerForConversion(this);
-        resetForNewConversion(conversion);
-        mode.addListener((observable, oldValue, newValue) -> conversion.setMode(newValue));
-    }
-
-    public void resetForNewConversion(Conversion conversion) {
-        this.conversion = conversion;
+        mode.addListener((observable, oldValue, newValue) -> ConverterApplication.getContext().setMode(newValue));
     }
 
     public void parallelMode(ActionEvent actionEvent) {

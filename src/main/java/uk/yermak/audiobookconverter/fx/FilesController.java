@@ -24,7 +24,6 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ import java.util.*;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController implements ConversionSubscriber {
+public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -63,7 +62,7 @@ public class FilesController implements ConversionSubscriber {
     ListView<MediaInfo> fileList;
 
     @FXML
-    TreeTableView<Organisable> chapters;
+    TreeTableView<Organisable> bookStructure;
     @FXML
     private TreeTableColumn<Organisable, String> chapterColumn;
     @FXML
@@ -78,12 +77,12 @@ public class FilesController implements ConversionSubscriber {
     @FXML
     public Button stopButton;
 
-    private Conversion conversion;
-    private ObservableList<MediaInfo> selectedMedia;
     private MediaInfoChangeListener listener;
 
     private static final String M4B = "m4b";
     private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+
+    private final ContextMenu contextMenu = new ContextMenu();
 
 
     @FXML
@@ -103,6 +102,7 @@ public class FilesController implements ConversionSubscriber {
             event.consume();
         });
 
+
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
@@ -111,9 +111,11 @@ public class FilesController implements ConversionSubscriber {
         contextMenu.getItems().addAll(item1, item2);
 
         ConversionContext context = ConverterApplication.getContext();
-        selectedMedia = context.getSelectedMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
+        fileList.setItems(media);
+        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        resetForNewConversion(context.registerForConversion(this));
+        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
         selectedMedia.addListener((InvalidationListener) observable -> {
             if (selectedMedia.isEmpty()) return;
@@ -121,16 +123,28 @@ public class FilesController implements ConversionSubscriber {
             List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
             if (!change.containsAll(selection) || !selection.containsAll(change)) {
                 fileList.getSelectionModel().clearSelection();
-                change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
+                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
             }
         });
+
+        /* TODO fix buttons behaviour
+        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
+                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
+        );
+*/
+        //TOODO: this section may not work
+  /*      media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+        if (listener != null) {
+            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
+        }
+        listener = new MediaInfoChangeListener(conversion);
+        fileList.getSelectionModel().selectedItemProperty().addListener(listener);*/
+
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
     }
-
-    private final ContextMenu contextMenu = new ContextMenu();
 
 
     @FXML
@@ -175,7 +189,7 @@ public class FilesController implements ConversionSubscriber {
     }
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, conversion);
+        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversion());
     }
 
     private void selectFilesDialog(Window window) {
@@ -246,37 +260,29 @@ public class FilesController implements ConversionSubscriber {
         ConversionContext context = ConverterApplication.getContext();
 
 
-        List<MediaInfo> media = conversion.getMedia();
-        if (media.size() > 0) {
-            AudioBookInfo audioBookInfo = conversion.getBookInfo();
-            MediaInfo mediaInfo = media.get(0);
-            String outputDestination;
-            if (conversion.getMode().equals(ConversionMode.BATCH)) {
-                outputDestination = selectOutputDirectory();
-            } else {
-                outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
-            }
-            if (outputDestination != null) {
-                String finalName = new File(outputDestination).getName();
-                conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-                    if (ProgressStatus.FINISHED.equals(newValue)) {
-                        Platform.runLater(() -> showNotification(finalName));
-                    }
-                });
-
-                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
-                context.startConversion(outputDestination, conversionProgress);
-
-            }
+//        List<MediaInfo> media = conversion.getMedia();
+        String outputDestination;
+        if (ConverterApplication.getContext().getMode().equals(ConversionMode.BATCH)) {
+            outputDestination = selectOutputDirectory();
+        } else {
+            outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo());
+        }
+        if (outputDestination != null) {
+            String finalName = new File(outputDestination).getName();
+           /* conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
+                if (ProgressStatus.FINISHED.equals(newValue)) {
+                    Platform.runLater(() -> showNotification(finalName));
+                }
+            });*/
+            Book book = context.getBook();
+            book.getParts().forEach(part -> {
+                String output = finalName + ", " + part.getTitle();
+                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), output);
+                context.startConversion(part, output, conversionProgress);
+            });
         }
     }
 
-    private static void showNotification(String finalOutputDestination) {
-        Notifications.create()
-                .title("AudioBookConverter: Conversion is completed")
-                .text(finalOutputDestination).show();
-    }
 
     private String selectOutputDirectory() {
         JfxEnv env = ConverterApplication.getEnv();
@@ -292,13 +298,13 @@ public class FilesController implements ConversionSubscriber {
         return outputDestination;
     }
 
-    private String selectOutputFile(AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+    private String selectOutputFile(AudioBookInfo audioBookInfo) {
         JfxEnv env = ConverterApplication.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
-        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
+        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter(M4B, "*." + M4B)
@@ -358,41 +364,19 @@ public class FilesController implements ConversionSubscriber {
         });
     }
 
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        this.conversion = conversion;
-
-        ObservableList<MediaInfo> media = this.conversion.getMedia();
-        fileList.setItems(media);
-        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-/* TODO fix buttons behaviour
-        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
-                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
-*/
-
-//        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-
-        if (listener != null) {
-            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
-        }
-        listener = new MediaInfoChangeListener(conversion);
-        fileList.getSelectionModel().selectedItemProperty().addListener(listener);
-    }
-
     public void importChapters(ActionEvent actionEvent) {
         if (fileList.getItems().isEmpty()) {
             return;
         }
         chaptersTab.setDisable(false);
-        chapters.setShowRoot(false);
+        bookStructure.setShowRoot(false);
 
 
         Book book = new Book(fileList.getItems());
 
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
-        chapters.setRoot(bookItem);
+        bookStructure.setRoot(bookItem);
 
         book.getParts().forEach(p -> {
             TreeItem<Organisable> partItem = new TreeItem<>(p);
@@ -407,6 +391,7 @@ public class FilesController implements ConversionSubscriber {
         });
 
         bookItem.setExpanded(true);
+        ConverterApplication.getContext().setBook(book);
         filesChapters.getSelectionModel().select(chaptersTab);
     }
 
@@ -495,8 +480,9 @@ public class FilesController implements ConversionSubscriber {
         @Override
         public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
 //            updateUI(conversion.getStatus(), conversion.getMedia().isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            ObservableList<MediaInfo> selectedMedia = ConverterApplication.getContext().getSelectedMedia();
             selectedMedia.clear();
-            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(conversion.getMedia().get(i)));
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(ConverterApplication.getContext().getMedia().get(i)));
         }
     }
 }

@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +11,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -41,18 +41,17 @@ public class ParallelConversionStrategy implements ConversionStrategy {
         File metaFile = null;
         try {
 //            MediaInfo maxMedia = maximiseEncodingParameters();
-            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
+            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
             fileListFile = prepareFiles(jobId);
 
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
-            OutputParameters finalParameters = conversion.getOutputParameters().copy();
-                    for (MediaInfo mediaInfo : prioritizedMedia) {
+            for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, finalParameters, mediaInfo, tempOutput, callback));
+                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
@@ -61,7 +60,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
                 future.get();
             }
             if (conversion.getStatus().isOver()) return;
-            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
+            metaFile = new MetadataBuilder().prepareMeta(jobId, ConverterApplication.getContext().getBookInfo(), conversion.getMedia());
             FFMpegConcatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
@@ -89,6 +88,8 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     }
 
     private List<MediaInfo> prioritiseMedia() {
+        return conversion.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
+/*
         List<MediaInfo> sortedMedia = new ArrayList<>(conversion.getMedia().size());
 
         for (MediaInfo mediaInfo : conversion.getMedia()) {
@@ -98,7 +99,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
 //            mediaInfo.setBitrate(maxMedia.getBitrate());
         }
         Collections.sort(sortedMedia, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
-        return sortedMedia;
+        return sortedMedia;*/
     }
 
 

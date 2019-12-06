@@ -41,6 +41,11 @@ public class ArtWorkBean implements ArtWork {
         this.format = format;
     }
 
+    @Override
+    public boolean matchCrc32(long crc32) {
+        return this.crc32 == crc32;
+    }
+
     public ArtWorkBean(final String fileName, final String format, final long crc32) {
         this.fileName = fileName;
         this.format = format;

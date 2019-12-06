@@ -126,8 +126,8 @@ public class OutputController implements ConversionSubscriber {
 
     @Override
     public void resetForNewConversion(Conversion conversion) {
-        params = conversion.getOutputParameters();
-        media = conversion.getMedia();
+        params = ConverterApplication.getContext().getOutputParameters();
+        media = ConverterApplication.getContext().getMedia();
         media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
     }
 }

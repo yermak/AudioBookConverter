@@ -66,7 +66,7 @@ public class Utils {
         }
     }
 
-    public static String getOuputFilenameSuggestion(String fileName, AudioBookInfo bookInfo) {
+    public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
             filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif><if(NUMBER)>, Part <NUMBER><endif>";
@@ -119,7 +119,7 @@ public class Utils {
         String mp3Filename;
 
         if (StringUtils.isBlank(result)) {
-            mp3Filename = fileName;
+            mp3Filename = "NewBook";
         } else {
             mp3Filename = result;
         }

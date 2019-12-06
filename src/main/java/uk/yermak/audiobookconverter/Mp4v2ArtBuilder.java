@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class Mp4v2ArtBuilder {
 
 
     public void coverArt(String outputFileName) throws IOException, InterruptedException {
-        ObservableList<ArtWork> posters = conversion.getPosters();
+        ObservableList<ArtWork> posters = ConverterApplication.getContext().getPosters();
 
         int i = 0;
         for (ArtWork poster : posters) {

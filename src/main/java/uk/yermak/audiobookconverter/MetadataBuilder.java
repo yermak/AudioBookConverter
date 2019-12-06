@@ -15,9 +15,6 @@ import java.util.List;
 public class MetadataBuilder {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private Logger logger() {
-        return this.logger;
-    }
 
     public File prepareMeta(final long jobId, final AudioBookInfo bookInfo, final List<MediaInfo> inputMedia) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);

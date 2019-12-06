@@ -76,6 +76,11 @@ public class ArtWorkImage implements ArtWork {
         this.getBean().setFormat(format);
     }
 
+    @Override
+    public boolean matchCrc32(long crc32) {
+        return getCrc32() == crc32;
+    }
+
     public ArtWorkImage(final Image image) {
         this.image = image;
         this.logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

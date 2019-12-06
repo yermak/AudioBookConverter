@@ -169,7 +169,7 @@ public class MediaPlayerController implements ConversionSubscriber {
 
     @Override
     public void resetForNewConversion(Conversion conversion) {
-        media = conversion.getMedia();
+        media = ConverterApplication.getContext().getMedia();
         ConverterApplication.getContext().getSelectedMedia().clear();
     }
 }

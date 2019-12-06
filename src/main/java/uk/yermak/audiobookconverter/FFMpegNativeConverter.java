@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class FFMpegNativeConverter implements Callable<ConverterOutput> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Conversion conversion;
-    private OutputParameters outputParameters;
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
@@ -29,9 +28,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
     private ProgressParser progressParser = null;
 
 
-    public FFMpegNativeConverter(Conversion conversion, OutputParameters outputParameters, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+    public FFMpegNativeConverter(Conversion conversion, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
         this.conversion = conversion;
-        this.outputParameters = outputParameters;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
@@ -52,6 +50,7 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
             progressParser.start();
 
             ProcessBuilder ffmpegProcessBuilder;
+            OutputParameters outputParameters = conversion.getOutputParameters();
             if (outputParameters.isAuto()) {
                 if (mediaInfo.getCodec().equals("aac")) {
                     logger.debug("Transcoding aac stream for {}", outputFileName);
@@ -70,8 +69,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                             "-vn",
                             "-codec:a", "aac",
                             "-f", "ipod",
-                            "-vol", outputParameters.getVolumeValue(),
-                            "-af", outputParameters.getFiltersValue(),
+//                            "-vol", outputParameters.getVolumeValue(),
+//                            "-af", outputParameters.getFiltersValue(),
                             "-progress", progressParser.getUri().toString(),
                             outputFileName
                     );
@@ -87,8 +86,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                         "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
                         "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
                         "-cutoff", outputParameters.getCutoffValue(),
-                        "-vol", outputParameters.getVolumeValue(),
-                        "-af", outputParameters.getFiltersValue(),
+//                        "-vol", outputParameters.getVolumeValue(),
+//                        "-af", outputParameters.getFiltersValue(),
                         "-progress", progressParser.getUri().toString(),
                         outputFileName
                 );

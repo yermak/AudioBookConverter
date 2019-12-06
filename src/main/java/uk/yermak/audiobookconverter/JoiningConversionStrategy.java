@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class JoiningConversionStrategy implements ConversionStrategy {
         try {
             conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
-            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getMedia());
+            metaFile = new MetadataBuilder().prepareMeta(jobId, ConverterApplication.getContext().getBookInfo(), conversion.getMedia());
             fileListFile = prepareFiles(jobId);
             if (conversion.getStatus().isOver()) return;
             FFMpegLinearNativeConverter concatenator = new FFMpegLinearNativeConverter(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), conversion.getOutputParameters(), progressCallbacks.get("output"));
@@ -62,7 +63,6 @@ public class JoiningConversionStrategy implements ConversionStrategy {
             FileUtils.deleteQuietly(fileListFile);
         }
     }
-
 
 
     protected File prepareFiles(long jobId) throws IOException {

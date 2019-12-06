@@ -144,6 +144,8 @@ public class FilesController {
 
         filesChapters.getTabs().remove(chaptersTab);
 
+        bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
@@ -401,6 +403,7 @@ public class FilesController {
     }
 
     public void combine(ActionEvent actionEvent) {
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
 
     }
 

@@ -384,6 +384,15 @@ public class FilesController {
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
 
+        updateBookStructure(book, bookItem);
+
+        bookItem.setExpanded(true);
+        ConverterApplication.getContext().setBook(book);
+        filesChapters.getSelectionModel().select(chaptersTab);
+        fileList.getItems().clear();
+    }
+
+    private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {
         book.getParts().forEach(p -> {
             TreeItem<Organisable> partItem = new TreeItem<>(p);
             bookItem.getChildren().add(partItem);
@@ -395,11 +404,6 @@ public class FilesController {
                 });
             });
         });
-
-        bookItem.setExpanded(true);
-        ConverterApplication.getContext().setBook(book);
-        filesChapters.getSelectionModel().select(chaptersTab);
-        fileList.getItems().clear();
     }
 
     public void combine(ActionEvent actionEvent) {
@@ -408,7 +412,13 @@ public class FilesController {
     }
 
     public void split(ActionEvent actionEvent) {
-
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.size()!=1) return;
+        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+        organisable.split();
+        bookStructure.getRoot().getChildren().clear();
+        Book book = ConverterApplication.getContext().getBook();
+        updateBookStructure(book, bookStructure.getRoot());
     }
 
 

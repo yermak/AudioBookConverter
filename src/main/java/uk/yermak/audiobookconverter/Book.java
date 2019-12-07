@@ -7,8 +7,8 @@ public class Book implements Organisable {
     private ObservableList<Part> parts = FXCollections.observableArrayList();
 
     public Book(ObservableList<MediaInfo> items) {
-        Part firstPart = new Part(1, items);
-        parts.add(firstPart);
+        Part part = new Part(this, items);
+        parts.add(part);
     }
 
     @Override
@@ -24,6 +24,11 @@ public class Book implements Organisable {
     @Override
     public long getDuration() {
         return parts.stream().mapToLong(Part::getDuration).sum();
+    }
+
+    @Override
+    public void split() {
+
     }
 
     public ObservableList<Part> getParts() {

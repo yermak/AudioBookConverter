@@ -87,6 +87,11 @@ public class MediaInfoBean implements MediaInfo {
         return this.duration();
     }
 
+    @Override
+    public void split() {
+        //TODO
+    }
+
     public String getFileName() {
         return this.fileName();
     }

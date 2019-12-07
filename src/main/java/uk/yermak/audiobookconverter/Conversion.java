@@ -31,6 +31,7 @@ public class Conversion {
     private OutputParameters outputParameters;
     private String outputDestination;
     private Part part;
+    private AudioBookInfo bookInfo;
 
 
     public List<MediaInfo> getMedia() {
@@ -38,10 +39,11 @@ public class Conversion {
     }
 
 
-    public void start(Part part, String outputDestination, Refreshable refreshable, OutputParameters outputParameters) {
+    public void start(Part part, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo) {
         setPart(part);
         setOutputDestination(outputDestination);
         setOutputParameters(outputParameters);
+        setBookInfo(bookInfo);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
 
@@ -125,6 +127,14 @@ public class Conversion {
 
     public Part getPart() {
         return part;
+    }
+
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        this.bookInfo = bookInfo;
+    }
+
+    public AudioBookInfo getBookInfo() {
+        return bookInfo;
     }
 }
 

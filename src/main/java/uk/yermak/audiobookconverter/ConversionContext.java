@@ -81,7 +81,7 @@ public class ConversionContext {
                 Platform.runLater(() -> ConverterApplication.showNotification(output));
             }
         });
-        conversionHolder.get().start(part, output, conversionProgress, outputParameters.copy());
+        conversionHolder.get().start(part, output, conversionProgress, outputParameters.copy(), bookInfo.get());
 
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);

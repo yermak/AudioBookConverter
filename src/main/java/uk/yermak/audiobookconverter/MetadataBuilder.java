@@ -1,6 +1,7 @@
 //decompiled from MetadataBuilder.class
 package uk.yermak.audiobookconverter;
 
+import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MetadataBuilder {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -47,6 +49,8 @@ public class MetadataBuilder {
             metaData.add("END=" + totalDuration);
             metaData.add("title= "+Utils.formatChapter(bookInfo, chapter));
         }
+        String collect = metaData.stream().collect(Collectors.joining(toString()));
+        logger.debug(collect);
         FileUtils.writeLines(metaFile, "UTF-8", metaData);
         return metaFile;
     }

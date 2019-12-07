@@ -6,7 +6,7 @@ public class Version {
     private final static int BUILD = 0;
 
     public static String getVersionString() {
-        return "AudioBookConverter " + MAJOR + "." + MINOR + (BUILD != 0 ? "." + BUILD : "");
+        return "AudioBookConverter-" + MAJOR + "." + MINOR + (BUILD != 0 ? "." + BUILD : "");
     }
 }
 

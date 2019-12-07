@@ -86,7 +86,7 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif><if(NUMBER)> , Part <NUMBER><endif>";
+            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 
@@ -95,7 +95,6 @@ public class Utils {
         filenameTemplate.add("TITLE", StringUtils.isEmpty(bookInfo.getTitle()) ? null : bookInfo.getTitle());
         filenameTemplate.add("SERIES", StringUtils.isEmpty(bookInfo.getSeries()) ? null : bookInfo.getSeries());
         filenameTemplate.add("NARRATOR", StringUtils.isEmpty(bookInfo.getNarrator()) ? null : bookInfo.getNarrator());
-        filenameTemplate.add("NUMBER", bookInfo.getBookNumber() == 0 ? null : bookInfo.getBookNumber());
 /*
         StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotBlank(bookInfo.getWriter())) {

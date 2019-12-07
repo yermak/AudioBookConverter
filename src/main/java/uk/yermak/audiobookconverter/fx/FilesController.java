@@ -276,13 +276,17 @@ public class FilesController {
             outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
         }
         if (outputDestination != null) {
-            String finalName = new File(outputDestination).getName();
-
             Book book = context.getBook();
-            book.getParts().forEach(part -> {
+            ObservableList<Part> parts = book.getParts();
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i);
+                if (parts.size() > 1) {
+                    outputDestination = outputDestination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+                }
+                String finalName = new File(outputDestination).getName();
                 ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), finalName);
                 context.startConversion(part, outputDestination, conversionProgress);
-            });
+            }
         }
     }
 
@@ -301,7 +305,7 @@ public class FilesController {
         return outputDestination;
     }
 
-    private String selectOutputFile(AudioBookInfo audioBookInfo) {
+    private static String selectOutputFile(AudioBookInfo audioBookInfo) {
         JfxEnv env = ConverterApplication.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
@@ -413,7 +417,7 @@ public class FilesController {
 
     public void split(ActionEvent actionEvent) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        if (selectedCells.size()!=1) return;
+        if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
         organisable.split();
         bookStructure.getRoot().getChildren().clear();

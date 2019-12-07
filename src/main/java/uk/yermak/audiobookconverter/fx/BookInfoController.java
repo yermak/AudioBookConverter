@@ -2,6 +2,9 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
@@ -64,38 +67,45 @@ public class BookInfoController {
 
 //        clearTags();
 
-        AudioBookInfo bookInfo = ConverterApplication.getContext().getBookInfo();
+        SimpleObjectProperty<AudioBookInfo> bookInfo = ConverterApplication.getContext().getBookInfo();
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> bookInfo.setTitle(title.getText()));
-        writer.textProperty().addListener(o -> bookInfo.setWriter(writer.getText()));
-        narrator.textProperty().addListener(o -> bookInfo.setNarrator(narrator.getText()));
+        title.textProperty().addListener(o -> bookInfo.get().setTitle(title.getText()));
+        writer.textProperty().addListener(o -> bookInfo.get().setWriter(writer.getText()));
+        narrator.textProperty().addListener(o -> bookInfo.get().setNarrator(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.setGenre(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> bookInfo.setGenre(genre.getEditor().getText()));
+        genre.valueProperty().addListener(o -> bookInfo.get().setGenre(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> bookInfo.get().setGenre(genre.getEditor().getText()));
 
-        series.textProperty().addListener(o -> bookInfo.setSeries(series.getText()));
+        series.textProperty().addListener(o -> bookInfo.get().setSeries(series.getText()));
         bookNo.textProperty().addListener(o -> {
-            if (StringUtils.isNotBlank(bookNo.getText())) bookInfo.setBookNumber(Integer.parseInt(bookNo.getText()));
+            if (StringUtils.isNotBlank(bookNo.getText()))
+                bookInfo.get().setBookNumber(Integer.parseInt(bookNo.getText()));
         });
-        year.textProperty().addListener(o -> bookInfo.setYear(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.setComment(comment.getText()));
+        year.textProperty().addListener(o -> bookInfo.get().setYear(year.getText()));
+        comment.textProperty().addListener(o -> bookInfo.get().setComment(comment.getText()));
+
+        ConverterApplication.getContext().addBookInfoChangeListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> copyTags(bookInfo.get()));
+        });
 
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
-        if (clear) {
-            clearTags();
-        } else {
-            Executors.newSingleThreadExecutor().submit(() -> {
-                //getBookInfo is proxied blocking method should be executed outside of UI thread,
-                // when info become available - scheduling update in UI thread.
-                AudioBookInfo info = media.get(0).getBookInfo();
-                Platform.runLater(() -> copyTags(info));
+        if (ConverterApplication.getContext().getBook() == null) {
+            if (clear) {
+                clearTags();
+            } else {
+                Executors.newSingleThreadExecutor().submit(() -> {
+                    //getBookInfo is proxied blocking method should be executed outside of UI thread,
+                    // when info become available - scheduling update in UI thread.
+                    AudioBookInfo info = media.get(0).getBookInfo();
+                    Platform.runLater(() -> copyTags(info));
 
-            });
+                });
+            }
         }
     }
 

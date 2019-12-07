@@ -20,27 +20,27 @@ public class AudioBookInfo {
     private String comment = "";
     private String longDescription = "";
 
+    public AudioBookInfo() {
+    }
 
-    public static AudioBookInfo instance(final Map tags) {
-        AudioBookInfo audioBookInfo = new AudioBookInfo();
+    public AudioBookInfo(Map<String, String> tags) {
         if (tags != null) {
-            audioBookInfo.setTitle((String) tags.get("title"));
-            audioBookInfo.setWriter((String) tags.get("artist"));
-            audioBookInfo.setNarrator((String) tags.get("album_artist"));
-            audioBookInfo.setSeries((String) tags.get("album"));
-            audioBookInfo.setYear((String) tags.get("year"));
-            audioBookInfo.setComment((String) tags.get("comment-0"));
-            audioBookInfo.setGenre((String) tags.get("genre"));
-            String trackNumber = (String) tags.get("track number");
+            this.setTitle(tags.get("title"));
+            this.setWriter(tags.get("artist"));
+            this.setNarrator(tags.get("album_artist"));
+            this.setSeries(tags.get("album"));
+            this.setYear(tags.get("year"));
+            this.setComment(tags.get("comment-0"));
+            this.setGenre(tags.get("genre"));
+            String trackNumber = tags.get("track number");
             if (trackNumber != null) {
-                audioBookInfo.setBookNumber(Integer.parseInt(trackNumber));
+                this.setBookNumber(Integer.parseInt(trackNumber));
             }
-            String trackCount = (String) tags.get("track count");
+            String trackCount = tags.get("track count");
             if (trackCount != null) {
-                audioBookInfo.setTotalTracks(Integer.parseInt(trackCount));
+                this.setTotalTracks(Integer.parseInt(trackCount));
             }
         }
-        return audioBookInfo;
     }
 
     private String writer() {

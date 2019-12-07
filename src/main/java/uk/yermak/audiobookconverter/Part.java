@@ -8,21 +8,28 @@ import java.util.stream.Collectors;
 
 public class Part implements Organisable {
     private String title;
-    private int number;
 
     private ObservableList<Chapter> chapters = FXCollections.observableArrayList();
+    private Book book;
 
 
-    public Part(int number, ObservableList<MediaInfo> media) {
-        this.number = number;
-        for (int i = 0; i < media.size(); i++) {
-            MediaInfo mediaInfo = media.get(i);
-            chapters.add(new Chapter(i + 1, mediaInfo));
-        }
+    public Part(Book book, ObservableList<MediaInfo> media) {
+        this.book = book;
+        media.forEach(m -> chapters.add(new Chapter(this, m)));
+    }
+
+    public Part(Book book, List<Chapter> chapters) {
+        this.book = book;
+        chapters.forEach(c -> c.setPart(this));
+        this.chapters.addAll(chapters);
     }
 
     public String getTitle() {
-        return "Part " + number;
+        return "Part " + getNumber();
+    }
+
+    private Object getNumber() {
+        return getBook().getParts().indexOf(this) + 1;
     }
 
     @Override
@@ -36,6 +43,11 @@ public class Part implements Organisable {
 
     }
 
+    @Override
+    public void split() {
+
+    }
+
     public ObservableList<Chapter> getChapters() {
         return chapters;
     }
@@ -43,5 +55,14 @@ public class Part implements Organisable {
     public List<MediaInfo> getChaptersMedia() {
         List<MediaInfo> media = chapters.stream().flatMap(chapter -> chapter.getMedia().stream()).collect(Collectors.toList());
         return media;
+    }
+
+    public Book getBook() {
+        return this.book;
+    }
+
+    public void createNextPart(List<Chapter> chapters) {
+        int i = book.getParts().indexOf(this);
+        book.getParts().add(i + 1, new Part(book, chapters));
     }
 }

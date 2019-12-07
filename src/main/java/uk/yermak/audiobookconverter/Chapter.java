@@ -1,32 +1,33 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.function.ToLongFunction;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Chapter implements Organisable {
-    private final int number;
     private String details;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private String customTitle;
+    private Part part;
 
-    public Chapter(int number, MediaInfo mediaInfo) {
-        this.number = number;
-        this.details = mediaInfo.getTitle();
+
+    public Chapter(Part part, MediaInfo mediaInfo) {
+        this.part = part;
         media.add(mediaInfo);
+        this.details = mediaInfo.getTitle();
     }
 
     public String getTitle() {
         if (customTitle != null) {
-            return number + ":" + customTitle;
+            return Chapter.this.getNumber() + ":" + customTitle;
         }
-        return "Chapter " + number;
+        return "Chapter " + getNumber();
     }
 
     public int getNumber() {
-        return number;
+        return part.getChapters().indexOf(this) + 1;
     }
 
     @Override
@@ -39,6 +40,15 @@ public class Chapter implements Organisable {
         return media.stream().mapToLong(MediaInfo::getDuration).sum();
     }
 
+    @Override
+    public void split() {
+        List<Chapter> currentChapters = new ArrayList<>(part.getChapters().subList(0, getNumber() - 1));
+        List<Chapter> nextChapters = new ArrayList<>(part.getChapters().subList(getNumber() - 1, part.getChapters().size() - 1));
+        part.getChapters().clear();
+        part.getChapters().addAll(currentChapters);
+        part.createNextPart(nextChapters);
+    }
+
     public ObservableList<MediaInfo> getMedia() {
         return media;
     }
@@ -49,5 +59,9 @@ public class Chapter implements Organisable {
 
     public void setCustomTitle(String customTitle) {
         this.customTitle = customTitle;
+    }
+
+    public void setPart(Part part) {
+        this.part = part;
     }
 }

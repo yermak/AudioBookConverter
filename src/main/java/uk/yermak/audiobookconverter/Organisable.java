@@ -7,4 +7,5 @@ public interface Organisable {
 
     long getDuration();
 
+    void split();
 }

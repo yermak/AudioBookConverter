@@ -56,6 +56,11 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getDuration();
     }
 
+    @Override
+    public void split() {
+        this.getMediaInfo().split();
+    }
+
     public String getFileName() {
         return this.filename;
     }

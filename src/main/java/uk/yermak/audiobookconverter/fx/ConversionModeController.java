@@ -7,9 +7,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ConversionMode;
-import uk.yermak.audiobookconverter.ConversionSubscriber;
 
 import java.lang.invoke.MethodHandles;
 

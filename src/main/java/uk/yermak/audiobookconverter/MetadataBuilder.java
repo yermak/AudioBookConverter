@@ -1,7 +1,6 @@
 //decompiled from MetadataBuilder.class
 package uk.yermak.audiobookconverter;
 
-import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

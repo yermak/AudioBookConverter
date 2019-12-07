@@ -1,12 +1,8 @@
 package uk.yermak.audiobookconverter;
 
-import java.util.Arrays;
-import java.util.Map;
-
 import com.google.gson.Gson;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.Map;
 
 public class AudioBookInfo {
     private String writer = "";

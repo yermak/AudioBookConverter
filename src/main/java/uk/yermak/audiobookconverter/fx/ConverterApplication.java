@@ -9,10 +9,10 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.controlsfx.control.Notifications;
-import uk.yermak.audiobookconverter.ConversionContext;
-import uk.yermak.audiobookconverter.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.ConversionContext;
+import uk.yermak.audiobookconverter.Version;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;

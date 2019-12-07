@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

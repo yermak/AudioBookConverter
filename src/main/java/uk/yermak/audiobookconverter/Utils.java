@@ -3,6 +3,9 @@ package uk.yermak.audiobookconverter;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +16,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.*;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -95,37 +94,6 @@ public class Utils {
         filenameTemplate.add("TITLE", StringUtils.isEmpty(bookInfo.getTitle()) ? null : bookInfo.getTitle());
         filenameTemplate.add("SERIES", StringUtils.isEmpty(bookInfo.getSeries()) ? null : bookInfo.getSeries());
         filenameTemplate.add("NARRATOR", StringUtils.isEmpty(bookInfo.getNarrator()) ? null : bookInfo.getNarrator());
-/*
-        StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(bookInfo.getWriter())) {
-            builder
-                    .append(StringUtils.trim(bookInfo.getWriter()));
-        }
-        if (StringUtils.isNotBlank(bookInfo.getSeries()) && !StringUtils.equals(bookInfo.getSeries(), bookInfo.getTitle())) {
-            builder
-                    .append(" - [")
-                    .append(StringUtils.trim(bookInfo.getSeries()));
-            builder.append("] ");
-        }
-        if (StringUtils.isNotBlank(bookInfo.getTitle())) {
-            builder
-                    .append(" - ")
-                    .append(StringUtils.trim(bookInfo.getTitle()));
-        }
-        if (StringUtils.isNotBlank(bookInfo.getNarrator())) {
-            builder
-                    .append(" (")
-                    .append(StringUtils.trim(bookInfo.getNarrator()))
-                    .append(")");
-        }
-
-        if (bookInfo.getBookNumber() > 0) {
-            builder
-                    .append(", Part ")
-                    .append(bookInfo.getBookNumber());
-        }
-        String result = builder.toString();
-*/
 
         String result = filenameTemplate.render();
         char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};

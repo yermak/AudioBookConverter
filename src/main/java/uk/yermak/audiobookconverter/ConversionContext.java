@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,7 +12,8 @@ import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**

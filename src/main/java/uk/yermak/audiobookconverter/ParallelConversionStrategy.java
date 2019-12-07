@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,8 +39,6 @@ public class ParallelConversionStrategy implements ConversionStrategy {
         File fileListFile = null;
         File metaFile = null;
         try {
-//            MediaInfo maxMedia = maximiseEncodingParameters();
-
             conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
             fileListFile = prepareFiles(jobId);
@@ -89,17 +86,6 @@ public class ParallelConversionStrategy implements ConversionStrategy {
 
     private List<MediaInfo> prioritiseMedia() {
         return conversion.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
-/*
-        List<MediaInfo> sortedMedia = new ArrayList<>(conversion.getMedia().size());
-
-        for (MediaInfo mediaInfo : conversion.getMedia()) {
-            sortedMedia.add(mediaInfo);
-//            mediaInfo.setFrequency(maxMedia.getFrequency());
-//            mediaInfo.setChannels(maxMedia.getChannels());
-//            mediaInfo.setBitrate(maxMedia.getBitrate());
-        }
-        Collections.sort(sortedMedia, (o1, o2) -> (int) (o2.getDuration() - o1.getDuration()));
-        return sortedMedia;*/
     }
 
 

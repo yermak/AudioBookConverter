@@ -103,7 +103,7 @@ public class FFMediaLoader {
                 }
                 logger.debug("Found tags: {} in {}", format.tags, filename);
 
-                AudioBookInfo bookInfo = AudioBookInfo.instance(new HashMap<>(format.tags));
+                AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
 
                 logger.info("Created AudioBookInfo {}", bookInfo);
 

@@ -13,10 +13,7 @@ import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +31,7 @@ public class ConversionContext {
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
     private ObservableList<String> genres = FXCollections.observableArrayList();
 
-    private AudioBookInfo bookInfo;
+    private SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
     private Book book;
     private ObservableList<MediaInfo> media;
     private ObservableList<ArtWork> posters;
@@ -51,8 +48,8 @@ public class ConversionContext {
     }
 
     public void saveGenres() {
-        if (StringUtils.isNotEmpty(bookInfo.getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.getGenre()))) {
-            genres.add(bookInfo.getGenre());
+        if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
+            genres.add(bookInfo.get().getGenre());
         }
         String collect = genres.stream().collect(Collectors.joining("::"));
         AppProperties.setProperty("genres", collect);
@@ -96,7 +93,7 @@ public class ConversionContext {
 
     private void resetForNewConversion() {
         reloadGenres();
-        bookInfo = new AudioBookInfo();
+        bookInfo.set(new AudioBookInfo());
         posters = FXCollections.observableArrayList();
         media = FXCollections.observableArrayList();
     }
@@ -158,10 +155,10 @@ public class ConversionContext {
 
 
     public void setBookInfo(AudioBookInfo bookInfo) {
-        this.bookInfo = bookInfo;
+        this.bookInfo.set(bookInfo);
     }
 
-    public AudioBookInfo getBookInfo() {
+    public SimpleObjectProperty<AudioBookInfo> getBookInfo() {
         return bookInfo;
     }
 
@@ -172,5 +169,9 @@ public class ConversionContext {
 
     public Conversion getPlannedConversion() {
         return conversionHolder.get();
+    }
+
+    public void addBookInfoChangeListener(ChangeListener<AudioBookInfo> listener) {
+        bookInfo.addListener(listener);
     }
 }

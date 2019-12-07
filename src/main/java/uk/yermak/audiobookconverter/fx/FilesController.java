@@ -273,7 +273,7 @@ public class FilesController {
         if (ConverterApplication.getContext().getMode().equals(ConversionMode.BATCH)) {
             outputDestination = selectOutputDirectory();
         } else {
-            outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo());
+            outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
         }
         if (outputDestination != null) {
             String finalName = new File(outputDestination).getName();

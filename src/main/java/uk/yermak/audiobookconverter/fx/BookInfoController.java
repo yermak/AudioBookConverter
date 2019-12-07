@@ -81,7 +81,7 @@ public class BookInfoController {
 
         series.textProperty().addListener(o -> bookInfo.get().setSeries(series.getText()));
         bookNo.textProperty().addListener(o -> {
-            if (StringUtils.isNotBlank(bookNo.getText()) && Integer.parseInt(bookNo.getText()) != 0)
+            if (StringUtils.isNotBlank(bookNo.getText()))
                 bookInfo.get().setBookNumber(Integer.parseInt(bookNo.getText()));
         });
         year.textProperty().addListener(o -> bookInfo.get().setYear(year.getText()));
@@ -116,7 +116,9 @@ public class BookInfoController {
         narrator.setText(bookInfo.getNarrator());
         genre.getEditor().setText(bookInfo.getGenre());
         series.setText(bookInfo.getSeries());
-        bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+        if (bookInfo.getBookNumber() != 0) {
+            bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+        }
         year.setText(bookInfo.getYear());
         comment.setText(bookInfo.getComment());
     }

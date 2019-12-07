@@ -24,6 +24,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,12 +281,13 @@ public class FilesController {
             ObservableList<Part> parts = book.getParts();
             for (int i = 0; i < parts.size(); i++) {
                 Part part = parts.get(i);
+                String finalDesination = outputDestination;
                 if (parts.size() > 1) {
-                    outputDestination = outputDestination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+                    finalDesination = finalDesination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
                 }
-                String finalName = new File(outputDestination).getName();
+                String finalName = new File(finalDesination).getName();
                 ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), finalName);
-                context.startConversion(part, outputDestination, conversionProgress);
+                context.startConversion(part, finalDesination, conversionProgress);
             }
         }
     }

@@ -40,7 +40,6 @@ public class JoiningConversionStrategy implements ConversionStrategy {
 
         try {
             conversion.getOutputParameters().updateAuto(conversion.getMedia());
-
             metaFile = new MetadataBuilder().prepareMeta(jobId, ConverterApplication.getContext().getBookInfo().get(), conversion.getPart());
             fileListFile = prepareFiles(jobId);
             if (conversion.getStatus().isOver()) return;

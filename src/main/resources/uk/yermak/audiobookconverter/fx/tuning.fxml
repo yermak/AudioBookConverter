@@ -27,8 +27,8 @@
 
         <Label text="Volume" GridPane.columnIndex="0" GridPane.rowIndex="0"
                GridPane.halignment="LEFT"/>
-        <Slider fx:id="volume" GridPane.columnIndex="1" GridPane.rowIndex="0" min="0" max="200" value="100"
-                showTickMarks="true" showTickLabels="true" majorTickUnit="10" snapToTicks="true" minorTickCount="5" disable="false"/>
+        <Slider fx:id="volume" GridPane.columnIndex="1" GridPane.rowIndex="0" min="0" max="1000" value="100"
+                showTickMarks="true" showTickLabels="true" majorTickUnit="10" snapToTicks="true" minorTickCount="5" disable="false" />
 
     </children>
 </GridPane>

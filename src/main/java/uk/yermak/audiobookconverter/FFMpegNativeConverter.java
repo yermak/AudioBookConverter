@@ -68,9 +68,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                             "-i", mediaInfo.getFileName(),
                             "-vn",
                             "-codec:a", "aac",
+                            "-filter:a", outputParameters.getFiltersValue(),
                             "-f", "ipod",
-//                            "-vol", outputParameters.getVolumeValue(),
-//                            "-af", outputParameters.getFiltersValue(),
                             "-progress", progressParser.getUri().toString(),
                             outputFileName
                     );
@@ -85,9 +84,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                         outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
                         "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
                         "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
+                        "-filter:a", outputParameters.getFiltersValue(),
                         "-cutoff", outputParameters.getCutoffValue(),
-//                        "-vol", outputParameters.getVolumeValue(),
-//                        "-af", outputParameters.getFiltersValue(),
                         "-progress", progressParser.getUri().toString(),
                         outputFileName
                 );

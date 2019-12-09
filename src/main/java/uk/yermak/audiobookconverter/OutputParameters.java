@@ -12,7 +12,6 @@ public class OutputParameters {
     private int parts = 1;
     private int cutoff = 10000;
     private int volume = 100;
-    private String filters = "";
 
     private int frequency() {
         return this.frequency;
@@ -40,10 +39,6 @@ public class OutputParameters {
 
     private int cutoff() {
         return this.cutoff;
-    }
-
-    private String filters() {
-        return this.filters;
     }
 
     public int getBitRate() {
@@ -173,16 +168,8 @@ public class OutputParameters {
         this.volume = volume;
     }
 
-    public int getVolume() {
-        return this.volume;
-    }
-
-    public String getVolumeValue() {
-        return String.valueOf(256 * this.volume / 100);
-    }
-
     public String getFiltersValue() {
-        return this.filters();
+        return "volume=" + (volume / 100.0);
     }
 
     public OutputParameters copy() {
@@ -196,7 +183,6 @@ public class OutputParameters {
         op.parts = this.parts();
         op.cutoff = this.cutoff();
         op.volume = this.volume;
-        op.filters = this.filters();
         return op;
     }
 

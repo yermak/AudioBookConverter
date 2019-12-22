@@ -9,6 +9,10 @@ Audio Book Converter V3
 
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 -------------
+If you enjoyed current version of AudioBookConverter, contribute some funds to continue improvement work on the product.
+-------------
+<a href="https://paypal.me/pools/c/8l28GKocaS">Donate!</a>
+-------------
 Main features:
 --------------
 * Parallel encoding: more cores - faster results

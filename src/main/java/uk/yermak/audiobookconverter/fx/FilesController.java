@@ -85,6 +85,7 @@ public class FilesController {
     private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
 
     private final ContextMenu contextMenu = new ContextMenu();
+    private boolean chaptersMode = false;
 
 
     @FXML
@@ -221,42 +222,63 @@ public class FilesController {
     }
 
     public void removeFiles(ActionEvent event) {
-        ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
-        fileList.getItems().removeAll(selected);
+        if (chaptersMode) {
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
+                Organisable organisable = selectedCell.getTreeItem().getValue();
+                organisable.remove();
+            }
+            updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+        } else {
+            ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
+            fileList.getItems().removeAll(selected);
+        }
     }
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-
+        ConverterApplication.getContext().setBook(null);
+        bookStructure.setRoot(null);
+        filesChapters.getTabs().add(filesTab);
+        filesChapters.getTabs().remove(chaptersTab);
+        chaptersMode = false;
     }
 
     public void moveUp(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected > 0) {
-                MediaInfo upper = items.get(selected - 1);
-                MediaInfo lower = items.get(selected);
-                items.set(selected - 1, lower);
-                items.set(selected, upper);
-                fileList.getSelectionModel().clearAndSelect(selected - 1);
+        if (chaptersMode) {
+
+        } else {
+            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+            if (selectedIndices.size() == 1) {
+                ObservableList<MediaInfo> items = fileList.getItems();
+                int selected = selectedIndices.get(0);
+                if (selected > 0) {
+                    MediaInfo upper = items.get(selected - 1);
+                    MediaInfo lower = items.get(selected);
+                    items.set(selected - 1, lower);
+                    items.set(selected, upper);
+                    fileList.getSelectionModel().clearAndSelect(selected - 1);
+                }
             }
         }
     }
 
 
     public void moveDown(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected < items.size() - 1) {
-                MediaInfo lower = items.get(selected + 1);
-                MediaInfo upper = items.get(selected);
-                items.set(selected, lower);
-                items.set(selected + 1, upper);
-                fileList.getSelectionModel().clearAndSelect(selected + 1);
+        if (chaptersMode) {
+
+        } else {
+            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+            if (selectedIndices.size() == 1) {
+                ObservableList<MediaInfo> items = fileList.getItems();
+                int selected = selectedIndices.get(0);
+                if (selected < items.size() - 1) {
+                    MediaInfo lower = items.get(selected + 1);
+                    MediaInfo upper = items.get(selected);
+                    items.set(selected, lower);
+                    items.set(selected + 1, upper);
+                    fileList.getSelectionModel().clearAndSelect(selected + 1);
+                }
             }
         }
     }
@@ -289,6 +311,13 @@ public class FilesController {
                 context.startConversion(part, finalDesination, conversionProgress);
             }
         }
+
+        ConverterApplication.getContext().setBook(null);
+        bookStructure.setRoot(null);
+        filesChapters.getTabs().add(filesTab);
+        filesChapters.getTabs().remove(chaptersTab);
+        fileList.getItems().clear();
+        chaptersMode = false;
     }
 
 
@@ -395,6 +424,7 @@ public class FilesController {
         ConverterApplication.getContext().setBook(book);
         filesChapters.getSelectionModel().select(chaptersTab);
         fileList.getItems().clear();
+        chaptersMode = true;
     }
 
     private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {

@@ -1,5 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MediaInfoBean implements MediaInfo {
     private String fileName;
     private int channels;
@@ -9,6 +12,7 @@ public class MediaInfoBean implements MediaInfo {
     private AudioBookInfo bookInfo;
     private ArtWork artWork;
     private String codec;
+    private Chapter chapter;
 
     public String fileName() {
         return this.fileName;
@@ -84,9 +88,22 @@ public class MediaInfoBean implements MediaInfo {
         return this.duration();
     }
 
+
+    public int getNumber() {
+        return chapter.getMedia().indexOf(this) + 1;
+    }
     @Override
     public void split() {
-        //TODO
+        List<MediaInfo> currentMedia = new ArrayList<>(chapter.getMedia().subList(0, getNumber() - 1));
+        List<MediaInfo> nextMedia = new ArrayList<>(chapter.getMedia().subList(getNumber() - 1, chapter.getMedia().size() - 1));
+        chapter.getMedia().clear();
+        chapter.getMedia().addAll(currentMedia);
+        chapter.createNextChapter(nextMedia);
+    }
+
+    @Override
+    public void remove() {
+        chapter.getMedia().remove(this);
     }
 
     public String getFileName() {

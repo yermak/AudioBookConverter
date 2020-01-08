@@ -30,6 +30,8 @@ public interface MediaInfo extends Organisable {
     String getCodec();
 
     void setCodec(final String codec);
+
+    void setChapter(Chapter chapter);
 }
 
         

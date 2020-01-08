@@ -48,6 +48,11 @@ public class Part implements Organisable {
 
     }
 
+    @Override
+    public void remove() {
+        book.getParts().remove(this);
+    }
+
     public ObservableList<Chapter> getChapters() {
         return chapters;
     }

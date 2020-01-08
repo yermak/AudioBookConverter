@@ -19,6 +19,12 @@ public class Chapter implements Organisable {
         this.details = mediaInfo.getTitle();
     }
 
+    public Chapter(Part part, List<MediaInfo> nextMedia) {
+        this.part = part;
+        media.addAll(nextMedia);
+        this.details = nextMedia.get(0).getTitle();
+    }
+
     public String getTitle() {
         if (customTitle != null) {
             return Chapter.this.getNumber() + ":" + customTitle;
@@ -49,6 +55,11 @@ public class Chapter implements Organisable {
         part.createNextPart(nextChapters);
     }
 
+    @Override
+    public void remove() {
+        part.getChapters().remove(this);
+    }
+
     public ObservableList<MediaInfo> getMedia() {
         return media;
     }
@@ -63,5 +74,10 @@ public class Chapter implements Organisable {
 
     public void setPart(Part part) {
         this.part = part;
+    }
+
+    public void createNextChapter(List<MediaInfo> nextMedia) {
+        int i = part.getChapters().indexOf(this);
+        part.getChapters().add(i + 1, new Chapter(part, nextMedia));
     }
 }

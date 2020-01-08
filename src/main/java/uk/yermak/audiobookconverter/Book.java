@@ -31,6 +31,11 @@ public class Book implements Organisable {
 
     }
 
+    @Override
+    public void remove() {
+
+    }
+
     public ObservableList<Part> getParts() {
         return parts;
     }

@@ -134,6 +134,11 @@ public class MediaInfoBean implements MediaInfo {
         this.codec = codec;
     }
 
+    @Override
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
     public MediaInfoBean(final String fileName) {
         this.fileName = fileName;
         this.channels = 2;

@@ -98,6 +98,11 @@ public class MediaInfoProxy implements MediaInfo {
         this.getMediaInfo().setCodec(codec);
     }
 
+    @Override
+    public void setChapter(Chapter chapter) {
+        this.getMediaInfo().setChapter(chapter);
+    }
+
     MediaInfoProxy(final String filename, final Future futureLoad) {
         this.filename = filename;
         this.futureLoad = futureLoad;

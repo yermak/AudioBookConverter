@@ -13,16 +13,11 @@ public class Chapter implements Organisable {
     private Part part;
 
 
-    public Chapter(Part part, MediaInfo mediaInfo) {
-        this.part = part;
-        media.add(mediaInfo);
-        this.details = mediaInfo.getTitle();
-    }
-
     public Chapter(Part part, List<MediaInfo> nextMedia) {
         this.part = part;
-        media.addAll(nextMedia);
         this.details = nextMedia.get(0).getTitle();
+        nextMedia.forEach(mediaInfo -> mediaInfo.setChapter(this));
+        media.addAll(nextMedia);
     }
 
     public String getTitle() {

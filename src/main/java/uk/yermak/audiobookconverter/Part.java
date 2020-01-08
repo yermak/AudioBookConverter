@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class Part implements Organisable {
 
     public Part(Book book, ObservableList<MediaInfo> media) {
         this.book = book;
-        media.forEach(m -> chapters.add(new Chapter(this, m)));
+        media.forEach(m -> chapters.add(new Chapter(this, Collections.singletonList(m))));
     }
 
     public Part(Book book, List<Chapter> chapters) {

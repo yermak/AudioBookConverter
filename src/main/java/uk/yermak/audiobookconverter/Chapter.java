@@ -53,6 +53,9 @@ public class Chapter implements Organisable {
     @Override
     public void remove() {
         part.getChapters().remove(this);
+        if (part.getChapters().isEmpty()) {
+            part.remove();
+        }
     }
 
     public ObservableList<MediaInfo> getMedia() {

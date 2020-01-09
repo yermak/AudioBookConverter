@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class MediaInfoProxy implements MediaInfo {
@@ -106,6 +107,19 @@ public class MediaInfoProxy implements MediaInfo {
     MediaInfoProxy(final String filename, final Future futureLoad) {
         this.filename = filename;
         this.futureLoad = futureLoad;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MediaInfo)) return false;
+        MediaInfo that = (MediaInfo) o;
+        return getFileName().equals(that.getFileName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFileName());
     }
 }
 

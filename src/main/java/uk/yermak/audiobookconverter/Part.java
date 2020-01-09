@@ -41,7 +41,6 @@ public class Part implements Organisable {
     @Override
     public long getDuration() {
         return chapters.stream().mapToLong(Chapter::getDuration).sum();
-
     }
 
     @Override

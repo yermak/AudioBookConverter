@@ -428,6 +428,7 @@ public class FilesController {
     }
 
     private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {
+        bookStructure.getRoot().getChildren().clear();
         book.getParts().forEach(p -> {
             TreeItem<Organisable> partItem = new TreeItem<>(p);
             bookItem.getChildren().add(partItem);
@@ -451,7 +452,6 @@ public class FilesController {
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
         organisable.split();
-        bookStructure.getRoot().getChildren().clear();
         Book book = ConverterApplication.getContext().getBook();
         updateBookStructure(book, bookStructure.getRoot());
     }

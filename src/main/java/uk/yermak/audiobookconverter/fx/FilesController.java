@@ -32,6 +32,7 @@ import uk.yermak.audiobookconverter.*;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -444,7 +445,16 @@ public class FilesController {
 
     public void combine(ActionEvent actionEvent) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-
+        List<Chapter> mergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c-> (Chapter) c).collect(Collectors.toList());
+        if (mergers.size() > 1) {
+            Chapter recipient = mergers.remove(0);
+            mergers.forEach(c -> {
+                        recipient.getMedia().addAll(c.getMedia());
+                        c.getMedia().clear();
+                        c.remove();
+                    }
+            );
+        }
     }
 
     public void split(ActionEvent actionEvent) {

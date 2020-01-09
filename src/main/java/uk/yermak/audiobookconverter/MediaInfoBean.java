@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MediaInfoBean implements MediaInfo {
     private String fileName;
@@ -104,6 +105,9 @@ public class MediaInfoBean implements MediaInfo {
     @Override
     public void remove() {
         chapter.getMedia().remove(this);
+        if (chapter.getMedia().isEmpty()){
+            chapter.remove();
+        }
     }
 
     public String getFileName() {
@@ -147,6 +151,20 @@ public class MediaInfoBean implements MediaInfo {
         this.duration = 0L;
         this.codec = "";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MediaInfo)) return false;
+        MediaInfo that = (MediaInfo) o;
+        return getFileName().equals(that.getFileName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFileName());
+    }
+
 }
 
         

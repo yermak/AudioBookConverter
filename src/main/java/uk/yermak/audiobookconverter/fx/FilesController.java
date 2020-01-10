@@ -466,6 +466,7 @@ public class FilesController {
                 recipient.combine(chapterMergers);
             }
         }
+        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
     public void split(ActionEvent actionEvent) {

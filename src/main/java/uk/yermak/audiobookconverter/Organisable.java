@@ -11,4 +11,7 @@ public interface Organisable {
 
     void remove();
 
+    void moveUp();
+
+    void moveDown();
 }

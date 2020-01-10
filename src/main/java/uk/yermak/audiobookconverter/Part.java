@@ -54,6 +54,16 @@ public class Part implements Organisable {
         book.getParts().remove(this);
     }
 
+    @Override
+    public void moveUp() {
+
+    }
+
+    @Override
+    public void moveDown() {
+
+    }
+
     public ObservableList<Chapter> getChapters() {
         return chapters;
     }

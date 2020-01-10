@@ -247,7 +247,12 @@ public class FilesController {
 
     public void moveUp(ActionEvent event) {
         if (chaptersMode) {
-
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            if (selectedCells.size() == 1) {
+                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+                organisable.moveUp();
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+            }
         } else {
             ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
             if (selectedIndices.size() == 1) {
@@ -264,10 +269,14 @@ public class FilesController {
         }
     }
 
-
     public void moveDown(ActionEvent event) {
         if (chaptersMode) {
-
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            if (selectedCells.size() == 1) {
+                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+                organisable.moveDown();
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+            }
         } else {
             ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
             if (selectedIndices.size() == 1) {
@@ -441,6 +450,7 @@ public class FilesController {
                 });
             });
         });
+        bookStructure.getRoot().getChildren().forEach(t->t.setExpanded(true));
     }
 
     public void combine(ActionEvent actionEvent) {
@@ -456,7 +466,6 @@ public class FilesController {
                 recipient.combine(chapterMergers);
             }
         }
-        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
     public void split(ActionEvent actionEvent) {

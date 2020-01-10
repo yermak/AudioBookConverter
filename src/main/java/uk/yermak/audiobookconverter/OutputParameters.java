@@ -169,7 +169,8 @@ public class OutputParameters {
     }
 
     public String getFiltersValue() {
-        return "volume=" + (volume / 100.0);
+//        return "\"volume=100dB\"";
+        return "\"volume=" + (volume / 100.0)+"\"";
     }
 
     public OutputParameters copy() {

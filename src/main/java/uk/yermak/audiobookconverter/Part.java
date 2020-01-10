@@ -71,4 +71,12 @@ public class Part implements Organisable {
         int i = book.getParts().indexOf(this);
         book.getParts().add(i + 1, new Part(book, chapters));
     }
+
+    public void combine(List<Part> mergers) {
+        mergers.stream().flatMap(p -> p.getChapters().stream()).forEach(c -> {
+            c.setPart(this);
+            getChapters().add(c);
+        });
+        mergers.forEach(Part::remove);
+    }
 }

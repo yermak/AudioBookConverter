@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -93,6 +94,7 @@ public class MediaInfoBean implements MediaInfo {
     public int getNumber() {
         return chapter.getMedia().indexOf(this) + 1;
     }
+
     @Override
     public void split() {
         List<MediaInfo> currentMedia = new ArrayList<>(chapter.getMedia().subList(0, getNumber() - 1));
@@ -105,19 +107,22 @@ public class MediaInfoBean implements MediaInfo {
     @Override
     public void remove() {
         chapter.getMedia().remove(this);
-        if (chapter.getMedia().isEmpty()){
+        if (chapter.getMedia().isEmpty()) {
             chapter.remove();
         }
     }
 
     @Override
     public void moveUp() {
-
+        if (getNumber() < 2) return;
+        Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber() - 2);
     }
 
     @Override
     public void moveDown() {
-
+        if (getNumber() > chapter.getMedia().size()) return;
+        Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber());
+//        throw new RuntimeException();
     }
 
     public String getFileName() {

@@ -445,10 +445,16 @@ public class FilesController {
 
     public void combine(ActionEvent actionEvent) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        List<Chapter> mergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c-> (Chapter) c).collect(Collectors.toList());
-        if (mergers.size() > 1) {
-            Chapter recipient = mergers.remove(0);
-            recipient.combine(mergers);
+        List<Part> partMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Part)).map(c -> (Part) c).collect(Collectors.toList());
+        if (partMergers.size() > 1) {
+            Part recipient = partMergers.remove(0);
+            recipient.combine(partMergers);
+        } else {
+            List<Chapter> chapterMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c -> (Chapter) c).collect(Collectors.toList());
+            if (chapterMergers.size() > 1) {
+                Chapter recipient = chapterMergers.remove(0);
+                recipient.combine(chapterMergers);
+            }
         }
         updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }

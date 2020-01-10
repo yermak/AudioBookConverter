@@ -86,7 +86,7 @@ public class Chapter implements Organisable {
     public void combine(List<Chapter> mergers) {
         mergers.stream().flatMap(c -> c.getMedia().stream()).forEach(m -> {
             m.setChapter(this);
-            getMedia().addAll(m);
+            getMedia().add(m);
         });
         mergers.forEach(Chapter::remove);
     }

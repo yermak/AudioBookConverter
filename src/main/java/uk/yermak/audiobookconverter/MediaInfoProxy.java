@@ -67,6 +67,16 @@ public class MediaInfoProxy implements MediaInfo {
         this.getMediaInfo().remove();
     }
 
+    @Override
+    public void moveUp() {
+
+    }
+
+    @Override
+    public void moveDown() {
+
+    }
+
     public String getFileName() {
         return this.filename;
     }

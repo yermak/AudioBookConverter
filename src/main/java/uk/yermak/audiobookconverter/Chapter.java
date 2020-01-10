@@ -62,6 +62,16 @@ public class Chapter implements Organisable {
         }
     }
 
+    @Override
+    public void moveUp() {
+
+    }
+
+    @Override
+    public void moveDown() {
+
+    }
+
     public ObservableList<MediaInfo> getMedia() {
         return media;
     }

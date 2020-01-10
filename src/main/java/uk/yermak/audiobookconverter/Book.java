@@ -36,6 +36,16 @@ public class Book implements Organisable {
 
     }
 
+    @Override
+    public void moveUp() {
+
+    }
+
+    @Override
+    public void moveDown() {
+
+    }
+
     public ObservableList<Part> getParts() {
         return parts;
     }

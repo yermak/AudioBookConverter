@@ -110,6 +110,16 @@ public class MediaInfoBean implements MediaInfo {
         }
     }
 
+    @Override
+    public void moveUp() {
+
+    }
+
+    @Override
+    public void moveDown() {
+
+    }
+
     public String getFileName() {
         return this.fileName();
     }

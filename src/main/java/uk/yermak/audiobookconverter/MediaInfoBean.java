@@ -96,7 +96,7 @@ public class MediaInfoBean implements MediaInfo {
     @Override
     public void split() {
         List<MediaInfo> currentMedia = new ArrayList<>(chapter.getMedia().subList(0, getNumber() - 1));
-        List<MediaInfo> nextMedia = new ArrayList<>(chapter.getMedia().subList(getNumber() - 1, chapter.getMedia().size() - 1));
+        List<MediaInfo> nextMedia = new ArrayList<>(chapter.getMedia().subList(getNumber() - 1, chapter.getMedia().size()));
         chapter.getMedia().clear();
         chapter.getMedia().addAll(currentMedia);
         chapter.createNextChapter(nextMedia);

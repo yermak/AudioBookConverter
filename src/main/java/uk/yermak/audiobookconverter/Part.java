@@ -50,6 +50,7 @@ public class Part implements Organisable {
 
     @Override
     public void remove() {
+        getChapters().clear();
         book.getParts().remove(this);
     }
 

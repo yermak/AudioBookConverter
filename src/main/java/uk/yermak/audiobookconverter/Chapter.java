@@ -5,6 +5,9 @@ import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Chapter implements Organisable {
     private String details;
@@ -52,6 +55,7 @@ public class Chapter implements Organisable {
 
     @Override
     public void remove() {
+        getMedia().clear();
         part.getChapters().remove(this);
         if (part.getChapters().isEmpty()) {
             part.remove();
@@ -77,5 +81,13 @@ public class Chapter implements Organisable {
     public void createNextChapter(List<MediaInfo> nextMedia) {
         int i = part.getChapters().indexOf(this);
         part.getChapters().add(i + 1, new Chapter(part, nextMedia));
+    }
+
+    public void combine(List<Chapter> mergers) {
+        mergers.stream().flatMap(c -> c.getMedia().stream()).forEach(m -> {
+            m.setChapter(this);
+            getMedia().addAll(m);
+        });
+        mergers.forEach(Chapter::remove);
     }
 }

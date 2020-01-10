@@ -448,13 +448,9 @@ public class FilesController {
         List<Chapter> mergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c-> (Chapter) c).collect(Collectors.toList());
         if (mergers.size() > 1) {
             Chapter recipient = mergers.remove(0);
-            mergers.forEach(c -> {
-                        recipient.getMedia().addAll(c.getMedia());
-                        c.getMedia().clear();
-                        c.remove();
-                    }
-            );
+            recipient.combine(mergers);
         }
+        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
     public void split(ActionEvent actionEvent) {
@@ -462,8 +458,7 @@ public class FilesController {
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
         organisable.split();
-        Book book = ConverterApplication.getContext().getBook();
-        updateBookStructure(book, bookStructure.getRoot());
+        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
 

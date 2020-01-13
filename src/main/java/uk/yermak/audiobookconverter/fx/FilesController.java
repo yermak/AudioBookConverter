@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -179,20 +181,33 @@ public class FilesController {
 
 
     private void processFiles(Collection<File> files) {
+        List<String> fileNames = collectFiles(files);
+
+        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
+        if (chaptersMode) {
+            Book book = ConverterApplication.getContext().getBook();
+            Part part = new Part(book, FXCollections.observableArrayList(addedMedia));
+            book.getParts().add(part);
+            updateBookStructure(book, bookStructure.getRoot());
+        } else {
+            fileList.getItems().addAll(addedMedia);
+        }
+    }
+
+    private List<String> collectFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
-                processFiles(FileUtils.listFiles(file, FILE_EXTENSIONS, true));
+                Collection<File> nestedFiles = FileUtils.listFiles(file, FILE_EXTENSIONS, true);
+                nestedFiles.stream().map(File::getPath).forEach(fileNames::add);
             } else {
-                boolean contains = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
-                if (contains) {
+                boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
+                if (allowedFileExtension) {
                     fileNames.add(file.getPath());
                 }
             }
         }
-        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
-
-        fileList.getItems().addAll(addedMedia);
+        return fileNames;
     }
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
@@ -450,7 +465,7 @@ public class FilesController {
                 });
             });
         });
-        bookStructure.getRoot().getChildren().forEach(t->t.setExpanded(true));
+        bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
     }
 
     public void combine(ActionEvent actionEvent) {

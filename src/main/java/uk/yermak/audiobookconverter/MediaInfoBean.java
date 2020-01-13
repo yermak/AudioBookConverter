@@ -122,7 +122,6 @@ public class MediaInfoBean implements MediaInfo {
     public void moveDown() {
         if (getNumber() > chapter.getMedia().size()) return;
         Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber());
-//        throw new RuntimeException();
     }
 
     public String getFileName() {

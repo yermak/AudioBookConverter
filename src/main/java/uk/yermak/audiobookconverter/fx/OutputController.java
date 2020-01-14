@@ -4,7 +4,10 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionContext;
@@ -12,7 +15,6 @@ import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
-import java.math.BigDecimal;
 
 /**
  * Created by yermak on 08/09/2018.

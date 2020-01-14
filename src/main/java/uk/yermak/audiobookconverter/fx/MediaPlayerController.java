@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by yermak on 26-Oct-18.
  */
-public class MediaPlayerController implements ConversionSubscriber {
+public class MediaPlayerController  {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -48,12 +48,9 @@ public class MediaPlayerController implements ConversionSubscriber {
     public void initialize() {
 
         ConversionContext context = ConverterApplication.getContext();
-
-        resetForNewConversion(context.registerForConversion(this));
+        media = context.getMedia();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
-
         selectedMedia.addListener((InvalidationListener) observable -> updateUI(selectedMedia.isEmpty() && mediaPlayer == null));
-
     }
 
     private void updateUI(boolean disable) {
@@ -167,9 +164,4 @@ public class MediaPlayerController implements ConversionSubscriber {
     }
 
 
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        media = ConverterApplication.getContext().getMedia();
-        ConverterApplication.getContext().getSelectedMedia().clear();
-    }
 }

@@ -130,11 +130,6 @@ public class ConversionContext {
         return selectedMedia;
     }
 
-    public Conversion registerForConversion(ConversionSubscriber conversionSubscriber) {
-        conversionHolder.addListener((observable, oldValue, newValue) -> conversionSubscriber.resetForNewConversion(newValue));
-        return conversionHolder.get();
-    }
-
     public void pauseConversions() {
         conversionQueue.forEach(Conversion::pause);
         paused = true;

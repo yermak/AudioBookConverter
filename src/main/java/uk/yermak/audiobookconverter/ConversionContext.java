@@ -35,9 +35,8 @@ public class ConversionContext {
     private Book book;
     private ObservableList<MediaInfo> media;
     private ObservableList<ArtWork> posters;
+    private SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
 
-
-    private OutputParameters outputParameters = new OutputParameters();
     private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
 
 
@@ -51,7 +50,7 @@ public class ConversionContext {
         if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
             genres.add(bookInfo.get().getGenre());
         }
-        String collect = genres.stream().collect(Collectors.joining("::"));
+        String collect = String.join("::", genres);
         AppProperties.setProperty("genres", collect);
     }
 
@@ -81,7 +80,7 @@ public class ConversionContext {
                 Platform.runLater(() -> ConverterApplication.showNotification(output));
             }
         });
-        conversionHolder.get().start(part, output, conversionProgress, outputParameters.copy(), bookInfo.get());
+        conversionHolder.get().start(part, output, conversionProgress, outputParameters.get(), bookInfo.get());
 
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);
@@ -96,10 +95,11 @@ public class ConversionContext {
         bookInfo.set(new AudioBookInfo());
         posters = FXCollections.observableArrayList();
         media = FXCollections.observableArrayList();
+        outputParameters.set(new OutputParameters());
     }
 
     public OutputParameters getOutputParameters() {
-        return outputParameters;
+        return outputParameters.get();
     }
 
     public Book getBook() {
@@ -151,11 +151,6 @@ public class ConversionContext {
 
     public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
         mode.addListener(listener);
-    }
-
-
-    public void setBookInfo(AudioBookInfo bookInfo) {
-        this.bookInfo.set(bookInfo);
     }
 
     public SimpleObjectProperty<AudioBookInfo> getBookInfo() {

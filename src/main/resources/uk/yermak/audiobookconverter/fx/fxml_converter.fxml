@@ -48,9 +48,9 @@
         <Tab text="Output" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/output.fxml"/>
         </Tab>
-        <Tab text="Tuning" closable="false">
+        <!--<Tab text="Tuning" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/tuning.fxml"/>
-        </Tab>
+        </Tab>-->
         <Tab text="Queue" closable="false" fx:id="queueTab">
             <ListView fx:id="progressQueue" prefHeight="-Infinity"/>
         </Tab>

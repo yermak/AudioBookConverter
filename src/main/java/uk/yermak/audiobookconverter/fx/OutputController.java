@@ -7,23 +7,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Conversion;
-import uk.yermak.audiobookconverter.ConversionSubscriber;
+import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 
 /**
  * Created by yermak on 08/09/2018.
  */
-public class OutputController implements ConversionSubscriber {
+public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     public ComboBox<Integer> cutoff;
     @FXML
-    private Spinner<Integer> parts;
+    private ComboBox<String> volume;
     @FXML
     private CheckBox auto;
 
@@ -39,14 +39,13 @@ public class OutputController implements ConversionSubscriber {
     private RadioButton vbr;
     @FXML
     private Slider quality;
-    private OutputParameters params;
     private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
         cutoff.setDisable(false);
         quality.setDisable(true);
-        params.setCbr(true);
+        ConverterApplication.getContext().getOutputParameters().setCbr(true);
 
     }
 
@@ -54,11 +53,14 @@ public class OutputController implements ConversionSubscriber {
         bitRate.setDisable(true);
         cutoff.setDisable(true);
         quality.setDisable(false);
-        params.setCbr(false);
+        ConverterApplication.getContext().getOutputParameters().setCbr(false);
     }
 
     @FXML
     private void initialize() {
+
+        volume.getItems().addAll("100%", "200%", "300%");
+        volume.getSelectionModel().select(0);
 
         frequency.getItems().addAll(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);
         frequency.getSelectionModel().select(new Integer(44100));
@@ -72,15 +74,17 @@ public class OutputController implements ConversionSubscriber {
         cutoff.getItems().addAll(8000, 10000, 12000, 14000, 16000, 20000);
         cutoff.getSelectionModel().select(new Integer(12000));
 
-        resetForNewConversion(ConverterApplication.getContext().registerForConversion(this));
 
-        auto.selectedProperty().addListener((observable, oldValue, newValue) -> params.setAuto(newValue));
-        bitRate.valueProperty().addListener((observable, oldValue, newValue) -> params.setBitRate(newValue));
-        frequency.valueProperty().addListener((observable, oldValue, newValue) -> params.setFrequency(newValue));
-        channels.valueProperty().addListener((observable, oldValue, newValue) -> params.setChannels(newValue));
-        quality.valueProperty().addListener((observable, oldValue, newValue) -> params.setQuality((int) Math.round(newValue.doubleValue())));
-        cutoff.valueProperty().addListener((observable, oldValue, newValue) -> params.setCutoff(newValue));
+        ConversionContext context = ConverterApplication.getContext();
+        media = context.getMedia();
 
+        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
+        bitRate.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setBitRate(newValue));
+        frequency.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setFrequency(newValue));
+        channels.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setChannels(newValue));
+        quality.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setQuality((int) Math.round(newValue.doubleValue())));
+        cutoff.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setCutoff(newValue));
+        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
 
         auto.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
@@ -105,6 +109,7 @@ public class OutputController implements ConversionSubscriber {
                     quality.setDisable(false);
                 }
             }
+            updateParameters(media, media.isEmpty());
         });
 
         media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
@@ -112,22 +117,13 @@ public class OutputController implements ConversionSubscriber {
 
     private void updateParameters(ObservableList<MediaInfo> media, boolean empty) {
         if (!empty) {
-            params.updateAuto(media);
-            copyParameters(params);
+            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+//            params.updateAuto(media);
+            frequency.setValue(params.getFrequency());
+            bitRate.setValue(params.getBitRate());
+            channels.setValue(params.getChannels());
+            quality.setValue(params.getQuality());
         }
     }
 
-    private void copyParameters(OutputParameters params) {
-        frequency.setValue(params.getFrequency());
-        bitRate.setValue(params.getBitRate());
-        channels.setValue(params.getChannels());
-        quality.setValue(params.getQuality());
-    }
-
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        params = ConverterApplication.getContext().getOutputParameters();
-        media = ConverterApplication.getContext().getMedia();
-        media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
-    }
 }

@@ -319,12 +319,8 @@ public class FilesController {
             context.setBook(new Book(fileList.getItems()));
         }
 
-        String outputDestination;
-        if (ConverterApplication.getContext().getMode().equals(ConversionMode.BATCH)) {
-            outputDestination = selectOutputDirectory();
-        } else {
-            outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
-        }
+        String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
+
         if (outputDestination != null) {
             Book book = context.getBook();
             ObservableList<Part> parts = book.getParts();

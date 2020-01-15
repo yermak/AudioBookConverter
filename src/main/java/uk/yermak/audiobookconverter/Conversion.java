@@ -50,7 +50,7 @@ public class Conversion {
 
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
 
-        ConversionStrategy conversionStrategy = ConverterApplication.getContext().getMode().createConvertionStrategy(this, progressCallbacks);
+        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks);
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);

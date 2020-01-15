@@ -66,7 +66,9 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             artBuilder.coverArt(tempFile);
 
             if (conversion.getStatus().isOver()) return;
-            FileUtils.moveFile(new File(tempFile), new File(conversion.getOutputDestination()));
+            File destFile = new File(conversion.getOutputDestination());
+            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+            FileUtils.moveFile(new File(tempFile), destFile);
             conversion.finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);

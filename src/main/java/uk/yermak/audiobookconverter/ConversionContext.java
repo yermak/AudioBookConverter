@@ -72,7 +72,7 @@ public class ConversionContext {
     }
 
 
-    public void startConversion(Part part, String output, ConversionProgress conversionProgress) {
+    public void startConversion(Convertable convertable, String output, ConversionProgress conversionProgress) {
         subscriber.addConversionProgress(conversionProgress);
 
         conversionHolder.get().addStatusChangeListener((observable, oldValue, newValue) -> {
@@ -80,7 +80,7 @@ public class ConversionContext {
                 Platform.runLater(() -> ConverterApplication.showNotification(output));
             }
         });
-        conversionHolder.get().start(part, output, conversionProgress, outputParameters.get(), bookInfo.get());
+        conversionHolder.get().start(convertable, output, conversionProgress, outputParameters.get(), bookInfo.get());
 
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);

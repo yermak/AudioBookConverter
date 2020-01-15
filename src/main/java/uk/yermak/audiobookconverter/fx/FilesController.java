@@ -34,7 +34,6 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Yermak on 04-Feb-18.
@@ -64,6 +63,13 @@ public class FilesController {
     public Tab filesTab;
 
     @FXML
+    public ToggleGroup outputMode;
+    @FXML
+    public RadioButton partMode;
+    @FXML
+    public RadioButton chapterMode;
+
+    @FXML
     ListView<MediaInfo> fileList;
 
     @FXML
@@ -89,6 +95,7 @@ public class FilesController {
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
+    private boolean filePerChapter;
 
 
     @FXML
@@ -325,15 +332,29 @@ public class FilesController {
         if (outputDestination != null) {
             Book book = context.getBook();
             ObservableList<Part> parts = book.getParts();
-            for (int i = 0; i < parts.size(); i++) {
-                Part part = parts.get(i);
-                String finalDesination = outputDestination;
-                if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+            if (filePerChapter) {
+                List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+                for (int i = 0; i < chapters.size(); i++) {
+                    Chapter chapter = chapters.get(i);
+                    String finalDesination = outputDestination;
+                    if (chapters.size() > 1) {
+                        finalDesination = finalDesination.replace("." + M4B, ", Chapter " + (i + 1) + "." + M4B);
+                    }
+                    String finalName = new File(finalDesination).getName();
+                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
+                    context.startConversion(chapter, finalDesination, conversionProgress);
                 }
-                String finalName = new File(finalDesination).getName();
-                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getChaptersMedia().size(), part.getDuration(), finalName);
-                context.startConversion(part, finalDesination, conversionProgress);
+            } else {
+                for (int i = 0; i < parts.size(); i++) {
+                    Part part = parts.get(i);
+                    String finalDesination = outputDestination;
+                    if (parts.size() > 1) {
+                        finalDesination = finalDesination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+                    }
+                    String finalName = new File(finalDesination).getName();
+                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getMedia().size(), part.getDuration(), finalName);
+                    context.startConversion(part, finalDesination, conversionProgress);
+                }
             }
         }
 
@@ -460,9 +481,7 @@ public class FilesController {
             p.getChapters().forEach(c -> {
                 TreeItem<Organisable> chapterItem = new TreeItem<>(c);
                 partItem.getChildren().add(chapterItem);
-                c.getMedia().forEach(m -> {
-                    chapterItem.getChildren().add(new TreeItem<>(m));
-                });
+                c.getMedia().forEach(m -> chapterItem.getChildren().add(new TreeItem<>(m)));
             });
         });
         bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
@@ -470,6 +489,7 @@ public class FilesController {
 
     public void combine(ActionEvent actionEvent) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.isEmpty()) return;
         List<Part> partMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Part)).map(c -> (Part) c).collect(Collectors.toList());
         if (partMergers.size() > 1) {
             Part recipient = partMergers.remove(0);
@@ -492,6 +512,13 @@ public class FilesController {
         updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
+    public void filePerPart(ActionEvent actionEvent) {
+        this.filePerChapter = false;
+    }
+
+    public void filePerChapter(ActionEvent actionEvent) {
+        this.filePerChapter = true;
+    }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
         @Override
@@ -569,11 +596,6 @@ public class FilesController {
     }
 
     private class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
-        private Conversion conversion;
-
-        public MediaInfoChangeListener(Conversion conversion) {
-            this.conversion = conversion;
-        }
 
         @Override
         public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {

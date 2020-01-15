@@ -3,11 +3,13 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Part implements Organisable {
+public class Part implements Organisable, Convertable {
     private String title;
 
     private ObservableList<Chapter> chapters = FXCollections.observableArrayList();
@@ -68,7 +70,8 @@ public class Part implements Organisable {
         return chapters;
     }
 
-    public List<MediaInfo> getChaptersMedia() {
+    @Override
+    public List<MediaInfo> getMedia() {
         List<MediaInfo> media = chapters.stream().flatMap(chapter -> chapter.getMedia().stream()).collect(Collectors.toList());
         return media;
     }
@@ -88,5 +91,20 @@ public class Part implements Organisable {
             getChapters().add(c);
         });
         mergers.forEach(Part::remove);
+    }
+
+    @Override
+    public List<String> getMetaData(AudioBookInfo bookInfo) {
+        List<String> metaData = new ArrayList<>();
+        long totalDuration = 0;
+        for (Chapter chapter : getChapters()) {
+            metaData.add("[CHAPTER]");
+            metaData.add("TIMEBASE=1/1000");
+            metaData.add("START=" + totalDuration);
+            totalDuration += chapter.getDuration();
+            metaData.add("END=" + totalDuration);
+            metaData.add("title= " + Utils.formatChapter(bookInfo, chapter));
+        }
+        return metaData;
     }
 }

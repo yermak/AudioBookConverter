@@ -108,10 +108,9 @@ public class ConversionProgress implements Runnable, Refreshable {
             double progress = (double) currentDuration / totalDuration;
             long delta = System.currentTimeMillis() - pausePeriod - startTime;
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
-            long finalSize = estimatedSize;
             this.progress.set(progress);
             this.remaining.set(remainingTime);
-            this.size.set((int) (finalSize / progress));
+            this.size.set((int) (estimatedSize / progress));
         }
     }
 

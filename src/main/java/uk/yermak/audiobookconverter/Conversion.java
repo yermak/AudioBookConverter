@@ -26,17 +26,17 @@ public class Conversion {
 
     private OutputParameters outputParameters;
     private String outputDestination;
-    private Part part;
+    private Convertable convertable;
     private AudioBookInfo bookInfo;
 
 
     public List<MediaInfo> getMedia() {
-        return getPart().getChaptersMedia();
+        return getConverable().getMedia();
     }
 
 
-    public void start(Part part, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo) {
-        setPart(part);
+    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo) {
+        setConverable(convertable);
         setOutputDestination(outputDestination);
         setOutputParameters(outputParameters);
         setBookInfo(bookInfo);
@@ -45,14 +45,7 @@ public class Conversion {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
 
-       /* part.getChapters().forEach(chapter -> {
-            chapter.getMedia().forEach(mediaInfo -> {
-                progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable));
-            });
-        });*/
-
-        part.getChapters().stream().flatMap(c -> c.getMedia().stream()).map(MediaInfo::getFileName).forEach(s ->
-                progressCallbacks.put(s, new ProgressCallback(s, refreshable)));
+        convertable.getMedia().stream().map(MediaInfo::getFileName).forEach(s -> progressCallbacks.put(s, new ProgressCallback(s, refreshable)));
 
 
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
@@ -63,8 +56,8 @@ public class Conversion {
         status.set(IN_PROGRESS);
     }
 
-    private void setPart(Part part) {
-        this.part = part;
+    private void setConverable(Convertable convertable) {
+        this.convertable = convertable;
     }
 
 
@@ -121,8 +114,8 @@ public class Conversion {
         this.outputDestination = outputDestination;
     }
 
-    public Part getPart() {
-        return part;
+    public Convertable getConverable() {
+        return convertable;
     }
 
     public void setBookInfo(AudioBookInfo bookInfo) {

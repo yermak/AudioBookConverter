@@ -37,7 +37,7 @@ public class ConversionContext {
     private ObservableList<ArtWork> posters;
     private SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
 
-    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
+//    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
 
 
     public ConversionContext() {
@@ -63,13 +63,13 @@ public class ConversionContext {
         }
     }
 
-    public void setMode(ConversionMode mode) {
-        this.mode.set(mode);
-    }
-
-    public ConversionMode getMode() {
-        return mode.get();
-    }
+//    public void setMode(ConversionMode mode) {
+//        this.mode.set(mode);
+//    }
+//
+//    public ConversionMode getMode() {
+//        return mode.get();
+//    }
 
 
     public void startConversion(Convertable convertable, String output, ConversionProgress conversionProgress) {
@@ -144,9 +144,9 @@ public class ConversionContext {
         return paused;
     }
 
-    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
-        mode.addListener(listener);
-    }
+//    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
+//        mode.addListener(listener);
+//    }
 
     public SimpleObjectProperty<AudioBookInfo> getBookInfo() {
         return bookInfo;

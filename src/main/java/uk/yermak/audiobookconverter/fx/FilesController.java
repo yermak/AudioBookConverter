@@ -63,11 +63,7 @@ public class FilesController {
     public Tab filesTab;
 
     @FXML
-    public ToggleGroup outputMode;
-    @FXML
-    public RadioButton partMode;
-    @FXML
-    public RadioButton chapterMode;
+    private CheckBox split;
 
     @FXML
     ListView<MediaInfo> fileList;
@@ -95,7 +91,7 @@ public class FilesController {
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
-    private boolean filePerChapter;
+//    private boolean filePerChapter;
 
 
     @FXML
@@ -332,7 +328,7 @@ public class FilesController {
         if (outputDestination != null) {
             Book book = context.getBook();
             ObservableList<Part> parts = book.getParts();
-            if (filePerChapter) {
+            if (split.isSelected()) {
                 List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
                 for (int i = 0; i < chapters.size(); i++) {
                     Chapter chapter = chapters.get(i);
@@ -510,14 +506,6 @@ public class FilesController {
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
         organisable.split();
         updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-    }
-
-    public void filePerPart(ActionEvent actionEvent) {
-        this.filePerChapter = false;
-    }
-
-    public void filePerChapter(ActionEvent actionEvent) {
-        this.filePerChapter = true;
     }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {

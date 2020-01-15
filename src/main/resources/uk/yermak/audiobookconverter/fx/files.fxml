@@ -9,6 +9,7 @@
           fx:controller="uk.yermak.audiobookconverter.fx.FilesController">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
+        <ToggleGroup fx:id="outputMode"/>
 
     </fx:define>
 
@@ -99,6 +100,7 @@
                         </Label>
                         <SplitPane/>
 
+
                         <Button fx:id="importButton" text="Chapters" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#importChapters"
                                 GridPane.valignment="TOP"
@@ -131,6 +133,20 @@
 
                 <TitledPane fx:id="jobPanes" text="Convert">
                     <VBox spacing="5">
+                        <Label text="File per..." />
+                        <RadioButton fx:id="partMode" text="Part"
+                                     toggleGroup="$outputMode" onAction="#filePerPart" selected="true">
+                            <tooltip>
+                                <Tooltip text="Save each part of the book into separate file (Default)"/>
+                            </tooltip>
+
+                        </RadioButton>
+                        <RadioButton fx:id="chapterMode" text="Chapter"
+                                     toggleGroup="$outputMode" onAction="#filePerChapter" >
+                            <tooltip>
+                                <Tooltip text="Save each chapter of the book into separate file (Compatibility mode)"/>
+                            </tooltip>
+                        </RadioButton>
 
                         <Button fx:id="startButton" text="Start" disable="false"
                                 minWidth="${screen.visualBounds.width * 0.05}"

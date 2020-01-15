@@ -39,9 +39,10 @@
         <Tab text="Book Info" closable="false" >
             <fx:include source="/uk/yermak/audiobookconverter/fx/book_info.fxml"/>
         </Tab>
-        <Tab text="Conversion mode" closable="false">
+        <!--<Tab text="Conversion mode" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/conversion_mode.fxml"/>
         </Tab>
+        -->
         <Tab text="Art Work" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/art_work.fxml"/>
         </Tab>

@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Chapter implements Organisable {
+public class Chapter implements Organisable, Convertable {
     private String details;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private String customTitle;
@@ -72,8 +72,20 @@ public class Chapter implements Organisable {
 
     }
 
+    @Override
     public ObservableList<MediaInfo> getMedia() {
         return media;
+    }
+
+    @Override
+    public List<String> getMetaData(AudioBookInfo bookInfo) {
+        List<String> metaData = new ArrayList<>();
+        metaData.add("[CHAPTER]");
+        metaData.add("TIMEBASE=1/1000");
+        metaData.add("START=" + 0);
+        metaData.add("END=" + getDuration());
+        metaData.add("title= " + Utils.formatChapter(bookInfo, this));
+        return metaData;
     }
 
     public String getCustomTitle() {

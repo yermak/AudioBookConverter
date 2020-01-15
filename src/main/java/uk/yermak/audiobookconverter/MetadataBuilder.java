@@ -17,7 +17,7 @@ public class MetadataBuilder {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
-    public File prepareMeta(final long jobId, final AudioBookInfo bookInfo, Part part) throws IOException {
+    public File prepareMeta(final long jobId, final AudioBookInfo bookInfo, Convertable convertable) throws IOException {
         File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
         List<String> metaData = new ArrayList<>();
         metaData.add(";FFMETADATA1");
@@ -38,15 +38,8 @@ public class MetadataBuilder {
         metaData.add("media_type=2");
         metaData.add("genre=" + bookInfo.getGenre());
         metaData.add("encoder=https://github.com/yermak/AudioBookConverter");
-        long totalDuration = 0;
-
-        for (Chapter chapter : part.getChapters()) {
-            metaData.add("[CHAPTER]");
-            metaData.add("TIMEBASE=1/1000");
-            metaData.add("START=" + totalDuration);
-            totalDuration += chapter.getDuration();
-            metaData.add("END=" + totalDuration);
-            metaData.add("title= "+Utils.formatChapter(bookInfo, chapter));
+        if (convertable != null) {
+            metaData.addAll(convertable.getMetaData(bookInfo));
         }
         String collect = metaData.stream().collect(Collectors.joining(toString()));
         logger.debug(collect);

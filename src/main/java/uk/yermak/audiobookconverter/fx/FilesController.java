@@ -256,7 +256,7 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-        ConverterApplication.getContext().setBook(null);
+        ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
         filesChapters.getTabs().add(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
@@ -348,14 +348,13 @@ public class FilesController {
                     context.startConversion(part, finalDesination, conversionProgress);
                 }
             }
+            ConverterApplication.getContext().resetForNewConversion();
+            bookStructure.setRoot(null);
+            filesChapters.getTabs().add(filesTab);
+            filesChapters.getTabs().remove(chaptersTab);
+            fileList.getItems().clear();
+            chaptersMode = false;
         }
-
-        ConverterApplication.getContext().setBook(null);
-        bookStructure.setRoot(null);
-        filesChapters.getTabs().add(filesTab);
-        filesChapters.getTabs().remove(chaptersTab);
-        fileList.getItems().clear();
-        chaptersMode = false;
     }
 
 

@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class Part implements Organisable, Convertable {
         return "Part " + getNumber();
     }
 
-    private Object getNumber() {
+    public int getNumber() {
         return getBook().getParts().indexOf(this) + 1;
     }
 
@@ -103,7 +102,7 @@ public class Part implements Organisable, Convertable {
             metaData.add("START=" + totalDuration);
             totalDuration += chapter.getDuration();
             metaData.add("END=" + totalDuration);
-            metaData.add("title= " + Utils.formatChapter(bookInfo, chapter));
+            metaData.add("title= " + Utils.formatChapter(getNumber(), chapter));
         }
         return metaData;
     }

@@ -24,7 +24,7 @@ public class MetadataBuilder {
         metaData.add("major_brand=M4A");
         metaData.add("minor_version=512");
         metaData.add("compatible_brands=isomiso2");
-        metaData.add("title=" + bookInfo.getTitle());
+        metaData.add("title=" + bookInfo.getTitle() + "-" + convertable.getNumber());
         metaData.add("artist=" + bookInfo.getWriter());
         if (StringUtils.isNotBlank(bookInfo.getSeries())) {
             metaData.add("album=" + bookInfo.getSeries());

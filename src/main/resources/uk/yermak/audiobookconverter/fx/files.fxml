@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.stage.Screen?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
+<?import javafx.stage.Screen?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5" gridLinesVisible="false" GridPane.rowIndex="1"
           GridPane.fillHeight="true"
           fx:controller="uk.yermak.audiobookconverter.fx.FilesController">
@@ -159,7 +159,7 @@
                             <CheckBox fx:id="split"/>
                             <Label text=" Split">
                                 <tooltip>
-                                    <Tooltip text="Split book by chapter or original file depending on mode"/>
+                                    <Tooltip text="Split book by chapters or original files depending on the mode"/>
                                 </tooltip>
                             </Label>
                         </HBox>

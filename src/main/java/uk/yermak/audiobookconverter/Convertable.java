@@ -6,4 +6,6 @@ public interface Convertable {
     List<MediaInfo> getMedia();
 
     List<String> getMetaData(AudioBookInfo bookInfo);
+
+    int getNumber();
 }

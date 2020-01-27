@@ -13,7 +13,9 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionContext;
+import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;

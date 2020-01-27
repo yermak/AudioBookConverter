@@ -31,7 +31,7 @@
     <!--</TitledPane>
 -->
 
-    <TabPane minHeight="${screen.visualBounds.height*0.20}" prefHeight="${screen.visualBounds.height*0.20}" fx:id="tabs"
+    <TabPane minHeight="${screen.visualBounds.height*0.25}" prefHeight="${screen.visualBounds.height*0.25}" fx:id="tabs"
              GridPane.rowIndex="2" GridPane.fillHeight="false">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
@@ -39,15 +39,19 @@
         <Tab text="Book Info" closable="false" >
             <fx:include source="/uk/yermak/audiobookconverter/fx/book_info.fxml"/>
         </Tab>
-        <Tab text="Conversion mode" closable="false">
+        <!--<Tab text="Conversion mode" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/conversion_mode.fxml"/>
         </Tab>
+        -->
         <Tab text="Art Work" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/art_work.fxml"/>
         </Tab>
         <Tab text="Output" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/output.fxml"/>
         </Tab>
+        <!--<Tab text="Tuning" closable="false">
+            <fx:include source="/uk/yermak/audiobookconverter/fx/tuning.fxml"/>
+        </Tab>-->
         <Tab text="Queue" closable="false" fx:id="queueTab">
             <ListView fx:id="progressQueue" prefHeight="-Infinity"/>
         </Tab>

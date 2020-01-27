@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class FFMpegNativeConverter implements Callable<ConverterOutput> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Conversion conversion;
-    private OutputParameters outputParameters;
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
@@ -29,9 +28,8 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
     private ProgressParser progressParser = null;
 
 
-    public FFMpegNativeConverter(Conversion conversion, OutputParameters outputParameters, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+    public FFMpegNativeConverter(Conversion conversion, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
         this.conversion = conversion;
-        this.outputParameters = outputParameters;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
@@ -43,7 +41,6 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
             while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
 
 
-
             progressParser = new TcpProgressParser(progress -> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);
                 if (progress.isEnd()) {
@@ -53,8 +50,10 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
             progressParser.start();
 
             ProcessBuilder ffmpegProcessBuilder;
+            OutputParameters outputParameters = conversion.getOutputParameters();
             if (outputParameters.isAuto()) {
                 if (mediaInfo.getCodec().equals("aac")) {
+                    logger.debug("Transcoding aac stream for {}", outputFileName);
                     ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                             "-i", mediaInfo.getFileName(),
                             "-vn",
@@ -64,16 +63,19 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                             outputFileName
                     );
                 } else {
+                    logger.debug("Re-encoding in auto mode to aac for {}", outputFileName);
                     ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                             "-i", mediaInfo.getFileName(),
                             "-vn",
                             "-codec:a", "aac",
+                            "-filter:a", outputParameters.getFiltersValue(),
                             "-f", "ipod",
                             "-progress", progressParser.getUri().toString(),
                             outputFileName
                     );
                 }
             } else {
+                logger.debug("Re-encoding in custom mode to aac for {}", outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         "-vn",
@@ -82,6 +84,7 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                         outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
                         "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
                         "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
+                        "-filter:a", outputParameters.getFiltersValue(),
                         "-cutoff", outputParameters.getCutoffValue(),
                         "-progress", progressParser.getUri().toString(),
                         outputFileName

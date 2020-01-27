@@ -6,27 +6,29 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public class AppProperties {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final File APP_DIR = new File(System.getenv("APPDATA"), Version.getVersionString());
+    public static final File PROP_FILE = new File(APP_DIR, Version.getVersionString() + ".properties");
 
     public AppProperties() {
     }
 
     private static Properties getAppProperties() {
+        //TODO:add default props here
         Properties defaultProperties = new Properties();
         Properties applicationProps = new Properties(defaultProperties);
-
-        try {
-            FileInputStream in = new FileInputStream(new File(new File(System.getenv("APPDATA"), "AudioBookConverter-V3"), "AudioBookConverter-V3.properties"));
-            applicationProps.load(in);
-            in.close();
-        } catch (Exception e) {
-            logger.error("Error during loading properties", e);
+        if (PROP_FILE.exists()) {
+            try (FileInputStream in = new FileInputStream(PROP_FILE)) {
+                applicationProps.load(in);
+            } catch (IOException e) {
+                logger.error("Error during loading properties", e);
+            }
         }
-
         return applicationProps;
     }
 
@@ -38,20 +40,13 @@ public class AppProperties {
     public static void setProperty(String key, String value) {
         Properties applicationProps = getAppProperties();
         applicationProps.put(key, value);
-
-        try {
-            File appDir = new File(new File(System.getenv("APPDATA")), "AudioBookConverter-V3");
-            if (!appDir.exists()) {
-                boolean succ = appDir.mkdir();
-                System.out.println(succ);
+        File appDir = APP_DIR;
+        if (appDir.exists() || appDir.mkdir()) {
+            try (FileOutputStream out = new FileOutputStream(PROP_FILE)) {
+                applicationProps.store(out, "");
+            } catch (Exception e) {
+                logger.error("Error during saving properties", e);
             }
-            FileOutputStream out = new FileOutputStream(new File(appDir, "AudioBookConverter-V3.properties"));
-            applicationProps.store(out, "");
-            out.close();
-        } catch (Exception e) {
-            logger.error("Error during saving propertie", e);
         }
-
     }
-
 }

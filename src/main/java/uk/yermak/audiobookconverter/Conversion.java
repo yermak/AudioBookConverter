@@ -2,13 +2,12 @@ package uk.yermak.audiobookconverter;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,50 +21,42 @@ public class Conversion {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
-    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
-    private AudioBookInfo bookInfo;
     private OutputParameters outputParameters;
     private String outputDestination;
+    private Convertable convertable;
+    private AudioBookInfo bookInfo;
 
 
-    public void setMode(ConversionMode mode) {
-        this.mode.set(mode);
+    public List<MediaInfo> getMedia() {
+        return getConverable().getMedia();
     }
 
-    public void setBookInfo(AudioBookInfo bookInfo) {
-        this.bookInfo = bookInfo;
-    }
 
-    public ObservableList<MediaInfo> getMedia() {
-        return media;
-    }
-
-    public ConversionMode getMode() {
-        return mode.get();
-    }
-
-    public AudioBookInfo getBookInfo() {
-        return bookInfo;
-    }
-
-    public void start(String outputDestination, Refreshable refreshable) {
+    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo) {
+        setConverable(convertable);
         setOutputDestination(outputDestination);
+        setOutputParameters(outputParameters);
+        setBookInfo(bookInfo);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
 
-
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
+
+        convertable.getMedia().stream().map(MediaInfo::getFileName).forEach(s -> progressCallbacks.put(s, new ProgressCallback(s, refreshable)));
+
+
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
 
-        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy(this, progressCallbacks);
-
+        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks);
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);
+    }
+
+    private void setConverable(Convertable convertable) {
+        this.convertable = convertable;
     }
 
 
@@ -104,9 +95,6 @@ public class Conversion {
         }
     }
 
-    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
-        mode.addListener(listener);
-    }
 
     public void setOutputParameters(OutputParameters params) {
         outputParameters = params;
@@ -116,9 +104,6 @@ public class Conversion {
         return outputParameters;
     }
 
-    public ObservableList<ArtWork> getPosters() {
-        return bookInfo.getPosters();
-    }
 
     public String getOutputDestination() {
         return outputDestination;
@@ -126,6 +111,18 @@ public class Conversion {
 
     public void setOutputDestination(String outputDestination) {
         this.outputDestination = outputDestination;
+    }
+
+    public Convertable getConverable() {
+        return convertable;
+    }
+
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        this.bookInfo = bookInfo;
+    }
+
+    public AudioBookInfo getBookInfo() {
+        return bookInfo;
     }
 }
 

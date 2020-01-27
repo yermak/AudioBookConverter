@@ -1,9 +1,10 @@
 package uk.yermak.audiobookconverter;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
@@ -36,13 +37,23 @@ public class StreamCopier implements Callable<Long> {
         for (int n; -1 != (n = in.read(buffer)); count += (long) n) {
             out.write(buffer, 0, n);
         }
-        IOUtils.closeQuietly(in);
-        IOUtils.closeQuietly(out);
+        closeQuietly(in);
+        closeQuietly(out);
         return count;
     }
 
 
     public static Future<Long> copy(InputStream in, OutputStream out) {
         return executorService.submit(new StreamCopier(in, out));
+    }
+
+    public static void closeQuietly(final Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (final IOException ioe) {
+            // ignore
+        }
     }
 }

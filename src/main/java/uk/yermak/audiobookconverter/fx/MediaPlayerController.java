@@ -13,7 +13,9 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionContext;
+import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by yermak on 26-Oct-18.
  */
-public class MediaPlayerController implements ConversionSubscriber {
+public class MediaPlayerController  {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -48,12 +50,9 @@ public class MediaPlayerController implements ConversionSubscriber {
     public void initialize() {
 
         ConversionContext context = ConverterApplication.getContext();
-
-        resetForNewConversion(context.registerForConversion(this));
+        media = context.getMedia();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
-
         selectedMedia.addListener((InvalidationListener) observable -> updateUI(selectedMedia.isEmpty() && mediaPlayer == null));
-
     }
 
     private void updateUI(boolean disable) {
@@ -167,9 +166,4 @@ public class MediaPlayerController implements ConversionSubscriber {
     }
 
 
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        media = conversion.getMedia();
-        ConverterApplication.getContext().getSelectedMedia().clear();
-    }
 }

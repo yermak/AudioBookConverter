@@ -5,9 +5,6 @@ import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Chapter implements Organisable, Convertable {
     private String details;
@@ -84,7 +81,7 @@ public class Chapter implements Organisable, Convertable {
         metaData.add("TIMEBASE=1/1000");
         metaData.add("START=" + 0);
         metaData.add("END=" + getDuration());
-        metaData.add("title= " + Utils.formatChapter(bookInfo, this));
+        metaData.add("title= " + Utils.formatChapter(bookInfo.getBookNumber(), this));
         return metaData;
     }
 

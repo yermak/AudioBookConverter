@@ -65,7 +65,7 @@ public class Utils {
         }
     }
 
-    public static String formatChapter(AudioBookInfo bookInfo, Chapter chapter) {
+    public static String formatChapter(int partNumber, Chapter chapter) {
         String chapterFormat = AppProperties.getProperty("chapter_format");
         if (chapterFormat == null) {
             chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>: <CHAPTER_TITLE><endif> - <DURATION>";
@@ -73,7 +73,7 @@ public class Utils {
         }
 
         ST chapterTemplate = new ST(chapterFormat);
-        chapterTemplate.add("BOOK_NUMBER", bookInfo.getBookNumber() == 0 ? null : bookInfo.getBookNumber());
+        chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
         chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
         chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getCustomTitle()) ? null : chapter.getCustomTitle());
         chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));

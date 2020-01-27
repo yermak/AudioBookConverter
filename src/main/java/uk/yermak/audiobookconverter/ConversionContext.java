@@ -33,12 +33,9 @@ public class ConversionContext {
 
     private SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
     private Book book;
-    private ObservableList<MediaInfo> media;
-    private ObservableList<ArtWork> posters;
+    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+    private ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
-
-//    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
-
 
     public ConversionContext() {
         conversionQueue.add(conversionHolder.get());
@@ -63,15 +60,6 @@ public class ConversionContext {
         }
     }
 
-//    public void setMode(ConversionMode mode) {
-//        this.mode.set(mode);
-//    }
-//
-//    public ConversionMode getMode() {
-//        return mode.get();
-//    }
-
-
     public void startConversion(Convertable convertable, String output, ConversionProgress conversionProgress) {
         subscriber.addConversionProgress(conversionProgress);
 
@@ -87,14 +75,14 @@ public class ConversionContext {
         conversionHolder.set(newConversion);
 
         saveGenres();
-        resetForNewConversion();
     }
 
-    private void resetForNewConversion() {
+     public void resetForNewConversion() {
         reloadGenres();
         bookInfo.set(new AudioBookInfo());
-        posters = FXCollections.observableArrayList();
-        media = FXCollections.observableArrayList();
+        book = null;
+        posters.clear();
+        media.clear();
         outputParameters.set(new OutputParameters());
     }
 

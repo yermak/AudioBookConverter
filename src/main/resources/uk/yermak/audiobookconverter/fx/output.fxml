@@ -46,7 +46,7 @@
         <ComboBox fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" disable="true"/>
 
 
-        <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s"
+        <RadioButton fx:id="cbr" text="Constant bitrate, kb/s"
                      GridPane.columnIndex="0" GridPane.rowIndex="2"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT" disable="true"/>
 

@@ -6,6 +6,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.controlsfx.control.Notifications;
@@ -17,6 +19,9 @@ import uk.yermak.audiobookconverter.Version;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
@@ -58,9 +63,32 @@ public class ConverterApplication extends Application {
                 System.exit(0);
             });
 
+            String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
+            if (!Version.getVersionString().equals(version)){
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("New Version Available!");
+                String s = "Would you like to download new version?";
+                alert.setContentText(s);
+                Optional<ButtonType> result = alert.showAndWait();
+
+                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                    ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/releases/latest");
+                }
+            }
+
+            System.out.println("version = " + version);
         } catch (IOException e) {
             logger.error("Error initiating application", e);
             e.printStackTrace();
+        }
+    }
+    public static String readStringFromURL(String requestURL) throws IOException
+    {
+        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString()))
+        {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
         }
     }
 

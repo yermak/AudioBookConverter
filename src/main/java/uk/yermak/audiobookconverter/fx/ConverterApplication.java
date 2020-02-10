@@ -92,7 +92,7 @@ public class ConverterApplication extends Application {
         }
     }
 
-    public static String readStringFromURL(String requestURL) throws IOException {
+    private static String readStringFromURL(String requestURL) throws IOException {
         try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";

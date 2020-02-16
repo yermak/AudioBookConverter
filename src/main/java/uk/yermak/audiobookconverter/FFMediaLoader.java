@@ -94,7 +94,7 @@ public class FFMediaLoader {
                         mediaInfo.setFrequency(ffMpegStream.sample_rate);
                         mediaInfo.setBitrate((int) ffMpegStream.bit_rate);
                         mediaInfo.setDuration(Math.round(ffMpegStream.duration * 1000));
-                    } else if (ART_WORK_CODECS.keySet().contains(ffMpegStream.codec_name)) {
+                    } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                         Future futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, ART_WORK_CODECS.get(ffMpegStream.codec_name));

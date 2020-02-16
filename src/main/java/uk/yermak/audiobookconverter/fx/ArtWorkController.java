@@ -10,9 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -24,6 +28,9 @@ public class ArtWorkController {
     ListView<ArtWork> imageList;
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+
+    private static final String[] IMAGE_EXTENSIONS = new String[]{"jpg", "jpeg", "jfif", "png", "bmp"};
 
     @FXML
     private void initialize() {
@@ -97,5 +104,43 @@ public class ArtWorkController {
                 logger.debug("Image {} moved right", new Object[]{selected});
             }
         }
+    }
+
+
+    public void pasteImage(ActionEvent actionEvent) {
+        try {
+            Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            if (transferable != null) {
+                if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+                    java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
+                    Image fimage = awtImageToFX(image);
+                    imageList.getItems().add(new ArtWorkImage(fimage));
+                } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    for (String artFile : artFiles) {
+                        imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(artFile))));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load from clipboard", e);
+            e.printStackTrace();
+        }
+    }
+
+    private static javafx.scene.image.Image awtImageToFX(java.awt.Image image) throws Exception {
+        if (!(image instanceof RenderedImage)) {
+            BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+            Graphics g = bufferedImage.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            image = bufferedImage;
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write((RenderedImage) image, "png", out);
+        out.flush();
+        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        return new javafx.scene.image.Image(in);
     }
 }

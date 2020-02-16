@@ -33,8 +33,8 @@ public class ArtWorkImage implements ArtWork {
             this.bean();
         }
 
-        BufferedImage bImage = SwingFXUtils.fromFXImage(this.image(), (BufferedImage) null);
-        String poster = Utils.getTmp((long) this.image().hashCode(), this.image().hashCode(), ".png");
+        BufferedImage bImage = SwingFXUtils.fromFXImage(this.image(), null);
+        String poster = Utils.getTmp(this.image().hashCode(), this.image().hashCode(), ".png");
 
         try {
             File posterFile = new File(poster);

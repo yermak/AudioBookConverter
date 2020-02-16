@@ -2,10 +2,12 @@ package uk.yermak.audiobookconverter;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +29,19 @@ public class Conversion {
     private String outputDestination;
     private Convertable convertable;
     private AudioBookInfo bookInfo;
-
+    private List<ArtWork> posters;
 
     public List<MediaInfo> getMedia() {
         return getConverable().getMedia();
     }
 
 
-    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo) {
-        setConverable(convertable);
-        setOutputDestination(outputDestination);
-        setOutputParameters(outputParameters);
-        setBookInfo(bookInfo);
+    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo, ObservableList<ArtWork> posters) {
+        this.convertable = convertable;
+        this.outputDestination = outputDestination;
+        this.outputParameters = outputParameters;
+        this.bookInfo = bookInfo;
+        this.posters = new ArrayList<>(posters);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
 
@@ -53,10 +56,6 @@ public class Conversion {
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);
-    }
-
-    private void setConverable(Convertable convertable) {
-        this.convertable = convertable;
     }
 
 
@@ -96,10 +95,6 @@ public class Conversion {
     }
 
 
-    public void setOutputParameters(OutputParameters params) {
-        outputParameters = params;
-    }
-
     public OutputParameters getOutputParameters() {
         return outputParameters;
     }
@@ -109,20 +104,20 @@ public class Conversion {
         return outputDestination;
     }
 
-    public void setOutputDestination(String outputDestination) {
-        this.outputDestination = outputDestination;
-    }
-
     public Convertable getConverable() {
         return convertable;
     }
 
-    public void setBookInfo(AudioBookInfo bookInfo) {
-        this.bookInfo = bookInfo;
-    }
-
     public AudioBookInfo getBookInfo() {
         return bookInfo;
+    }
+
+    public List<ArtWork> getPosters() {
+        return posters;
+    }
+
+    public void setPosters(ObservableList<ArtWork> posters) {
+        this.posters = posters;
     }
 }
 

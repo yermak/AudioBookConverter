@@ -20,33 +20,41 @@
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
     <children>
-        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3"
+        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"
                   orientation="HORIZONTAL"/>
 
         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"
                 GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
             <tooltip>
-                <Tooltip text="Add files for conversion to the list"/>
+                <Tooltip text="Add cover image from external file"/>
             </tooltip>
         </Button>
-        <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
-                onAction="#removeImage"
+
+        <Button fx:id="pasteButton" text="Paste" minWidth="${screen.visualBounds.width * 0.04}" onAction="#pasteImage"
                 GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2">
             <tooltip>
-                <Tooltip text="Add files for conversion to the list"/>
+                <Tooltip text="Add cover image from buffer"/>
+            </tooltip>
+        </Button>
+
+        <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
+                onAction="#removeImage"
+                GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2">
+            <tooltip>
+                <Tooltip text="Remove cover image from the list"/>
             </tooltip>
         </Button>
         <Button fx:id="left" text="&lt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#left"
-                GridPane.columnIndex="1" GridPane.rowIndex="2">
+                GridPane.columnIndex="1" GridPane.rowIndex="3">
             <tooltip>
-                <Tooltip text="Previous"/>
+                <Tooltip text="Move image left"/>
             </tooltip>
         </Button>
 
         <Button fx:id="right" text="&gt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#right"
-                GridPane.columnIndex="2" GridPane.rowIndex="2">
+                GridPane.columnIndex="2" GridPane.rowIndex="3">
             <tooltip>
-                <Tooltip text="Previous"/>
+                <Tooltip text="Move image right"/>
             </tooltip>
         </Button>
     </children>

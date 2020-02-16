@@ -34,7 +34,7 @@ public class Utils {
     }
 
     public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-"+Version.getVersionString()+"-" + jobId + "-" + index + extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {
@@ -85,7 +85,7 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
+            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER>]<endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 
@@ -94,6 +94,7 @@ public class Utils {
         filenameTemplate.add("TITLE", StringUtils.isEmpty(bookInfo.getTitle()) ? null : bookInfo.getTitle());
         filenameTemplate.add("SERIES", StringUtils.isEmpty(bookInfo.getSeries()) ? null : bookInfo.getSeries());
         filenameTemplate.add("NARRATOR", StringUtils.isEmpty(bookInfo.getNarrator()) ? null : bookInfo.getNarrator());
+        filenameTemplate.add("BOOK_NUMBER", bookInfo.getBookNumber() == 0 ? null : bookInfo.getBookNumber());
 
         String result = filenameTemplate.render();
         char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};

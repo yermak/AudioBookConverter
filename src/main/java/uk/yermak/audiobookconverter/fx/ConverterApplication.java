@@ -6,8 +6,11 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,9 @@ import uk.yermak.audiobookconverter.Version;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
@@ -25,6 +31,7 @@ public class ConverterApplication extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
@@ -58,9 +65,37 @@ public class ConverterApplication extends Application {
                 System.exit(0);
             });
 
+            checkNewVersion();
+
         } catch (IOException e) {
             logger.error("Error initiating application", e);
             e.printStackTrace();
+        }
+    }
+
+    private void checkNewVersion() {
+        try {
+            String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
+            if (!Version.getVersionString().equals(StringUtils.trim(version))) {
+                logger.info("New version found: {}", version);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("New Version Available!");
+                String s = "Would you like to download new version?";
+                alert.setContentText(s);
+                Optional<ButtonType> result = alert.showAndWait();
+                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                    ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/releases/latest");
+                }
+            }
+        } catch (IOException e) {
+            logger.info(e.getMessage());
+        }
+    }
+
+    private static String readStringFromURL(String requestURL) throws IOException {
+        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
         }
     }
 

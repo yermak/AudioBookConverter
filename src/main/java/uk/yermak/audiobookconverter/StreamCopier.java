@@ -34,7 +34,7 @@ public class StreamCopier implements Callable<Long> {
     public Long call() throws Exception {
         long count = 0L;
         byte[] buffer = new byte[4096];
-        for (int n; -1 != (n = in.read(buffer)); count += (long) n) {
+        for (int n; -1 != (n = in.read(buffer)); count += n) {
             out.write(buffer, 0, n);
         }
         closeQuietly(in);

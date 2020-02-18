@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>3</version>
+    <version>4</version>
 
 
     <properties>
@@ -16,24 +16,17 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
-        <version-scala>2.12.8</version-scala>
     </properties>
 
 
-    <repositories>
+    <!--<repositories>
         <repository>
             <id>maven-eclipse-repo</id>
             <url>http://maven-eclipse.github.io/maven</url>
         </repository>
-    </repositories>
+    </repositories>-->
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${version-scala}</version>
-        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -60,6 +53,25 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.0-alpha0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>2.0.0-alpha0</version>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/org.antlr/ST4 -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>ST4</artifactId>
+            <version>4.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.14.3</version>
@@ -69,52 +81,7 @@
     </dependencies>
     <build>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.4.4</version>
-
-                    <configuration>
-                        <scalaVersion>${version-scala}</scalaVersion>
-                        <args>
-                            <arg>-deprecation</arg>
-                            <arg>-explaintypes</arg>
-                            <arg>-feature</arg>
-                            <arg>-optimise</arg>
-                            <arg>-unchecked</arg>
-                        </args>
-                    </configuration>
-
-                    <executions>
-                        <execution>
-                            <id>scala-compile</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>add-source</goal>
-                                <goal>compile</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>scala-compile-tests</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>testCompile</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
-
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

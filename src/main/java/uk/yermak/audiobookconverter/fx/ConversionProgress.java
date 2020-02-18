@@ -3,10 +3,13 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Refreshable;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +18,7 @@ import java.util.Map;
  * Created by yermak on 08-Feb-18.
  */
 public class ConversionProgress implements Runnable, Refreshable {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     //TODO move to Conversion class
@@ -61,6 +65,9 @@ public class ConversionProgress implements Runnable, Refreshable {
                 case FINISHED:
                     finished();
                     break;
+                case ERROR:
+                    error();
+                    break;
             }
         });
     }
@@ -104,10 +111,9 @@ public class ConversionProgress implements Runnable, Refreshable {
             double progress = (double) currentDuration / totalDuration;
             long delta = System.currentTimeMillis() - pausePeriod - startTime;
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
-            long finalSize = estimatedSize;
             this.progress.set(progress);
             this.remaining.set(remainingTime);
-            this.size.set((int) (finalSize / progress));
+            this.size.set((int) (estimatedSize / progress));
         }
     }
 
@@ -123,6 +129,10 @@ public class ConversionProgress implements Runnable, Refreshable {
     private void finished() {
         finished = true;
         state.set("Completed!");
+    }
+    private void error() {
+        finished = true;
+        state.set("Error!");
     }
 
     private void cancelled() {

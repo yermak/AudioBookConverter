@@ -9,9 +9,13 @@ import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -19,6 +23,7 @@ import java.util.concurrent.*;
  * Created by yermak on 1/10/2018.
  */
 public class FFMediaLoader {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private List<String> fileNames;
     private Conversion conversion;
@@ -33,6 +38,7 @@ public class FFMediaLoader {
     }
 
     public List<MediaInfo> loadMediaInfo() {
+        logger.info("Loading media info");
         try {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
@@ -42,10 +48,11 @@ public class FFMediaLoader {
                 media.add(mediaInfo);
             }
 
-            searchForPosters(media, conversion.getPosters());
+            searchForPosters(media, ConverterApplication.getContext().getPosters());
 
             return media;
         } catch (Exception e) {
+            logger.error("Error during loading media info", e);
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -71,29 +78,39 @@ public class FFMediaLoader {
                 if (conversion.getStatus().isOver())
                     throw new InterruptedException("Media Info Loading was interrupted");
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
+                logger.debug("Extracted ffprobe error: {}", probeResult.getError());
                 FFmpegFormat format = probeResult.getFormat();
+                logger.debug("Extracted track format: {}", format.format_name);
                 MediaInfoBean mediaInfo = new MediaInfoBean(filename);
 
                 List<FFmpegStream> streams = probeResult.getStreams();
+                logger.debug("Found {} streams in {}", streams.size(), filename);
 
                 for (FFmpegStream ffMpegStream : streams) {
                     if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
+                        logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                         mediaInfo.setCodec(ffMpegStream.codec_name);
                         mediaInfo.setChannels(ffMpegStream.channels);
                         mediaInfo.setFrequency(ffMpegStream.sample_rate);
                         mediaInfo.setBitrate((int) ffMpegStream.bit_rate);
-                        mediaInfo.setDuration((long) ffMpegStream.duration * 1000);
-                    } else if (ART_WORK_CODECS.keySet().contains(ffMpegStream.codec_name)) {
+                        mediaInfo.setDuration(Math.round(ffMpegStream.duration * 1000));
+                    } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
+                        logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                         Future futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, ART_WORK_CODECS.get(ffMpegStream.codec_name));
                         mediaInfo.setArtWork(artWork);
                     }
                 }
-                AudioBookInfo bookInfo = AudioBookInfo.instance(new HashMap<>(format.tags));
+                logger.debug("Found tags: {} in {}", format.tags, filename);
+
+                AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
+
+                logger.info("Created AudioBookInfo {}", bookInfo);
 
                 mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
+                logger.error("Failed to load media info", e);
                 e.printStackTrace();
                 throw e;
             }
@@ -135,7 +152,10 @@ public class FFMediaLoader {
                 File posterFile = new File(poster);
                 long crc32 = Utils.checksumCRC32(posterFile);
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster, format, crc32);
-                Platform.runLater(() -> addPosterIfMissing(artWorkBean, conversion.getPosters()));
+                Platform.runLater(() -> {
+                    if (!conversion.getStatus().isOver())
+                        addPosterIfMissing(artWorkBean, ConverterApplication.getContext().getPosters());
+                });
                 return artWorkBean;
             } finally {
                 Utils.closeSilently(process);
@@ -158,7 +178,7 @@ public class FFMediaLoader {
     }
 
     static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
-        if (!posters.stream().mapToLong(ArtWork::getCrc32).anyMatch(value -> value == artWork.getCrc32())) {
+        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
             posters.add(artWork);
         }
     }

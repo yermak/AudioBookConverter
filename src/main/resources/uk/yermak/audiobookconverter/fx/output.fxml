@@ -26,13 +26,13 @@
             <ToggleGroup fx:id="br"/>
         </fx:define>
 
-        <Label text="Split book into equal parts" GridPane.columnIndex="0" GridPane.rowIndex="0"
+        <Label text="Volume" GridPane.columnIndex="0" GridPane.rowIndex="0"
                GridPane.halignment="LEFT"/>
         <Label text="Sampling frequency, Hz" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
 
 
-        <Spinner fx:id="parts" GridPane.columnIndex="1" GridPane.rowIndex="0" min="1" max="10"
-                 maxWidth="80" editable="true" disable="true"/>
+        <ComboBox fx:id="volume" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                 maxWidth="80" />
 
         <ComboBox fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="1" disable="true"/>
 
@@ -46,7 +46,7 @@
         <ComboBox fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="1" disable="true"/>
 
 
-        <RadioButton fx:id="cbr" text="Constant bitrate, kBs/s"
+        <RadioButton fx:id="cbr" text="Constant bitrate, kb/s"
                      GridPane.columnIndex="0" GridPane.rowIndex="2"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT" disable="true"/>
 

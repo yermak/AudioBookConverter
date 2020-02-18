@@ -2,8 +2,10 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,17 +25,21 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController implements ConversionSubscriber {
+public class FilesController {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     public Button addButton;
@@ -47,9 +53,29 @@ public class FilesController implements ConversionSubscriber {
     public Button downButton;
 
     @FXML
-    ListView<MediaInfo> fileList;
-    TreeView<MediaInfo> chapters;
+    public Button importButton;
 
+    @FXML
+    public Tab chaptersTab;
+    @FXML
+    public TabPane filesChapters;
+    @FXML
+    public Tab filesTab;
+
+    @FXML
+    private CheckBox split;
+
+    @FXML
+    ListView<MediaInfo> fileList;
+
+    @FXML
+    TreeTableView<Organisable> bookStructure;
+    @FXML
+    private TreeTableColumn<Organisable, String> chapterColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> durationColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> detailsColumn;
 
     @FXML
     public Button startButton;
@@ -58,12 +84,15 @@ public class FilesController implements ConversionSubscriber {
     @FXML
     public Button stopButton;
 
-    private Conversion conversion;
-    private ObservableList<MediaInfo> selectedMedia;
     private MediaInfoChangeListener listener;
 
     private static final String M4B = "m4b";
     private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+
+    private final ContextMenu contextMenu = new ContextMenu();
+    private boolean chaptersMode = false;
+//    private boolean filePerChapter;
+
 
     @FXML
     public void initialize() {
@@ -82,6 +111,7 @@ public class FilesController implements ConversionSubscriber {
             event.consume();
         });
 
+
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
@@ -90,9 +120,11 @@ public class FilesController implements ConversionSubscriber {
         contextMenu.getItems().addAll(item1, item2);
 
         ConversionContext context = ConverterApplication.getContext();
-        selectedMedia = context.getSelectedMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
+        fileList.setItems(media);
+        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        resetForNewConversion(context.registerForConversion(this));
+        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
         selectedMedia.addListener((InvalidationListener) observable -> {
             if (selectedMedia.isEmpty()) return;
@@ -100,13 +132,31 @@ public class FilesController implements ConversionSubscriber {
             List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
             if (!change.containsAll(selection) || !selection.containsAll(change)) {
                 fileList.getSelectionModel().clearSelection();
-                change.forEach(m -> fileList.getSelectionModel().select(this.conversion.getMedia().indexOf(m)));
+                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
             }
         });
 
-    }
+        /* TODO fix buttons behaviour
+        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
+                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
+        );
+*/
+        //TOODO: this section may not work
+  /*      media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+        if (listener != null) {
+            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
+        }
+        listener = new MediaInfoChangeListener(conversion);
+        fileList.getSelectionModel().selectedItemProperty().addListener(listener);*/
 
-    private final ContextMenu contextMenu = new ContextMenu();
+        filesChapters.getTabs().remove(chaptersTab);
+
+        bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
+        detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
+        durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
+    }
 
 
     @FXML
@@ -134,24 +184,37 @@ public class FilesController implements ConversionSubscriber {
 
 
     private void processFiles(Collection<File> files) {
+        List<String> fileNames = collectFiles(files);
+
+        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
+        if (chaptersMode) {
+            Book book = ConverterApplication.getContext().getBook();
+            Part part = new Part(book, FXCollections.observableArrayList(addedMedia));
+            book.getParts().add(part);
+            updateBookStructure(book, bookStructure.getRoot());
+        } else {
+            fileList.getItems().addAll(addedMedia);
+        }
+    }
+
+    private List<String> collectFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
-                processFiles(FileUtils.listFiles(file, FILE_EXTENSIONS, true));
+                Collection<File> nestedFiles = FileUtils.listFiles(file, FILE_EXTENSIONS, true);
+                nestedFiles.stream().map(File::getPath).forEach(fileNames::add);
             } else {
-                boolean contains = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
-                if (contains) {
+                boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
+                if (allowedFileExtension) {
                     fileNames.add(file.getPath());
                 }
             }
         }
-        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
-
-        fileList.getItems().addAll(addedMedia);
+        return fileNames;
     }
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, conversion);
+        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversion());
     }
 
     private void selectFilesDialog(Window window) {
@@ -178,81 +241,122 @@ public class FilesController implements ConversionSubscriber {
     }
 
     public void removeFiles(ActionEvent event) {
-        ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
-        fileList.getItems().removeAll(selected);
+        if (chaptersMode) {
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
+                Organisable organisable = selectedCell.getTreeItem().getValue();
+                organisable.remove();
+            }
+            updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+        } else {
+            ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
+            fileList.getItems().removeAll(selected);
+        }
     }
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-
+        ConverterApplication.getContext().resetForNewConversion();
+        bookStructure.setRoot(null);
+        filesChapters.getTabs().add(filesTab);
+        filesChapters.getTabs().remove(chaptersTab);
+        chaptersMode = false;
     }
 
     public void moveUp(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected > 0) {
-                MediaInfo upper = items.get(selected - 1);
-                MediaInfo lower = items.get(selected);
-                items.set(selected - 1, lower);
-                items.set(selected, upper);
-                fileList.getSelectionModel().clearAndSelect(selected - 1);
+        if (chaptersMode) {
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            if (selectedCells.size() == 1) {
+                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+                organisable.moveUp();
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+            }
+        } else {
+            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+            if (selectedIndices.size() == 1) {
+                ObservableList<MediaInfo> items = fileList.getItems();
+                int selected = selectedIndices.get(0);
+                if (selected > 0) {
+                    MediaInfo upper = items.get(selected - 1);
+                    MediaInfo lower = items.get(selected);
+                    items.set(selected - 1, lower);
+                    items.set(selected, upper);
+                    fileList.getSelectionModel().clearAndSelect(selected - 1);
+                }
             }
         }
     }
 
-
     public void moveDown(ActionEvent event) {
-        ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-        if (selectedIndices.size() == 1) {
-            ObservableList<MediaInfo> items = fileList.getItems();
-            int selected = selectedIndices.get(0);
-            if (selected < items.size() - 1) {
-                MediaInfo lower = items.get(selected + 1);
-                MediaInfo upper = items.get(selected);
-                items.set(selected, lower);
-                items.set(selected + 1, upper);
-                fileList.getSelectionModel().clearAndSelect(selected + 1);
+        if (chaptersMode) {
+            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+            if (selectedCells.size() == 1) {
+                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+                organisable.moveDown();
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+            }
+        } else {
+            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
+            if (selectedIndices.size() == 1) {
+                ObservableList<MediaInfo> items = fileList.getItems();
+                int selected = selectedIndices.get(0);
+                if (selected < items.size() - 1) {
+                    MediaInfo lower = items.get(selected + 1);
+                    MediaInfo upper = items.get(selected);
+                    items.set(selected, lower);
+                    items.set(selected + 1, upper);
+                    fileList.getSelectionModel().clearAndSelect(selected + 1);
+                }
             }
         }
     }
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
+        if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
+        if (context.getBook() == null) {
+            context.setBook(new Book(fileList.getItems()));
+        }
 
-        List<MediaInfo> media = conversion.getMedia();
-        if (media.size() > 0) {
-            AudioBookInfo audioBookInfo = conversion.getBookInfo();
-            MediaInfo mediaInfo = media.get(0);
-            String outputDestination;
-            if (conversion.getMode().equals(ConversionMode.BATCH)) {
-                outputDestination = selectOutputDirectory();
-            } else {
-                outputDestination = selectOutputFile(audioBookInfo, mediaInfo);
-            }
-            if (outputDestination != null) {
-                String finalName = new File(outputDestination).getName();
-                conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
-                    if (ProgressStatus.FINISHED.equals(newValue)) {
-                        Platform.runLater(() -> showNotification(finalName));
+        String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
+
+        if (outputDestination != null) {
+            Book book = context.getBook();
+            ObservableList<Part> parts = book.getParts();
+            if (split.isSelected()) {
+                List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+                for (int i = 0; i < chapters.size(); i++) {
+                    Chapter chapter = chapters.get(i);
+                    String finalDesination = outputDestination;
+                    if (chapters.size() > 1) {
+                        finalDesination = finalDesination.replace("." + M4B, ", Chapter " + (i + 1) + "." + M4B);
                     }
-                });
-
-                long totalDuration = media.stream().mapToLong(MediaInfo::getDuration).sum();
-                ConversionProgress conversionProgress = new ConversionProgress(conversion, media.size(), totalDuration, finalName);
-                context.startConversion(outputDestination, conversionProgress);
-
+                    String finalName = new File(finalDesination).getName();
+                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
+                    context.startConversion(chapter, finalDesination, conversionProgress);
+                }
+            } else {
+                for (int i = 0; i < parts.size(); i++) {
+                    Part part = parts.get(i);
+                    String finalDesination = outputDestination;
+                    if (parts.size() > 1) {
+                        finalDesination = finalDesination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+                    }
+                    String finalName = new File(finalDesination).getName();
+                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getMedia().size(), part.getDuration(), finalName);
+                    context.startConversion(part, finalDesination, conversionProgress);
+                }
             }
+            ConverterApplication.getContext().resetForNewConversion();
+            bookStructure.setRoot(null);
+            filesChapters.getTabs().add(filesTab);
+            filesChapters.getTabs().remove(chaptersTab);
+            fileList.getItems().clear();
+            chaptersMode = false;
         }
     }
 
-    private static void showNotification(String finalOutputDestination) {
-        Notifications.create()
-                .title("AudioBookConverter: Conversion is completed")
-                .text(finalOutputDestination).show();
-    }
 
     private String selectOutputDirectory() {
         JfxEnv env = ConverterApplication.getEnv();
@@ -268,16 +372,16 @@ public class FilesController implements ConversionSubscriber {
         return outputDestination;
     }
 
-    private String selectOutputFile(AudioBookInfo audioBookInfo, MediaInfo mediaInfo) {
+    private static String selectOutputFile(AudioBookInfo audioBookInfo) {
         JfxEnv env = ConverterApplication.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
-        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(mediaInfo.getFileName(), audioBookInfo));
+        fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(M4B, "*."+M4B)
+                new FileChooser.ExtensionFilter(M4B, "*." + M4B)
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
@@ -334,26 +438,69 @@ public class FilesController implements ConversionSubscriber {
         });
     }
 
-    @Override
-    public void resetForNewConversion(Conversion conversion) {
-        this.conversion = conversion;
-
-        ObservableList<MediaInfo> media = this.conversion.getMedia();
-        fileList.setItems(media);
-        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-/* TODO fix buttons behaviour
-        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
-                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
-*/
-
-//        media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-
-        if (listener != null) {
-            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
+    public void importChapters(ActionEvent actionEvent) {
+        if (fileList.getItems().isEmpty()) {
+            return;
         }
-        listener = new MediaInfoChangeListener(conversion);
-        fileList.getSelectionModel().selectedItemProperty().addListener(listener);
+        chaptersTab.setDisable(false);
+        filesChapters.getTabs().add(chaptersTab);
+        filesChapters.getTabs().remove(filesTab);
+
+        bookStructure.setShowRoot(false);
+
+
+        Book book = new Book(fileList.getItems());
+
+
+        TreeItem<Organisable> bookItem = new TreeItem<>(book);
+        bookStructure.setRoot(bookItem);
+
+        updateBookStructure(book, bookItem);
+
+        bookItem.setExpanded(true);
+        ConverterApplication.getContext().setBook(book);
+        filesChapters.getSelectionModel().select(chaptersTab);
+        fileList.getItems().clear();
+        chaptersMode = true;
+    }
+
+    private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {
+        bookStructure.getRoot().getChildren().clear();
+        book.getParts().forEach(p -> {
+            TreeItem<Organisable> partItem = new TreeItem<>(p);
+            bookItem.getChildren().add(partItem);
+            p.getChapters().forEach(c -> {
+                TreeItem<Organisable> chapterItem = new TreeItem<>(c);
+                partItem.getChildren().add(chapterItem);
+                c.getMedia().forEach(m -> chapterItem.getChildren().add(new TreeItem<>(m)));
+            });
+        });
+        bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
+    }
+
+    public void combine(ActionEvent actionEvent) {
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.isEmpty()) return;
+        List<Part> partMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Part)).map(c -> (Part) c).collect(Collectors.toList());
+        if (partMergers.size() > 1) {
+            Part recipient = partMergers.remove(0);
+            recipient.combine(partMergers);
+        } else {
+            List<Chapter> chapterMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c -> (Chapter) c).collect(Collectors.toList());
+            if (chapterMergers.size() > 1) {
+                Chapter recipient = chapterMergers.remove(0);
+                recipient.combine(chapterMergers);
+            }
+        }
+        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+    }
+
+    public void split(ActionEvent actionEvent) {
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.size() != 1) return;
+        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+        organisable.split();
+        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
     private static class ListViewListCellCallback implements Callback<ListView<MediaInfo>, ListCell<MediaInfo>> {
@@ -432,17 +579,13 @@ public class FilesController implements ConversionSubscriber {
     }
 
     private class MediaInfoChangeListener implements ChangeListener<MediaInfo> {
-        private Conversion conversion;
-
-        public MediaInfoChangeListener(Conversion conversion) {
-            this.conversion = conversion;
-        }
 
         @Override
         public void changed(ObservableValue<? extends MediaInfo> observable, MediaInfo oldValue, MediaInfo newValue) {
 //            updateUI(conversion.getStatus(), conversion.getMedia().isEmpty(), fileList.getSelectionModel().getSelectedIndices());
+            ObservableList<MediaInfo> selectedMedia = ConverterApplication.getContext().getSelectedMedia();
             selectedMedia.clear();
-            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(conversion.getMedia().get(i)));
+            fileList.getSelectionModel().getSelectedIndices().forEach(i -> selectedMedia.add(ConverterApplication.getContext().getMedia().get(i)));
         }
     }
 }

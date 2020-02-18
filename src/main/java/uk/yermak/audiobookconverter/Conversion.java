@@ -2,10 +2,14 @@ package uk.yermak.audiobookconverter;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,48 +20,39 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
  * Created by Yermak on 06-Feb-18.
  */
 public class Conversion {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
-    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private SimpleObjectProperty<ConversionMode> mode = new SimpleObjectProperty<>(ConversionMode.PARALLEL);
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
-    private AudioBookInfo bookInfo;
     private OutputParameters outputParameters;
     private String outputDestination;
+    private Convertable convertable;
+    private AudioBookInfo bookInfo;
+    private List<ArtWork> posters;
 
-
-    public void setMode(ConversionMode mode) {
-        this.mode.set(mode);
+    public List<MediaInfo> getMedia() {
+        return getConverable().getMedia();
     }
 
-    public void setBookInfo(AudioBookInfo bookInfo) {
+
+    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo, ObservableList<ArtWork> posters) {
+        this.convertable = convertable;
+        this.outputDestination = outputDestination;
+        this.outputParameters = outputParameters;
         this.bookInfo = bookInfo;
-    }
-
-    public ObservableList<MediaInfo> getMedia() {
-        return media;
-    }
-
-    public ConversionMode getMode() {
-        return mode.get();
-    }
-
-    public AudioBookInfo getBookInfo() {
-        return bookInfo;
-    }
-
-    public void start(String outputDestination, Refreshable refreshable) {
-        setOutputDestination(outputDestination);
+        this.posters = new ArrayList<>(posters);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
 
-
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-        media.forEach(mediaInfo -> progressCallbacks.put(mediaInfo.getFileName(), new ProgressCallback(mediaInfo.getFileName(), refreshable)));
+
+        convertable.getMedia().stream().map(MediaInfo::getFileName).forEach(s -> progressCallbacks.put(s, new ProgressCallback(s, refreshable)));
+
+
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
 
-        ConversionStrategy conversionStrategy = mode.get().createConvertionStrategy(this, progressCallbacks);
-
+        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks);
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);
@@ -99,28 +94,30 @@ public class Conversion {
         }
     }
 
-    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
-        mode.addListener(listener);
-    }
-
-    public void setOutputParameters(OutputParameters params) {
-        outputParameters = params;
-    }
 
     public OutputParameters getOutputParameters() {
         return outputParameters;
     }
 
-    public ObservableList<ArtWork> getPosters() {
-        return bookInfo.getPosters();
-    }
 
     public String getOutputDestination() {
         return outputDestination;
     }
 
-    public void setOutputDestination(String outputDestination) {
-        this.outputDestination = outputDestination;
+    public Convertable getConverable() {
+        return convertable;
+    }
+
+    public AudioBookInfo getBookInfo() {
+        return bookInfo;
+    }
+
+    public List<ArtWork> getPosters() {
+        return posters;
+    }
+
+    public void setPosters(ObservableList<ArtWork> posters) {
+        this.posters = posters;
     }
 }
 

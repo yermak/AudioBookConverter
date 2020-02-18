@@ -1,15 +1,19 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.collections.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 04-Jan-18.
  */
 public class Mp4v2ArtBuilder {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
     private Conversion conversion;
@@ -20,7 +24,7 @@ public class Mp4v2ArtBuilder {
 
 
     public void coverArt(String outputFileName) throws IOException, InterruptedException {
-        ObservableList<ArtWork> posters = conversion.getPosters();
+        List<ArtWork> posters = conversion.getPosters();
 
         int i = 0;
         for (ArtWork poster : posters) {

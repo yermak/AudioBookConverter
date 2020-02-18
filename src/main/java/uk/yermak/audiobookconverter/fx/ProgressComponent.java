@@ -7,11 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.Conversion;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
 
@@ -19,6 +22,7 @@ import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
  * Created by yermak on 08-Feb-18.
  */
 public class ProgressComponent extends GridPane {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
     private Label title;

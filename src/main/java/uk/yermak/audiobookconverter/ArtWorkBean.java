@@ -1,5 +1,9 @@
 package uk.yermak.audiobookconverter;
 
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+
 public class ArtWorkBean implements ArtWork {
     private String fileName;
     private String format;
@@ -51,6 +55,11 @@ public class ArtWorkBean implements ArtWork {
         this.format = format;
         this.crc32 = crc32;
     }
+
+    public ArtWorkBean(String fileName) {
+        this(fileName, FilenameUtils.getExtension(fileName), Utils.checksumCRC32(new File(fileName)));
+    }
+
 }
 
         

@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter;
 
 public interface ArtWork {
+    String[] IMAGE_EXTENSIONS = new String[]{"jpg", "jpeg", "jfif", "png", "bmp"};
+
     long getCrc32();
 
     void setCrc32(final long crc32);

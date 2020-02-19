@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
@@ -16,7 +18,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -29,8 +33,6 @@ public class ArtWorkController {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-
-    private static final String[] IMAGE_EXTENSIONS = new String[]{"jpg", "jpeg", "jfif", "png", "bmp"};
 
     @FXML
     private void initialize() {
@@ -53,20 +55,16 @@ public class ArtWorkController {
         File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
         logger.debug("Opened dialog for art image in folder: {}", new Object[]{sourceFolder});
         if (file != null) {
-            try {
-                imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(file))));
-                logger.info("Added art work from file: {}", new Object[]{file});
-            } catch (FileNotFoundException e) {
-                logger.error("Error during building artwork", e);
-                e.printStackTrace();
-            }
+            imageList.getItems().add(new ArtWorkBean(file.getName()));
+            logger.info("Added art work from file: {}", new Object[]{file});
         }
     }
 
     @FXML
     private void removeImage(ActionEvent actionEvent) {
         int toRemove = imageList.getSelectionModel().getSelectedIndex();
-        imageList.getItems().remove(toRemove);
+        ConverterApplication.getContext().removePoster(toRemove);
+//        imageList.getItems().remove(toRemove);
         logger.info("Removed art work #{}", toRemove);
     }
 
@@ -77,19 +75,12 @@ public class ArtWorkController {
             ObservableList items = imageList.getItems();
             Integer selected = (Integer) selectedIndices.get(0);
             if (selected > 0) {
-                moveLeft(items, selected);
+                ConverterApplication.getContext().movePosterLeft(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
                 logger.debug("Image {} moved left", new Object[]{selected});
             }
         }
 
-    }
-
-    private ArtWork moveLeft(final ObservableList items, final Integer selected) {
-        ArtWork lower = (ArtWork) items.get(selected);
-        ArtWork upper = (ArtWork) items.get(selected - 1);
-        items.set(selected - 1, lower);
-        return (ArtWork) items.set(selected, upper);
     }
 
     @FXML
@@ -99,7 +90,7 @@ public class ArtWorkController {
             ObservableList items = imageList.getItems();
             Integer selected = (Integer) selectedIndices.get(0);
             if (selected < items.size() - 1) {
-                moveLeft(items, selected + 1);
+                ConverterApplication.getContext().movePosterLeft(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
                 logger.debug("Image {} moved right", new Object[]{selected});
             }
@@ -114,12 +105,22 @@ public class ArtWorkController {
                 if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
                     Image fimage = awtImageToFX(image);
-                    imageList.getItems().add(new ArtWorkImage(fimage));
+                    ConverterApplication.getContext().addPosterIfMissing(new ArtWorkImage(fimage));
+//                    imageList.getItems().add(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                    for (String artFile : artFiles) {
-                        imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(artFile))));
-                    }
+
+                    artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
+                        ConverterApplication.getContext().addPosterIfMissing(new ArtWorkBean(f));
+//                        imageList.getItems().add(new ArtWorkBean(f));
+
+                    });
+
+                   /* for (String artFile : artFiles) {
+                        if (ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(artFile)){
+                            imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(artFile))));
+                        }
+                    }*/
                 }
             }
         } catch (Exception e) {

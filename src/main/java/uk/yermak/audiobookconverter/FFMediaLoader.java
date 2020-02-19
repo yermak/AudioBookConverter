@@ -150,11 +150,10 @@ public class FFMediaLoader {
                     finished = process.waitFor(500, TimeUnit.MILLISECONDS);
                 }
                 File posterFile = new File(poster);
-                long crc32 = Utils.checksumCRC32(posterFile);
-                ArtWorkBean artWorkBean = new ArtWorkBean(poster, format, crc32);
+                ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversion.getStatus().isOver())
-                        addPosterIfMissing(artWorkBean, ConverterApplication.getContext().getPosters());
+                        ConverterApplication.getContext().addPosterIfMissing(artWorkBean);
                 });
                 return artWorkBean;
             } finally {
@@ -165,37 +164,16 @@ public class FFMediaLoader {
     }
 
     static Collection<File> findPictures(File dir) {
-        return FileUtils.listFiles(dir, new String[]{"jpg", "jpeg", "png", "bmp"}, true);
+        return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
     }
 
     static void searchForPosters(List<MediaInfo> media, ObservableList<ArtWork> posters) {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> addPosterIfMissing(new ArtWorkBean(tempCopy(f.getPath()), extension(f.getName()), Utils.checksumCRC32(f)), posters)));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> ConverterApplication.getContext().addPosterIfMissing(new ArtWorkBean(Utils.tempCopy(f.getPath())))));
 
     }
 
-    static void addPosterIfMissing(ArtWork artWork, ObservableList<ArtWork> posters) {
-        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
-            posters.add(artWork);
-        }
-    }
-
-    static String extension(String fileName) {
-        int i = fileName.lastIndexOf('.');
-        return fileName.substring(i);
-    }
-
-    static String tempCopy(String fileName) {
-        File destFile = new File(Utils.getTmp(System.currentTimeMillis(), 0, extension(fileName)));
-        try {
-            FileUtils.copyFile(new File(fileName), destFile);
-            return destFile.getPath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }

@@ -43,6 +43,23 @@ public class ConversionContext {
         resetForNewConversion();
     }
 
+    public void movePosterLeft(final Integer selected) {
+        Platform.runLater(() -> {
+            ArtWork lower = posters.get(selected);
+            ArtWork upper = posters.get(selected - 1);
+            posters.set(selected - 1, lower);
+            posters.set(selected, upper);
+        });
+    }
+
+    public void addPosterIfMissing(ArtWork artWork) {
+        Platform.runLater(() -> {
+            if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
+                posters.add(artWork);
+            }
+        });
+    }
+
     public void saveGenres() {
         if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
             genres.add(bookInfo.get().getGenre());
@@ -77,7 +94,7 @@ public class ConversionContext {
         saveGenres();
     }
 
-     public void resetForNewConversion() {
+    public void resetForNewConversion() {
         reloadGenres();
         bookInfo.set(new AudioBookInfo());
         book = null;
@@ -151,5 +168,9 @@ public class ConversionContext {
 
     public void addBookInfoChangeListener(ChangeListener<AudioBookInfo> listener) {
         bookInfo.addListener(listener);
+    }
+
+    public void removePoster(int toRemove) {
+        Platform.runLater(() -> posters.remove(toRemove));
     }
 }

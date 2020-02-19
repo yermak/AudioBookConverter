@@ -1,7 +1,7 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import static org.testng.Assert.*;
 
@@ -12,22 +12,23 @@ public class FFMediaLoaderTest {
 
     @org.testng.annotations.Test
     public void testAddPosterIfMissing() {
-        ObservableList<ArtWork> posters = FXCollections.observableArrayList();
+        ConversionContext context = ConverterApplication.getContext();
+        ObservableList<ArtWork> posters = context.getPosters();
 
-        ArtWorkBean art1 = new ArtWorkBean("","", 1);
-        FFMediaLoader.addPosterIfMissing(art1, posters);
+        ArtWorkBean art1 = new ArtWorkBean("", "", 1);
+        context.addPosterIfMissing(art1);
         assertTrue(posters.contains(art1));
         assertEquals(posters.size(), 1);
 
-        ArtWorkBean art2 = new ArtWorkBean("","",  2);
+        ArtWorkBean art2 = new ArtWorkBean("", "", 2);
 
-        FFMediaLoader.addPosterIfMissing(art2, posters);
+        context.addPosterIfMissing(art2);
         assertTrue(posters.contains(art2));
         assertEquals(posters.size(), 2);
 
         ArtWorkBean art22 = new ArtWorkBean("", "", 2);
 
-        FFMediaLoader.addPosterIfMissing(art22, posters);
+        context.addPosterIfMissing(art22);
         assertFalse(posters.contains(art22));
         assertEquals(posters.size(), 2);
 

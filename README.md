@@ -1,13 +1,16 @@
 Audio Book Converter V4
 ===============
 * Convert Audiobook from mp3 to m4b.
-* Convert mp3 to Audiobook.
+* Convert mp3 to Audiobook (AAC)
 * Convert mp3 to ipod format.
 * Convert mp3 to IBook (IPhone) format.
-* Convert wma to Audiobook.
-* Convert m4a to Audiobook
+* Convert wma to Audiobook (AAC)
+* Convert m4a to Audiobook (AAC)
 
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
+-------------
+Short video demonstrating latest features related to chapters support: https://www.youtube.com/watch?v=N7JrujMfids 
+
 -------------
 If you enjoyed current version of AudioBookConverter, contribute some funds to continue improvement work on the product.
 -------------

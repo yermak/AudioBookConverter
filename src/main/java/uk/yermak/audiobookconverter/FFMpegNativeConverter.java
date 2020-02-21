@@ -104,7 +104,7 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-
+            Mp4v2InfoLoader.updateDuration(mediaInfo, outputFileName);
             return new ConverterOutput(mediaInfo, outputFileName);
         } catch (CancellationException ce) {
             return null;

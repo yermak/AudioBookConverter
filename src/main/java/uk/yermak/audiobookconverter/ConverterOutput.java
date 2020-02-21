@@ -8,10 +8,6 @@ public class ConverterOutput {
         return this.mediaInfo;
     }
 
-    public void mediaInfo_$eq(final MediaInfo x$1) {
-        this.mediaInfo = x$1;
-    }
-
     public String outputFileName() {
         return this.outputFileName;
     }

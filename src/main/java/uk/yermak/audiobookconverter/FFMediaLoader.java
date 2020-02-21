@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -48,7 +47,7 @@ public class FFMediaLoader {
                 media.add(mediaInfo);
             }
 
-            searchForPosters(media, ConverterApplication.getContext().getPosters());
+            searchForPosters(media);
 
             return media;
         } catch (Exception e) {
@@ -160,14 +159,13 @@ public class FFMediaLoader {
                 Utils.closeSilently(process);
             }
         }
-
     }
 
     static Collection<File> findPictures(File dir) {
         return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
     }
 
-    static void searchForPosters(List<MediaInfo> media, ObservableList<ArtWork> posters) {
+    static void searchForPosters(List<MediaInfo> media) {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 

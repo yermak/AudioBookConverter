@@ -8,4 +8,6 @@ public interface Convertable {
     List<String> getMetaData(AudioBookInfo bookInfo);
 
     int getNumber();
+
+    boolean isTheOnlyOne();
 }

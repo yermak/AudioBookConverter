@@ -24,23 +24,20 @@ public class MetadataBuilder {
         metaData.add("major_brand=M4A");
         metaData.add("minor_version=512");
         metaData.add("compatible_brands=isomiso2");
-        metaData.add("title=" + bookInfo.getTitle() + "-" + convertable.getNumber());
+        metaData.add("title=" + bookInfo.getTitle() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
         metaData.add("artist=" + bookInfo.getWriter());
         if (StringUtils.isNotBlank(bookInfo.getSeries())) {
             metaData.add("album=" + bookInfo.getSeries());
         } else {
             metaData.add("album=" + bookInfo.getTitle());
         }
-
         metaData.add("composer=" + bookInfo.getNarrator());
+        metaData.add("date=" + bookInfo.getYear());
         metaData.add("comment=" + bookInfo.getComment());
         metaData.add("track=" + bookInfo.getBookNumber() + "/" + bookInfo.getTotalTracks());
         metaData.add("media_type=2");
         metaData.add("genre=" + bookInfo.getGenre());
-        metaData.add("encoder=https://github.com/yermak/AudioBookConverter");
-        if (convertable != null) {
-            metaData.addAll(convertable.getMetaData(bookInfo));
-        }
+        metaData.addAll(convertable.getMetaData(bookInfo));
         String collect = metaData.stream().collect(Collectors.joining(toString()));
         logger.debug(collect);
         FileUtils.writeLines(metaFile, "UTF-8", metaData);

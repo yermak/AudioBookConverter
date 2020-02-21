@@ -32,6 +32,11 @@ public class Chapter implements Organisable, Convertable {
     }
 
     @Override
+    public boolean isTheOnlyOne() {
+        return part.getChapters().size() == 1;
+    }
+
+    @Override
     public String getDetails() {
         return details;
     }

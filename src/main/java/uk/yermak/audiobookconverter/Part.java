@@ -35,6 +35,11 @@ public class Part implements Organisable, Convertable {
     }
 
     @Override
+    public boolean isTheOnlyOne() {
+        return book.getParts().size() == 1;
+    }
+
+    @Override
     public String getDetails() {
         return title;
     }

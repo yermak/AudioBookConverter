@@ -52,12 +52,16 @@ public class ConversionContext {
         });
     }
 
-    public void addPosterIfMissing(ArtWork artWork) {
+    public void addPosterIfMissingWithDelay(ArtWork artWork) {
         Platform.runLater(() -> {
-            if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
-                posters.add(artWork);
-            }
+            addPosterIfMissing(artWork);
         });
+    }
+
+    void addPosterIfMissing(ArtWork artWork) {
+        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
+            posters.add(artWork);
+        }
     }
 
     public void saveGenres() {

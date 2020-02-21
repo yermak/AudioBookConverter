@@ -104,13 +104,13 @@ public class ArtWorkController {
                 if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
                     Image fimage = awtImageToFX(image);
-                    ConverterApplication.getContext().addPosterIfMissing(new ArtWorkImage(fimage));
+                    ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
 //                    imageList.getItems().add(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().addPosterIfMissing(new ArtWorkBean(f));
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(f));
 //                        imageList.getItems().add(new ArtWorkBean(f));
 
                     });

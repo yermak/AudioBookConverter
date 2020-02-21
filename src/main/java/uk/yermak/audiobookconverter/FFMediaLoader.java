@@ -152,7 +152,7 @@ public class FFMediaLoader {
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversion.getStatus().isOver())
-                        ConverterApplication.getContext().addPosterIfMissing(artWorkBean);
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 });
                 return artWorkBean;
             } finally {
@@ -169,7 +169,7 @@ public class FFMediaLoader {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> ConverterApplication.getContext().addPosterIfMissing(new ArtWorkBean(Utils.tempCopy(f.getPath())))));
+        searchDirs.forEach(d -> findPictures(d).forEach(f -> ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f.getPath())))));
 
     }
 

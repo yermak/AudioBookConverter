@@ -44,6 +44,7 @@ public class BookInfoController {
     private void initialize() {
 
         MenuItem menuItem = new MenuItem("Remove");
+        genre.setItems(ConverterApplication.getContext().getGenres());
         menuItem.setOnAction(event -> {
             genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
             ConverterApplication.getContext().saveGenres();

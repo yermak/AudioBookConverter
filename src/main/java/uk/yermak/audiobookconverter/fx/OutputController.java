@@ -4,7 +4,6 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
@@ -26,8 +25,10 @@ public class OutputController {
     public ComboBox<Integer> cutoff;
     @FXML
     private ComboBox<String> volume;
+/*
     @FXML
     private CheckBox auto;
+*/
 
     @FXML
     private ComboBox<Integer> frequency;
@@ -61,8 +62,10 @@ public class OutputController {
     @FXML
     private void initialize() {
 
+/*
         volume.getItems().addAll("100%", "200%", "300%");
         volume.getSelectionModel().select(0);
+*/
 
         frequency.getItems().addAll(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);
         frequency.getSelectionModel().select(new Integer(44100));
@@ -80,14 +83,15 @@ public class OutputController {
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
 
-        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
+//        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setBitRate(newValue));
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setFrequency(newValue));
         channels.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setChannels(newValue));
         quality.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setQuality((int) Math.round(newValue.doubleValue())));
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setCutoff(newValue));
-        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
+//        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
 
+/*
         auto.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
             bitRate.setDisable(newValue);
@@ -114,6 +118,7 @@ public class OutputController {
             updateParameters(media, media.isEmpty());
         });
 
+*/
         media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
     }
 

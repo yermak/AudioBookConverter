@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -97,6 +98,14 @@ public class FilesController {
             event.consume();
         });
 
+        fileList.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<MediaInfo>() {
+            @Override
+            public void onChanged(Change<? extends MediaInfo> c) {
+                ConverterApplication.getContext().getSelectedMedia().clear();
+                ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
+            }
+        });
+
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -109,6 +118,7 @@ public class FilesController {
         ObservableList<MediaInfo> media = context.getMedia();
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 

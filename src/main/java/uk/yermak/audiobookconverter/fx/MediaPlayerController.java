@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -52,10 +51,10 @@ public class MediaPlayerController  {
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
-        selectedMedia.addListener((InvalidationListener) observable -> updateUI(selectedMedia.isEmpty() && mediaPlayer == null));
+//        selectedMedia.addListener((ListChangeListener<MediaInfo>) c -> disablePlayer(selectedMedia.isEmpty() && mediaPlayer == null));
     }
 
-    private void updateUI(boolean disable) {
+    private void disablePlayer(boolean disable) {
         playButton.setDisable(disable);
         timelapse.setDisable(disable);
         volume.setDisable(disable);

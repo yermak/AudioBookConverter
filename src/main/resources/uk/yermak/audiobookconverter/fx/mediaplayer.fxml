@@ -15,13 +15,13 @@
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
 
-    <Slider fx:id="timelapse" minorTickCount="4" disable="true" GridPane.hgrow="ALWAYS"
+    <Slider fx:id="timelapse" minorTickCount="4" GridPane.hgrow="ALWAYS"
             minWidth="${screen.visualBounds.width * 0.35}" majorTickUnit="1"
             GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-    <Slider fx:id="volume" orientation="VERTICAL" disable="true" maxHeight="10"
+    <Slider fx:id="volume" orientation="VERTICAL" maxHeight="10"
             min="0" max="1.0" value="1.0"
             GridPane.rowIndex="0" GridPane.columnIndex="2" GridPane.rowSpan="2"/>
-    <Button fx:id="playButton" text="Play/Pause" disable="true"
+    <Button fx:id="playButton" text="Play/Pause"
             minWidth="${screen.visualBounds.width * 0.05}"
             onAction="#play"
             GridPane.rowIndex="0" GridPane.columnIndex="3" GridPane.rowSpan="2">

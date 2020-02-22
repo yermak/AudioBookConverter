@@ -5,11 +5,11 @@ import java.util.concurrent.Future;
 
 public class MediaInfoProxy implements MediaInfo {
     private final String filename;
-    private final Future futureLoad;
+    private final Future<MediaInfo> futureLoad;
 
     private MediaInfo getMediaInfo() {
         try {
-            return (MediaInfo) this.futureLoad.get();
+            return this.futureLoad.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -114,7 +114,7 @@ public class MediaInfoProxy implements MediaInfo {
         this.getMediaInfo().setChapter(chapter);
     }
 
-    MediaInfoProxy(final String filename, final Future futureLoad) {
+    MediaInfoProxy(final String filename, final Future<MediaInfo> futureLoad) {
         this.filename = filename;
         this.futureLoad = futureLoad;
     }

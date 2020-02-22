@@ -12,27 +12,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Yermak on 29-Dec-17.
  */
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    static String determineTempFilename(String inputFilename, final String extension, String prefix, final String suffix, boolean uniqie, String folder) {
-        File file = new File(inputFilename);
-        File outFile = new File(folder, prefix + file.getName());
-        String result = outFile.getAbsolutePath().replaceAll("(?i)\\." + extension, "." + suffix);
-        if (!result.endsWith("." + suffix)) {
-            result = result + "." + suffix;
-        }
-        return result;
-    }
 
     public static String getTmp(long jobId, int index, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + extension).getAbsolutePath();
@@ -54,22 +40,10 @@ public class Utils {
         }
     }
 
-    public static void closeSilently(Future future) {
-        if (future != null) {
-            future.cancel(true);
-        }
-    }
-
-    public static void closeSilently(ExecutorService executorService) {
-        if (executorService != null) {
-            executorService.shutdownNow();
-        }
-    }
-
     public static String formatChapter(int partNumber, Chapter chapter) {
         String chapterFormat = AppProperties.getProperty("chapter_format");
         if (chapterFormat == null) {
-            chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>: <CHAPTER_TITLE><endif> - <DURATION>";
+            chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>- <CHAPTER_TITLE><endif> - <DURATION>";
             AppProperties.setProperty("chapter_format", chapterFormat);
         }
 
@@ -112,33 +86,6 @@ public class Utils {
         return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
     }
 
-    public static String makeFilenameUnique(String filename) {
-        Pattern extPattern = Pattern.compile("\\.(\\w+)$");
-        Matcher extMatcher = extPattern.matcher(filename);
-        if (extMatcher.find()) {
-            try {
-                String extension = extMatcher.group(1);
-
-                for (File outputFile = new File(filename); outputFile.exists(); outputFile = new File(filename)) {
-                    Pattern pattern = Pattern.compile("(?i)(.*)\\((\\d+)\\)\\." + extension + "$");
-                    Matcher matcher = pattern.matcher(filename);
-                    if (matcher.find()) {
-                        filename = matcher.group(1) + "(" + (Integer.parseInt(matcher.group(2)) + 1) + ")." + extension;
-                    } else {
-                        filename = filename.replaceAll("." + extension + "$", "(1)." + extension);
-                    }
-                }
-
-                return filename;
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Cannot use filename" + " " + filename);
-            }
-        } else {
-            throw new RuntimeException("Cannot use filename" + " " + filename + " (2)");
-        }
-    }
-
     public static long checksumCRC32(File file) {
         try {
             return FileUtils.checksumCRC32(file);
@@ -161,10 +108,9 @@ public class Utils {
     }
 
     public static String formatTime(long millis) {
-        String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+        return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
-        return hms;
     }
 
     public static String formatSize(long bytes) {

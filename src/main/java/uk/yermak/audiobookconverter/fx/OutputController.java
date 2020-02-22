@@ -120,6 +120,7 @@ public class OutputController {
     private void updateParameters(ObservableList<MediaInfo> media, boolean empty) {
         if (!empty) {
             OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+            //TODO
 //            params.updateAuto(media);
             frequency.setValue(params.getFrequency());
             bitRate.setValue(params.getBitRate());

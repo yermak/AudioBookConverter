@@ -76,8 +76,7 @@ public class Part implements Organisable, Convertable {
 
     @Override
     public List<MediaInfo> getMedia() {
-        List<MediaInfo> media = chapters.stream().flatMap(chapter -> chapter.getMedia().stream()).collect(Collectors.toList());
-        return media;
+        return chapters.stream().flatMap(chapter -> chapter.getMedia().stream()).collect(Collectors.toList());
     }
 
     public Book getBook() {

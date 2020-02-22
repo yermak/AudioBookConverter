@@ -36,7 +36,7 @@ public class ConverterApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-        Parent root = null;
+        Parent root;
 
         logger.info("Initialising application");
 

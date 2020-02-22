@@ -31,7 +31,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     }
 
     public void run() {
-        List<Future<ConverterOutput>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
         String tempFile = Utils.getTmp(jobId, 999999, ".m4b");
@@ -48,13 +48,14 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             for (MediaInfo mediaInfo : prioritizedMedia) {
                 String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), ".m4b");
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName());
-                Future<ConverterOutput> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, mediaInfo, tempOutput, callback));
+                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
-            for (Future<ConverterOutput> future : futures) {
+            for (Future<String> future : futures) {
                 if (conversion.getStatus().isOver()) return;
-                future.get();
+                String outputFileName = future.get();
+                logger.debug("Waited for completion of {}", outputFileName);
             }
             if (conversion.getStatus().isOver()) return;
             metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getConverable());
@@ -82,7 +83,6 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
-            if (conversion.getStatus().isOver()) return;
         }
     }
 

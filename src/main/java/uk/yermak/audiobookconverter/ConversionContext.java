@@ -123,10 +123,6 @@ public class ConversionContext {
         return media;
     }
 
-    public void setMedia(ObservableList<MediaInfo> media) {
-        this.media = media;
-    }
-
     public void stopConversions() {
         conversionQueue.forEach(Conversion::stop);
     }
@@ -153,10 +149,6 @@ public class ConversionContext {
         return paused;
     }
 
-//    public void addModeChangeListener(ChangeListener<ConversionMode> listener) {
-//        mode.addListener(listener);
-//    }
-
     public SimpleObjectProperty<AudioBookInfo> getBookInfo() {
         return bookInfo;
     }
@@ -164,7 +156,6 @@ public class ConversionContext {
     public ObservableList<ArtWork> getPosters() {
         return posters;
     }
-
 
     public Conversion getPlannedConversion() {
         return conversionHolder.get();

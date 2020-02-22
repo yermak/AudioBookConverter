@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -17,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Yermak on 29-Dec-17.
  */
-public class FFMpegNativeConverter implements Callable<ConverterOutput> {
+public class FFMpegNativeConverter implements Callable<String> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Conversion conversion;
     private MediaInfo mediaInfo;
@@ -35,11 +34,11 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
         this.callback = callback;
     }
 
-    public ConverterOutput convertMp3toM4a() throws IOException, InterruptedException {
+    @Override
+    public String call() throws Exception {
         try {
             if (conversion.getStatus().isOver()) return null;
             while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
-
 
             progressParser = new TcpProgressParser(progress -> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);
@@ -105,7 +104,7 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
             Mp4v2InfoLoader.updateDuration(mediaInfo, outputFileName);
-            return new ConverterOutput(mediaInfo, outputFileName);
+            return outputFileName;
         } catch (CancellationException ce) {
             return null;
         } catch (URISyntaxException e) {
@@ -114,11 +113,6 @@ public class FFMpegNativeConverter implements Callable<ConverterOutput> {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
-    }
-
-    @Override
-    public ConverterOutput call() throws Exception {
-        return convertMp3toM4a();
     }
 
 }

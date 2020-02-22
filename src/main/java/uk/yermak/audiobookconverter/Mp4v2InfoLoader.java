@@ -20,8 +20,7 @@ public class Mp4v2InfoLoader {
 
     static long parseDuration(String info) {
         String[] lines = StringUtils.split(info, "\n");
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
+        for (String line : lines) {
             if (StringUtils.isNotEmpty(line)) {
                 String[] columns = StringUtils.split(line, ",");
                 if (StringUtils.contains(columns[0], "audio")) {
@@ -39,7 +38,7 @@ public class Mp4v2InfoLoader {
         return 0;
     }
 
-    public static void updateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException, InterruptedException {
+    public static void updateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         Process process = null;
         try {
             ProcessBuilder infoProcessBuilder = new ProcessBuilder(MP4INFO, outputFileName);

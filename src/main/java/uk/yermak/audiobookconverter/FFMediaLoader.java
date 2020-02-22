@@ -42,7 +42,7 @@ public class FFMediaLoader {
             FFprobe ffprobe = new FFprobe(FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
-                Future futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversion));
+                Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversion));
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
@@ -95,8 +95,8 @@ public class FFMediaLoader {
                         mediaInfo.setDuration(Math.round(ffMpegStream.duration * 1000));
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
-                        Future futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
-                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad, ART_WORK_CODECS.get(ffMpegStream.codec_name));
+                        Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
+                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                         mediaInfo.setArtWork(artWork);
                     }
                 }
@@ -148,7 +148,6 @@ public class FFMediaLoader {
                 while (!conversion.getStatus().isOver() && !finished) {
                     finished = process.waitFor(500, TimeUnit.MILLISECONDS);
                 }
-                File posterFile = new File(poster);
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversion.getStatus().isOver())

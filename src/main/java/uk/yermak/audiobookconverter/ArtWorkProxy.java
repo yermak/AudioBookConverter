@@ -7,17 +7,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Future;
 
 public class ArtWorkProxy implements ArtWork {
-    private final Future futureLoad;
-    private String format;
+    private final Future<ArtWork> futureLoad;
     private final Logger logger;
-
-    public Future futureLoad() {
-        return this.futureLoad;
-    }
-
-    public String format() {
-        return this.format;
-    }
 
     private Logger logger() {
         return this.logger;
@@ -25,20 +16,12 @@ public class ArtWorkProxy implements ArtWork {
 
     private ArtWork getArtWork() {
         try {
-            return (ArtWork) this.futureLoad().get();
+            return this.futureLoad.get();
         } catch (Exception e) {
             this.logger().error("Failed to load ArtWork Proxy:", e);
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    public String getFormat() {
-        return this.format();
-    }
-
-    public void setFormat(final String format) {
-        this.getArtWork().setFormat(format);
     }
 
     @Override
@@ -50,21 +33,12 @@ public class ArtWorkProxy implements ArtWork {
         return this.getArtWork().getCrc32();
     }
 
-    public void setCrc32(final long crc32) {
-        this.getArtWork().setCrc32(crc32);
-    }
-
     public String getFileName() {
         return this.getArtWork().getFileName();
     }
 
-    public void setFileName(final String fileName) {
-        this.getArtWork().setFileName(fileName);
-    }
-
-    public ArtWorkProxy(final Future futureLoad, final String format) {
+    public ArtWorkProxy(final Future<ArtWork> futureLoad) {
         this.futureLoad = futureLoad;
-        this.format = format;
         this.logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     }
 }

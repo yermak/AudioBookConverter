@@ -94,7 +94,6 @@ public class Conversion {
         }
     }
 
-
     public OutputParameters getOutputParameters() {
         return outputParameters;
     }
@@ -116,9 +115,6 @@ public class Conversion {
         return posters;
     }
 
-    public void setPosters(ObservableList<ArtWork> posters) {
-        this.posters = posters;
-    }
 }
 
 

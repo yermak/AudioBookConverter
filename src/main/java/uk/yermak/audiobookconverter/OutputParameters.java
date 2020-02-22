@@ -10,37 +10,8 @@ public class OutputParameters {
     private int quality = 3;
     private boolean cbr = true;
     private boolean auto = true;
-    private int parts = 1;
     private int cutoff = 10000;
     private int volume = 100;
-
-    private int frequency() {
-        return this.frequency;
-    }
-
-    private int channels() {
-        return this.channels;
-    }
-
-    private int quality() {
-        return this.quality;
-    }
-
-    private boolean cbr() {
-        return this.cbr;
-    }
-
-    private boolean auto() {
-        return this.auto;
-    }
-
-    private int parts() {
-        return this.parts;
-    }
-
-    private int cutoff() {
-        return this.cutoff;
-    }
 
     public int getBitRate() {
         return bitRate;
@@ -51,7 +22,7 @@ public class OutputParameters {
     }
 
     public int getFrequency() {
-        return this.frequency();
+        return this.frequency;
     }
 
     public void setFrequency(final int frequency) {
@@ -59,7 +30,7 @@ public class OutputParameters {
     }
 
     public int getChannels() {
-        return this.channels();
+        return this.channels;
     }
 
     public void setChannels(final int channels) {
@@ -67,7 +38,7 @@ public class OutputParameters {
     }
 
     public int getQuality() {
-        return this.quality();
+        return this.quality;
     }
 
     public void setQuality(final int quality) {
@@ -75,7 +46,7 @@ public class OutputParameters {
     }
 
     public boolean isCbr() {
-        return this.cbr();
+        return this.cbr;
     }
 
     public void setCbr(final boolean cbr) {
@@ -83,23 +54,15 @@ public class OutputParameters {
     }
 
     public boolean isAuto() {
-        return this.auto();
+        return this.auto;
     }
 
     public void setAuto(final boolean auto) {
         this.auto = auto;
     }
 
-    public int getParts() {
-        return this.parts();
-    }
-
-    public void setParts(final int parts) {
-        this.parts = parts;
-    }
-
-    public void updateAuto(final List media) {
-        if (this.auto()) {
+    public void updateAuto(final List<MediaInfo> media) {
+        if (this.auto) {
             int maxChannels = 0;
             int maxFrequency = 0;
             int maxBitRate = 0;
@@ -116,18 +79,18 @@ public class OutputParameters {
             this.setChannels(maxChannels);
             this.setFrequency(maxFrequency);
 
-            if (this.cbr()) {
+            if (this.cbr) {
                 this.setBitRate(maxBitRate / 1000);
             }
         }
     }
 
     public String getFFMpegQualityParameter() {
-        return this.cbr() ? "-b:a" : "-vbr";
+        return this.cbr ? "-b:a" : "-vbr";
     }
 
     public String getFFMpegQualityValue() {
-        return this.cbr() ? this.getBitRate() + "k" : String.valueOf(this.quality());
+        return this.cbr ? this.getBitRate() + "k" : String.valueOf(this.quality);
     }
 
     public String getFFMpegFrequencyValue() {
@@ -139,10 +102,10 @@ public class OutputParameters {
     }
 
     public String getCutoffValue() {
-        if (this.cbr()) {
-            return String.valueOf(this.cutoff());
+        if (this.cbr) {
+            return String.valueOf(this.cutoff);
         } else {
-            switch (this.quality()) {
+            switch (this.quality) {
                 case 1:
                     return "13050";
                 case 2:
@@ -161,33 +124,14 @@ public class OutputParameters {
         this.cutoff = cutoff;
     }
 
-    public int getCutoff() {
-        return this.cutoff();
-    }
-
     public void setVolume(final int volume) {
         this.volume = volume;
     }
 
     public String getFiltersValue() {
 //        return "\"volume=100dB\"";
-        return "\"volume=" + (volume / 100.0)+"\"";
+        return "\"volume=" + (volume / 100.0) + "\"";
     }
-
-    public OutputParameters copy() {
-        OutputParameters op = new OutputParameters();
-        op.bitRate = this.getBitRate();
-        op.frequency = this.frequency();
-        op.channels = this.channels();
-        op.quality = this.quality();
-        op.cbr = this.cbr();
-        op.auto = this.auto();
-        op.parts = this.parts();
-        op.cutoff = this.cutoff();
-        op.volume = this.volume;
-        return op;
-    }
-
 }
 
         

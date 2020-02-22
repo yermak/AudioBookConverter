@@ -24,13 +24,9 @@ public class ArtWorkImage implements ArtWork {
         return this.logger;
     }
 
-    private ArtWork bean() {
-        return this.bean;
-    }
-
     private ArtWork getBean() {
-        if (this.bean() != null) {
-            this.bean();
+        if (this.bean != null) {
+            return this.bean;
         }
 
         BufferedImage bImage = SwingFXUtils.fromFXImage(this.image(), null);
@@ -41,37 +37,21 @@ public class ArtWorkImage implements ArtWork {
             posterFile.deleteOnExit();
             ImageIO.write(bImage, "png", posterFile);
             long crc32 = Utils.checksumCRC32(posterFile);
-            this.bean = new ArtWorkBean(poster, "png", crc32);
+            this.bean = new ArtWorkBean(poster, crc32);
         } catch (IOException var7) {
             this.logger().error("Error during parallel conversion", var7);
             var7.printStackTrace();
         }
 
-        return this.bean();
+        return this.bean;
     }
 
     public long getCrc32() {
         return this.getBean().getCrc32();
     }
 
-    public void setCrc32(final long crc32) {
-        this.getBean().setCrc32(crc32);
-    }
-
     public String getFileName() {
         return this.getBean().getFileName();
-    }
-
-    public void setFileName(final String fileName) {
-        this.getBean().setFileName(fileName);
-    }
-
-    public String getFormat() {
-        return this.getBean().getFormat();
-    }
-
-    public void setFormat(final String format) {
-        this.getBean().setFormat(format);
     }
 
     @Override

@@ -15,9 +15,6 @@ public class AppProperties {
     public static final File APP_DIR = new File(System.getenv("APPDATA"), Version.getVersionString());
     public static final File PROP_FILE = new File(APP_DIR, Version.getVersionString() + ".properties");
 
-    public AppProperties() {
-    }
-
     private static Properties getAppProperties() {
         //TODO:add default props here
         Properties defaultProperties = new Properties();

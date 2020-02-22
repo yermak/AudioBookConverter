@@ -70,9 +70,9 @@ public class ArtWorkController {
 
     @FXML
     private void left(ActionEvent actionEvent) {
-        ObservableList selectedIndices = imageList.getSelectionModel().getSelectedIndices();
+        ObservableList<Integer> selectedIndices = imageList.getSelectionModel().getSelectedIndices();
         if (selectedIndices.size() == 1) {
-            Integer selected = (Integer) selectedIndices.get(0);
+            Integer selected = selectedIndices.get(0);
             if (selected > 0) {
                 ConverterApplication.getContext().movePosterLeft(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
@@ -84,10 +84,10 @@ public class ArtWorkController {
 
     @FXML
     private void right(ActionEvent actionEvent) {
-        ObservableList selectedIndices = imageList.getSelectionModel().getSelectedIndices();
+        ObservableList<Integer> selectedIndices = imageList.getSelectionModel().getSelectedIndices();
         if (selectedIndices.size() == 1) {
             ObservableList items = imageList.getItems();
-            Integer selected = (Integer) selectedIndices.get(0);
+            Integer selected = selectedIndices.get(0);
             if (selected < items.size() - 1) {
                 ConverterApplication.getContext().movePosterLeft(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
@@ -105,21 +105,12 @@ public class ArtWorkController {
                     java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
                     Image fimage = awtImageToFX(image);
                     ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
-//                    imageList.getItems().add(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
                         ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(f));
-//                        imageList.getItems().add(new ArtWorkBean(f));
-
                     });
-
-                   /* for (String artFile : artFiles) {
-                        if (ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(artFile)){
-                            imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(artFile))));
-                        }
-                    }*/
                 }
             }
         } catch (Exception e) {

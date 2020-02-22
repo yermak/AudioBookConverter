@@ -38,14 +38,6 @@ public class AudioBookInfo {
         }
     }
 
-    private int bookNumber() {
-        return this.bookNumber;
-    }
-
-    private int totalTracks() {
-        return this.totalTracks;
-    }
-
     public String getSeries() {
         return series == null ? title : title;
     }
@@ -71,7 +63,7 @@ public class AudioBookInfo {
     }
 
     public String getGenre() {
-        return writer;
+        return genre;
     }
 
     public void setGenre(final String genre) {
@@ -79,7 +71,7 @@ public class AudioBookInfo {
     }
 
     public String getTitle() {
-        return writer;
+        return title;
     }
 
     public void setTitle(final String title) {
@@ -87,7 +79,7 @@ public class AudioBookInfo {
     }
 
     public int getBookNumber() {
-        return this.bookNumber();
+        return this.bookNumber;
     }
 
     public void setBookNumber(final int bookNumber) {
@@ -95,7 +87,7 @@ public class AudioBookInfo {
     }
 
     public String getNarrator() {
-        return writer;
+        return narrator;
     }
 
     public void setNarrator(final String narrator) {
@@ -111,7 +103,7 @@ public class AudioBookInfo {
     }
 
     public int getTotalTracks() {
-        return this.totalTracks();
+        return totalTracks;
     }
 
     public void setTotalTracks(final int totalTracks) {

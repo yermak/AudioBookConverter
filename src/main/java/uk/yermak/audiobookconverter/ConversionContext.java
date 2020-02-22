@@ -39,7 +39,6 @@ public class ConversionContext {
 
     public ConversionContext() {
         conversionQueue.add(conversionHolder.get());
-        reloadGenres();
         resetForNewConversion();
     }
 
@@ -90,12 +89,11 @@ public class ConversionContext {
             }
         });
         conversionHolder.get().start(convertable, output, conversionProgress, outputParameters.get(), bookInfo.get(), posters);
+        saveGenres();
 
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);
         conversionHolder.set(newConversion);
-
-        saveGenres();
     }
 
     public void resetForNewConversion() {
@@ -167,5 +165,9 @@ public class ConversionContext {
 
     public void removePoster(int toRemove) {
         Platform.runLater(() -> posters.remove(toRemove));
+    }
+
+    public ObservableList<String> getGenres() {
+        return genres;
     }
 }

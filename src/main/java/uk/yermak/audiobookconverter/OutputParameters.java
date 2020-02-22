@@ -9,7 +9,6 @@ public class OutputParameters {
     private int channels = 2;
     private int quality = 3;
     private boolean cbr = true;
-    private boolean auto = true;
     private int cutoff = 10000;
     private int volume = 100;
 
@@ -53,16 +52,9 @@ public class OutputParameters {
         this.cbr = cbr;
     }
 
-    public boolean isAuto() {
-        return this.auto;
-    }
 
-    public void setAuto(final boolean auto) {
-        this.auto = auto;
-    }
-
+    //TODO reconsider
     public void updateAuto(final List<MediaInfo> media) {
-        if (this.auto) {
             int maxChannels = 0;
             int maxFrequency = 0;
             int maxBitRate = 0;
@@ -82,7 +74,6 @@ public class OutputParameters {
             if (this.cbr) {
                 this.setBitRate(maxBitRate / 1000);
             }
-        }
     }
 
     public String getFFMpegQualityParameter() {
@@ -122,15 +113,6 @@ public class OutputParameters {
 
     public void setCutoff(final int cutoff) {
         this.cutoff = cutoff;
-    }
-
-    public void setVolume(final int volume) {
-        this.volume = volume;
-    }
-
-    public String getFiltersValue() {
-//        return "\"volume=100dB\"";
-        return "\"volume=" + (volume / 100.0) + "\"";
     }
 }
 

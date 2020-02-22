@@ -39,7 +39,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
         File fileListFile = null;
         File metaFile = null;
         try {
-            conversion.getOutputParameters().updateAuto(conversion.getMedia());
+//            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
             fileListFile = prepareFiles(jobId);
 

@@ -50,7 +50,7 @@ public class Utils {
         ST chapterTemplate = new ST(chapterFormat);
         chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
         chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
-        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getCustomTitle()) ? null : chapter.getCustomTitle());
+        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getRawTitle()) ? null : chapter.getRawTitle());
         chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));
         return chapterTemplate.render();
 

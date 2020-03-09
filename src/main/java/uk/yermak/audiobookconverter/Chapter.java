@@ -9,7 +9,7 @@ import java.util.List;
 public class Chapter implements Organisable, Convertable {
     private String details;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private String customTitle;
+    private String rawTitle;
     private Part part;
 
 
@@ -21,8 +21,8 @@ public class Chapter implements Organisable, Convertable {
     }
 
     public String getTitle() {
-        if (customTitle != null) {
-            return Chapter.this.getNumber() + ":" + customTitle;
+        if (rawTitle != null) {
+            return Chapter.this.getNumber() + ":" + rawTitle;
         }
         return "Chapter " + getNumber();
     }
@@ -90,12 +90,12 @@ public class Chapter implements Organisable, Convertable {
         return metaData;
     }
 
-    public String getCustomTitle() {
-        return customTitle;
+    public String getRawTitle() {
+        return rawTitle;
     }
 
-    public void setCustomTitle(String customTitle) {
-        this.customTitle = customTitle;
+    public void setRawTitle(String rawTitle) {
+        this.rawTitle = rawTitle;
     }
 
     public void setPart(Part part) {

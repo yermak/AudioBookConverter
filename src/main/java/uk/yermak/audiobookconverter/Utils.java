@@ -60,7 +60,7 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER>]<endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
+            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 

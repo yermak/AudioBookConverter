@@ -39,7 +39,7 @@ public class AudioBookInfo {
     }
 
     public String getSeries() {
-        return series == null ? title : title;
+        return series == null ? title : series;
     }
 
     public void setSeries(final String series) {

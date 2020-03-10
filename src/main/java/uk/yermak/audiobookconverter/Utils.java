@@ -50,7 +50,7 @@ public class Utils {
         ST chapterTemplate = new ST(chapterFormat);
         chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
         chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
-        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getCustomTitle()) ? null : chapter.getCustomTitle());
+        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getRawTitle()) ? null : chapter.getRawTitle());
         chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));
         return chapterTemplate.render();
 
@@ -60,7 +60,7 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER>]<endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
+            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 

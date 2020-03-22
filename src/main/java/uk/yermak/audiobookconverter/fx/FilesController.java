@@ -15,6 +15,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
@@ -124,11 +127,15 @@ public class FilesController {
 
         selectedMedia.addListener((InvalidationListener) observable -> {
             if (selectedMedia.isEmpty()) return;
-            List<MediaInfo> change = new ArrayList<>(selectedMedia);
-            List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
-            if (!change.containsAll(selection) || !selection.containsAll(change)) {
-                fileList.getSelectionModel().clearSelection();
-                change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+            if (!chaptersMode) {
+                List<MediaInfo> change = new ArrayList<>(selectedMedia);
+                List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
+                if (!change.containsAll(selection) || !selection.containsAll(change)) {
+                    fileList.getSelectionModel().clearSelection();
+                    change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
+                }
+            } else {
+//                    bookStructure.getSelectionModel().select();
             }
         });
 
@@ -193,14 +200,24 @@ public class FilesController {
         }
     }
 
+    private static String[] toSuffixes(final String[] extensions) {
+        final String[] suffixes = new String[extensions.length];
+        for (int i = 0; i < extensions.length; i++) {
+            suffixes[i] = "." + extensions[i];
+        }
+        return suffixes;
+    }
+
     private List<String> collectFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
         for (File file : files) {
             if (file.isDirectory()) {
-                Collection<File> nestedFiles = FileUtils.listFiles(file, FILE_EXTENSIONS, true);
+                SuffixFileFilter suffixFileFilter = new SuffixFileFilter(toSuffixes(FILE_EXTENSIONS), IOCase.INSENSITIVE);
+                Collection<File> nestedFiles = FileUtils.listFiles(file, suffixFileFilter, TrueFileFilter.INSTANCE);
+//                Collection<File> nestedFiles = FileUtils.listFiles(file, FILE_EXTENSIONS, true);
                 nestedFiles.stream().map(File::getPath).forEach(fileNames::add);
             } else {
-                boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()));
+                boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()).toLowerCase());
                 if (allowedFileExtension) {
                     fileNames.add(file.getPath());
                 }

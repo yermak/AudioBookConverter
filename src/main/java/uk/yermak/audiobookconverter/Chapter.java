@@ -4,12 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Chapter implements Organisable, Convertable {
     private String details;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private String rawTitle;
     private Part part;
 
 
@@ -21,9 +21,6 @@ public class Chapter implements Organisable, Convertable {
     }
 
     public String getTitle() {
-        if (rawTitle != null) {
-            return Chapter.this.getNumber() + ":" + rawTitle;
-        }
         return "Chapter " + getNumber();
     }
 
@@ -66,12 +63,14 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public void moveUp() {
-
+        if (getNumber() < 2) return;
+        Collections.swap(part.getChapters(), getNumber() - 1, getNumber() - 2);
     }
 
     @Override
     public void moveDown() {
-
+        if (getNumber() > part.getChapters().size()) return;
+        Collections.swap(part.getMedia(), getNumber() - 1, getNumber());
     }
 
     @Override
@@ -90,14 +89,6 @@ public class Chapter implements Organisable, Convertable {
         return metaData;
     }
 
-    public String getRawTitle() {
-        return rawTitle;
-    }
-
-    public void setRawTitle(String rawTitle) {
-        this.rawTitle = rawTitle;
-    }
-
     public void setPart(Part part) {
         this.part = part;
     }
@@ -113,5 +104,9 @@ public class Chapter implements Organisable, Convertable {
             getMedia().add(m);
         });
         mergers.forEach(Chapter::remove);
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 }

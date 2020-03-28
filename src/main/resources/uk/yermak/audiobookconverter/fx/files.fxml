@@ -127,6 +127,15 @@
                             </tooltip>
                         </Button>
 
+                        <Button fx:id="editButton" text="Edit" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#edit"
+                                disable="false" GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Edit chapter"/>
+                            </tooltip>
+                        </Button>
+
 
                     </VBox>
                 </TitledPane>

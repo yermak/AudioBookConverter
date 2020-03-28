@@ -485,4 +485,23 @@ public class FilesController {
         updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
     }
 
+    public void edit(ActionEvent actionEvent) {
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.size() != 1) return;
+        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+        if (organisable instanceof Chapter) {
+            Chapter chapter = (Chapter) organisable;
+
+            TextInputDialog dialog = new TextInputDialog(chapter.getDetails());
+            dialog.setTitle("Chapter title");
+            dialog.setHeaderText("Set custom chapter title");
+            dialog.setContentText("Title:");
+
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                chapter.setDetails(result.get());
+            }
+        }
+        bookStructure.refresh();
+    }
 }

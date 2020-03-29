@@ -3,10 +3,15 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Book implements Organisable {
+    private final AudioBookInfo audioBookInfo;
     private ObservableList<Part> parts = FXCollections.observableArrayList();
 
-    public Book(ObservableList<MediaInfo> items) {
+    public Book(ObservableList<MediaInfo> items, AudioBookInfo audioBookInfo) {
+        this.audioBookInfo = audioBookInfo;
         Part part = new Part(this, items);
         parts.add(part);
     }
@@ -48,5 +53,14 @@ public class Book implements Organisable {
 
     public ObservableList<Part> getParts() {
         return parts;
+    }
+
+
+    public List<Chapter> getChapters() {
+        return parts.stream().flatMap(part -> part.getChapters().stream()).collect(Collectors.toList());
+    }
+
+    public AudioBookInfo getBookInfo() {
+        return audioBookInfo;
     }
 }

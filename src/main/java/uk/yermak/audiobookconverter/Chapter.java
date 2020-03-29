@@ -2,20 +2,20 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 public class Chapter implements Organisable, Convertable {
-    private String details;
+    private String customTitle;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private Part part;
+    private Map<String, Function<Chapter, String>> renderMap = new HashMap<>();
 
 
     public Chapter(Part part, List<MediaInfo> nextMedia) {
         this.part = part;
-        this.details = nextMedia.get(0).getTitle();
         nextMedia.forEach(mediaInfo -> mediaInfo.setChapter(this));
         media.addAll(nextMedia);
     }
@@ -35,7 +35,8 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public String getDetails() {
-        return details;
+        ConverterApplication.getContext().getBookInfo().get();
+        return Utils.renderChapter(this, renderMap);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class Chapter implements Organisable, Convertable {
         metaData.add("TIMEBASE=1/1000");
         metaData.add("START=" + 0);
         metaData.add("END=" + getDuration());
-        metaData.add("title= " + Utils.formatChapter(bookInfo.getBookNumber(), this));
+        metaData.add("title= " + Utils.renderChapter(this, renderMap));
         return metaData;
     }
 
@@ -106,7 +107,19 @@ public class Chapter implements Organisable, Convertable {
         mergers.forEach(Chapter::remove);
     }
 
-    public void setDetails(String details) {
-        this.details = details;
+    public Part getPart() {
+        return part;
+    }
+
+    public Map<String, Function<Chapter, String>> getRenderMap() {
+        return renderMap;
+    }
+
+    public void setCustomTitle(String customTitle) {
+        this.customTitle = customTitle;
+    }
+
+    public String getCustomTitle() {
+        return customTitle;
     }
 }

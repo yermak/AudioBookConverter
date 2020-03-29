@@ -93,7 +93,7 @@
                         </Button>
 
                         <SplitPane/>
-                        <Label text="Advanced" textAlignment="CENTER" alignment="CENTER">
+                        <Label text="Chapters mode" textAlignment="CENTER" alignment="CENTER">
                             <font>
                                 <Font name="Arial Black" size="12.0"/>
                             </font>
@@ -101,7 +101,7 @@
                         <SplitPane/>
 
 
-                        <Button fx:id="importButton" text="Chapters" minWidth="${screen.visualBounds.width * 0.05}"
+                        <Button fx:id="importButton" text="Import" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#importChapters"
                                 GridPane.valignment="TOP"
                         >

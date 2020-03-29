@@ -329,7 +329,7 @@ public class FilesController {
         if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
         if (context.getBook() == null) {
-            context.setBook(new Book(fileList.getItems()));
+            context.setBook(new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get()));
         }
 
         String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
@@ -431,7 +431,7 @@ public class FilesController {
         bookStructure.setShowRoot(false);
 
 
-        Book book = new Book(fileList.getItems());
+        Book book = new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get());
 
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
@@ -490,18 +490,9 @@ public class FilesController {
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
         if (organisable instanceof Chapter) {
-            Chapter chapter = (Chapter) organisable;
-
-            TextInputDialog dialog = new TextInputDialog(chapter.getDetails());
-            dialog.setTitle("Chapter title");
-            dialog.setHeaderText("Set custom chapter title");
-            dialog.setContentText("Title:");
-
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                chapter.setDetails(result.get());
-            }
+            new ChapterEditor((Chapter) organisable).editChapter();
+            bookStructure.refresh();
         }
-        bookStructure.refresh();
     }
+
 }

@@ -12,7 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -50,10 +53,27 @@ public class Utils {
         ST chapterTemplate = new ST(chapterFormat);
         chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
         chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
-        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getDetails()) ? chapter.getTitle(): chapter.getDetails());
+        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getDetails()) ? chapter.getTitle() : chapter.getDetails());
         chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));
         return chapterTemplate.render();
 
+    }
+
+    public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, String>> context) {
+        String chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
+                "<if(BOOK_TITLE)><BOOK_TITLE> <endif>" +
+                "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
+                "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER> <endif>" +
+                "<if(TAG)><TAG> <endif>" +
+                "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
+                "<if(DURATION)> - <DURATION><endif>";
+
+        ST chapterTemplate = new ST(chapterFormat);
+        Set<Map.Entry<String, Function<Chapter, String>>> entries = context.entrySet();
+        for (Map.Entry<String, Function<Chapter, String>> entry : entries) {
+            chapterTemplate.add(entry.getKey(), entry.getValue().apply(chapter));
+        }
+        return chapterTemplate.render();
     }
 
 

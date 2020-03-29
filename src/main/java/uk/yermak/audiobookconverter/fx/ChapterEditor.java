@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 class ChapterEditor {
@@ -98,37 +99,53 @@ class ChapterEditor {
 
         ComboBox<String> tagsSelection = new ComboBox<>();
         tagsSelection.getItems().addAll("None", "title", "artist", "album_artist", "album", "genre", "year", "comment-0", "file_name");
-        tagsSelection.getSelectionModel().select(0);
-        customisationBox.getChildren().add(new HBox(5.0, tagsSelection, new Label("MP3 tag")));
-        tagsSelection.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+        AtomicInteger selected = new AtomicInteger();
+        context.keySet().stream()
+                .filter(s -> s.contains("TAG"))
+                .mapToInt(value -> Integer.parseInt(value.substring(4)))
+                .findAny().ifPresent(value ->
+                selected.set(value));
 
+        tagsSelection.getSelectionModel().select(selected.get());
+
+        customisationBox.getChildren().add(new HBox(5.0, tagsSelection, new Label("MP3 tag")));
+
+        tagsSelection.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             switch (newValue.intValue()) {
                 case 0:
-                    context.remove("TAG");
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
                     break;
                 case 1:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getTitle());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.1", chapter -> chapter.getMedia().get(0).getBookInfo().getTitle());
                     break;
                 case 2:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getWriter());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.2", chapter -> chapter.getMedia().get(0).getBookInfo().getWriter());
                     break;
                 case 3:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getNarrator());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.3", chapter -> chapter.getMedia().get(0).getBookInfo().getNarrator());
                     break;
                 case 4:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getSeries());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.4", chapter -> chapter.getMedia().get(0).getBookInfo().getSeries());
                     break;
                 case 5:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getGenre());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.5", chapter -> chapter.getMedia().get(0).getBookInfo().getGenre());
                     break;
                 case 6:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getYear());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.6", chapter -> chapter.getMedia().get(0).getBookInfo().getYear());
                     break;
                 case 7:
-                    context.put("TAG", chapter -> chapter.getMedia().get(0).getBookInfo().getComment());
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.7", chapter -> chapter.getMedia().get(0).getBookInfo().getComment());
                     break;
                 case 8:
-                    context.put("TAG", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
+                    for (int i = 1; i < 9; i++) context.remove("TAG." + i);
+                    context.put("TAG.8", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
                     break;
             }
             Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
@@ -163,22 +180,23 @@ class ChapterEditor {
 
         dialog.getDialogPane().setContent(grid);
 
+        Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
 
         Optional result = dialog.showAndWait();
 
         result.ifPresent(r -> {
             chapter.getRenderMap().clear();
             chapter.getRenderMap().putAll(context);
-            if (StringUtils.isNotEmpty(customTitle.getText())){
+            if (StringUtils.isNotEmpty(customTitle.getText())) {
                 chapter.setCustomTitle(customTitle.getText());
                 chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
             }
-            if (applyForAllChapters.isSelected()){
+            if (applyForAllChapters.isSelected()) {
                 List<Chapter> chapters = chapter.getPart().getBook().getChapters();
                 for (Chapter c : chapters) {
                     c.getRenderMap().clear();
                     c.getRenderMap().putAll(context);
-                    if (StringUtils.isNotEmpty(customTitle.getText())){
+                    if (StringUtils.isNotEmpty(customTitle.getText())) {
                         c.setCustomTitle(customTitle.getText());
                         c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
                     }

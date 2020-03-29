@@ -88,7 +88,7 @@ class ChapterEditor {
         chapterNo.setSelected(context.containsKey("CHAPTER_NUMBER"));
         chapterNo.setOnAction(event -> {
             if (chapterNo.isSelected()) {
-                context.put("CHAPTER_NUMBER", c -> String.valueOf(c.getNumber()));
+                context.put("CHAPTER_NUMBER", Chapter::getNumberString);
             } else {
                 context.remove("CHAPTER_NUMBER");
             }

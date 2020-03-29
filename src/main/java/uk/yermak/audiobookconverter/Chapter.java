@@ -18,6 +18,8 @@ public class Chapter implements Organisable, Convertable {
         this.part = part;
         nextMedia.forEach(mediaInfo -> mediaInfo.setChapter(this));
         media.addAll(nextMedia);
+        renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
+        renderMap.put("CHAPTER_TEXT", c -> "Chapter");
     }
 
     public String getTitle() {
@@ -26,6 +28,10 @@ public class Chapter implements Organisable, Convertable {
 
     public int getNumber() {
         return part.getChapters().indexOf(this) + 1;
+    }
+
+    public String getNumberString() {
+        return String.valueOf(getNumber());
     }
 
     @Override

@@ -61,9 +61,9 @@ public class Utils {
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, String>> context) {
         String chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
-                "<if(BOOK_TITLE)><BOOK_TITLE> <endif>" +
+                "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
                 "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
-                "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER> <endif>" +
+                "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER>. <endif>" +
                 "<if(TAG)><TAG> <endif>" +
                 "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
                 "<if(DURATION)> - <DURATION><endif>";

@@ -71,7 +71,11 @@ public class Utils {
         ST chapterTemplate = new ST(chapterFormat);
         Set<Map.Entry<String, Function<Chapter, String>>> entries = context.entrySet();
         for (Map.Entry<String, Function<Chapter, String>> entry : entries) {
-            chapterTemplate.add(entry.getKey(), entry.getValue().apply(chapter));
+            if (entry.getKey().contains("TAG")) {
+                chapterTemplate.add("TAG", entry.getValue().apply(chapter));
+            } else {
+                chapterTemplate.add(entry.getKey(), entry.getValue().apply(chapter));
+            }
         }
         return chapterTemplate.render();
     }

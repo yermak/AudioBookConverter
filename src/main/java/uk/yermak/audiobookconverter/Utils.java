@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -60,23 +59,25 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, String>> context) {
-        String chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
-                "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
-                "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
-                "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER>. <endif>" +
-                "<if(TAG)><TAG> <endif>" +
-                "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
-                "<if(DURATION)> - <DURATION><endif>";
-
-        ST chapterTemplate = new ST(chapterFormat);
-        Set<Map.Entry<String, Function<Chapter, String>>> entries = context.entrySet();
-        for (Map.Entry<String, Function<Chapter, String>> entry : entries) {
-            if (entry.getKey().contains("TAG")) {
-                chapterTemplate.add("TAG", entry.getValue().apply(chapter));
-            } else {
-                chapterTemplate.add(entry.getKey(), entry.getValue().apply(chapter));
-            }
+        String chapterFormat = AppProperties.getProperty("chapter_format");
+        if (chapterFormat == null) {
+            chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
+                    "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
+                    "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
+                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER>. <endif>" +
+                    "<if(TAG)><TAG> <endif>" +
+                    "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
+                    "<if(DURATION)> - <DURATION><endif>";
+            AppProperties.setProperty("chapter_format", chapterFormat);
         }
+        ST chapterTemplate = new ST(chapterFormat);
+        context.forEach((key, value) -> {
+            if (key.contains("TAG")) {
+                chapterTemplate.add("TAG", value.apply(chapter));
+            } else {
+                chapterTemplate.add(key, value.apply(chapter));
+            }
+        });
         return chapterTemplate.render();
     }
 

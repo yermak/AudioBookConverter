@@ -3,6 +3,8 @@ package uk.yermak.audiobookconverter;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AudioBookInfo {
@@ -15,6 +17,7 @@ public class AudioBookInfo {
     private int bookNumber = 0;
     private int totalTracks = 0;
     private String comment = "";
+    private List<Track> tracks = new ArrayList<>();
 
     public AudioBookInfo() {
     }
@@ -123,6 +126,10 @@ public class AudioBookInfo {
 
     public String toString() {
         return (new Gson()).toJson(this);
+    }
+
+    public List<Track> getTracks() {
+        return tracks;
     }
 }
 

@@ -8,6 +8,8 @@ import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
@@ -59,7 +61,7 @@ public class FFMediaLoader {
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
-        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac");
+        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac");
         private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
         private final String filename;
         private Conversion conversion;
@@ -101,12 +103,19 @@ public class FFMediaLoader {
                     }
                 }
                 logger.debug("Found tags: {} in {}", format.tags, filename);
-
                 AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
+                mediaInfo.setBookInfo(bookInfo);
 
+
+                if (FilenameUtils.getExtension(filename).equalsIgnoreCase("FLAC")) {
+                    File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
+                    if (file.exists()) {
+                        String cue = FileUtils.readFileToString(file, "UTF-8");
+                        parseCueChapters(mediaInfo, cue);
+                    }
+                }
                 logger.info("Created AudioBookInfo {}", bookInfo);
 
-                mediaInfo.setBookInfo(bookInfo);
                 return mediaInfo;
             } catch (IOException e) {
                 logger.error("Failed to load media info", e);
@@ -114,7 +123,53 @@ public class FFMediaLoader {
                 throw e;
             }
         }
+
     }
+
+    static void parseCueChapters(MediaInfoBean mediaInfo, String cue) {
+        AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+        String[] split = StringUtils.split(cue, "\n");
+        for (String line : split) {
+            int i = -1;
+            if (bookInfo.getTracks().isEmpty()) {
+                if ((i = line.indexOf("GENRE")) != -1) bookInfo.setGenre(cleanText(line.substring(i + 5)));
+                if ((i = line.indexOf("TITLE")) != -1) bookInfo.setTitle(cleanText(line.substring(i + 5)));
+                if ((i = line.indexOf("DATE")) != -1) bookInfo.setYear(cleanText(line.substring(i + 4)));
+                if ((i = line.indexOf("PERFORMER")) != -1) bookInfo.setNarrator(cleanText(line.substring(i + 9)));
+            } else {
+                Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 1);
+                if ((i = line.indexOf("TITLE")) != -1) track.setTitle(cleanText(line.substring(i + 5)));
+                if ((i = line.indexOf("PERFORMER")) != -1) track.setWriter(cleanText(line.substring(i + 9)));
+            }
+            if ((i = line.indexOf("TRACK")) != -1) {
+                bookInfo.getTracks().add(new Track(cleanText(line.substring(i + 5))));
+            } else {
+                if ((i = line.indexOf("INDEX 00")) != -1 && bookInfo.getTracks().size() > 1) {
+                    Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 2);
+                    track.setEnd(parseCueTime(line.substring(i + 8)));
+                }
+                if ((i = line.indexOf("INDEX 01")) != -1) {
+                    Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 1);
+                    track.setStart(parseCueTime(line.substring(i + 8)));
+                }
+            }
+        }
+        if (!bookInfo.getTracks().isEmpty()) {
+            bookInfo.getTracks().get(bookInfo.getTracks().size() - 1).setEnd(mediaInfo.getDuration());
+        }
+    }
+
+    private static long parseCueTime(String substring) {
+        String cleanText = cleanText(substring);
+        String[] split = cleanText.split(":");
+        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 10;
+        return time;
+    }
+
+    private static String cleanText(String text) {
+        return StringUtils.remove(StringUtils.trim(text), '"');
+    }
+
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
 
@@ -169,7 +224,6 @@ public class FFMediaLoader {
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
         searchDirs.forEach(d -> findPictures(d).forEach(f -> ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f.getPath())))));
-
     }
 
 

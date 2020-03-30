@@ -14,13 +14,17 @@ public class Chapter implements Organisable, Convertable {
     private Map<String, Function<Chapter, String>> renderMap = new HashMap<>();
 
 
-    public Chapter(Part part, List<MediaInfo> nextMedia) {
+    public Chapter(Part part, List<MediaInfo> media) {
         this.part = part;
-        nextMedia.forEach(mediaInfo -> mediaInfo.setChapter(this));
-        media.addAll(nextMedia);
+        media.forEach(mediaInfo -> mediaInfo.setChapter(this));
+        this.media.addAll(media);
         renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
         renderMap.put("CHAPTER_TEXT", c -> "Chapter");
         renderMap.put("DURATION", Chapter::getDurationString);
+    }
+
+    public Chapter(MediaInfo mediaInfo) {
+        this(null, Collections.singletonList(mediaInfo));
     }
 
     public String getTitle() {

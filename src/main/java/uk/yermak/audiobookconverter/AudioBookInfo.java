@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -20,12 +21,22 @@ public class AudioBookInfo {
 
     public AudioBookInfo(Map<String, String> tags) {
         if (tags != null) {
-            this.setTitle(tags.get("title"));
+            this.setTitle(tags.get("album"));
             this.setWriter(tags.get("artist"));
             this.setNarrator(tags.get("album_artist"));
-            this.setSeries(tags.get("album"));
-            this.setYear(tags.get("year"));
-            this.setComment(tags.get("comment-0"));
+//            this.setSeries(tags.get("album"));
+            if (StringUtils.isNotBlank(tags.get("date"))) {
+                this.setYear(tags.get("date"));
+            }
+            if (StringUtils.isNotBlank(tags.get("year"))) {
+                this.setYear(tags.get("year"));
+            }
+            if (StringUtils.isNotBlank(tags.get("comment"))) {
+                this.setComment(tags.get("comment"));
+            }
+            if (StringUtils.isNotBlank(tags.get("comment-0"))) {
+                this.setComment(tags.get("comment-0"));
+            }
             this.setGenre(tags.get("genre"));
             String trackNumber = tags.get("track number");
             if (trackNumber != null) {

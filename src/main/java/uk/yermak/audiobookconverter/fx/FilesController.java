@@ -77,7 +77,7 @@ public class FilesController {
     public Button stopButton;
 
     private static final String M4B = "m4b";
-    private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma"};
+    private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma", "flac"};
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;

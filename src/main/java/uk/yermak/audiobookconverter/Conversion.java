@@ -47,7 +47,7 @@ public class Conversion {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
 
-        convertable.getMedia().stream().map(MediaInfo::getFileName).forEach(s -> progressCallbacks.put(s, new ProgressCallback(s, refreshable)));
+        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, refreshable)));
 
 
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));

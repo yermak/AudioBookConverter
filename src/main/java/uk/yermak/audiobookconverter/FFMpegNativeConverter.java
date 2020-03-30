@@ -53,6 +53,8 @@ public class FFMpegNativeConverter implements Callable<String> {
             if (mediaInfo.getCodec().equals("aac")) {
                 logger.debug("Transcoding aac stream for {}", outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-ss", toFFMpegTime(mediaInfo.getOffset()),
+                        "-t", toFFMpegTime(mediaInfo.getDuration()),
                         "-i", mediaInfo.getFileName(),
                         "-vn",
                         "-codec:a", "copy",
@@ -63,6 +65,8 @@ public class FFMpegNativeConverter implements Callable<String> {
             } else {
                 logger.debug("Re-encoding to aac for {}", outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-ss", toFFMpegTime(mediaInfo.getOffset()),
+                        "-t", toFFMpegTime(mediaInfo.getDuration()),
                         "-i", mediaInfo.getFileName(),
                         "-vn",
                         "-codec:a", "aac",
@@ -97,6 +101,10 @@ public class FFMpegNativeConverter implements Callable<String> {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
+    }
+
+    static String toFFMpegTime(long time) {
+        return (time / 1000) + "." + time % 1000;
     }
 
 }

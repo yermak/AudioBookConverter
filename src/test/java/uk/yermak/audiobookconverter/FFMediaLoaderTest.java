@@ -48,7 +48,7 @@ public class FFMediaLoaderTest {
         AudioBookInfo bookInfo = new AudioBookInfo();
         MediaInfoBean mediaInfo = new MediaInfoBean("test");
         mediaInfo.setBookInfo(bookInfo);
-        mediaInfo.setDuration(2205071);
+        mediaInfo.setDuration(2305071);
         FFMediaLoader.parseCueChapters(mediaInfo, cue);
         assertEquals(bookInfo.getGenre(), "Classical");
         assertEquals(bookInfo.getTitle(), "Брамс");
@@ -58,21 +58,21 @@ public class FFMediaLoaderTest {
         assertEquals(tracks.size(), 3);
 
         Track track1 = tracks.get(0);
-        assertEquals(track1.getStart(), 320);
-        assertEquals(track1.getEnd(), 1313670);
+        assertEquals(track1.getStart(), 426);
+        assertEquals(track1.getEnd(), 1321093);
         assertEquals(track1.getTrackNo(),"01 AUDIO");
         assertEquals(track1.getTitle(), "Фортепианный концерт ре минор соч. 15 - Maestoso");
         assertEquals(track1.getWriter(), "DeAgostini Classica 1");
 
         Track track2 = tracks.get(1);
-        assertEquals(track2.getStart(), 1321070);
-        assertEquals(track2.getEnd(), 2198150);
+        assertEquals(track2.getStart(), 1321093);
+        assertEquals(track2.getEnd(), 2205093);
         assertEquals(track2.getTitle(), "Фортепианный концерт ре минор соч. 15 - Adagio");
         assertEquals(track2.getWriter(), "DeAgostini Classica 2");
 
         Track track3 = tracks.get(2);
-        assertEquals(track3.getStart(), 2205070);
-        assertEquals(track3.getEnd(), 2205071);
+        assertEquals(track3.getStart(), 2205093);
+        assertEquals(track3.getEnd(), 2305071);
         assertEquals(track3.getTitle(), "Фортепианный концерт ре минор соч. 15 - Rondo. Allegro ma non troppo");
         assertEquals(track3.getWriter(), "DeAgostini Classica 3");
     }

@@ -99,4 +99,9 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     public void setChapter(Chapter chapter) {
         this.chapter = chapter;
     }
+
+    @Override
+    public long getOffset() {
+        return track.getStart();
+    }
 }

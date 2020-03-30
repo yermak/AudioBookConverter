@@ -110,7 +110,7 @@ public class FFMediaLoader {
                 if (FilenameUtils.getExtension(filename).equalsIgnoreCase("FLAC")) {
                     File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
                     if (file.exists()) {
-                        String cue = FileUtils.readFileToString(file, "UTF-8");
+                        String cue = FileUtils.readFileToString(file);
                         parseCueChapters(mediaInfo, cue);
                     }
                 }
@@ -144,13 +144,14 @@ public class FFMediaLoader {
             if ((i = line.indexOf("TRACK")) != -1) {
                 bookInfo.getTracks().add(new Track(cleanText(line.substring(i + 5))));
             } else {
-                if ((i = line.indexOf("INDEX 00")) != -1 && bookInfo.getTracks().size() > 1) {
-                    Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 2);
-                    track.setEnd(parseCueTime(line.substring(i + 8)));
-                }
                 if ((i = line.indexOf("INDEX 01")) != -1) {
+                    long time = parseCueTime(line.substring(i + 8));
+                    if (bookInfo.getTracks().size() > 1) {
+                        Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 2);
+                        track.setEnd(time);
+                    }
                     Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 1);
-                    track.setStart(parseCueTime(line.substring(i + 8)));
+                    track.setStart(time);
                 }
             }
         }
@@ -162,7 +163,7 @@ public class FFMediaLoader {
     private static long parseCueTime(String substring) {
         String cleanText = cleanText(substring);
         String[] split = cleanText.split(":");
-        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 10;
+        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2])*1000 / 75;
         return time;
     }
 

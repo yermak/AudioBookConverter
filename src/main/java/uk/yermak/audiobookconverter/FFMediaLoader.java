@@ -59,7 +59,7 @@ public class FFMediaLoader {
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
-        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2");
+        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac");
         private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
         private final String filename;
         private Conversion conversion;

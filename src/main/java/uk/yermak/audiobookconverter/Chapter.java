@@ -20,6 +20,7 @@ public class Chapter implements Organisable, Convertable {
         media.addAll(nextMedia);
         renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
         renderMap.put("CHAPTER_TEXT", c -> "Chapter");
+        renderMap.put("DURATION", Chapter::getDurationString);
     }
 
     public String getTitle() {
@@ -48,6 +49,10 @@ public class Chapter implements Organisable, Convertable {
     @Override
     public long getDuration() {
         return media.stream().mapToLong(MediaInfo::getDuration).sum();
+    }
+
+    public String getDurationString() {
+        return Utils.formatTime(getDuration());
     }
 
     @Override

@@ -166,7 +166,7 @@ class ChapterEditor {
         customisationBox.getChildren().add(duration);
         duration.setOnAction(event -> {
             if (duration.isSelected()) {
-                context.put("DURATION", c -> Utils.formatTime(c.getDuration()));
+                context.put("DURATION", Chapter::getDurationString);
             } else {
                 context.remove("DURATION");
             }

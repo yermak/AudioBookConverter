@@ -1,11 +1,8 @@
 package uk.yermak.audiobookconverter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
-public class MediaInfoBean implements MediaInfo {
+public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     private String fileName;
     private int channels;
     private int frequency;
@@ -14,7 +11,6 @@ public class MediaInfoBean implements MediaInfo {
     private AudioBookInfo bookInfo;
     private ArtWork artWork;
     private String codec;
-    private Chapter chapter;
 
     public String fileName() {
         return this.fileName;
@@ -91,38 +87,6 @@ public class MediaInfoBean implements MediaInfo {
     }
 
 
-    public int getNumber() {
-        return chapter.getMedia().indexOf(this) + 1;
-    }
-
-    @Override
-    public void split() {
-        List<MediaInfo> currentMedia = new ArrayList<>(chapter.getMedia().subList(0, getNumber() - 1));
-        List<MediaInfo> nextMedia = new ArrayList<>(chapter.getMedia().subList(getNumber() - 1, chapter.getMedia().size()));
-        chapter.getMedia().clear();
-        chapter.getMedia().addAll(currentMedia);
-        chapter.createNextChapter(nextMedia);
-    }
-
-    @Override
-    public void remove() {
-        chapter.getMedia().remove(this);
-        if (chapter.getMedia().isEmpty()) {
-            chapter.remove();
-        }
-    }
-
-    @Override
-    public void moveUp() {
-        if (getNumber() < 2) return;
-        Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber() - 2);
-    }
-
-    @Override
-    public void moveDown() {
-        if (getNumber() > chapter.getMedia().size()) return;
-        Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber());
-    }
 
     public String getFileName() {
         return this.fileName();

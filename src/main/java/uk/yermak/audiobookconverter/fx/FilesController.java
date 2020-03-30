@@ -192,7 +192,7 @@ public class FilesController {
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
         if (chaptersMode) {
             Book book = ConverterApplication.getContext().getBook();
-            Part part = new Part(book, FXCollections.observableArrayList(addedMedia));
+            Part part = new Part(book, FXCollections.observableArrayList(addedMedia.stream().map(Chapter::new).collect(Collectors.toList())));
             book.getParts().add(part);
             updateBookStructure(book, bookStructure.getRoot());
         } else {

@@ -1,4 +1,3 @@
-//decompiled from MetadataBuilder.class
 package uk.yermak.audiobookconverter;
 
 import org.apache.commons.io.FileUtils;

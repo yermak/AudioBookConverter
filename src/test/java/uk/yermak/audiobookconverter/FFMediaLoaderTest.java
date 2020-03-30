@@ -1,7 +1,13 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.collections.ObservableList;
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.Test;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -32,5 +38,42 @@ public class FFMediaLoaderTest {
         assertFalse(posters.contains(art22));
         assertEquals(posters.size(), 2);
 
+    }
+
+
+    @Test
+    public void testParseCueChapters() throws IOException {
+        InputStream stream = this.getClass().getResourceAsStream("/Брамс.cue");
+        String cue = IOUtils.toString(stream, "cp1251");
+        AudioBookInfo bookInfo = new AudioBookInfo();
+        MediaInfoBean mediaInfo = new MediaInfoBean("test");
+        mediaInfo.setBookInfo(bookInfo);
+        mediaInfo.setDuration(2205071);
+        FFMediaLoader.parseCueChapters(mediaInfo, cue);
+        assertEquals(bookInfo.getGenre(), "Classical");
+        assertEquals(bookInfo.getTitle(), "Брамс");
+        assertEquals(bookInfo.getYear(), "2007");
+        assertEquals(bookInfo.getNarrator(), "DeAgostini Classica");
+        List<Track> tracks = bookInfo.getTracks();
+        assertEquals(tracks.size(), 3);
+
+        Track track1 = tracks.get(0);
+        assertEquals(track1.getStart(), 320);
+        assertEquals(track1.getEnd(), 1313670);
+        assertEquals(track1.getTrackNo(),"01 AUDIO");
+        assertEquals(track1.getTitle(), "Фортепианный концерт ре минор соч. 15 - Maestoso");
+        assertEquals(track1.getWriter(), "DeAgostini Classica 1");
+
+        Track track2 = tracks.get(1);
+        assertEquals(track2.getStart(), 1321070);
+        assertEquals(track2.getEnd(), 2198150);
+        assertEquals(track2.getTitle(), "Фортепианный концерт ре минор соч. 15 - Adagio");
+        assertEquals(track2.getWriter(), "DeAgostini Classica 2");
+
+        Track track3 = tracks.get(2);
+        assertEquals(track3.getStart(), 2205070);
+        assertEquals(track3.getEnd(), 2205071);
+        assertEquals(track3.getTitle(), "Фортепианный концерт ре минор соч. 15 - Rondo. Allegro ma non troppo");
+        assertEquals(track3.getWriter(), "DeAgostini Classica 3");
     }
 }

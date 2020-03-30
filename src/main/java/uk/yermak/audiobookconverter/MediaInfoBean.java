@@ -121,6 +121,11 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.chapter = chapter;
     }
 
+    @Override
+    public long getOffset() {
+        return 0;
+    }
+
     public MediaInfoBean(final String fileName) {
         this.fileName = fileName;
         this.channels = 2;

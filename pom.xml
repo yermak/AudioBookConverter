@@ -71,7 +71,7 @@
             <artifactId>ffmpeg</artifactId>
             <version>0.6.3-SHANPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Yermak/Projects/AudioBookConverter/lib/ffmpeg-0.6.3-SNAPSHOT.jar</systemPath>
+            <systemPath>${basedir}/lib/ffmpeg-0.6.3-SNAPSHOT.jar</systemPath>
         </dependency>
 
         <dependency>

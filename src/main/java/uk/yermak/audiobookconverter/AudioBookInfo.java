@@ -27,6 +27,9 @@ public class AudioBookInfo {
             this.setTitle(tags.get("album"));
             this.setWriter(tags.get("artist"));
             this.setNarrator(tags.get("album_artist"));
+            if (StringUtils.isNotBlank(tags.get("narratedby"))) {
+                this.setNarrator(tags.get("narratedby"));
+            }
 //            this.setSeries(tags.get("album"));
             if (StringUtils.isNotBlank(tags.get("date"))) {
                 this.setYear(tags.get("date"));

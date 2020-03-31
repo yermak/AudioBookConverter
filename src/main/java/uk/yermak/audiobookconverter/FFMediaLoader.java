@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import javafx.application.Platform;
 import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.probe.FFmpegChapter;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
@@ -102,18 +103,17 @@ public class FFMediaLoader {
                         mediaInfo.setArtWork(artWork);
                     }
                 }
+
                 logger.debug("Found tags: {} in {}", format.tags, filename);
                 AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
                 mediaInfo.setBookInfo(bookInfo);
 
+                processEmbededChapter(mediaInfo, probeResult.getChapters());
 
                 if (FilenameUtils.getExtension(filename).equalsIgnoreCase("FLAC")) {
-                    File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
-                    if (file.exists()) {
-                        String cue = FileUtils.readFileToString(file);
-                        parseCueChapters(mediaInfo, cue);
-                    }
+                        parseCueChapters(mediaInfo);
                 }
+
                 logger.info("Created AudioBookInfo {}", bookInfo);
 
                 return mediaInfo;
@@ -124,9 +124,30 @@ public class FFMediaLoader {
             }
         }
 
+        private void processEmbededChapter(MediaInfoBean mediaInfo, List<FFmpegChapter> chapters) {
+            AudioBookInfo bookInfo = mediaInfo.getBookInfo();
+            for (int i = 0; i < chapters.size(); i++) {
+                FFmpegChapter chapter = chapters.get(i);
+                Track track = new Track(StringUtils.leftPad(String.valueOf(i+1),3, "00"));
+                track.setTitle(chapter.tags.title);
+                track.setStart((long) (Double.parseDouble(chapter.start_time)*1000));
+                track.setEnd((long) (Double.parseDouble(chapter.end_time)*1000));
+                bookInfo.getTracks().add(track);
+            }
+        }
     }
 
-    static void parseCueChapters(MediaInfoBean mediaInfo, String cue) {
+    static void parseCueChapters(MediaInfoBean mediaInfo) throws IOException {
+        String filename = mediaInfo.getFileName();
+        File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
+        if (file.exists()) {
+            String cue = FileUtils.readFileToString(file);
+
+            parseCue(mediaInfo, cue);
+        }
+    }
+
+    static void parseCue(MediaInfoBean mediaInfo, String cue) {
         AudioBookInfo bookInfo = mediaInfo.getBookInfo();
         String[] split = StringUtils.split(cue, "\n");
         for (String line : split) {

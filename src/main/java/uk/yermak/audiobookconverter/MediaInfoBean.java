@@ -87,7 +87,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     }
 
 
-
     public String getFileName() {
         return this.fileName();
     }
@@ -145,7 +144,7 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName());
+        return Objects.hash(getFileName() + getDuration());
     }
 
 }

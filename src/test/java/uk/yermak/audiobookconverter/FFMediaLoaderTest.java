@@ -49,7 +49,7 @@ public class FFMediaLoaderTest {
         MediaInfoBean mediaInfo = new MediaInfoBean("test");
         mediaInfo.setBookInfo(bookInfo);
         mediaInfo.setDuration(2305071);
-        FFMediaLoader.parseCueChapters(mediaInfo, cue);
+        FFMediaLoader.parseCue(mediaInfo, cue);
         assertEquals(bookInfo.getGenre(), "Classical");
         assertEquals(bookInfo.getTitle(), "Брамс");
         assertEquals(bookInfo.getYear(), "2007");

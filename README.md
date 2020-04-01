@@ -5,7 +5,7 @@ Overtime AudioBookConverter evolved and currently can support converion of most 
 
 
 <a href="https://paypal.me/pools/c/8l28GKocaS">Donate</a> if you have found AudioBookConverter helpful!
-======
+-----
 
 
 Supported source formats:
@@ -29,7 +29,7 @@ Main features:
 Installation & dependencies:
 -----
 Just download the file from link bellow, no QuickTime or iTunes required.
------
+=======
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 
 Usage:

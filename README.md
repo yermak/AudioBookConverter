@@ -29,6 +29,7 @@ Main features:
 Installation & dependencies:
 -----
 Just download the file from link bellow, no QuickTime or iTunes required.
+-----
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 
 Usage:

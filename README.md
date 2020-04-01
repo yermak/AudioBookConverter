@@ -26,10 +26,8 @@ Main features:
 * Instant playback: listen what you are going to encode
 * Simple and lightweigh user interface: Convert a book with few clicks
 
-Installation & dependencies:
------
-Just download the file from link bellow, no QuickTime or iTunes required.
-<br/>
+Just download the file from link bellow, no QuickTime or iTunes is required.
+----
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 =======
 

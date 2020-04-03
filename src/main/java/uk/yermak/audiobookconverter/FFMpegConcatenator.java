@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,20 +48,34 @@ public class FFMpegConcatenator {
 
         Process process = null;
         try {
-
-            ProcessBuilder ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
-                    "-protocol_whitelist", "file,pipe,concat",
-                    "-vn",
-                    "-f", "concat",
-                    "-safe", "0",
-                    "-i", fileListFileName,
-                    "-i", metaDataFileName,
-                    "-map_metadata", "1",
-                    "-f", "ipod",
-                    "-c:a", "copy",
-                    "-movflags", "+faststart",
-                    "-progress", progressParser.getUri().toString(),
-                    outputFileName);
+            String extension = FilenameUtils.getExtension(outputFileName);
+            ProcessBuilder ffmpegProcessBuilder;
+            if ("MP3".equalsIgnoreCase(extension)) {
+                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-protocol_whitelist", "file,pipe,concat",
+                        "-vn",
+                        "-f", "concat",
+                        "-safe", "0",
+                        "-i", fileListFileName,
+                        "-f", "mp3",
+                        "-c:a", "copy",
+                        "-progress", progressParser.getUri().toString(),
+                        outputFileName);
+            } else {
+                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
+                        "-protocol_whitelist", "file,pipe,concat",
+                        "-vn",
+                        "-f", "concat",
+                        "-safe", "0",
+                        "-i", fileListFileName,
+                        "-i", metaDataFileName,
+                        "-map_metadata", "1",
+                        "-f", "ipod",
+                        "-c:a", "copy",
+                        "-movflags", "+faststart",
+                        "-progress", progressParser.getUri().toString(),
+                        outputFileName);
+            }
 
             process = ffmpegProcessBuilder.start();
 

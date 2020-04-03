@@ -24,7 +24,7 @@ public class AudioBookInfo {
 
     public AudioBookInfo(Map<String, String> tags) {
         if (tags != null) {
-            this.setTitle(tags.get("album"));
+            this.setTitle(tags.get("title"));
             this.setWriter(tags.get("artist"));
             this.setNarrator(tags.get("album_artist"));
             if (StringUtils.isNotBlank(tags.get("narratedby"))) {
@@ -33,7 +33,7 @@ public class AudioBookInfo {
             if (StringUtils.isNotBlank(tags.get("composer"))) {
                 this.setNarrator(tags.get("composer"));
             }
-//            this.setSeries(tags.get("album"));
+            this.setSeries(tags.get("album"));
             if (StringUtils.isNotBlank(tags.get("date"))) {
                 this.setYear(tags.get("date"));
             }

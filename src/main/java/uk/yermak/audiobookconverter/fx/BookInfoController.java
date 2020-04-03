@@ -109,7 +109,7 @@ public class BookInfoController {
 
 
     private void copyTags(AudioBookInfo bookInfo) {
-        title.setText(bookInfo.getTitle());
+        title.setText(bookInfo.getSeries());
         writer.setText(bookInfo.getWriter());
         narrator.setText(bookInfo.getNarrator());
         genre.getEditor().setText(bookInfo.getGenre());

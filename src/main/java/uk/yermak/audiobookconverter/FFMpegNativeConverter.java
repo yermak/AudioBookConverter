@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,25 @@ public class FFMpegNativeConverter implements Callable<String> {
 
             ProcessBuilder ffmpegProcessBuilder;
             OutputParameters outputParameters = conversion.getOutputParameters();
-            if (mediaInfo.getCodec().equals("aac")) {
+
+            String extension = FilenameUtils.getExtension(outputFileName);
+            String format = "ipod";
+            String codec = "aac";
+
+            switch (extension) {
+                case "mp3": {
+                    format = "mp3";
+                    codec = "libmp3lame";
+                    break;
+                }
+                case "ogg": {
+                    format = "ogg";
+                    codec = "libopus";
+                    break;
+                }
+            }
+
+            if (mediaInfo.getCodec().equals(codec)) {
                 logger.debug("Transcoding aac stream for {}", outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
                         "-ss", toFFMpegTime(mediaInfo.getOffset()),
@@ -60,7 +79,7 @@ public class FFMpegNativeConverter implements Callable<String> {
                         "-vn",
                         "-codec:a", "copy",
                         "-t", toFFMpegTime(mediaInfo.getDuration()),
-                        "-f", "ipod",
+                        "-f", format,
                         "-progress", progressParser.getUri().toString(),
                         outputFileName
                 );
@@ -70,8 +89,8 @@ public class FFMpegNativeConverter implements Callable<String> {
                         "-ss", toFFMpegTime(mediaInfo.getOffset()),
                         "-i", mediaInfo.getFileName(),
                         "-vn",
-                        "-codec:a", "aac",
-                        "-f", "ipod",
+                        "-codec:a", codec,
+                        "-f", format,
                         outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
                         "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
                         "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),

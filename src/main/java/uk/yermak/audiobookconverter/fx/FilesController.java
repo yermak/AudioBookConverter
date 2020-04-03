@@ -77,7 +77,12 @@ public class FilesController {
     public Button stopButton;
 
     private static final String M4B = "m4b";
-    private final static String[] FILE_EXTENSIONS = new String[]{"mp3", "m4a", M4B, "wma", "flac"};
+    private static final String M4A = "m4a";
+    public static final String MP3 = "mp3";
+    public static final String WMA = "wma";
+    public static final String FLAC = "flac";
+    public static final String OGG = "ogg";
+    private final static String[] FILE_EXTENSIONS = new String[]{MP3, M4A, M4B, WMA, FLAC};
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
@@ -342,8 +347,9 @@ public class FilesController {
                 for (int i = 0; i < chapters.size(); i++) {
                     Chapter chapter = chapters.get(i);
                     String finalDesination = outputDestination;
+                    String extension = FilenameUtils.getExtension(finalDesination);
                     if (chapters.size() > 1) {
-                        finalDesination = finalDesination.replace("." + M4B, ", Chapter " + (i + 1) + "." + M4B);
+                        finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
                     }
                     String finalName = new File(finalDesination).getName();
                     ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
@@ -354,7 +360,8 @@ public class FilesController {
                     Part part = parts.get(i);
                     String finalDesination = outputDestination;
                     if (parts.size() > 1) {
-                        finalDesination = finalDesination.replace("." + M4B, ", Part " + (i + 1) + "." + M4B);
+                        String extension = FilenameUtils.getExtension(finalDesination);
+                        finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
                     }
                     String finalName = new File(finalDesination).getName();
                     ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getMedia().size(), part.getDuration(), finalName);
@@ -393,8 +400,11 @@ public class FilesController {
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(M4B, "*." + M4B)
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter(M4B, "*." + M4B),
+                new FileChooser.ExtensionFilter(M4A, "*." + M4A),
+                new FileChooser.ExtensionFilter(MP3, "*." + MP3),
+                new FileChooser.ExtensionFilter(OGG, "*." + OGG)
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;

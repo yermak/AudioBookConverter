@@ -23,7 +23,7 @@ public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "."+extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {
@@ -108,7 +108,8 @@ public class Utils {
         } else {
             mp3Filename = result;
         }
-        return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
+        return mp3Filename;
+//        return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
     }
 
     public static long checksumCRC32(File file) {

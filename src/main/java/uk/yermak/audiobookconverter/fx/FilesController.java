@@ -150,7 +150,7 @@ public class FilesController {
         );
 */
         //TOODO: this section may not work
-  /*      media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getList().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
+  /*      media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getReencodingOptions().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
         if (listener != null) {
             fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
         }
@@ -219,7 +219,6 @@ public class FilesController {
             if (file.isDirectory()) {
                 SuffixFileFilter suffixFileFilter = new SuffixFileFilter(toSuffixes(FILE_EXTENSIONS), IOCase.INSENSITIVE);
                 Collection<File> nestedFiles = FileUtils.listFiles(file, suffixFileFilter, TrueFileFilter.INSTANCE);
-//                Collection<File> nestedFiles = FileUtils.listFiles(file, FILE_EXTENSIONS, true);
                 nestedFiles.stream().map(File::getPath).forEach(fileNames::add);
             } else {
                 boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()).toLowerCase());
@@ -342,12 +341,14 @@ public class FilesController {
         if (outputDestination != null) {
             Book book = context.getBook();
             ObservableList<Part> parts = book.getParts();
+            String extension = FilenameUtils.getExtension(outputDestination);
+            ConverterApplication.getContext().getOutputParameters().setupFormat(extension);
+
             if (split.isSelected()) {
                 List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
                 for (int i = 0; i < chapters.size(); i++) {
                     Chapter chapter = chapters.get(i);
                     String finalDesination = outputDestination;
-                    String extension = FilenameUtils.getExtension(finalDesination);
                     if (chapters.size() > 1) {
                         finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
                     }
@@ -360,7 +361,6 @@ public class FilesController {
                     Part part = parts.get(i);
                     String finalDesination = outputDestination;
                     if (parts.size() > 1) {
-                        String extension = FilenameUtils.getExtension(finalDesination);
                         finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
                     }
                     String finalName = new File(finalDesination).getName();
@@ -375,21 +375,6 @@ public class FilesController {
             fileList.getItems().clear();
             chaptersMode = false;
         }
-    }
-
-
-    private String selectOutputDirectory() {
-        JfxEnv env = ConverterApplication.getEnv();
-
-        String outputDestination;
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        String outputFolder = AppProperties.getProperty("output.folder");
-        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
-        directoryChooser.setTitle("Select destination folder for encoded files");
-        File selectedDirectory = directoryChooser.showDialog(env.getWindow());
-        AppProperties.setProperty("output.folder", selectedDirectory.getAbsolutePath());
-        outputDestination = selectedDirectory.getPath();
-        return outputDestination;
     }
 
     private static String selectOutputFile(AudioBookInfo audioBookInfo) {

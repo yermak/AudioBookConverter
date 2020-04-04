@@ -90,7 +90,6 @@ public class ConversionContext {
         });
         conversionHolder.get().start(convertable, output, conversionProgress, outputParameters.get(), bookInfo.get(), posters);
         saveGenres();
-
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);
         conversionHolder.set(newConversion);

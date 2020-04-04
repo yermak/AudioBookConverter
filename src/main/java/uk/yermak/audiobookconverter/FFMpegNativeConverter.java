@@ -2,11 +2,9 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -24,7 +22,6 @@ public class FFMpegNativeConverter implements Callable<String> {
     private final String outputFileName;
     private ProgressCallback callback;
     private Process process;
-    private final static String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
     private ProgressParser progressParser = null;
 
 
@@ -52,53 +49,12 @@ public class FFMpegNativeConverter implements Callable<String> {
             ProcessBuilder ffmpegProcessBuilder;
             OutputParameters outputParameters = conversion.getOutputParameters();
 
-            String extension = FilenameUtils.getExtension(outputFileName);
-            String format = "ipod";
-            String codec = "aac";
-
-            switch (extension) {
-                case "mp3": {
-                    format = "mp3";
-                    codec = "libmp3lame";
-                    break;
-                }
-                case "ogg": {
-                    format = "ogg";
-                    codec = "libopus";
-                    break;
-                }
-            }
-
-            if (mediaInfo.getCodec().equals(codec)) {
-                logger.debug("Transcoding aac stream for {}", outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
-                        "-ss", toFFMpegTime(mediaInfo.getOffset()),
-                        "-i", mediaInfo.getFileName(),
-                        "-map_metadata", "-1",
-                        "-map_chapters", "-1",
-                        "-vn",
-                        "-codec:a", "copy",
-                        "-t", toFFMpegTime(mediaInfo.getDuration()),
-                        "-f", format,
-                        "-progress", progressParser.getUri().toString(),
-                        outputFileName
-                );
+            if (outputParameters.needReencode(mediaInfo.getCodec())) {
+                logger.debug("Re-encoding to {} for {}", outputParameters.format, outputFileName);
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
             } else {
-                logger.debug("Re-encoding to aac for {}", outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(FFMPEG,
-                        "-ss", toFFMpegTime(mediaInfo.getOffset()),
-                        "-i", mediaInfo.getFileName(),
-                        "-vn",
-                        "-codec:a", codec,
-                        "-f", format,
-                        outputParameters.getFFMpegQualityParameter(), outputParameters.getFFMpegQualityValue(),
-                        "-ar", String.valueOf(outputParameters.getFFMpegFrequencyValue()),
-                        "-ac", String.valueOf(outputParameters.getFFMpegChannelsValue()),
-                        "-t", toFFMpegTime(mediaInfo.getDuration()),
-                        "-cutoff", outputParameters.getCutoffValue(),
-                        "-progress", progressParser.getUri().toString(),
-                        outputFileName
-                );
+                logger.debug("Transcoding {} stream for {}", outputParameters.format, outputFileName);
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
             }
             process = ffmpegProcessBuilder.start();
 
@@ -124,8 +80,5 @@ public class FFMpegNativeConverter implements Callable<String> {
         }
     }
 
-    static String toFFMpegTime(long time) {
-        return (time / 1000) + "." + time % 1000;
-    }
 
 }

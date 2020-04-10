@@ -79,7 +79,7 @@ public class FilesController {
     public static final String WMA = "wma";
     public static final String FLAC = "flac";
     public static final String OGG = "ogg";
-    private final static String[] FILE_EXTENSIONS = new String[]{MP3, M4A, M4B, WMA, FLAC};
+    private final static String[] FILE_EXTENSIONS = new String[]{MP3, M4A, M4B, WMA, FLAC, OGG};
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;

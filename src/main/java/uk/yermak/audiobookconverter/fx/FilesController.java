@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
+import com.google.common.collect.ImmutableSet;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -79,7 +80,7 @@ public class FilesController {
     public static final String WMA = "wma";
     public static final String FLAC = "flac";
     public static final String OGG = "ogg";
-    private final static String[] FILE_EXTENSIONS = new String[]{MP3, M4A, M4B, WMA, FLAC, OGG};
+    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG};
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
@@ -203,23 +204,26 @@ public class FilesController {
         }
     }
 
-    private static String[] toSuffixes(final String[] extensions) {
+    private static String[] toSuffixes(String prefix, final String[] extensions) {
         final String[] suffixes = new String[extensions.length];
         for (int i = 0; i < extensions.length; i++) {
-            suffixes[i] = "." + extensions[i];
+            suffixes[i] = prefix + extensions[i];
         }
         return suffixes;
     }
 
     private List<String> collectFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
+        List<String> strings = Arrays.asList(FILE_EXTENSIONS);
+        ImmutableSet<String> extensions = ImmutableSet.copyOf(FILE_EXTENSIONS);
+
         for (File file : files) {
             if (file.isDirectory()) {
-                SuffixFileFilter suffixFileFilter = new SuffixFileFilter(toSuffixes(FILE_EXTENSIONS), IOCase.INSENSITIVE);
+                SuffixFileFilter suffixFileFilter = new SuffixFileFilter(toSuffixes(".", FILE_EXTENSIONS), IOCase.INSENSITIVE);
                 Collection<File> nestedFiles = FileUtils.listFiles(file, suffixFileFilter, TrueFileFilter.INSTANCE);
                 nestedFiles.stream().map(File::getPath).forEach(fileNames::add);
             } else {
-                boolean allowedFileExtension = Arrays.asList(FILE_EXTENSIONS).contains(FilenameUtils.getExtension(file.getName()).toLowerCase());
+                boolean allowedFileExtension = extensions.contains(FilenameUtils.getExtension(file.getName()).toLowerCase());
                 if (allowedFileExtension) {
                     fileNames.add(file.getPath());
                 }
@@ -242,9 +246,8 @@ public class FilesController {
 
         fileChooser.setTitle("Select " + filetypes.toString() + " files for conversion");
 
-        for (String fileExtension : FILE_EXTENSIONS) {
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(fileExtension, "*." + fileExtension));
-        }
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio", Arrays.asList(toSuffixes("*.", FILE_EXTENSIONS))));
+
 
         List<File> files = fileChooser.showOpenMultipleDialog(window);
         if (files != null) {

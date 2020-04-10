@@ -69,10 +69,7 @@ public class FilesController {
 
     @FXML
     public Button startButton;
-    @FXML
-    public Button pauseButton;
-    @FXML
-    public Button stopButton;
+
 
     private static final String M4B = "m4b";
     private static final String M4A = "m4a";
@@ -399,21 +396,6 @@ public class FilesController {
         return file.getPath();
     }
 
-
-    public void pause(ActionEvent actionEvent) {
-        ConversionContext context = ConverterApplication.getContext();
-        if (context.isPaused()) {
-            context.resumeConversions();
-            pauseButton.setText("Pause all");
-        } else {
-            context.pauseConversions();
-            pauseButton.setText("Resume all");
-        }
-    }
-
-    public void stop(ActionEvent actionEvent) {
-        ConverterApplication.getContext().stopConversions();
-    }
 
 
     public void importChapters(ActionEvent actionEvent) {

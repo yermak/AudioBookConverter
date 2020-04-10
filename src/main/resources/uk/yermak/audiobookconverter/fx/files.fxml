@@ -95,7 +95,7 @@
                         <SplitPane/>
                         <Label text="Chapters mode" textAlignment="CENTER" alignment="CENTER">
                             <font>
-                                <Font name="Arial Black" size="12.0"/>
+                                <Font size="16.0"/>
                             </font>
                         </Label>
                         <SplitPane/>
@@ -139,50 +139,38 @@
                         <SplitPane/>
                         <Label text="Split book file by" textAlignment="CENTER" alignment="CENTER">
                             <font>
-                                <Font name="Arial Black" size="12.0"/>
+                                <Font size="16.0"/>
                             </font>
                         </Label>
-                        <SplitPane/>
-
 
                         <fx:define>
                             <ToggleGroup fx:id="split_radio"/>
                         </fx:define>
-
+                        <HBox spacing="5">
                         <RadioButton fx:id="split_by_parts" text="Parts"
                                      toggleGroup="$split_radio" onAction="#splitByParts" selected="true" wrapText="false"/>
                         <RadioButton fx:id="split_by_chapters" text="Chapters"
                                      toggleGroup="$split_radio" onAction="#splitByChapter" selected="false" wrapText="false" />
 
-
+                        </HBox>
                         <SplitPane/>
+<!--
                         <Label text="Conversion" textAlignment="CENTER" alignment="CENTER">
                             <font>
                                 <Font name="Arial Black" size="12.0"/>
                             </font>
                         </Label>
                         <SplitPane/>
+-->
 
                         <Button fx:id="startButton" text="Start" disable="false"
                                 minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#start">
+                            <font>
+                                <Font size="16.0"/>
+                            </font>
                             <tooltip>
                                 <Tooltip text="Start conversion of files"/>
-                            </tooltip>
-                        </Button>
-                        <Button fx:id="pauseButton" text="Pause all"
-                                minWidth="${screen.visualBounds.width * 0.05}"
-                                GridPane.fillHeight="true"
-                                onAction="#pause">
-                            <tooltip>
-                                <Tooltip text="Pause conversion of files"/>
-                            </tooltip>
-                        </Button>
-                        <Button fx:id="stopButton" text="Stop all"
-                                minWidth="${screen.visualBounds.width * 0.05}"
-                                onAction="#stop">
-                            <tooltip>
-                                <Tooltip text="Stop conversion of files"/>
                             </tooltip>
                         </Button>
                     </VBox>

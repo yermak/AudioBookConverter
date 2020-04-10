@@ -53,7 +53,26 @@
             <fx:include source="/uk/yermak/audiobookconverter/fx/tuning.fxml"/>
         </Tab>-->
         <Tab text="Queue" closable="false" fx:id="queueTab">
-            <ListView fx:id="progressQueue" prefHeight="-Infinity"/>
+            <VBox>
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="pauseButton" text="Pause all"
+                        minWidth="${screen.visualBounds.width * 0.05}"
+                        GridPane.fillHeight="true"
+                        onAction="#pause">
+                    <tooltip>
+                        <Tooltip text="Pause conversion of files"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="stopButton" text="Stop all"
+                        minWidth="${screen.visualBounds.width * 0.05}"
+                        onAction="#stop">
+                    <tooltip>
+                        <Tooltip text="Stop conversion of files"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+            <ListView fx:id="progressQueue" prefHeight="Infinity" minHeight="250"/>
+            </VBox>
         </Tab>
     </TabPane>
 

@@ -55,9 +55,6 @@ public class FilesController {
     public Tab filesTab;
 
     @FXML
-    private CheckBox split;
-
-    @FXML
     ListView<MediaInfo> fileList;
 
     @FXML
@@ -86,6 +83,7 @@ public class FilesController {
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
+    private boolean split;
 //    private boolean filePerChapter;
 
 
@@ -344,7 +342,7 @@ public class FilesController {
             String extension = FilenameUtils.getExtension(outputDestination);
             ConverterApplication.getContext().getOutputParameters().setupFormat(extension);
 
-            if (split.isSelected()) {
+            if (split) {
                 List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
                 for (int i = 0; i < chapters.size(); i++) {
                     Chapter chapter = chapters.get(i);
@@ -490,4 +488,11 @@ public class FilesController {
         }
     }
 
+    public void splitByParts(ActionEvent actionEvent) {
+        this.split = false;
+    }
+
+    public void splitByChapter(ActionEvent actionEvent) {
+        this.split = true;
+    }
 }

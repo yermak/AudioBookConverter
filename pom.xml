@@ -10,12 +10,13 @@
 
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
+        <javafx.version>14</javafx.version>
     </properties>
 
 
@@ -27,6 +28,36 @@
     </repositories>-->
 
     <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -37,7 +68,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
+            <version>3.8.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -46,13 +77,13 @@
             <version>8.40.14</version>
         </dependency>
 
-<!--
-        <dependency>
-            <groupId>net.bramp.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>0.6.2</version>
-        </dependency>
--->
+        <!--
+                <dependency>
+                    <groupId>net.bramp.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>0.6.2</version>
+                </dependency>
+        -->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -70,10 +101,10 @@
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>0.6.3-SNAPSHOT</version>
-<!--
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/ffmpeg-0.6.3-SNAPSHOT.jar</systemPath>
--->
+            <!--
+                        <scope>system</scope>
+                        <systemPath>${basedir}/lib/ffmpeg-0.6.3-SNAPSHOT.jar</systemPath>
+            -->
         </dependency>
 
         <dependency>
@@ -107,9 +138,19 @@
 
         <plugins>
             <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <mainClass>ConverterApplication</mainClass>
+                    <executable>C:\Users\Yermak\Programs\Java\jdk-14\bin\java.exe</executable>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -175,37 +216,57 @@
             </plugin>
 
             <plugin>
-                <groupId>com.zenjava</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.8.3</version>
-                <configuration>
-                    <vendor>https://github.com/yermak</vendor>
-                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
-                    <bundler>EXE</bundler>
-
-                    <bundleArguments>
-                        <runtime>${java.home}</runtime>
-                    </bundleArguments>
-                    <verbose>true</verbose>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- required before build-native -->
-                        <id>create-jfxjar</id>
+                        <id>installer</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>build-jar</goal>
+                            <goal>single</goal>
                         </goals>
-                    </execution>
-                    <execution>
-                        <id>create-native</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build-native</goal>
-                        </goals>
+                        <configuration>
+                            <descriptor>src/main/deploy/assembly/package-zip.xml</descriptor>
+                            <outputDirectory>target/dir</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+                        <plugin>
+                            <groupId>com.zenjava</groupId>
+                            <artifactId>javafx-maven-plugin</artifactId>
+                            <version>8.8.3</version>
+                            <configuration>
+                                <vendor>https://github.com/yermak</vendor>
+                                <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
+                                <bundler>EXE</bundler>
+
+                                <bundleArguments>
+                                    <runtime>${java.home}</runtime>
+                                </bundleArguments>
+                                <verbose>true</verbose>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    &lt;!&ndash; required before build-native &ndash;&gt;
+                                    <id>create-jfxjar</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>build-jar</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>create-native</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>build-native</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+            -->
 
         </plugins>
     </build>

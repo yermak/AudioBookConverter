@@ -109,7 +109,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName()+getDuration()) ;
+        return Objects.hash(getFileName() + getDuration());
     }
 
 }

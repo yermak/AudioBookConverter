@@ -28,7 +28,6 @@ public class OutputParameters {
         format = Format.instance(extension);
     }
 
-
     public enum Format {
         M4B("ipod", "aac") {
         }, MP3("mp3", "libmp3lame") {
@@ -46,13 +45,14 @@ public class OutputParameters {
                 return Arrays.asList(strings);
             }
         }, OGG("ogg", "libopus") {
-
             @Override
             public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
                 List<String> options = new ArrayList<>();
                 options.add(FFMPEG);
-                options.add("-ss");
-                options.add(toFFMpegTime(mediaInfo.getOffset()));
+                if (mediaInfo.getOffset() != -1) {
+                    options.add("-ss");
+                    options.add(toFFMpegTime(mediaInfo.getOffset()));
+                }
                 options.add("-i");
                 options.add(mediaInfo.getFileName());
                 options.add("-vn");
@@ -64,8 +64,10 @@ public class OutputParameters {
                 options.add(outputParameters.getFFMpegQualityValue());
                 options.add("-ac");
                 options.add(String.valueOf(outputParameters.getFFMpegChannelsValue()));
-                options.add("-t");
-                options.add(toFFMpegTime(mediaInfo.getDuration()));
+                if (mediaInfo.getOffset() != -1) {
+                    options.add("-t");
+                    options.add(toFFMpegTime(mediaInfo.getDuration()));
+                }
                 options.add("-cutoff");
                 options.add(outputParameters.getCutoffValue());
                 options.add("-progress");
@@ -105,8 +107,10 @@ public class OutputParameters {
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
             options.add(FFMPEG);
-            options.add("-ss");
-            options.add(toFFMpegTime(mediaInfo.getOffset()));
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-ss");
+                options.add(toFFMpegTime(mediaInfo.getOffset()));
+            }
             options.add("-i");
             options.add(mediaInfo.getFileName());
             options.add("-vn");
@@ -118,8 +122,10 @@ public class OutputParameters {
             options.add(outputParameters.getFFMpegQualityValue());
             options.add("-ac");
             options.add(String.valueOf(outputParameters.getFFMpegChannelsValue()));
-            options.add("-t");
-            options.add(toFFMpegTime(mediaInfo.getDuration()));
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-t");
+                options.add(toFFMpegTime(mediaInfo.getDuration()));
+            }
             options.add("-cutoff");
             options.add(outputParameters.getCutoffValue());
             options.add("-progress");
@@ -129,18 +135,31 @@ public class OutputParameters {
         }
 
         public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
-            String[] strings = {FFMPEG,
-                    "-ss", toFFMpegTime(mediaInfo.getOffset()),
-                    "-i", mediaInfo.getFileName(),
-                    "-map_metadata", "-1",
-                    "-map_chapters", "-1",
-                    "-vn",
-                    "-codec:a", "copy",
-                    "-t", toFFMpegTime(mediaInfo.getDuration()),
-                    "-f", format,
-                    "-progress", progressUri,
-                    outputFileName};
-            return Arrays.asList(strings);
+            List<String> options = new ArrayList<>();
+            options.add(FFMPEG);
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-ss");
+                options.add(toFFMpegTime(mediaInfo.getOffset()));
+            }
+            options.add("-i");
+            options.add(mediaInfo.getFileName());
+            options.add("-map_metadata");
+            options.add("-1");
+            options.add("-map_chapters");
+            options.add("-1");
+            options.add("-vn");
+            options.add("-codec:a");
+            options.add("copy");
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-t");
+                options.add(toFFMpegTime(mediaInfo.getDuration()));
+            }
+            options.add("-f");
+            options.add(format);
+            options.add("-progress");
+            options.add(progressUri);
+            options.add(outputFileName);
+            return options;
         }
 
         public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {

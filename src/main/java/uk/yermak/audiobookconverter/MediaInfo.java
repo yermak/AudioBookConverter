@@ -34,6 +34,8 @@ public interface MediaInfo extends Organisable {
     void setChapter(Chapter chapter);
 
     long getOffset();
+
+
 }
 
         

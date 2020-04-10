@@ -122,8 +122,9 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public long getOffset() {
-        return 0;
+        return -1;
     }
+
 
     public MediaInfoBean(final String fileName) {
         this.fileName = fileName;

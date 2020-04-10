@@ -51,7 +51,7 @@
 
         <Accordion GridPane.columnIndex="1" GridPane.rowIndex="1" expandedPane="$filePane">
             <panes>
-                <TitledPane fx:id="filePane" text="Organise">
+                <TitledPane fx:id="filePane" text="Actions">
                     <VBox spacing="5">
                         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#addFiles"
@@ -136,12 +136,33 @@
                             </tooltip>
                         </Button>
 
+                        <SplitPane/>
+                        <Label text="Split book file by" textAlignment="CENTER" alignment="CENTER">
+                            <font>
+                                <Font name="Arial Black" size="12.0"/>
+                            </font>
+                        </Label>
+                        <SplitPane/>
 
-                    </VBox>
-                </TitledPane>
 
-                <TitledPane fx:id="jobPanes" text="Convert">
-                    <VBox spacing="5">
+                        <fx:define>
+                            <ToggleGroup fx:id="split_radio"/>
+                        </fx:define>
+
+                        <RadioButton fx:id="split_by_parts" text="Parts"
+                                     toggleGroup="$split_radio" onAction="#splitByParts" selected="true" wrapText="false"/>
+                        <RadioButton fx:id="split_by_chapters" text="Chapters"
+                                     toggleGroup="$split_radio" onAction="#splitByChapter" selected="false" wrapText="false" />
+
+
+                        <SplitPane/>
+                        <Label text="Convert" textAlignment="CENTER" alignment="CENTER">
+                            <font>
+                                <Font name="Arial Black" size="12.0"/>
+                            </font>
+                        </Label>
+                        <SplitPane/>
+
                         <Button fx:id="startButton" text="Start" disable="false"
                                 minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#start">
@@ -164,14 +185,6 @@
                                 <Tooltip text="Stop conversion of files"/>
                             </tooltip>
                         </Button>
-                        <HBox >
-                            <CheckBox fx:id="split"/>
-                            <Label text=" Split">
-                                <tooltip>
-                                    <Tooltip text="Split book by chapters or original files depending on the mode"/>
-                                </tooltip>
-                            </Label>
-                        </HBox>
                     </VBox>
                 </TitledPane>
 

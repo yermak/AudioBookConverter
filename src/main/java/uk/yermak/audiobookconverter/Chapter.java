@@ -2,7 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,7 +11,7 @@ public class Chapter implements Organisable, Convertable {
     private String customTitle;
     private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private Part part;
-    private Map<String, Function<Chapter, String>> renderMap = new HashMap<>();
+    private Map<String, Function<Chapter, Object>> renderMap = new HashMap<>();
 
 
     public Chapter(Part part, List<MediaInfo> media) {
@@ -21,6 +21,10 @@ public class Chapter implements Organisable, Convertable {
         renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
         renderMap.put("CHAPTER_TEXT", c -> "Chapter");
         renderMap.put("DURATION", Chapter::getDurationString);
+    }
+
+    public String getNumberString() {
+        return StringUtils.leftPad(String.valueOf(getNumber()), 3, "0");
     }
 
     public Chapter(MediaInfo mediaInfo) {
@@ -35,10 +39,6 @@ public class Chapter implements Organisable, Convertable {
         return part.getChapters().indexOf(this) + 1;
     }
 
-    public String getNumberString() {
-        return String.valueOf(getNumber());
-    }
-
     @Override
     public boolean isTheOnlyOne() {
         return part.getChapters().size() == 1;
@@ -46,7 +46,6 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public String getDetails() {
-        ConverterApplication.getContext().getBookInfo().get();
         return Utils.renderChapter(this, renderMap);
     }
 
@@ -126,7 +125,7 @@ public class Chapter implements Organisable, Convertable {
         return part;
     }
 
-    public Map<String, Function<Chapter, String>> getRenderMap() {
+    public Map<String, Function<Chapter, Object>> getRenderMap() {
         return renderMap;
     }
 

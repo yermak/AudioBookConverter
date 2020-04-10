@@ -23,7 +23,7 @@ public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "."+extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "." + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {
@@ -58,7 +58,7 @@ public class Utils {
 
     }
 
-    public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, String>> context) {
+    public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         String chapterFormat = AppProperties.getProperty("chapter_format");
         if (chapterFormat == null) {
             chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
@@ -139,6 +139,12 @@ public class Utils {
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
     }
 
+    public static String formatTimeForFilename(long millis) {
+        return String.format("%02d-%02d-%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
+    }
+
     public static String formatSize(long bytes) {
         if (bytes == -1L) {
             return "---";
@@ -156,5 +162,38 @@ public class Utils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
+        String partFormat = AppProperties.getProperty("part_format");
+        if (partFormat == null) {
+            partFormat = "<if(WRITER)><WRITER> <endif>" +
+                    "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +
+                    "<if(TITLE)><TITLE><endif>" +
+                    "<if(NARRATOR)> (<NARRATOR>)<endif>" +
+                    "<if(YEAR)>-<YEAR><endif>" +
+                    "<if(PART)>, Part <PART><endif>";
+            AppProperties.setProperty("part_format", partFormat);
+        }
+
+        ST partTemplate = new ST(partFormat);
+        context.forEach((key, value) -> {
+            partTemplate.add(key, value.apply(part));
+        });
+
+        String result = partTemplate.render();
+        char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};
+        for (char c : toRemove) {
+            result = StringUtils.remove(result, c);
+        }
+        String mp3Filename;
+
+        if (StringUtils.isBlank(result)) {
+            mp3Filename = "NewBook";
+        } else {
+            mp3Filename = result;
+        }
+        return mp3Filename;
+
     }
 }

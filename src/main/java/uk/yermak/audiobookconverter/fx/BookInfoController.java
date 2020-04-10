@@ -99,7 +99,7 @@ public class BookInfoController {
                 Executors.newSingleThreadExecutor().submit(() -> {
                     //getBookInfo is proxied blocking method should be executed outside of UI thread,
                     // when info become available - scheduling update in UI thread.
-                    AudioBookInfo info = media.get(0).getBookInfo();
+                        AudioBookInfo info = media.get(0).getBookInfo();
                     Platform.runLater(() -> copyTags(info));
 
                 });

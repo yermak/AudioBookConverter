@@ -62,7 +62,7 @@ public class FFMediaLoader {
 
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
-        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac");
+        private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
         private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
         private final String filename;
         private Conversion conversion;
@@ -88,6 +88,8 @@ public class FFMediaLoader {
                 List<FFmpegStream> streams = probeResult.getStreams();
                 logger.debug("Found {} streams in {}", streams.size(), filename);
 
+                Map<String, String> streamTags = null;
+
                 for (FFmpegStream ffMpegStream : streams) {
                     if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
                         logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
@@ -96,6 +98,7 @@ public class FFMediaLoader {
                         mediaInfo.setFrequency(ffMpegStream.sample_rate);
                         mediaInfo.setBitrate((int) ffMpegStream.bit_rate);
                         mediaInfo.setDuration(Math.round(ffMpegStream.duration * 1000));
+                        streamTags = ffMpegStream.tags;
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                         Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
@@ -105,13 +108,20 @@ public class FFMediaLoader {
                 }
 
                 logger.debug("Found tags: {} in {}", format.tags, filename);
-                AudioBookInfo bookInfo = new AudioBookInfo(format.tags);
+                HashMap<String, String> tags = new HashMap<>();
+                if (format.tags != null) {
+                    tags.putAll(format.tags);
+                }
+                if (streamTags != null) {
+                    tags.putAll(streamTags);
+                }
+                AudioBookInfo bookInfo = new AudioBookInfo(tags);
                 mediaInfo.setBookInfo(bookInfo);
 
                 processEmbededChapter(mediaInfo, probeResult.getChapters());
 
                 if (FilenameUtils.getExtension(filename).equalsIgnoreCase("FLAC")) {
-                        parseCueChapters(mediaInfo);
+                    parseCueChapters(mediaInfo);
                 }
 
                 logger.info("Created AudioBookInfo {}", bookInfo);
@@ -128,10 +138,10 @@ public class FFMediaLoader {
             AudioBookInfo bookInfo = mediaInfo.getBookInfo();
             for (int i = 0; i < chapters.size(); i++) {
                 FFmpegChapter chapter = chapters.get(i);
-                Track track = new Track(StringUtils.leftPad(String.valueOf(i+1),3, "00"));
+                Track track = new Track(StringUtils.leftPad(String.valueOf(i + 1), 3, "00"));
                 track.setTitle(chapter.tags.title);
-                track.setStart((long) (Double.parseDouble(chapter.start_time)*1000));
-                track.setEnd((long) (Double.parseDouble(chapter.end_time)*1000));
+                track.setStart((long) (Double.parseDouble(chapter.start_time) * 1000));
+                track.setEnd((long) (Double.parseDouble(chapter.end_time) * 1000));
                 bookInfo.getTracks().add(track);
             }
         }
@@ -184,7 +194,7 @@ public class FFMediaLoader {
     private static long parseCueTime(String substring) {
         String cleanText = cleanText(substring);
         String[] split = cleanText.split(":");
-        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2])*1000 / 75;
+        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 1000 / 75;
         return time;
     }
 

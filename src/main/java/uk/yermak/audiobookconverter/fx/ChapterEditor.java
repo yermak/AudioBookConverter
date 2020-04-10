@@ -184,7 +184,7 @@ class ChapterEditor {
 
         Optional result = dialog.showAndWait();
 
-        result.ifPresent(r -> {
+        if (result.isPresent() && result.get() == ButtonType.OK){
             chapter.getRenderMap().clear();
             chapter.getRenderMap().putAll(context);
             if (StringUtils.isNotEmpty(customTitle.getText())) {
@@ -203,6 +203,6 @@ class ChapterEditor {
 
                 }
             }
-        });
+        }
     }
 }

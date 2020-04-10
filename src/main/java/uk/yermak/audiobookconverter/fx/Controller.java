@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -27,6 +29,11 @@ public class Controller implements Subscriber {
     Tab queueTab;
 
     @FXML
+    public Button pauseButton;
+    @FXML
+    public Button stopButton;
+
+    @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
         context.subscribeForStart(this);
@@ -41,4 +48,20 @@ public class Controller implements Subscriber {
         tabs.getSelectionModel().select(queueTab);
 //        });
     }
+
+    public void pause(ActionEvent actionEvent) {
+        ConversionContext context = ConverterApplication.getContext();
+        if (context.isPaused()) {
+            context.resumeConversions();
+            pauseButton.setText("Pause all");
+        } else {
+            context.pauseConversions();
+            pauseButton.setText("Resume all");
+        }
+    }
+
+    public void stop(ActionEvent actionEvent) {
+        ConverterApplication.getContext().stopConversions();
+    }
+
 }

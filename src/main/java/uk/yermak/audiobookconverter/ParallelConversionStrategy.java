@@ -34,7 +34,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
         List<Future<String>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
-        String tempFile = Utils.getTmp(jobId, 999999, conversion.getFormat());
+        String tempFile = Utils.getTmp(jobId, conversion.getOutputDestination().hashCode(), conversion.getFormat());
 
         File fileListFile = null;
         File metaFile = null;
@@ -47,7 +47,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = getTempFileName(jobId, mediaInfo.hashCode(), conversion.getFormat());
+                String tempOutput = Utils.getTmp(jobId, mediaInfo.hashCode(), conversion.getFormat());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -80,7 +80,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             for (MediaInfo mediaInfo : conversion.getMedia()) {
-                FileUtils.deleteQuietly(new File(getTempFileName(jobId, mediaInfo.hashCode(), conversion.getFormat())));
+                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode(), conversion.getFormat())));
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
@@ -92,13 +92,9 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     }
 
 
-    protected String getTempFileName(long jobId, int index, String extension) {
-        return Utils.getTmp(jobId, index, extension);
-    }
-
     protected File prepareFiles(long jobId) throws IOException {
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = conversion.getMedia().stream().map(mediaInfo -> "file '" + getTempFileName(jobId, mediaInfo.hashCode(), conversion.getFormat()) + "'").collect(Collectors.toList());
+        List<String> outFiles = conversion.getMedia().stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.hashCode(), conversion.getFormat()) + "'").collect(Collectors.toList());
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
     }

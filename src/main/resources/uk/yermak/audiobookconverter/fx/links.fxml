@@ -32,21 +32,21 @@
                    GridPane.columnIndex="1" GridPane.rowIndex="0"
                    GridPane.valignment="TOP" GridPane.halignment="RIGHT">
             <tooltip>
-                <Tooltip text="https://github.com/yermak/AudioBookConverter"/>
+                <Tooltip text="https://www.recoupler.com/products/audiobookconverter"/>
             </tooltip>
         </Hyperlink>
         <Hyperlink text="About this software" onAction="#openLink"
                    GridPane.columnIndex="2" GridPane.rowIndex="0"
                    GridPane.valignment="TOP" GridPane.halignment="LEFT">
             <tooltip>
-                <Tooltip text="https://github.com/yermak/AudioBookConverter/wiki/About"/>
+                <Tooltip text="https://www.recoupler.com/products/audiobookconverter/about"/>
             </tooltip>
         </Hyperlink>
-        <Hyperlink text="Help" onAction="#openLink"
+        <Hyperlink text="FAQ" onAction="#openLink"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"
                    GridPane.valignment="TOP" GridPane.halignment="RIGHT">
             <tooltip>
-                <Tooltip text="https://github.com/yermak/AudioBookConverter/wiki/Help"/>
+                <Tooltip text="https://www.recoupler.com/products/audiobookconverter/faq"/>
             </tooltip>
         </Hyperlink>
         <Hyperlink text="Check for updates" onAction="#openLink"

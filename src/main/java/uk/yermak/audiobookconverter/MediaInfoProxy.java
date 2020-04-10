@@ -119,6 +119,7 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getOffset();
     }
 
+
     MediaInfoProxy(final String filename, final Future<MediaInfo> futureLoad) {
         this.filename = filename;
         this.futureLoad = futureLoad;

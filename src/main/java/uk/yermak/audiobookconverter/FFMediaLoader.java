@@ -212,7 +212,7 @@ public class FFMediaLoader {
             Process process = null;
             try {
                 if (conversion.getStatus().isOver()) throw new InterruptedException("ArtWork loading was interrupted");
-                String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), "." + format);
+                String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         poster);

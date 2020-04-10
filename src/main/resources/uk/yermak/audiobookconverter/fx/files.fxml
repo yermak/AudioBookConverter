@@ -95,7 +95,7 @@
                         <SplitPane/>
                         <Label text="Chapters mode" textAlignment="CENTER" alignment="CENTER">
                             <font>
-                                <Font size="16.0"/>
+                                <Font size="14.0"/>
                             </font>
                         </Label>
                         <SplitPane/>
@@ -139,7 +139,7 @@
                         <SplitPane/>
                         <Label text="Split book file by" textAlignment="CENTER" alignment="CENTER">
                             <font>
-                                <Font size="16.0"/>
+                                <Font size="14.0"/>
                             </font>
                         </Label>
 

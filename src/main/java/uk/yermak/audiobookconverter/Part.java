@@ -2,21 +2,51 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Part implements Organisable, Convertable {
-    private String title;
 
     private ObservableList<Chapter> chapters = FXCollections.observableArrayList();
     private Book book;
+    private Map<String, Function<Part, Object>> renderMap = new HashMap<>();
+
 
     public Part(Book book, List<Chapter> chapters) {
         this.book = book;
         chapters.forEach(c -> c.setPart(this));
         this.chapters.addAll(chapters);
+        renderMap.put("BOOK_NUMBER", Part::getBookNumberString);
+        renderMap.put("SERIES", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getSeries()));
+        renderMap.put("TITLE", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getTitle()));
+        renderMap.put("WRITER", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getWriter()));
+        renderMap.put("NARRATOR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getNarrator()));
+        renderMap.put("YEAR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getYear()));
+        renderMap.put("PART", Part::getNumberString);
+        renderMap.put("DURATION", Part::getDurationString);
+    }
+
+    private String getBookNumberString() {
+        if (getBook().getBookInfo().getBookNumber() == 0) return null;
+        return String.valueOf(getBook().getBookInfo().getBookNumber());
+    }
+
+    private String getNumberString() {
+        if (getBook().getParts().size() > 1) {
+            return StringUtils.leftPad(String.valueOf(getNumber()), 2, '0');
+        } else {
+            return null;
+        }
+    }
+
+    private String getDurationString() {
+        return Utils.formatTimeForFilename(getDuration());
     }
 
     public String getTitle() {
@@ -34,7 +64,7 @@ public class Part implements Organisable, Convertable {
 
     @Override
     public String getDetails() {
-        return title;
+        return Utils.renderPart(this, renderMap);
     }
 
     @Override

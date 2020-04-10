@@ -44,7 +44,7 @@ class ChapterEditor {
         HBox customisationBox = new HBox(15);
         grid.add(customisationBox, 0, 0);
 
-        Map<String, Function<Chapter, String>> context = new HashMap<>(chapter.getRenderMap());
+        Map<String, Function<Chapter, Object>> context = new HashMap<>(chapter.getRenderMap());
 
         CheckBox bookNo = new CheckBox("Book No");
         bookNo.setSelected(context.containsKey("BOOK_NUMBER"));
@@ -166,7 +166,7 @@ class ChapterEditor {
         customisationBox.getChildren().add(duration);
         duration.setOnAction(event -> {
             if (duration.isSelected()) {
-                context.put("DURATION", Chapter::getDurationString);
+                context.put("DURATION", Chapter::getDuration);
             } else {
                 context.remove("DURATION");
             }

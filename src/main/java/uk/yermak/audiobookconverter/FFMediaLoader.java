@@ -29,7 +29,7 @@ public class FFMediaLoader {
 
     private List<String> fileNames;
     private Conversion conversion;
-    private static final String FFPROBE = new File("external/x64/ffprobe.exe").getAbsolutePath();
+    private static final String FFPROBE = new File("app/external/x64/ffprobe.exe").getAbsolutePath();
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
 
@@ -205,7 +205,7 @@ public class FFMediaLoader {
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
 
-        private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+        private static final String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
 
         private MediaInfoBean mediaInfo;
         private String format;

@@ -1,0 +1,3 @@
+rmdir /s /q target/abc-jre
+C:\Users\Yermak\Programs\Java\jdk-14\bin\jlink.exe --module-path C:\Users\Yermak\Programs\Java\jdk-14\jmods;C:\Users\Yermak\Programs\Java\javafx-jmods-14 --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/abc-jre
+C:\Users\Yermak\Programs\Java\jdk-14\bin\jpackage.exe --app-version 5.0.12  --icon app/AudioBookConverter.ico --win-console --win-per-user-install -t msi --win-dir-chooser --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-5/audiobookconverter-5/app --main-jar lib/audiobookconverter-5.jar --runtime-image target/abc-jre

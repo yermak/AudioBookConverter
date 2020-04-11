@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class Mp4v2ArtBuilder {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String MP4ART = new File("external/x64/mp4art.exe").getAbsolutePath();
+    private static final String MP4ART = new File("app/external/x64/mp4art.exe").getAbsolutePath();
     private Conversion conversion;
 
     public Mp4v2ArtBuilder(Conversion conversion) {

@@ -24,7 +24,7 @@ public class FFMpegConcatenator {
     private String fileListFileName;
     private ProgressCallback callback;
     private ProgressParser progressParser;
-    private static final String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+    private static final String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
 
 
     public FFMpegConcatenator(Conversion conversion, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {

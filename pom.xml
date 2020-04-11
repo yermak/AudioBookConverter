@@ -6,7 +6,7 @@
 
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
-    <version>4</version>
+    <version>5</version>
 
 
     <properties>
@@ -189,7 +189,6 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                         </manifest>
                     </archive>
@@ -209,12 +208,30 @@
                         </goals>
                         <configuration>
                             <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
-                            <outputDirectory>target/dir</outputDirectory>
+                            <outputDirectory>target/package</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <executions>
+                    <execution><!-- Run our version calculation script -->
+                        <id>installer</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${basedir}/src/main/deploy/package/windows/package.bat</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -232,6 +249,7 @@
                     </execution>
                 </executions>
             </plugin>
+-->
 
             <!--
                         <plugin>

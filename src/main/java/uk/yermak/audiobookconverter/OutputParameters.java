@@ -190,7 +190,7 @@ public class OutputParameters {
         }
     }
 
-    private final static String FFMPEG = new File("external/x64/ffmpeg.exe").getAbsolutePath();
+    private final static String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
 
     private int bitRate = 128;
     private int frequency = 44100;

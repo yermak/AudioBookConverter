@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController {
+public class FilesController implements Subscriber {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -76,8 +76,9 @@ public class FilesController {
     public static final String MP3 = "mp3";
     public static final String WMA = "wma";
     public static final String FLAC = "flac";
+    public static final String AAC = "aac";
     public static final String OGG = "ogg";
-    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG};
+    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC};
 
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
@@ -87,6 +88,9 @@ public class FilesController {
 
     @FXML
     public void initialize() {
+        ConversionContext context = ConverterApplication.getContext();
+        context.subscribeForStart(this);
+
 
         fileList.setOnDragOver(event -> {
             if (event.getGestureSource() != fileList && event.getDragboard().hasFiles()) {
@@ -102,23 +106,19 @@ public class FilesController {
             event.consume();
         });
 
-        fileList.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<MediaInfo>() {
-            @Override
-            public void onChanged(Change<? extends MediaInfo> c) {
-                ConverterApplication.getContext().getSelectedMedia().clear();
-                ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
-            }
+        fileList.getSelectionModel().getSelectedItems().addListener((ListChangeListener<MediaInfo>) c -> {
+            ConverterApplication.getContext().getSelectedMedia().clear();
+            ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
         });
 
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
-        item1.setOnAction(e -> selectFilesDialog(ConverterApplication.getEnv().getWindow()));
+        item1.setOnAction(e -> selectFilesDialog());
         MenuItem item2 = new MenuItem("Folder");
-        item2.setOnAction(e -> selectFolderDialog(ConverterApplication.getEnv().getWindow()));
+        item2.setOnAction(e -> selectFolderDialog());
         contextMenu.getItems().addAll(item1, item2);
 
-        ConversionContext context = ConverterApplication.getContext();
         ObservableList<MediaInfo> media = context.getMedia();
         fileList.setItems(media);
         fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -169,7 +169,8 @@ public class FilesController {
         contextMenu.show(node, Side.RIGHT, 0, 0);
     }
 
-    private void selectFolderDialog(Window window) {
+    public void selectFolderDialog() {
+        Window window = ConverterApplication.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
@@ -233,7 +234,8 @@ public class FilesController {
         return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversion());
     }
 
-    private void selectFilesDialog(Window window) {
+    public void selectFilesDialog() {
+        Window window = ConverterApplication.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
@@ -480,4 +482,77 @@ public class FilesController {
     public void splitByChapter(ActionEvent actionEvent) {
         this.split = true;
     }
+
+    @FXML
+    ListView<ProgressComponent> progressQueue;
+
+    @FXML
+    TabPane tabs;
+
+    @FXML
+    Tab queueTab;
+
+    @FXML
+    public Button pauseButton;
+    @FXML
+    public Button stopButton;
+
+    @Override
+    public void addConversionProgress(ConversionProgress conversionProgress) {
+//        Platform.runLater(() -> {
+        ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
+        progressQueue.getItems().add(0, progressComponent);
+        tabs.getSelectionModel().select(queueTab);
+//        });
+    }
+
+    public void pause(ActionEvent actionEvent) {
+        ConversionContext context = ConverterApplication.getContext();
+        if (context.isPaused()) {
+            context.resumeConversions();
+            pauseButton.setText("Pause all");
+        } else {
+            context.pauseConversions();
+            pauseButton.setText("Resume all");
+        }
+    }
+
+    public void stop(ActionEvent actionEvent) {
+        ConverterApplication.getContext().stopConversions();
+    }
+
+    @FXML
+    protected void openLink(ActionEvent event) {
+        Hyperlink source = (Hyperlink) event.getSource();
+        ConverterApplication.getEnv().showDocument(source.getUserData().toString());
+    }
+
+    public void openWebSite(ActionEvent actionEvent) {
+        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter");
+    }
+
+    public void openAboutPage(ActionEvent actionEvent) {
+        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/about");
+    }
+
+    public void openFAQ(ActionEvent actionEvent) {
+        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/faq");
+    }
+
+    public void checkVersion(ActionEvent actionEvent) {
+        ConverterApplication.checkNewVersion();
+    }
+
+    public void exit(ActionEvent actionEvent) {
+        logger.info("Closing application");
+        ConverterApplication.getContext().stopConversions();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
+    }
+
+
 }

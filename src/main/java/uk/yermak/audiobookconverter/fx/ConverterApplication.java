@@ -29,6 +29,9 @@ public class ConverterApplication extends Application {
     private static ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {
+        //-Dprism.allowhidpi=false
+        //below does not work
+//        System.setProperty("prism.allowhidpi", "false");
         launch(args);
     }
 
@@ -73,7 +76,7 @@ public class ConverterApplication extends Application {
         }
     }
 
-    private void checkNewVersion() {
+    public static void checkNewVersion() {
         try {
             String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
             if (!Version.getVersionString().equals(StringUtils.trim(version))) {

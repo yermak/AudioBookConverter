@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
-          fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController">
+          fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController" VBox.vgrow="NEVER">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 

@@ -4,8 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
-          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController"
+<GridPane xmlns:fx="http://javafx.com/fxml"
+          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController" maxHeight="${screen.visualBounds.height*0.2}"
           gridLinesVisible="false">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
@@ -15,13 +15,13 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <columnConstraints>
-        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
     <children>
-        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"
-                  orientation="HORIZONTAL"/>
+        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4" maxHeight="${screen.visualBounds.height*0.07}"
+                  orientation="HORIZONTAL" GridPane.fillHeight="false"/>
 
         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"
                 GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">

@@ -9,14 +9,15 @@
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
-      prefHeight="${screen.visualBounds.height * 0.70}" prefWidth="${screen.visualBounds.width * 0.50}">
+      prefWidth="${screen.visualBounds.width * 0.50}"
+>
 
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
 
-    <MenuBar>
-        <Menu fx:id="mFile" text="File">
+    <MenuBar >
+        <Menu fx:id="mFile" text="File" >
             <Menu text="Add...">
                 <MenuItem text="Files" onAction="#selectFilesDialog"/>
                 <MenuItem text="Folder" onAction="#selectFolderDialog"/>
@@ -52,39 +53,21 @@
         </Menu>
     </MenuBar>
 
-
-    <!--
-        <rowConstraints>
-            <RowConstraints vgrow="NEVER" fillHeight="false"/>
-            <RowConstraints vgrow="ALWAYS" prefHeight="${screen.visualBounds.height*0.45}" maxHeight="Infinity"/>
-            <RowConstraints vgrow="NEVER" fillHeight="false"/>
-        </rowConstraints>
-    -->
-
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
+ <HBox VBox.vgrow="ALWAYS">
 
-    <GridPane hgap="5" vgap="5" gridLinesVisible="false"
-              GridPane.fillHeight="true">
-
-        <columnConstraints>
-            <ColumnConstraints hgrow="ALWAYS"/>
-            <ColumnConstraints hgrow="NEVER"/>
-        </columnConstraints>
-
-        <children>
-
-            <TabPane prefHeight="${screen.visualBounds.height*0.40}"
+            <TabPane
                      fx:id="filesChapters"
-                     GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.fillHeight="false">
+                     HBox.hgrow="ALWAYS">
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10"/>
                 </padding>
                 <Tab fx:id="filesTab" text="Add MP3 files to convert and bring them in right order..."
                      closable="false">
-                    <ListView fx:id="fileList" GridPane.valignment="TOP">
+                    <ListView fx:id="fileList" GridPane.valignment="TOP" GridPane.fillHeight="true">
                     </ListView>
                 </Tab>
                 <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
@@ -99,11 +82,38 @@
                     </TreeTableView>
 
                 </Tab>
+                <Tab text="Queue" closable="false" fx:id="queueTab">
+                    <VBox>
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button fx:id="pauseButton" text="Pause all"
+                                    minWidth="${screen.visualBounds.width * 0.05}"
+                                    GridPane.fillHeight="true"
+                                    onAction="#pause">
+                                <tooltip>
+                                    <Tooltip text="Pause conversion of files"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="stopButton" text="Stop all"
+                                    minWidth="${screen.visualBounds.width * 0.05}"
+                                    onAction="#stop">
+                                <tooltip>
+                                    <Tooltip text="Stop conversion of files"/>
+                                </tooltip>
+                            </Button>
+                        </HBox>
+                        <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </Tab>
+
             </TabPane>
 
 
 
-            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="10" right="0" bottom="0" left="0"/>
+                </padding>
+
                 <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}"
                         onAction="#addFiles"
                 >
@@ -219,14 +229,11 @@
                 </Button>
             </VBox>
 
-
-
-        </children>
-    </GridPane>
+</HBox>
 
     <fx:include source="/uk/yermak/audiobookconverter/fx/mediaplayer.fxml"/>
 
-    <TabPane minHeight="${screen.visualBounds.height*0.25}" prefHeight="${screen.visualBounds.height*0.25}" fx:id="tabs">
+    <TabPane  fx:id="tabs" VBox.vgrow="SOMETIMES">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>
@@ -236,30 +243,9 @@
         <Tab text="Art Work" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/art_work.fxml"/>
         </Tab>
+
         <Tab text="Output" closable="false">
             <fx:include source="/uk/yermak/audiobookconverter/fx/output.fxml"/>
-        </Tab>
-        <Tab text="Queue" closable="false" fx:id="queueTab">
-            <VBox>
-                <HBox alignment="CENTER_RIGHT">
-                    <Button fx:id="pauseButton" text="Pause all"
-                            minWidth="${screen.visualBounds.width * 0.05}"
-                            GridPane.fillHeight="true"
-                            onAction="#pause">
-                        <tooltip>
-                            <Tooltip text="Pause conversion of files"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="stopButton" text="Stop all"
-                            minWidth="${screen.visualBounds.width * 0.05}"
-                            onAction="#stop">
-                        <tooltip>
-                            <Tooltip text="Stop conversion of files"/>
-                        </tooltip>
-                    </Button>
-                </HBox>
-                <ListView fx:id="progressQueue" prefHeight="Infinity" minHeight="250"/>
-            </VBox>
         </Tab>
     </TabPane>
 

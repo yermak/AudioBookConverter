@@ -62,13 +62,6 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-    <!-- <TitledPane text="Add MP3 files to convert and bring them in right order..." collapsible="false"
-                 GridPane.rowIndex="1" GridPane.fillHeight="true">
-    -->
-
-    <!--</TitledPane>
--->
-
 
     <GridPane hgap="5" vgap="5" gridLinesVisible="false" GridPane.rowIndex="1"
               GridPane.fillHeight="true">
@@ -109,10 +102,12 @@
                 <fx:include source="/uk/yermak/audiobookconverter/fx/mediaplayer.fxml"/>
             </HBox>
 
+<!--
             <Accordion GridPane.columnIndex="1" GridPane.rowIndex="1" expandedPane="$filePane">
                 <panes>
-                    <TitledPane fx:id="filePane" text="Actions">
-                        <VBox spacing="5">
+-->
+                    <!--<TitledPane fx:id="filePane" text="Actions" >-->
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
                             <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}"
                                     onAction="#addFiles"
                             >
@@ -234,10 +229,10 @@
                                 </tooltip>
                             </Button>
                         </VBox>
-                    </TitledPane>
+                    <!--</TitledPane>-->
 
-                </panes>
-            </Accordion>
+             <!--   </panes>
+            </Accordion>-->
 
 
         </children>

@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.HostServices;
 import javafx.scene.Scene;
+import javafx.scene.input.Mnemonic;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,5 +29,9 @@ public class JfxEnv {
 
     public void showDocument(String url) {
         hostServices.showDocument(url);
+    }
+
+    public void addMnemonic(Mnemonic mnemonic) {
+        scene.addMnemonic(mnemonic);
     }
 }

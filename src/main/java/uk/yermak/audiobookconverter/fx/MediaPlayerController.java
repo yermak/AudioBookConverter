@@ -47,11 +47,11 @@ public class MediaPlayerController  {
 
     @FXML
     public void initialize() {
-
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 //        selectedMedia.addListener((ListChangeListener<MediaInfo>) c -> disablePlayer(selectedMedia.isEmpty() && mediaPlayer == null));
+
     }
 
     private void disablePlayer(boolean disable) {

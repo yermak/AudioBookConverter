@@ -200,9 +200,9 @@ public class FilesController {
         if (selectedDirectory != null) {
             processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
+            filesChapters.getTabs().add(filesTab);
+            filesChapters.getSelectionModel().select(filesTab);
         }
-        filesChapters.getTabs().add(filesTab);
-        filesChapters.getSelectionModel().select(filesTab);
     }
 
 
@@ -271,9 +271,9 @@ public class FilesController {
             File firstFile = files.get(0);
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
+            filesChapters.getTabs().add(filesTab);
+            filesChapters.getSelectionModel().select(filesTab);
         }
-        filesChapters.getTabs().add(filesTab);
-        filesChapters.getSelectionModel().select(filesTab);
     }
 
     public void removeFiles(ActionEvent event) {

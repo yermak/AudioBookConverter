@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController  {
+public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -230,7 +230,6 @@ public class FilesController  {
 
     private List<String> collectFiles(Collection<File> files) {
         List<String> fileNames = new ArrayList<>();
-        List<String> strings = Arrays.asList(FILE_EXTENSIONS);
         ImmutableSet<String> extensions = ImmutableSet.copyOf(FILE_EXTENSIONS);
 
         for (File file : files) {
@@ -562,4 +561,16 @@ public class FilesController  {
     }
 
 
+    public void clearQueue(ActionEvent actionEvent) {
+        ObservableList<ProgressComponent> items = progressQueue.getItems();
+        List<ProgressComponent> dones = new ArrayList<>();
+        for (ProgressComponent item : items) {
+            if (item.isOver()) dones.add(item);
+        }
+        Platform.runLater(() -> {
+            for (ProgressComponent done : dones) {
+                progressQueue.getItems().remove(done);
+            }
+        });
+    }
 }

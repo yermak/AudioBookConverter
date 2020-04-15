@@ -59,29 +59,11 @@
 
  <HBox VBox.vgrow="ALWAYS">
 
-            <TabPane
-                     fx:id="filesChapters"
-                     HBox.hgrow="ALWAYS">
+            <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS">
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10"/>
                 </padding>
-                <Tab fx:id="filesTab" text="Add MP3 files to convert and bring them in right order..."
-                     closable="false">
-                    <ListView fx:id="fileList" GridPane.valignment="TOP" GridPane.fillHeight="true">
-                    </ListView>
-                </Tab>
-                <Tab fx:id="chaptersTab" text="Organise chapters..." closable="false" disable="true">
-                    <TreeTableView fx:id="bookStructure" editable="true">
-                        <columns>
-                            <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
-                                             prefWidth="${screen.visualBounds.width * 0.1}"/>
-                            <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
-                            <TreeTableColumn text="Details" fx:id="detailsColumn" sortable="false"
-                                             prefWidth="${screen.visualBounds.width * 0.2}"/>
-                        </columns>
-                    </TreeTableView>
 
-                </Tab>
                 <Tab text="Queue" closable="false" fx:id="queueTab">
                     <VBox>
                         <HBox alignment="CENTER_RIGHT">
@@ -104,6 +86,24 @@
                         <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
                     </VBox>
                 </Tab>
+
+
+                <Tab fx:id="filesTab" text="Audio files" closable="false">
+                    <ListView fx:id="fileList" />
+                </Tab>
+                <Tab fx:id="chaptersTab" text="Chapters" closable="false">
+                    <TreeTableView fx:id="bookStructure" editable="true">
+                        <columns>
+                            <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
+                                             prefWidth="${screen.visualBounds.width * 0.1}"/>
+                            <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
+                            <TreeTableColumn text="Details" fx:id="detailsColumn" sortable="false"
+                                             prefWidth="${screen.visualBounds.width * 0.2}"/>
+                        </columns>
+                    </TreeTableView>
+
+                </Tab>
+
 
             </TabPane>
 

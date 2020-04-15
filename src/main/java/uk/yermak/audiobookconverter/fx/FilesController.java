@@ -36,6 +36,9 @@ public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
+    private ComboBox<String> splitFile;
+
+    @FXML
     private Button addButton;
     @FXML
     private Button removeButton;
@@ -126,6 +129,13 @@ public class FilesController {
             ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
         });
 
+        splitFile.getSelectionModel().select(0);
+        splitFile.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            switch (newValue) {
+                case "Parts" -> split = false;
+                case "Chapters" -> split = true;
+            }
+        });
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -496,14 +506,6 @@ public class FilesController {
         }
     }
 
-    public void splitByParts(ActionEvent actionEvent) {
-        this.split = false;
-    }
-
-    public void splitByChapter(ActionEvent actionEvent) {
-        this.split = true;
-    }
-
     public void addConversionProgress(ConversionProgress conversionProgress) {
         Platform.runLater(() -> {
             ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
@@ -572,5 +574,9 @@ public class FilesController {
                 progressQueue.getItems().remove(done);
             }
         });
+    }
+
+    public void splitFile(ActionEvent actionEvent) {
+
     }
 }

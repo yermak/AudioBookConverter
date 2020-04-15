@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter.fx;
 
 import com.google.common.collect.ImmutableSet;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -31,32 +32,48 @@ import java.util.stream.Collectors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController implements Subscriber {
+public class FilesController  {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
-    public Button addButton;
+    private Button addButton;
     @FXML
-    public Button removeButton;
+    private Button removeButton;
     @FXML
-    public Button clearButton;
+    private Button clearButton;
     @FXML
-    public Button upButton;
+    private Button upButton;
     @FXML
-    public Button downButton;
+    private Button downButton;
 
     @FXML
-    public Button importButton;
+    private Button importButton;
 
     @FXML
-    public Tab chaptersTab;
+    private TabPane filesChapters;
     @FXML
-    public TabPane filesChapters;
+    private Tab chaptersTab;
     @FXML
-    public Tab filesTab;
+    private Tab filesTab;
 
     @FXML
-    ListView<MediaInfo> fileList;
+    private Tab queueTab;
+
+
+    @FXML
+    private ListView<ProgressComponent> progressQueue;
+
+    @FXML
+    private TabPane tabs;
+
+
+    @FXML
+    private Button pauseButton;
+    @FXML
+    private Button stopButton;
+
+    @FXML
+    private ListView<MediaInfo> fileList;
 
     @FXML
     TreeTableView<Organisable> bookStructure;
@@ -68,7 +85,7 @@ public class FilesController implements Subscriber {
     private TreeTableColumn<Organisable, String> detailsColumn;
 
     @FXML
-    public Button startButton;
+    private Button startButton;
 
 
     private static final String M4B = "m4b";
@@ -89,8 +106,6 @@ public class FilesController implements Subscriber {
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
-        context.subscribeForStart(this);
-
 
         fileList.setOnDragOver(event -> {
             if (event.getGestureSource() != fileList && event.getDragboard().hasFiles()) {
@@ -153,6 +168,7 @@ public class FilesController implements Subscriber {
         listener = new MediaInfoChangeListener(conversion);
         fileList.getSelectionModel().selectedItemProperty().addListener(listener);*/
 
+        filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
 
         bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -185,6 +201,8 @@ public class FilesController implements Subscriber {
             processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
         }
+        filesChapters.getTabs().add(filesTab);
+        filesChapters.getSelectionModel().select(filesTab);
     }
 
 
@@ -255,6 +273,8 @@ public class FilesController implements Subscriber {
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
         }
+        filesChapters.getTabs().add(filesTab);
+        filesChapters.getSelectionModel().select(filesTab);
     }
 
     public void removeFiles(ActionEvent event) {
@@ -275,7 +295,7 @@ public class FilesController implements Subscriber {
         fileList.getItems().clear();
         ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
-        filesChapters.getTabs().add(filesTab);
+        filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
         chaptersMode = false;
     }
@@ -354,6 +374,7 @@ public class FilesController implements Subscriber {
                     }
                     String finalName = new File(finalDesination).getName();
                     ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
+                    this.addConversionProgress(conversionProgress);
                     context.startConversion(chapter, finalDesination, conversionProgress);
                 }
             } else {
@@ -365,12 +386,13 @@ public class FilesController implements Subscriber {
                     }
                     String finalName = new File(finalDesination).getName();
                     ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getMedia().size(), part.getDuration(), finalName);
+                    this.addConversionProgress(conversionProgress);
                     context.startConversion(part, finalDesination, conversionProgress);
                 }
             }
             ConverterApplication.getContext().resetForNewConversion();
             bookStructure.setRoot(null);
-            filesChapters.getTabs().add(filesTab);
+            filesChapters.getTabs().remove(filesTab);
             filesChapters.getTabs().remove(chaptersTab);
             fileList.getItems().clear();
             chaptersMode = false;
@@ -399,12 +421,12 @@ public class FilesController implements Subscriber {
     }
 
 
-
-    public void importChapters(ActionEvent actionEvent) {
+    public synchronized void importChapters(ActionEvent actionEvent) {
         if (fileList.getItems().isEmpty()) {
             return;
         }
         chaptersTab.setDisable(false);
+
         filesChapters.getTabs().add(chaptersTab);
         filesChapters.getTabs().remove(filesTab);
 
@@ -483,27 +505,12 @@ public class FilesController implements Subscriber {
         this.split = true;
     }
 
-    @FXML
-    ListView<ProgressComponent> progressQueue;
-
-    @FXML
-    TabPane tabs;
-
-    @FXML
-    Tab queueTab;
-
-    @FXML
-    public Button pauseButton;
-    @FXML
-    public Button stopButton;
-
-    @Override
     public void addConversionProgress(ConversionProgress conversionProgress) {
-//        Platform.runLater(() -> {
-        ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
-        progressQueue.getItems().add(0, progressComponent);
-        tabs.getSelectionModel().select(queueTab);
-//        });
+        Platform.runLater(() -> {
+            ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
+            progressQueue.getItems().add(0, progressComponent);
+            tabs.getSelectionModel().select(queueTab);
+        });
     }
 
     public void pause(ActionEvent actionEvent) {

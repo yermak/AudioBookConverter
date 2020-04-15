@@ -27,7 +27,6 @@ public class ConversionContext {
     private SimpleObjectProperty<Conversion> conversionHolder = new SimpleObjectProperty<>(new Conversion());
     private boolean paused;
 
-    private Subscriber subscriber;
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
     private ObservableList<String> genres = FXCollections.observableArrayList();
 
@@ -81,8 +80,6 @@ public class ConversionContext {
     }
 
     public void startConversion(Convertable convertable, String output, ConversionProgress conversionProgress) {
-        subscriber.addConversionProgress(conversionProgress);
-
         conversionHolder.get().addStatusChangeListener((observable, oldValue, newValue) -> {
             if (ProgressStatus.FINISHED.equals(newValue)) {
                 Platform.runLater(() -> ConverterApplication.showNotification(output));
@@ -122,10 +119,6 @@ public class ConversionContext {
 
     public void stopConversions() {
         conversionQueue.forEach(Conversion::stop);
-    }
-
-    public void subscribeForStart(Subscriber subscriber) {
-        this.subscriber = subscriber;
     }
 
     public ObservableList<MediaInfo> getSelectedMedia() {

@@ -3,6 +3,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.stage.Screen?>
@@ -19,30 +20,92 @@
     <MenuBar>
         <Menu fx:id="mFile" text="File">
             <Menu text="Add...">
-                <MenuItem text="Files" onAction="#selectFilesDialog"/>
-                <MenuItem text="Folder" onAction="#selectFolderDialog"/>
+                <MenuItem text="Files" onAction="#selectFilesDialog">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="INSERT" control="UP" meta="UP" shift="UP" shortcut="UP"/>
+                    </accelerator>
+                </MenuItem>
+
+                <MenuItem text="Folder" onAction="#selectFolderDialog">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="INSERT" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    </accelerator>
+                </MenuItem>
+
             </Menu>
             <SeparatorMenuItem/>
-            <MenuItem text="Remove" onAction="#removeFiles"/>
-            <MenuItem text="Clear" onAction="#clear"/>
+            <MenuItem text="Remove" onAction="#removeFiles">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+
+            <MenuItem text="Clear" onAction="#clear">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="DELETE" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
             <SeparatorMenuItem/>
-            <MenuItem text="Up" onAction="#moveUp"/>
-            <MenuItem text="Down" onAction="#moveDown"/>
+            <MenuItem text="Up" onAction="#moveUp">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem text="Down" onAction="#moveDown">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="DOWN" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
             <SeparatorMenuItem/>
-            <MenuItem text="Exit" onAction="#exit"/>
+            <MenuItem text="Exit" onAction="#exit">
+                <accelerator>
+                    <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
 
         <Menu fx:id="mChapter" text="Chapter">
-            <MenuItem text="Import" onAction="#importChapters"/>
-            <MenuItem text="Combine" onAction="#combine"/>
-            <MenuItem text="Split" onAction="#split"/>
+            <MenuItem text="Import" onAction="#importChapters">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+
+            <MenuItem text="Combine" onAction="#combine">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="PLUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+
+            <MenuItem text="Split" onAction="#split">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="MINUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
 
         <Menu fx:id="mConvert" text="Convert">
-            <MenuItem text="Start" onAction="#start"/>
+            <MenuItem text="Start" onAction="#start">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="ENTER" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
             <SeparatorMenuItem/>
-            <MenuItem text="Pause all" onAction="#pause"/>
-            <MenuItem text="Stop all" onAction="#stop"/>
+            <MenuItem text="Pause all" onAction="#pause">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="HOME" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem text="Stop all" onAction="#stop">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="END" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem text="Clear queue" onAction="#clearQueue">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="BACK_SPACE" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
 
         <Menu fx:id="mAbout" text="About">

@@ -82,6 +82,13 @@
                                 <Tooltip text="Stop conversion of files"/>
                             </tooltip>
                         </Button>
+                        <Button fx:id="clearQueueButton" text="Clear"
+                                minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#clearQueue">
+                            <tooltip>
+                                <Tooltip text="Clear completed or cancelled conversions"/>
+                            </tooltip>
+                        </Button>
                     </HBox>
                     <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
                 </VBox>

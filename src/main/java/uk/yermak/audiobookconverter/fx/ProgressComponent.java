@@ -124,4 +124,7 @@ public class ProgressComponent extends GridPane {
         conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue)));
     }
 
+    public boolean isOver() {
+        return conversionProgress.getConversion().getStatus().isOver();
+    }
 }

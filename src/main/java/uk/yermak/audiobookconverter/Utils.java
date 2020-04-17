@@ -201,13 +201,13 @@ public class Utils {
         return System.getProperty("os.name").contains("Windows");
     }
 
-    public final static String FFMPEG = new File(isWindows()?"app/external/x64/ffmpeg.exe":"ffmpeg").getAbsolutePath();
+    public final static String FFMPEG = isWindows()?new File("app/external/x64/ffmpeg.exe").getAbsolutePath():"ffmpeg";
 
-    public static final String MP4ART = new File(isWindows()?"app/external/x64/mp4art.exe":"mp4art").getAbsolutePath();
+    public static final String MP4ART = isWindows()?new File("app/external/x64/mp4art.exe").getAbsolutePath():"/usr/bin/mp4art";
 
-    public static final String MP4INFO = new File(isWindows()?"app/external/x64/mp4info.exe":"mp4info").getAbsolutePath();
+    public static final String MP4INFO = isWindows()?new File("app/external/x64/mp4info.exe").getAbsolutePath():"/usr/bin/mp4info";
 
-    public static final String FFPROBE = new File(Utils.isWindows()?"app/external/x64/ffprobe.exe":"ffprobe").getAbsolutePath();
+    public static final String FFPROBE = isWindows()?new File("app/external/x64/ffprobe.exe").getAbsolutePath():"/usr/bin/ffprobe";
 
 
 }

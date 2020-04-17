@@ -164,7 +164,7 @@
 <!--                <version>3.2.0</version>-->
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
+                        <descriptor>src/main/deploy/assembly/${assembly.script}</descriptor>
                     </descriptors>
                     <outputDirectory>target/package</outputDirectory>
                 </configuration>
@@ -213,7 +213,8 @@
             </activation>
             <properties>
                 <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\Java\javafx-jmods-14</javafx.mods>
+                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14</javafx.mods>
+                <assembly.script>windows-installer.xml</assembly.script>
                 <installer.script>windows/package.bat</installer.script>
             </properties>
         </profile>
@@ -227,7 +228,8 @@
             </activation>
             <properties>
                 <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.1</java.home>
-                <javafx.mods>/home/yermak/Programs/javafx-jmods-14</javafx.mods>
+                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14</javafx.mods>
+                <assembly.script>linux-installer.xml</assembly.script>
                 <installer.script>linux/package.sh</installer.script>
             </properties>
         </profile>

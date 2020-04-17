@@ -270,11 +270,11 @@
                     <Font size="14.0"/>
                 </font>
             </Label>
-            <ComboBox fx:id="splitFile" onAction="#splitFile" minWidth="${screen.visualBounds.width * 0.05}">
+            <ComboBox fx:id="splitFile" onAction="#splitFile" minWidth="${screen.visualBounds.width * 0.05}" >
                 <items>
                     <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Parts"/>
-                        <String fx:value="Chapters"/>
+                        <String fx:value="parts"/>
+                        <String fx:value="chapters"/>
                     </FXCollections>
                 </items>
             </ComboBox>

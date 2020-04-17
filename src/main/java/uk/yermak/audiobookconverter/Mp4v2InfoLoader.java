@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
@@ -16,7 +15,6 @@ import java.nio.charset.Charset;
 public class Mp4v2InfoLoader {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String MP4INFO = new File("app/external/x64/mp4info.exe").getAbsolutePath();
 
     static long parseDuration(String info) {
         String[] lines = StringUtils.split(info, "\n");
@@ -41,7 +39,7 @@ public class Mp4v2InfoLoader {
     public static void updateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         Process process = null;
         try {
-            ProcessBuilder infoProcessBuilder = new ProcessBuilder(MP4INFO, outputFileName);
+            ProcessBuilder infoProcessBuilder = new ProcessBuilder(Utils.MP4INFO, outputFileName);
             process = infoProcessBuilder.start();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);

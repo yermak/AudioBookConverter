@@ -5,7 +5,6 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -24,7 +23,6 @@ public class FFMpegConcatenator {
     private String fileListFileName;
     private ProgressCallback callback;
     private ProgressParser progressParser;
-    private static final String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
 
 
     public FFMpegConcatenator(Conversion conversion, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {

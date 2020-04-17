@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 public class Mp4v2ArtBuilder {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String MP4ART = new File("app/external/x64/mp4art.exe").getAbsolutePath();
     private Conversion conversion;
 
     public Mp4v2ArtBuilder(Conversion conversion) {
@@ -36,7 +34,7 @@ public class Mp4v2ArtBuilder {
     public void updateSinglePoster(ArtWork poster, int index, String outputFileName) throws IOException, InterruptedException {
         Process process = null;
         try {
-            ProcessBuilder artProcessBuilder = new ProcessBuilder(MP4ART,
+            ProcessBuilder artProcessBuilder = new ProcessBuilder(Utils.MP4ART,
                     "--art-index", String.valueOf(index),
                     "--add", "\"" + poster.getFileName() + "\"",
                     outputFileName);

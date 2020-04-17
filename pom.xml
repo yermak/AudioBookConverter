@@ -17,9 +17,7 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main></compiler.args.main>
-        <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
         <javafx.version>14</javafx.version>
-        <javafx.mods>C:\Users\Yermak\Programs\Java\javafx-jmods-14</javafx.mods>
     </properties>
 
     <dependencies>
@@ -210,13 +208,13 @@
                 <version>1.6.0</version>
                 <executions>
                     <execution>
-                        <id>windows-installer</id>
+                        <id>installer</id>
                         <phase>package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${basedir}/src/main/deploy/package/windows/package.bat</executable>
+                            <executable>${basedir}/src/main/deploy/package/${installer.script}</executable>
                             <arguments>
                                 <argument>${java.home}</argument>
                                 <argument>${javafx.mods}</argument>
@@ -228,6 +226,24 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>win</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
+                <javafx.mods>C:\Users\Yermak\Programs\Java\javafx-jmods-14</javafx.mods>
+                <installer.script>windows/package.bat</installer.script>
+            </properties>
+        </profile>
+
+    </profiles>
+
 
 
 </project>

@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +31,7 @@ public class OutputParameters {
         M4B("ipod", "aac") {
         }, MP3("mp3", "libmp3lame") {
             public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
-                String[] strings = {FFMPEG,
+                String[] strings = {Utils.FFMPEG,
                         "-protocol_whitelist", "file,pipe,concat",
                         "-vn",
                         "-f", "concat",
@@ -48,7 +47,7 @@ public class OutputParameters {
             @Override
             public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
                 List<String> options = new ArrayList<>();
-                options.add(FFMPEG);
+                options.add(Utils.FFMPEG);
                 if (mediaInfo.getOffset() != -1) {
                     options.add("-ss");
                     options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -106,7 +105,7 @@ public class OutputParameters {
 
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
-            options.add(FFMPEG);
+            options.add(Utils.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -136,7 +135,7 @@ public class OutputParameters {
 
         public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
-            options.add(FFMPEG);
+            options.add(Utils.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -163,7 +162,7 @@ public class OutputParameters {
         }
 
         public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
-            String[] strings = {FFMPEG,
+            String[] strings = {Utils.FFMPEG,
                     "-protocol_whitelist", "file,pipe,concat",
                     "-vn",
                     "-f", "concat",
@@ -190,7 +189,7 @@ public class OutputParameters {
         }
     }
 
-    private final static String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
+
 
     private int bitRate = 128;
     private int frequency = 44100;

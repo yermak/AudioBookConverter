@@ -196,4 +196,18 @@ public class Utils {
         return mp3Filename;
 
     }
+
+    public static boolean isWindows() {
+        return System.getProperty("os.name").contains("Windows");
+    }
+
+    public final static String FFMPEG = new File(isWindows()?"app/external/x64/ffmpeg.exe":"ffmpeg").getAbsolutePath();
+
+    public static final String MP4ART = new File(isWindows()?"app/external/x64/mp4art.exe":"mp4art").getAbsolutePath();
+
+    public static final String MP4INFO = new File(isWindows()?"app/external/x64/mp4info.exe":"mp4info").getAbsolutePath();
+
+    public static final String FFPROBE = new File(Utils.isWindows()?"app/external/x64/ffprobe.exe":"ffprobe").getAbsolutePath();
+
+
 }

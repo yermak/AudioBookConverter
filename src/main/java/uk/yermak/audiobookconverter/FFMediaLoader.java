@@ -29,7 +29,6 @@ public class FFMediaLoader {
 
     private List<String> fileNames;
     private Conversion conversion;
-    private static final String FFPROBE = new File("app/external/x64/ffprobe.exe").getAbsolutePath();
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
 
@@ -42,7 +41,7 @@ public class FFMediaLoader {
     public List<MediaInfo> loadMediaInfo() {
         logger.info("Loading media info");
         try {
-            FFprobe ffprobe = new FFprobe(FFPROBE);
+            FFprobe ffprobe = new FFprobe(Utils.FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversion));
@@ -205,8 +204,6 @@ public class FFMediaLoader {
 
     private static class ArtWorkCallable implements Callable<ArtWork> {
 
-        private static final String FFMPEG = new File("app/external/x64/ffmpeg.exe").getAbsolutePath();
-
         private MediaInfoBean mediaInfo;
         private String format;
         private Conversion conversion;
@@ -223,7 +220,7 @@ public class FFMediaLoader {
             try {
                 if (conversion.getStatus().isOver()) throw new InterruptedException("ArtWork loading was interrupted");
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
-                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(FFMPEG,
+                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         poster);
                 process = pictureProcessBuilder.start();

@@ -118,10 +118,12 @@ public class ConversionProgress implements Runnable, Refreshable {
     }
 
     public synchronized void incCompleted(String fileName) {
+        logger.debug("Completed conversion of file: {}", fileName);
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
             state.set("Merging chapters...");
+            progress.set(1.0);
         }
         filesCount.set(completedFiles + "/" + totalFiles);
     }

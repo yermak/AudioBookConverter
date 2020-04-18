@@ -38,7 +38,9 @@ public class FFMpegConcatenator {
         while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
         callback.reset();
         try {
-            progressParser = new TcpProgressParser(progress -> callback.converted(progress.out_time_ns / 1000000, progress.total_size));
+            progressParser = new TcpProgressParser(progress -> {
+                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+            });
             progressParser.start();
         } catch (URISyntaxException e) {
         }
@@ -57,6 +59,7 @@ public class FFMpegConcatenator {
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
+
 
         } finally {
             Utils.closeSilently(process);

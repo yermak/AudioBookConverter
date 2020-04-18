@@ -103,26 +103,14 @@ public class FilesController {
     private final ContextMenu contextMenu = new ContextMenu();
     private boolean chaptersMode = false;
     private boolean split;
-//    private boolean filePerChapter;
-
 
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-        fileList.setOnDragOver(event -> {
-            if (event.getGestureSource() != fileList && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.ANY);
-            }
-
-            event.consume();
-        });
-
-        fileList.setOnDragDropped(event -> {
-            processFiles(event.getDragboard().getFiles());
-            event.setDropCompleted(true);
-            event.consume();
-        });
+        addDragEvenHandlers(bookStructure);
+        addDragEvenHandlers(fileList);
+        addDragEvenHandlers(progressQueue);
 
         fileList.getSelectionModel().getSelectedItems().addListener((ListChangeListener<MediaInfo>) c -> {
             ConverterApplication.getContext().getSelectedMedia().clear();
@@ -132,8 +120,8 @@ public class FilesController {
         splitFile.getSelectionModel().select(0);
         splitFile.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             switch (newValue) {
-                case "Parts" -> split = false;
-                case "Chapters" -> split = true;
+                case "parts" -> split = false;
+                case "chapters" -> split = true;
             }
         });
 
@@ -188,6 +176,28 @@ public class FilesController {
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
     }
 
+    private void addDragEvenHandlers(Control control) {
+        control.setOnDragOver(event -> {
+            if (event.getGestureSource() != control && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.ANY);
+            }
+
+            event.consume();
+        });
+
+        control.setOnDragDropped(event -> {
+            processFiles(event.getDragboard().getFiles());
+            event.setDropCompleted(true);
+            event.consume();
+            if (!chaptersMode) {
+                if (!filesChapters.getTabs().contains(filesTab)) {
+                    filesChapters.getTabs().add(filesTab);
+                    filesChapters.getSelectionModel().select(filesTab);
+                }
+            }
+        });
+    }
+
 
     @FXML
     protected void addFiles(ActionEvent event) {
@@ -210,8 +220,10 @@ public class FilesController {
         if (selectedDirectory != null) {
             processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
-            filesChapters.getTabs().add(filesTab);
-            filesChapters.getSelectionModel().select(filesTab);
+            if (!chaptersMode) {
+                filesChapters.getTabs().add(filesTab);
+                filesChapters.getSelectionModel().select(filesTab);
+            }
         }
     }
 
@@ -281,8 +293,10 @@ public class FilesController {
             File firstFile = files.get(0);
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
-            filesChapters.getTabs().add(filesTab);
-            filesChapters.getSelectionModel().select(filesTab);
+            if (!chaptersMode) {
+                filesChapters.getTabs().add(filesTab);
+                filesChapters.getSelectionModel().select(filesTab);
+            }
         }
     }
 

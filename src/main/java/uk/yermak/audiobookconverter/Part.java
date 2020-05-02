@@ -18,10 +18,8 @@ public class Part implements Organisable, Convertable {
     private Map<String, Function<Part, Object>> renderMap = new HashMap<>();
 
 
-    public Part(Book book, List<Chapter> chapters) {
+    public Part(Book book) {
         this.book = book;
-        chapters.forEach(c -> c.setPart(this));
-        this.chapters.addAll(chapters);
         renderMap.put("BOOK_NUMBER", Part::getBookNumberString);
         renderMap.put("SERIES", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getSeries()));
         renderMap.put("TITLE", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getTitle()));
@@ -30,6 +28,11 @@ public class Part implements Organisable, Convertable {
         renderMap.put("YEAR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getYear()));
         renderMap.put("PART", Part::getNumberString);
         renderMap.put("DURATION", Part::getDurationString);
+    }
+
+    public void construct(ObservableList<Chapter> chapters){
+        chapters.forEach(c -> c.setPart(this));
+        this.chapters.addAll(chapters);
     }
 
     private String getBookNumberString() {
@@ -108,7 +111,9 @@ public class Part implements Organisable, Convertable {
 
     public void createNextPart(List<Chapter> chapters) {
         int i = book.getParts().indexOf(this);
-        book.getParts().add(i + 1, new Part(book, chapters));
+        Part part = new Part(book);
+        part.construct(FXCollections.observableArrayList(chapters));
+        book.getParts().add(i + 1, part);
     }
 
     public void combine(List<Part> mergers) {

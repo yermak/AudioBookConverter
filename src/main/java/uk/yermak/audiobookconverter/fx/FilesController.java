@@ -234,7 +234,8 @@ public class FilesController {
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
         if (chaptersMode) {
             Book book = ConverterApplication.getContext().getBook();
-            Part part = new Part(book, FXCollections.observableArrayList(addedMedia.stream().map(Chapter::new).collect(Collectors.toList())));
+            Part part = new Part(book);
+            part.construct(FXCollections.observableArrayList(addedMedia.stream().map(Chapter::new).collect(Collectors.toList())));
             book.getParts().add(part);
             updateBookStructure(book, bookStructure.getRoot());
         } else {
@@ -375,13 +376,23 @@ public class FilesController {
         ConversionContext context = ConverterApplication.getContext();
         if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
-        if (context.getBook() == null) {
-            context.setBook(new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get()));
-        }
-
         String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
 
+
         if (outputDestination != null) {
+
+            if (context.getBook() == null) {
+                Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
+                Part part = new Part(book);
+                book.getParts().add(part);
+
+                part.construct(FXCollections.observableArrayList(fileList.getItems().stream().map(Chapter::new).collect(Collectors.toList())));
+                book.construct(fileList.getItems());
+                context.setBook(book);
+
+//                Executors.newSingleThreadExecutor().submit(() -> );
+            }
+
             Book book = context.getBook();
             ObservableList<Part> parts = book.getParts();
             String extension = FilenameUtils.getExtension(outputDestination);
@@ -448,7 +459,6 @@ public class FilesController {
         if (fileList.getItems().isEmpty()) {
             return;
         }
-        chaptersTab.setDisable(false);
 
         filesChapters.getTabs().add(chaptersTab);
         filesChapters.getTabs().remove(filesTab);
@@ -456,8 +466,16 @@ public class FilesController {
         bookStructure.setShowRoot(false);
 
 
-        Book book = new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get());
+        Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
+        Part part = new Part(book);
+        book.getParts().add(part);
 
+        part.construct(FXCollections.observableArrayList(fileList.getItems().stream().map(Chapter::new).collect(Collectors.toList())));
+        book.construct(fileList.getItems());
+
+        /*Book book = new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get());
+        book.construct(fileList.getItems());
+*/
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);

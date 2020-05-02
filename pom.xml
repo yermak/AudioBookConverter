@@ -238,7 +238,7 @@
             </activation>
             <properties>
                 <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.1</java.home>
-                <javafx.mods>/home/yermak/Programs/javafx-jmods-14</javafx.mods>
+                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14</javafx.mods>
                 <installer.script>linux/package.sh</installer.script>
             </properties>
         </profile>

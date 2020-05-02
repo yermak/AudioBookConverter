@@ -148,7 +148,6 @@
                             <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
                         </manifest>
                     </archive>
-
                 </configuration>
             </plugin>
 
@@ -156,19 +155,37 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
 <!--                <version>3.2.0</version>-->
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
-                    </descriptors>
-                    <outputDirectory>target/package</outputDirectory>
-                </configuration>
+
                 <executions>
+                    <execution>
+                        <id>mega-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>target/package</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -207,7 +224,7 @@
             </activation>
             <properties>
                 <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\Java\javafx-jmods-14</javafx.mods>
+                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14</javafx.mods>
                 <installer.script>windows/package.bat</installer.script>
             </properties>
         </profile>

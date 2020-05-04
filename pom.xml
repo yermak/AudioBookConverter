@@ -182,7 +182,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/deploy/assembly/prepare-installer.xml</descriptor>
+                                <descriptor>src/main/deploy/assembly/${installer.assmebly}</descriptor>
                             </descriptors>
                             <outputDirectory>target/package</outputDirectory>
                         </configuration>
@@ -226,6 +226,7 @@
                 <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
                 <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14</javafx.mods>
                 <installer.script>windows/package.bat</installer.script>
+                <installer.assmebly>windows-installer.xml</installer.assmebly>
             </properties>
         </profile>
 
@@ -240,6 +241,7 @@
                 <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.1</java.home>
                 <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14</javafx.mods>
                 <installer.script>linux/package.sh</installer.script>
+                <installer.assmebly>linux-installer.xml</installer.assmebly>
             </properties>
         </profile>
     </profiles>

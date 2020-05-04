@@ -20,13 +20,7 @@ public class Book implements Organisable {
                     ArrayList<Chapter> chapters = new ArrayList<>();
                     List<Track> tracks = m.getBookInfo().getTracks();
                     for (Track track : tracks) {
-                        MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, track);
-                        Chapter chapter = new Chapter(mediaTrackAdaptor);
-                        chapter.setCustomTitle(track.getTitle());
-                        chapter.getRenderMap().clear();
-                        chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-
-                        mediaTrackAdaptor.setChapter(chapter);
+                        Chapter chapter = trackToChapter(m, track);
                         chapters.add(chapter);
                     }
                     Part part = new Part(this);
@@ -57,13 +51,7 @@ public class Book implements Organisable {
                     ArrayList<Chapter> chapters = new ArrayList<>();
                     List<Track> tracks = m.getBookInfo().getTracks();
                     for (Track track : tracks) {
-                        MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, track);
-                        Chapter chapter = new Chapter(mediaTrackAdaptor);
-                        chapter.setCustomTitle(track.getTitle());
-                        chapter.getRenderMap().clear();
-                        chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-
-                        mediaTrackAdaptor.setChapter(chapter);
+                        Chapter chapter = trackToChapter(m, track);
                         chapters.add(chapter);
                     }
                     Part part = new Part(this);
@@ -79,6 +67,16 @@ public class Book implements Organisable {
             part.construct(FXCollections.observableArrayList(chapters));
             parts.add(part);
         }
+    }
+
+    private Chapter trackToChapter(MediaInfo m, Track track) {
+        MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, track);
+        Chapter chapter = new Chapter(mediaTrackAdaptor);
+        chapter.setCustomTitle(track.getTitle());
+        chapter.getRenderMap().clear();
+        chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
+        mediaTrackAdaptor.setChapter(chapter);
+        return chapter;
     }
 
 

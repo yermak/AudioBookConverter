@@ -27,6 +27,7 @@ import uk.yermak.audiobookconverter.*;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -372,65 +373,93 @@ public class FilesController {
         }
     }
 
-    public void start(ActionEvent actionEvent) {
+    private void launch(String outputDestination, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent) {
+        ConversionContext context = ConverterApplication.getContext();
+
+        if (context.getBook() == null) {
+            Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
+/*
+            Part part = new Part(book);
+            book.getParts().add(part);
+
+            part.construct(FXCollections.observableArrayList(mediaInfos.stream().map(Chapter::new).collect(Collectors.toList())));
+*/
+            book.construct(mediaInfos);
+            context.setBook(book);
+        }
+
+        Book book = context.getBook();
+        ObservableList<Part> parts = book.getParts();
+        String extension = FilenameUtils.getExtension(outputDestination);
+        ConverterApplication.getContext().getOutputParameters().setupFormat(extension);
+
+        if (split) {
+            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+            logger.debug("Found {} chapters in the book", chapters.size());
+            for (int i = 0; i < chapters.size(); i++) {
+                Chapter chapter = chapters.get(i);
+                String finalDesination = outputDestination;
+                if (chapters.size() > 1) {
+                    finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
+                }
+                String finalName = new File(finalDesination).getName();
+                logger.debug("Adding conversion for chapter {}", finalName);
+                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
+                addConversionProgress(conversionProgress);
+                context.startConversion(chapter, finalDesination, conversionProgress);
+            }
+        } else {
+            logger.debug("Found {} parts in the book", parts.size());
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i);
+                String finalDesination = outputDestination;
+                if (parts.size() > 1) {
+                    finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
+                }
+                String finalName = new File(finalDesination).getName();
+                logger.debug("Adding conversion for part {}", finalName);
+                int size = part.getMedia().size();
+                long duration = part.getDuration();
+                ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), size, duration, finalName);
+                addConversionProgress(conversionProgress);
+                context.startConversion(part, finalDesination, conversionProgress);
+            }
+        }
+
+
+        Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+
+    }
+
+    public synchronized void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
         if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
         String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
 
-
-        if (outputDestination != null) {
-
-            if (context.getBook() == null) {
-                Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
-                Part part = new Part(book);
-                book.getParts().add(part);
-
-                part.construct(FXCollections.observableArrayList(fileList.getItems().stream().map(Chapter::new).collect(Collectors.toList())));
-                book.construct(fileList.getItems());
-                context.setBook(book);
-
-//                Executors.newSingleThreadExecutor().submit(() -> );
-            }
-
-            Book book = context.getBook();
-            ObservableList<Part> parts = book.getParts();
-            String extension = FilenameUtils.getExtension(outputDestination);
-            ConverterApplication.getContext().getOutputParameters().setupFormat(extension);
-
-            if (split) {
-                List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
-                for (int i = 0; i < chapters.size(); i++) {
-                    Chapter chapter = chapters.get(i);
-                    String finalDesination = outputDestination;
-                    if (chapters.size() > 1) {
-                        finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
-                    }
-                    String finalName = new File(finalDesination).getName();
-                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), chapter.getMedia().size(), chapter.getDuration(), finalName);
-                    this.addConversionProgress(conversionProgress);
-                    context.startConversion(chapter, finalDesination, conversionProgress);
-                }
-            } else {
-                for (int i = 0; i < parts.size(); i++) {
-                    Part part = parts.get(i);
-                    String finalDesination = outputDestination;
-                    if (parts.size() > 1) {
-                        finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
-                    }
-                    String finalName = new File(finalDesination).getName();
-                    ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), part.getMedia().size(), part.getDuration(), finalName);
-                    this.addConversionProgress(conversionProgress);
-                    context.startConversion(part, finalDesination, conversionProgress);
-                }
-            }
-            ConverterApplication.getContext().resetForNewConversion();
-            bookStructure.setRoot(null);
-            filesChapters.getTabs().remove(filesTab);
-            filesChapters.getTabs().remove(chaptersTab);
-            fileList.getItems().clear();
-            chaptersMode = false;
+        if (outputDestination == null) {
+            return;
         }
+
+        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
+
+        ProgressComponent progressComponent = new ProgressComponent(new ConversionProgress(new Conversion(), 0, 0, "Calculating... " + new File(outputDestination).getName()));
+
+        Executors.newSingleThreadExecutor().submit(() -> {
+            Platform.runLater(() -> {
+                progressQueue.getItems().add(0, progressComponent);
+                filesChapters.getSelectionModel().select(queueTab);
+            });
+            launch(outputDestination, mediaInfos, progressComponent);
+        });
+
+
+        ConverterApplication.getContext().resetForNewConversion();
+        bookStructure.setRoot(null);
+        filesChapters.getTabs().remove(filesTab);
+        filesChapters.getTabs().remove(chaptersTab);
+        fileList.getItems().clear();
+        chaptersMode = false;
     }
 
     private static String selectOutputFile(AudioBookInfo audioBookInfo) {
@@ -467,15 +496,7 @@ public class FilesController {
 
 
         Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
-        Part part = new Part(book);
-        book.getParts().add(part);
-
-        part.construct(FXCollections.observableArrayList(fileList.getItems().stream().map(Chapter::new).collect(Collectors.toList())));
         book.construct(fileList.getItems());
-
-        /*Book book = new Book(fileList.getItems(), ConverterApplication.getContext().getBookInfo().get());
-        book.construct(fileList.getItems());
-*/
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
@@ -539,10 +560,10 @@ public class FilesController {
     }
 
     public void addConversionProgress(ConversionProgress conversionProgress) {
+        logger.debug("Delayed update of progress queue with {}", conversionProgress.getConversion().getOutputDestination());
+        ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
         Platform.runLater(() -> {
-            ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
             progressQueue.getItems().add(0, progressComponent);
-            tabs.getSelectionModel().select(queueTab);
         });
     }
 

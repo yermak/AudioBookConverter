@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -41,12 +42,18 @@ public class Mp4v2ArtBuilder {
 
             process = artProcessBuilder.start();
 
-            StreamCopier.copy(process.getInputStream(), System.out);
-            StreamCopier.copy(process.getErrorStream(), System.err);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getInputStream(), out);
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getErrorStream(), err);
+
             boolean finished = false;
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
+            logger.debug("Poster Out: {}", out.toString());
+            logger.error("Poster Error: {}", err.toString());
         } finally {
             Utils.closeSilently(process);
         }

@@ -42,7 +42,6 @@ public class Conversion {
         this.outputParameters = outputParameters;
         this.bookInfo = bookInfo;
         this.posters = new ArrayList<>(posters);
-//        this.format = FilenameUtils.getExtension(outputDestination);
 
         Executors.newSingleThreadExecutor().execute(refreshable);
 
@@ -116,8 +115,8 @@ public class Conversion {
         return posters;
     }
 
-    public String getFormat() {
-        return outputParameters.format.format;
+    public String getWorkfileExtension() {
+        return outputParameters.format.extension;
     }
 }
 

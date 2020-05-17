@@ -28,8 +28,8 @@ public class OutputParameters {
     }
 
     public enum Format {
-        M4B("ipod", "aac") {
-        }, MP3("mp3", "libmp3lame") {
+        M4B("ipod", "aac", "m4a") {
+        }, MP3("mp3", "libmp3lame", "mp3") {
             public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
                 String[] strings = {Utils.FFMPEG,
                         "-protocol_whitelist", "file,pipe,concat",
@@ -43,7 +43,7 @@ public class OutputParameters {
                         outputFileName};
                 return Arrays.asList(strings);
             }
-        }, OGG("ogg", "libopus") {
+        }, OGG("ogg", "libopus", "ogg") {
             @Override
             public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
                 List<String> options = new ArrayList<>();
@@ -78,10 +78,12 @@ public class OutputParameters {
 
         protected String format;
         protected String codec;
+        protected String extension;
 
-        Format(String format, String codec) {
+        Format(String format, String codec, String extension) {
             this.format = format;
             this.codec = codec;
+            this.extension = extension;
         }
 
         static String toFFMpegTime(long time) {
@@ -169,7 +171,7 @@ public class OutputParameters {
                     "-safe", "0",
                     "-i", fileListFileName,
                     "-i", metaDataFileName,
-                    "-map_metadata", "1",
+                    "-map_metadata", "1 ",
                     "-f", format,
                     "-c:a", "copy",
                     "-movflags", "+faststart",

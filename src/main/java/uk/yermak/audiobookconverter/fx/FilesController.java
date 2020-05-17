@@ -235,9 +235,7 @@ public class FilesController {
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
         if (chaptersMode) {
             Book book = ConverterApplication.getContext().getBook();
-            Part part = new Part(book);
-            part.construct(FXCollections.observableArrayList(addedMedia.stream().map(Chapter::new).collect(Collectors.toList())));
-            book.getParts().add(part);
+            book.construct(FXCollections.observableArrayList(addedMedia));
             updateBookStructure(book, bookStructure.getRoot());
         } else {
             fileList.getItems().addAll(addedMedia);
@@ -437,13 +435,6 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-/*
-        if (context.getBook() == null) {
-            importChapters(actionEvent);
-        }
-*/
-
-
         ProgressComponent progressComponent = new ProgressComponent(new ConversionProgress(new Conversion(), 0, 0, "Calculating... " + new File(outputDestination).getName()));
 
         Executors.newSingleThreadExecutor().submit(() -> {
@@ -453,8 +444,6 @@ public class FilesController {
             });
             launch(outputDestination, mediaInfos, progressComponent);
         });
-//        launch(outputDestination, mediaInfos, progressComponent);
-
 
         ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);

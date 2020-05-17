@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -225,13 +226,19 @@ public class FFMediaLoader {
                         poster);
                 process = pictureProcessBuilder.start();
 
-                StreamCopier.copy(process.getInputStream(), System.out);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                StreamCopier.copy(process.getInputStream(), out);
                 // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                StreamCopier.copy(process.getErrorStream(), System.err);
+                ByteArrayOutputStream err = new ByteArrayOutputStream();
+                StreamCopier.copy(process.getErrorStream(), err);
+
                 boolean finished = false;
                 while (!conversion.getStatus().isOver() && !finished) {
                     finished = process.waitFor(500, TimeUnit.MILLISECONDS);
                 }
+                logger.debug("ArtWork Out: {}", out.toString());
+                logger.error("ArtWork Error: {}", err.toString());
+
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversion.getStatus().isOver())

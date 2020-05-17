@@ -5,7 +5,7 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
@@ -60,16 +60,18 @@ public class FFMpegNativeConverter implements Callable<String> {
             }
             process = ffmpegProcessBuilder.start();
 
-            InputStream ffmpegIn = process.getInputStream();
-            InputStream ffmpegErr = process.getErrorStream();
-
-            StreamCopier.copy(ffmpegIn, System.out);
-            StreamCopier.copy(ffmpegErr, System.err);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getInputStream(), out);
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getErrorStream(), err);
 
             boolean finished = false;
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
+            logger.debug("Converter Out: {}", out.toString());
+            logger.error("Converter Error: {}", err.toString());
+
             Mp4v2InfoLoader.updateDuration(mediaInfo, outputFileName);
             return outputFileName;
         } catch (CancellationException ce) {

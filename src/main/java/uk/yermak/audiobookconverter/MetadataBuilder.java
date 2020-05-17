@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MetadataBuilder {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -37,8 +36,7 @@ public class MetadataBuilder {
         metaData.add("media_type=2");
         metaData.add("genre=" + bookInfo.getGenre());
         metaData.addAll(convertable.getMetaData(bookInfo));
-        String collect = metaData.stream().collect(Collectors.joining(toString()));
-        logger.debug(collect);
+        logger.debug("Saving metadata:" + String.join("\n", metaData));
         FileUtils.writeLines(metaFile, "UTF-8", metaData);
         return metaFile;
     }

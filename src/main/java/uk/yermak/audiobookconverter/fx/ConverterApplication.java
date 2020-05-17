@@ -32,6 +32,7 @@ public class ConverterApplication extends Application {
         //-Dprism.allowhidpi=false
         //below does not work
 //        System.setProperty("prism.allowhidpi", "false");
+//        StdOutErrLog.tieSystemOutAndErrToLog();
         launch(args);
     }
 

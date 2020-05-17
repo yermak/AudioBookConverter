@@ -22,8 +22,8 @@ import java.util.function.Function;
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index +"-"+System.currentTimeMillis()+"." + extension).getAbsolutePath();
+    public static String getTmp(long jobId, long index, String extension) {
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "." + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {
@@ -201,13 +201,13 @@ public class Utils {
         return System.getProperty("os.name").contains("Windows");
     }
 
-    public final static String FFMPEG = isWindows()?new File("app/external/x64/ffmpeg.exe").getAbsolutePath():"ffmpeg";
+    public final static String FFMPEG = isWindows() ? new File("app/external/x64/ffmpeg.exe").getAbsolutePath() : "ffmpeg";
 
-    public static final String MP4ART = isWindows()?new File("app/external/x64/mp4art.exe").getAbsolutePath():"mp4art";
+    public static final String MP4ART = isWindows() ? new File("app/external/x64/mp4art.exe").getAbsolutePath() : "mp4art";
 
-    public static final String MP4INFO = isWindows()?new File("app/external/x64/mp4info.exe").getAbsolutePath():"mp4info";
+    public static final String MP4INFO = isWindows() ? new File("app/external/x64/mp4info.exe").getAbsolutePath() : "mp4info";
 
-    public static final String FFPROBE = isWindows()?new File("app/external/x64/ffprobe.exe").getAbsolutePath():"ffprobe";
+    public static final String FFPROBE = isWindows() ? new File("app/external/x64/ffprobe.exe").getAbsolutePath() : "ffprobe";
 
 
 }

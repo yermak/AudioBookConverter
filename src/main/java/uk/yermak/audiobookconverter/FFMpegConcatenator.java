@@ -5,9 +5,11 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,18 +51,25 @@ public class FFMpegConcatenator {
         try {
             OutputParameters outputParameters = conversion.getOutputParameters();
             ProcessBuilder ffmpegProcessBuilder;
-            ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getConcatOptions(fileListFileName, metaDataFileName, progressParser.getUri().toString(), outputFileName));
+            List<String> concatOptions = outputParameters.getConcatOptions(fileListFileName, metaDataFileName, progressParser.getUri().toString(), outputFileName);
+            ffmpegProcessBuilder = new ProcessBuilder(concatOptions);
+            logger.debug("Starting concat with options {}", String.join("\n", concatOptions));
             process = ffmpegProcessBuilder.start();
 
-            StreamCopier.copy(process.getInputStream(), System.out);
-            StreamCopier.copy(process.getErrorStream(), System.err);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getInputStream(), out);
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            StreamCopier.copy(process.getErrorStream(), err);
 
             boolean finished = false;
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
+            logger.info("Concat Out: {}", out.toString());
+            logger.info("Concat Error: {}", err.toString());
 
-
+        } catch (Exception e) {
+            logger.error("Error during cancatination of files:", e);
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);

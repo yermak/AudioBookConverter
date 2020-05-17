@@ -65,11 +65,11 @@ public class FFMpegConcatenator {
             while (!conversion.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.info("Concat Out: {}", out.toString());
-            logger.info("Concat Error: {}", err.toString());
+            logger.debug("Concat Out: {}", out.toString());
+            logger.error("Concat Error: {}", err.toString());
 
         } catch (Exception e) {
-            logger.error("Error during cancatination of files:", e);
+            logger.error("Error during concatination of files:", e);
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);

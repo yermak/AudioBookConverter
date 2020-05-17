@@ -30,7 +30,7 @@ public class FFMediaLoader {
     private List<String> fileNames;
     private Conversion conversion;
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
-    private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(4);
+    private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(8);
 
     public FFMediaLoader(List<String> files, Conversion conversion) {
         this.fileNames = files;

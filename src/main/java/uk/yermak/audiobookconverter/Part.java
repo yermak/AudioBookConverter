@@ -20,6 +20,8 @@ public class Part implements Organisable, Convertable {
 
     public Part(Book book) {
         this.book = book;
+        book.getParts().add(this);
+        chapters.addListener(book);
         renderMap.put("BOOK_NUMBER", Part::getBookNumberString);
         renderMap.put("SERIES", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getSeries()));
         renderMap.put("TITLE", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getTitle()));
@@ -28,6 +30,7 @@ public class Part implements Organisable, Convertable {
         renderMap.put("YEAR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getYear()));
         renderMap.put("PART", Part::getNumberString);
         renderMap.put("DURATION", Part::getDurationString);
+
     }
 
     public void construct(ObservableList<Chapter> chapters){

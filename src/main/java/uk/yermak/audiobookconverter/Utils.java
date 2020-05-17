@@ -23,7 +23,7 @@ public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static String getTmp(long jobId, int index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "." + extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index +"-"+System.currentTimeMillis()+"." + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {

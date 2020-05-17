@@ -1,77 +1,52 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Book implements Organisable {
+public class Book implements Organisable, InvalidationListener {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final AudioBookInfo audioBookInfo;
 
     private ObservableList<Part> parts = FXCollections.observableArrayList();
-
-    public Book(ObservableList<MediaInfo> items, AudioBookInfo audioBookInfo) {
-        this.audioBookInfo = audioBookInfo;
-        items.stream()
-                .filter(m -> !m.getBookInfo().getTracks().isEmpty())
-                .forEach(m -> {
-                    ArrayList<Chapter> chapters = new ArrayList<>();
-                    List<Track> tracks = m.getBookInfo().getTracks();
-                    for (Track track : tracks) {
-                        Chapter chapter = trackToChapter(m, track);
-                        chapters.add(chapter);
-                    }
-                    Part part = new Part(this);
-                    part.construct(FXCollections.observableArrayList(chapters));
-                    parts.add(part);
-                });
-
-        List<Chapter> chapters = items.stream()
-                .filter(m -> m.getBookInfo().getTracks().isEmpty())
-                .map(Chapter::new)
-                .collect(Collectors.toList());
-        if (!chapters.isEmpty()) {
-            Part part = new Part(this);
-            part.construct(FXCollections.observableArrayList(chapters));
-            parts.add(part);
-        }
-    }
+    private InvalidationListener listener;
 
     public Book(AudioBookInfo audioBookInfo) {
         this.audioBookInfo = audioBookInfo;
     }
 
-
-    public void construct(ObservableList<MediaInfo> items){
-        items.stream()
-                .filter(m -> !m.getBookInfo().getTracks().isEmpty())
-                .forEach(m -> {
-                    ArrayList<Chapter> chapters = new ArrayList<>();
-                    List<Track> tracks = m.getBookInfo().getTracks();
-                    for (Track track : tracks) {
-                        Chapter chapter = trackToChapter(m, track);
-                        chapters.add(chapter);
-                    }
-                    Part part = new Part(this);
-                    part.construct(FXCollections.observableArrayList(chapters));
-                    parts.add(part);
-                });
-        List<Chapter> chapters = items.stream()
-                .filter(m -> m.getBookInfo().getTracks().isEmpty())
-                .map(Chapter::new)
-                .collect(Collectors.toList());
-        if (!chapters.isEmpty()) {
+    public void construct(ObservableList<MediaInfo> items) {
+        try {
             Part part = new Part(this);
-            part.construct(FXCollections.observableArrayList(chapters));
-            parts.add(part);
+            for (MediaInfo item : items) {
+                if (item.getBookInfo().getTracks().isEmpty()) {
+                    Chapter chapter = new Chapter(part, Collections.singletonList(item));
+                    part.getChapters().add(chapter);
+                } else {
+                    List<Track> tracks = item.getBookInfo().getTracks();
+                    for (Track track : tracks) {
+                        Chapter chapter = trackToChapter(part, item, track);
+                        part.getChapters().add(chapter);
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            logger.error("Error constructing book:",e);
         }
     }
 
-    private Chapter trackToChapter(MediaInfo m, Track track) {
+    private Chapter trackToChapter(Part part, MediaInfo m, Track track) {
         MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, track);
-        Chapter chapter = new Chapter(mediaTrackAdaptor);
+        Chapter chapter = new Chapter(part, Collections.singletonList(mediaTrackAdaptor));
         chapter.setCustomTitle(track.getTitle());
         chapter.getRenderMap().clear();
         chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
@@ -126,5 +101,15 @@ public class Book implements Organisable {
 
     public AudioBookInfo getBookInfo() {
         return audioBookInfo;
+    }
+
+
+    @Override
+    public void invalidated(Observable observable) {
+        if (listener!=null)  listener.invalidated(observable);
+    }
+
+    public void addListener(InvalidationListener listener) {
+        this.listener = listener;
     }
 }

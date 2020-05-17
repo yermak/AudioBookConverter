@@ -378,12 +378,6 @@ public class FilesController {
 
         if (context.getBook() == null) {
             Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
-/*
-            Part part = new Part(book);
-            book.getParts().add(part);
-
-            part.construct(FXCollections.observableArrayList(mediaInfos.stream().map(Chapter::new).collect(Collectors.toList())));
-*/
             book.construct(mediaInfos);
             context.setBook(book);
         }
@@ -443,6 +437,13 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
+/*
+        if (context.getBook() == null) {
+            importChapters(actionEvent);
+        }
+*/
+
+
         ProgressComponent progressComponent = new ProgressComponent(new ConversionProgress(new Conversion(), 0, 0, "Calculating... " + new File(outputDestination).getName()));
 
         Executors.newSingleThreadExecutor().submit(() -> {
@@ -452,6 +453,7 @@ public class FilesController {
             });
             launch(outputDestination, mediaInfos, progressComponent);
         });
+//        launch(outputDestination, mediaInfos, progressComponent);
 
 
         ConverterApplication.getContext().resetForNewConversion();
@@ -494,9 +496,9 @@ public class FilesController {
 
         bookStructure.setShowRoot(false);
 
+        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
         Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
-        book.construct(fileList.getItems());
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
@@ -508,6 +510,25 @@ public class FilesController {
         filesChapters.getSelectionModel().select(chaptersTab);
         fileList.getItems().clear();
         chaptersMode = true;
+
+
+        long lastBookUpdate = System.currentTimeMillis();
+        book.addListener(observable -> {
+            logger.debug("Captured book modification");
+            if (System.currentTimeMillis() - lastBookUpdate > 1000) {
+                Platform.runLater(() -> updateBookStructure(book, bookItem));
+            }
+        });
+
+        Executors.newSingleThreadExecutor().submit(() -> {
+            book.construct(mediaInfos);
+            updateBookStructure(book, bookItem);
+        });
+
+/*
+        book.construct(mediaInfos);
+        updateBookStructure(book, bookItem);
+*/
     }
 
     private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {
@@ -522,6 +543,7 @@ public class FilesController {
             });
         });
         bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
+        bookStructure.refresh();
     }
 
     public void combine(ActionEvent actionEvent) {

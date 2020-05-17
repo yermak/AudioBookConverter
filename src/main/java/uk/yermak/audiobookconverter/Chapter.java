@@ -16,6 +16,7 @@ public class Chapter implements Organisable, Convertable {
 
     public Chapter(Part part, List<MediaInfo> media) {
         this.part = part;
+        this.media.addListener(part.getBook());
         media.forEach(mediaInfo -> mediaInfo.setChapter(this));
         this.media.addAll(media);
         renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
@@ -106,6 +107,7 @@ public class Chapter implements Organisable, Convertable {
 
     public void setPart(Part part) {
         this.part = part;
+        this.media.addListener(part.getBook());
     }
 
     public void createNextChapter(List<MediaInfo> nextMedia) {

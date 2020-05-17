@@ -12,7 +12,8 @@ public class MediaInfoBeanTest {
     public void testRemove() {
         MediaInfoBean media = new MediaInfoBean("file.mp3");
         media.setBookInfo(new AudioBookInfo());
-        Book book = new Book(FXCollections.observableArrayList(media), new AudioBookInfo());
+        Book book = new Book(new AudioBookInfo());
+        book.construct(FXCollections.observableArrayList(media));
         Part part = book.getParts().get(0);
         Chapter chapter = part.getChapters().get(0);
         media.remove();
@@ -29,7 +30,8 @@ public class MediaInfoBeanTest {
         MediaInfoBean media2 = new MediaInfoBean("file2.mp3");
         media2.setBookInfo(new AudioBookInfo());
 
-        Book book = new Book(FXCollections.observableArrayList(media1, media2), new AudioBookInfo());
+        Book book = new Book(new AudioBookInfo());
+        book.construct(FXCollections.observableArrayList(media1, media2));
         Chapter chapter = book.getParts().get(0).getChapters().get(0);
         chapter.combine(book.getParts().get(0).getChapters().subList(1, 2));
         assertEquals(chapter.getMedia().size(),2 );

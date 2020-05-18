@@ -8,8 +8,6 @@ import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.fx.ConversionProgress;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -41,6 +39,7 @@ public class ConversionContext {
         resetForNewConversion();
     }
 
+    //TODO move somewhere
     public void movePosterLeft(final Integer selected) {
         Platform.runLater(() -> {
             ArtWork lower = posters.get(selected);
@@ -63,11 +62,13 @@ public class ConversionContext {
     }
 
     public void saveGenres() {
-        if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
-            genres.add(bookInfo.get().getGenre());
+        if (bookInfo.get()!=null) {
+            if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
+                genres.add(bookInfo.get().getGenre());
+            }
+            String collect = String.join("::", genres);
+            AppProperties.setProperty("genres", collect);
         }
-        String collect = String.join("::", genres);
-        AppProperties.setProperty("genres", collect);
     }
 
     private void reloadGenres() {
@@ -79,26 +80,18 @@ public class ConversionContext {
         }
     }
 
-    public void startConversion(Convertable convertable, String output, ConversionProgress conversionProgress) {
-        conversionHolder.get().addStatusChangeListener((observable, oldValue, newValue) -> {
-            if (ProgressStatus.FINISHED.equals(newValue)) {
-                Platform.runLater(() -> ConverterApplication.showNotification(output));
-            }
-        });
-        conversionHolder.get().start(convertable, output, conversionProgress, outputParameters.get(), bookInfo.get(), posters);
+    public void resetForNewConversion() {
         saveGenres();
         Conversion newConversion = new Conversion();
         conversionQueue.add(newConversion);
         conversionHolder.set(newConversion);
-    }
 
-    public void resetForNewConversion() {
         reloadGenres();
         bookInfo.set(new AudioBookInfo());
+        outputParameters.set(new OutputParameters());
         book = null;
         posters.clear();
         media.clear();
-        outputParameters.set(new OutputParameters());
     }
 
     public OutputParameters getOutputParameters() {

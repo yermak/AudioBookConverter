@@ -23,18 +23,20 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     private static ExecutorService executorService = Executors.newWorkStealingPool();
     private Conversion conversion;
     private Map<String, ProgressCallback> progressCallbacks;
+    private String outputDestination;
 
 
-    public ParallelConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks) {
+    public ParallelConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
         this.conversion = conversion;
         this.progressCallbacks = progressCallbacks;
+        this.outputDestination = outputDestination;
     }
 
     public void run() {
         List<Future<String>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
-        String tempFile = Utils.getTmp(jobId, conversion.getOutputDestination().hashCode(), conversion.getWorkfileExtension());
+        String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversion.getWorkfileExtension());
 
         File fileListFile = null;
         File metaFile = null;
@@ -68,7 +70,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             artBuilder.coverArt(tempFile);
 
             if (conversion.getStatus().isOver()) return;
-            File destFile = new File(conversion.getOutputDestination());
+            File destFile = new File(outputDestination);
             if (destFile.exists()) FileUtils.deleteQuietly(destFile);
             FileUtils.moveFile(new File(tempFile), destFile);
             conversion.finished();

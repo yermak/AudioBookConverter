@@ -223,6 +223,7 @@ public class FFMediaLoader {
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
                         "-i", mediaInfo.getFileName(),
+                        "-y",
                         poster);
                 process = pictureProcessBuilder.start();
 

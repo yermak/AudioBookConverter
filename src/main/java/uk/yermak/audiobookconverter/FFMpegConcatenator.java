@@ -18,17 +18,17 @@ import java.util.concurrent.TimeUnit;
 public class FFMpegConcatenator {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private ConversionGroup conversionGroup;
+    private final ConversionJob conversionJob;
     private final String outputFileName;
 
-    private String metaDataFileName;
-    private String fileListFileName;
-    private ProgressCallback callback;
+    private final String metaDataFileName;
+    private final String fileListFileName;
+    private final ProgressCallback callback;
     private ProgressParser progressParser;
 
 
-    public FFMpegConcatenator(ConversionGroup conversionGroup, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
-        this.conversionGroup = conversionGroup;
+    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
+        this.conversionJob = conversionJob;
         this.outputFileName = outputFileName;
         this.metaDataFileName = metaDataFileName;
         this.fileListFileName = fileListFileName;
@@ -36,8 +36,8 @@ public class FFMpegConcatenator {
     }
 
     public void concat() throws IOException, InterruptedException {
-        if (conversionGroup.getStatus().isOver()) return;
-        while (ProgressStatus.PAUSED.equals(conversionGroup.getStatus())) Thread.sleep(1000);
+        if (conversionJob.getStatus().isOver()) return;
+        while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
         try {
             progressParser = new TcpProgressParser(progress -> {
@@ -49,7 +49,7 @@ public class FFMpegConcatenator {
 
         Process process = null;
         try {
-            OutputParameters outputParameters = conversionGroup.getOutputParameters();
+            OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
             ProcessBuilder ffmpegProcessBuilder;
             List<String> concatOptions = outputParameters.getConcatOptions(fileListFileName, metaDataFileName, progressParser.getUri().toString(), outputFileName);
             ffmpegProcessBuilder = new ProcessBuilder(concatOptions);
@@ -62,7 +62,7 @@ public class FFMpegConcatenator {
             StreamCopier.copy(process.getErrorStream(), err);
 
             boolean finished = false;
-            while (!conversionGroup.getStatus().isOver() && !finished) {
+            while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
             logger.debug("Concat Out: {}", out.toString());

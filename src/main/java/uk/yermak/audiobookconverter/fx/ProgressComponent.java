@@ -9,7 +9,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;
 
@@ -46,7 +46,7 @@ public class ProgressComponent extends GridPane {
     private Button stopButton;
 
 
-    private ConversionProgress conversionProgress;
+    private final ConversionProgress conversionProgress;
 
 
     public ProgressComponent(ConversionProgress conversionProgress) {
@@ -61,7 +61,7 @@ public class ProgressComponent extends GridPane {
         }
         progressBar.progressProperty().setValue(0);
         progressBar.setMaxWidth(Double.MAX_VALUE);
-        String fileName = conversionProgress.fileName;
+        String fileName = conversionProgress.getConversionJob().getOutputDestination();
         if (fileName.length() > 80) {
             fileName = fileName.substring(0, 80) + "...";
         }
@@ -72,41 +72,39 @@ public class ProgressComponent extends GridPane {
         this.conversionProgress = conversionProgress;
 
         assignListeners(conversionProgress);
-        ConversionGroup conversionGroup = conversionProgress.getConversionGroup();
-        conversionGroup.addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
+        conversionProgress.getConversionJob().addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
     }
+
 
     private void updateButtons(ProgressStatus newValue) {
         Platform.runLater(() -> {
             switch (newValue) {
-                case PAUSED:
-                    pauseButton.setText("Resume");
-                    break;
-                case FINISHED:
+                case PAUSED -> pauseButton.setText("Resume");
+                case FINISHED -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
-                    break;
-                case CANCELLED:
+                }
+                case CANCELLED -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
-                    break;
-                case IN_PROGRESS:
+                }
+                case IN_PROGRESS -> {
                     pauseButton.setText("Pause");
                     pauseButton.setDisable(false);
                     stopButton.setDisable(false);
-                    break;
-                default: {
+                }
+                default -> {
                 }
             }
         });
     }
 
     private void stop() {
-        conversionProgress.getConversionGroup().stop();
+        conversionProgress.getConversionJob().stop();
     }
 
     private void pause() {
-        ConversionGroup conversionGroup = conversionProgress.getConversionGroup();
+        ConversionJob conversionGroup = conversionProgress.getConversionJob();
         if (conversionGroup.getStatus().equals(PAUSED)) {
             conversionGroup.resume();
         } else {
@@ -125,6 +123,6 @@ public class ProgressComponent extends GridPane {
     }
 
     public boolean isOver() {
-        return conversionProgress.getConversionGroup().getStatus().isOver();
+        return conversionProgress.getConversionJob().getStatus().isOver();
     }
 }

@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class ArtWorkListCell extends ListCell<ArtWork> {
-    private ImageView imageView = new ImageView();
+    private final ImageView imageView = new ImageView();
 
     @Override
     public void updateItem(ArtWork artWork, boolean empty) {

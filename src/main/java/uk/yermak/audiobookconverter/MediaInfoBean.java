@@ -3,7 +3,7 @@ package uk.yermak.audiobookconverter;
 import java.util.Objects;
 
 public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
-    private String fileName;
+    private final String fileName;
     private int channels;
     private int frequency;
     private int bitrate;

@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
 public class StreamCopier implements Callable<Long> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
     private final InputStream in;
     private final OutputStream out;
 

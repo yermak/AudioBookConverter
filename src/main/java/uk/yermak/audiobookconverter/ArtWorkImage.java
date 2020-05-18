@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 public class ArtWorkImage implements ArtWork {
-    private Image image;
+    private final Image image;
     private final Logger logger;
     private ArtWork bean;
 

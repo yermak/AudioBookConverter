@@ -17,7 +17,7 @@ public class AudioBookInfo {
     private int bookNumber = 0;
     private int totalTracks = 0;
     private String comment = "";
-    private List<Track> tracks = new ArrayList<>(0);
+    private final List<Track> tracks = new ArrayList<>(0);
 
     public AudioBookInfo() {
     }

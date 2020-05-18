@@ -6,7 +6,7 @@ package uk.yermak.audiobookconverter;
 public enum ProgressStatus {
     READY(false), IN_PROGRESS(false), PAUSED(false), FINISHED(true), ERROR(true), CANCELLED(true);
 
-    private boolean over;
+    private final boolean over;
 
     ProgressStatus(boolean over) {
         this.over = over;

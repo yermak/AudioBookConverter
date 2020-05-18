@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -21,21 +23,24 @@ public class ConversionContext {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private LinkedList<ConversionGroup> conversionGroupQueue = new LinkedList<>();
-    private SimpleObjectProperty<ConversionGroup> conversionHolder = new SimpleObjectProperty<>(new ConversionGroup());
+    private final LinkedList<ConversionJob> conversionQueue = new LinkedList<>();
+    private final SimpleObjectProperty<ConversionGroup> conversionGroupHolder = new SimpleObjectProperty<>(new ConversionGroup());
     private boolean paused;
 
-    private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
-    private ObservableList<String> genres = FXCollections.observableArrayList();
+    private final ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
+    private final ObservableList<String> genres = FXCollections.observableArrayList();
 
-    private SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
     private Book book;
-    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-    private SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
+    private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+    private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
+    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
+
+
+    private final static ExecutorService executorService = Executors.newCachedThreadPool();
+
 
     public ConversionContext() {
-        conversionGroupQueue.add(conversionHolder.get());
         resetForNewConversion();
     }
 
@@ -83,8 +88,7 @@ public class ConversionContext {
     public void resetForNewConversion() {
         saveGenres();
         ConversionGroup newConversionGroup = new ConversionGroup();
-        conversionGroupQueue.add(newConversionGroup);
-        conversionHolder.set(newConversionGroup);
+        conversionGroupHolder.set(newConversionGroup);
 
         reloadGenres();
         bookInfo.set(new AudioBookInfo());
@@ -111,7 +115,7 @@ public class ConversionContext {
     }
 
     public void stopConversions() {
-        conversionGroupQueue.forEach(ConversionGroup::stop);
+        conversionQueue.forEach(ConversionJob::stop);
     }
 
     public ObservableList<MediaInfo> getSelectedMedia() {
@@ -119,12 +123,12 @@ public class ConversionContext {
     }
 
     public void pauseConversions() {
-        conversionGroupQueue.forEach(ConversionGroup::pause);
+        conversionQueue.forEach(ConversionJob::pause);
         paused = true;
     }
 
     public void resumeConversions() {
-        conversionGroupQueue.forEach(ConversionGroup::resume);
+        conversionQueue.forEach(ConversionJob::resume);
         paused = false;
     }
 
@@ -140,8 +144,8 @@ public class ConversionContext {
         return posters;
     }
 
-    public ConversionGroup getPlannedConversion() {
-        return conversionHolder.get();
+    public ConversionGroup getPlannedConversionGroup() {
+        return conversionGroupHolder.get();
     }
 
     public void addBookInfoChangeListener(ChangeListener<AudioBookInfo> listener) {
@@ -154,5 +158,10 @@ public class ConversionContext {
 
     public ObservableList<String> getGenres() {
         return genres;
+    }
+
+    public void addJob(ConversionJob conversionJob) {
+        conversionQueue.add(conversionJob);
+        executorService.execute(conversionJob);
     }
 }

@@ -26,7 +26,7 @@ import java.util.Scanner;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
-    private static ConversionContext context = new ConversionContext();
+    private static final ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {
         //-Dprism.allowhidpi=false

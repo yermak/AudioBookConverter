@@ -3,8 +3,8 @@ package uk.yermak.audiobookconverter;
 import java.io.File;
 
 public class ArtWorkBean implements ArtWork {
-    private String fileName;
-    private long crc32;
+    private final String fileName;
+    private final long crc32;
 
     public String fileName() {
         return this.fileName;

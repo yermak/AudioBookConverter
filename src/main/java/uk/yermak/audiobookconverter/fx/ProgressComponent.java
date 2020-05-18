@@ -9,7 +9,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Conversion;
+import uk.yermak.audiobookconverter.ConversionGroup;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;
 
@@ -72,8 +72,8 @@ public class ProgressComponent extends GridPane {
         this.conversionProgress = conversionProgress;
 
         assignListeners(conversionProgress);
-        Conversion conversion = conversionProgress.getConversion();
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
+        ConversionGroup conversionGroup = conversionProgress.getConversionGroup();
+        conversionGroup.addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
     }
 
     private void updateButtons(ProgressStatus newValue) {
@@ -102,15 +102,15 @@ public class ProgressComponent extends GridPane {
     }
 
     private void stop() {
-        conversionProgress.getConversion().stop();
+        conversionProgress.getConversionGroup().stop();
     }
 
     private void pause() {
-        Conversion conversion = conversionProgress.getConversion();
-        if (conversion.getStatus().equals(PAUSED)) {
-            conversion.resume();
+        ConversionGroup conversionGroup = conversionProgress.getConversionGroup();
+        if (conversionGroup.getStatus().equals(PAUSED)) {
+            conversionGroup.resume();
         } else {
-            conversion.pause();
+            conversionGroup.pause();
         }
     }
 
@@ -125,6 +125,6 @@ public class ProgressComponent extends GridPane {
     }
 
     public boolean isOver() {
-        return conversionProgress.getConversion().getStatus().isOver();
+        return conversionProgress.getConversionGroup().getStatus().isOver();
     }
 }

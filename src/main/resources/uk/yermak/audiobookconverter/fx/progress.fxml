@@ -45,7 +45,7 @@
                 GridPane.fillHeight="true" GridPane.halignment="RIGHT"
         >
             <tooltip>
-                <Tooltip text="Pause conversion of files"/>
+                <Tooltip text="Pause conversionGroup of files"/>
             </tooltip>
         </Button>
 
@@ -64,7 +64,7 @@
                 GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT"
         >
             <tooltip>
-                <Tooltip text="Stop conversion of files"/>
+                <Tooltip text="Stop conversionGroup of files"/>
             </tooltip>
         </Button>
 

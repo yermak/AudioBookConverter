@@ -29,13 +29,13 @@ public class FFMediaLoader {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private List<String> fileNames;
-    private Conversion conversion;
+    private ConversionGroup conversionGroup;
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(8);
 
-    public FFMediaLoader(List<String> files, Conversion conversion) {
+    public FFMediaLoader(List<String> files, ConversionGroup conversionGroup) {
         this.fileNames = files;
-        this.conversion = conversion;
+        this.conversionGroup = conversionGroup;
         Collections.sort(fileNames);
     }
 
@@ -45,7 +45,7 @@ public class FFMediaLoader {
             FFprobe ffprobe = new FFprobe(Utils.FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
-                Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversion));
+                Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversionGroup));
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
@@ -65,19 +65,19 @@ public class FFMediaLoader {
         private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
         private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
         private final String filename;
-        private Conversion conversion;
+        private ConversionGroup conversionGroup;
         private FFprobe ffprobe;
 
-        public MediaInfoCallable(FFprobe ffprobe, String filename, Conversion conversion) {
+        public MediaInfoCallable(FFprobe ffprobe, String filename, ConversionGroup conversionGroup) {
             this.ffprobe = ffprobe;
             this.filename = filename;
-            this.conversion = conversion;
+            this.conversionGroup = conversionGroup;
         }
 
         @Override
         public MediaInfo call() throws Exception {
             try {
-                if (conversion.getStatus().isOver())
+                if (conversionGroup.getStatus().isOver())
                     throw new InterruptedException("Media Info Loading was interrupted");
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 logger.debug("Extracted ffprobe error: {}", probeResult.getError());
@@ -101,7 +101,7 @@ public class FFMediaLoader {
                         streamTags = ffMpegStream.tags;
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
-                        Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversion), 1, TimeUnit.SECONDS);
+                        Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup), 1, TimeUnit.SECONDS);
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                         mediaInfo.setArtWork(artWork);
                     }
@@ -207,19 +207,19 @@ public class FFMediaLoader {
 
         private MediaInfoBean mediaInfo;
         private String format;
-        private Conversion conversion;
+        private ConversionGroup conversionGroup;
 
-        public ArtWorkCallable(MediaInfoBean mediaInfo, String format, Conversion conversion) {
+        public ArtWorkCallable(MediaInfoBean mediaInfo, String format, ConversionGroup conversionGroup) {
             this.mediaInfo = mediaInfo;
             this.format = format;
-            this.conversion = conversion;
+            this.conversionGroup = conversionGroup;
         }
 
         @Override
         public ArtWork call() throws Exception {
             Process process = null;
             try {
-                if (conversion.getStatus().isOver()) throw new InterruptedException("ArtWork loading was interrupted");
+                if (conversionGroup.getStatus().isOver()) throw new InterruptedException("ArtWork loading was interrupted");
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
                         "-i", mediaInfo.getFileName(),
@@ -234,7 +234,7 @@ public class FFMediaLoader {
                 StreamCopier.copy(process.getErrorStream(), err);
 
                 boolean finished = false;
-                while (!conversion.getStatus().isOver() && !finished) {
+                while (!conversionGroup.getStatus().isOver() && !finished) {
                     finished = process.waitFor(500, TimeUnit.MILLISECONDS);
                 }
                 logger.debug("ArtWork Out: {}", out.toString());
@@ -242,7 +242,7 @@ public class FFMediaLoader {
 
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
-                    if (!conversion.getStatus().isOver())
+                    if (!conversionGroup.getStatus().isOver())
                         ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 });
                 return artWorkBean;

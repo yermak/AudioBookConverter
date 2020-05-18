@@ -15,19 +15,19 @@ import java.util.concurrent.TimeUnit;
 public class Mp4v2ArtBuilder {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private Conversion conversion;
+    private ConversionGroup conversionGroup;
 
-    public Mp4v2ArtBuilder(Conversion conversion) {
-        this.conversion = conversion;
+    public Mp4v2ArtBuilder(ConversionGroup conversionGroup) {
+        this.conversionGroup = conversionGroup;
     }
 
 
     public void coverArt(String outputFileName) throws IOException, InterruptedException {
-        List<ArtWork> posters = conversion.getPosters();
+        List<ArtWork> posters = conversionGroup.getPosters();
 
         int i = 0;
         for (ArtWork poster : posters) {
-            if (conversion.getStatus().isOver()) break;
+            if (conversionGroup.getStatus().isOver()) break;
             updateSinglePoster(poster, i++, outputFileName);
         }
     }
@@ -49,7 +49,7 @@ public class Mp4v2ArtBuilder {
             StreamCopier.copy(process.getErrorStream(), err);
 
             boolean finished = false;
-            while (!conversion.getStatus().isOver() && !finished) {
+            while (!conversionGroup.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
             logger.debug("Poster Out: {}", out.toString());

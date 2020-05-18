@@ -19,7 +19,7 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
 /**
  * Created by Yermak on 06-Feb-18.
  */
-public class Conversion {
+public class ConversionGroup {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
@@ -51,7 +51,7 @@ public class Conversion {
 
 
         progressCallbacks.put("output", new ProgressCallback("output", refreshable));
-        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks, outputDestination);
+        ConversionStrategy conversionStrategy = new ConversionJob(this, progressCallbacks, outputDestination);
 
         executorService.execute(conversionStrategy);
         status.set(IN_PROGRESS);

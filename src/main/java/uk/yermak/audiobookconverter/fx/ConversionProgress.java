@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Conversion;
+import uk.yermak.audiobookconverter.ConversionGroup;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Refreshable;
 
@@ -33,7 +33,7 @@ public class ConversionProgress implements Runnable, Refreshable {
 
     private long startTime;
     private boolean finished;
-    private Conversion conversion;
+    private ConversionGroup conversionGroup;
     private int totalFiles;
     private int completedFiles;
     private long totalDuration;
@@ -44,12 +44,12 @@ public class ConversionProgress implements Runnable, Refreshable {
     private long pausePeriod;
     private long pauseTime;
 
-    public ConversionProgress(Conversion conversion, int totalFiles, long totalDuration, String fileName) {
-        this.conversion = conversion;
+    public ConversionProgress(ConversionGroup conversionGroup, int totalFiles, long totalDuration, String fileName) {
+        this.conversionGroup = conversionGroup;
         this.totalFiles = totalFiles;
         this.totalDuration = totalDuration;
         this.fileName = fileName;
-        conversion.addStatusChangeListener((observable, oldValue, newValue) -> {
+        conversionGroup.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
                     cancelled();
@@ -167,8 +167,8 @@ public class ConversionProgress implements Runnable, Refreshable {
         remaining.set(60 * 1000);
     }
 
-    public Conversion getConversion() {
-        return conversion;
+    public ConversionGroup getConversionGroup() {
+        return conversionGroup;
     }
 
 }

@@ -9,9 +9,9 @@ import java.util.function.Function;
 
 public class Chapter implements Organisable, Convertable {
     private String customTitle;
-    private ObservableList<MediaInfo> media = FXCollections.observableArrayList();
+    private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private Part part;
-    private Map<String, Function<Chapter, Object>> renderMap = new HashMap<>();
+    private final Map<String, Function<Chapter, Object>> renderMap = new HashMap<>();
 
 
     public Chapter(Part part, List<MediaInfo> media) {

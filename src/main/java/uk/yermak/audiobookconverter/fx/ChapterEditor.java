@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 class ChapterEditor {
 
-    private Chapter chapter;
+    private final Chapter chapter;
 
     public ChapterEditor(Chapter chapter) {
         this.chapter = chapter;
@@ -103,8 +103,7 @@ class ChapterEditor {
         context.keySet().stream()
                 .filter(s -> s.contains("TAG"))
                 .mapToInt(value -> Integer.parseInt(value.substring(4)))
-                .findAny().ifPresent(value ->
-                selected.set(value));
+                .findAny().ifPresent(selected::set);
 
         tagsSelection.getSelectionModel().select(selected.get());
 

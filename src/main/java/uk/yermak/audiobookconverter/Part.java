@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public class Part implements Organisable, Convertable {
 
-    private ObservableList<Chapter> chapters = FXCollections.observableArrayList();
-    private Book book;
-    private Map<String, Function<Part, Object>> renderMap = new HashMap<>();
+    private final ObservableList<Chapter> chapters = FXCollections.observableArrayList();
+    private final Book book;
+    private final Map<String, Function<Part, Object>> renderMap = new HashMap<>();
 
 
     public Part(Book book) {

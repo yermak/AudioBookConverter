@@ -86,7 +86,7 @@ public class ArtWorkController {
     private void right(ActionEvent actionEvent) {
         ObservableList<Integer> selectedIndices = imageList.getSelectionModel().getSelectedIndices();
         if (selectedIndices.size() == 1) {
-            ObservableList items = imageList.getItems();
+            ObservableList<ArtWork> items = imageList.getItems();
             Integer selected = selectedIndices.get(0);
             if (selected < items.size() - 1) {
                 ConverterApplication.getContext().movePosterLeft(selected + 1);

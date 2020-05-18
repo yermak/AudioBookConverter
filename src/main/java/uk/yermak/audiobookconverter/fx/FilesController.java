@@ -149,8 +149,6 @@ public class FilesController {
                     fileList.getSelectionModel().clearSelection();
                     change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
                 }
-            } else {
-//                    bookStructure.getSelectionModel().select();
             }
         });
 
@@ -270,7 +268,7 @@ public class FilesController {
     }
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversion());
+        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversionGroup());
     }
 
     public void selectFilesDialog() {
@@ -394,11 +392,12 @@ public class FilesController {
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
-                int size = chapter.getMedia().size();
-                long duration = chapter.getDuration();
 
-                ConversionProgress conversionProgress = addConversionProgress(size, duration, finalName);
-                conversionGroup.start(chapter, conversionProgress, finalDesination);
+                ConversionProgress conversionProgress = conversionGroup.start(chapter, finalDesination);
+                Platform.runLater(() -> {
+                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
+                });
+
             }
         } else {
             logger.debug("Found {} parts in the book", parts.size());
@@ -410,10 +409,11 @@ public class FilesController {
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
-                int size = part.getMedia().size();
-                long duration = part.getDuration();
-                ConversionProgress conversionProgress = addConversionProgress(size, duration, finalName);
-                conversionGroup.start(part, conversionProgress, outputDestination);
+
+                ConversionProgress conversionProgress = conversionGroup.start(part, finalDesination);
+                Platform.runLater(() -> {
+                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
+                });
             }
         }
 
@@ -432,9 +432,9 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionGroup(), 0, 0, "Calculating... " + new File(outputDestination).getName()));
+        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
-        ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversion();
+        ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
 
         conversionGroup.setOutputParameters(context.getOutputParameters());
         conversionGroup.setBookInfo(context.getBookInfo().get());
@@ -573,14 +573,6 @@ public class FilesController {
         }
     }
 
-    public ConversionProgress addConversionProgress(int size, long duration, String finalName) {
-        ConversionProgress conversionProgress = new ConversionProgress(ConverterApplication.getContext().getPlannedConversion(), size, duration, finalName);
-        ProgressComponent progressComponent = new ProgressComponent(conversionProgress);
-        Platform.runLater(() -> {
-            progressQueue.getItems().add(0, progressComponent);
-        });
-        return conversionProgress;
-    }
 
     public void pause(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
@@ -647,4 +639,5 @@ public class FilesController {
     public void splitFile(ActionEvent actionEvent) {
 
     }
+
 }

@@ -5,9 +5,8 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
-import uk.yermak.audiobookconverter.Refreshable;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -17,12 +16,9 @@ import java.util.Map;
 /**
  * Created by yermak on 08-Feb-18.
  */
-public class ConversionProgress implements Runnable, Refreshable {
+public class ConversionProgress implements Runnable {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-
-    //TODO move to Conversion class
-    String fileName;
 
     SimpleLongProperty elapsed = new SimpleLongProperty();
     SimpleLongProperty remaining = new SimpleLongProperty();
@@ -33,23 +29,22 @@ public class ConversionProgress implements Runnable, Refreshable {
 
     private long startTime;
     private boolean finished;
-    private ConversionGroup conversionGroup;
-    private int totalFiles;
+    private final ConversionJob conversionJob;
+    private final int totalFiles;
     private int completedFiles;
-    private long totalDuration;
-    private Map<String, Long> durations = new HashMap<>();
-    private Map<String, Long> sizes = new HashMap<>();
+    private final long totalDuration;
+    private final Map<String, Long> durations = new HashMap<>();
+    private final Map<String, Long> sizes = new HashMap<>();
     private boolean paused;
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
 
-    public ConversionProgress(ConversionGroup conversionGroup, int totalFiles, long totalDuration, String fileName) {
-        this.conversionGroup = conversionGroup;
-        this.totalFiles = totalFiles;
-        this.totalDuration = totalDuration;
-        this.fileName = fileName;
-        conversionGroup.addStatusChangeListener((observable, oldValue, newValue) -> {
+    public ConversionProgress(ConversionJob conversionJob) {
+        this.conversionJob = conversionJob;
+        this.totalFiles = conversionJob.getConvertable().getMedia().size();
+        this.totalDuration = conversionJob.getConvertable().getDuration();
+        conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
                     cancelled();
@@ -167,8 +162,7 @@ public class ConversionProgress implements Runnable, Refreshable {
         remaining.set(60 * 1000);
     }
 
-    public ConversionGroup getConversionGroup() {
-        return conversionGroup;
+    public ConversionJob getConversionJob() {
+        return conversionJob;
     }
-
 }

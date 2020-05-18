@@ -92,17 +92,13 @@ public class OutputParameters {
 
         public static Format instance(String extension) {
             String ext = extension.toLowerCase();
-            switch (ext) {
-                case "m4b":
-                    return Format.M4B;
-                case "m4a":
-                    return Format.M4B;
-                case "mp3":
-                    return Format.MP3;
-                case "ogg":
-                    return Format.OGG;
-            }
-            return Format.M4B;
+            return switch (ext) {
+                case "m4b" -> Format.M4B;
+                case "m4a" -> Format.M4B;
+                case "mp3" -> Format.MP3;
+                case "ogg" -> Format.OGG;
+                default -> Format.M4B;
+            };
         }
 
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
@@ -199,7 +195,7 @@ public class OutputParameters {
     private int quality = 3;
     private boolean cbr = true;
     private int cutoff = 10000;
-    private int volume = 100;
+    private final int volume = 100;
     Format format = Format.M4B;
 
 
@@ -287,18 +283,13 @@ public class OutputParameters {
         if (this.cbr) {
             return String.valueOf(this.cutoff);
         } else {
-            switch (this.quality) {
-                case 1:
-                    return "13050";
-                case 2:
-                    return "13050";
-                case 3:
-                    return "14260";
-                case 4:
-                    return "15500";
-                default:
-                    return "0";
-            }
+            return switch (this.quality) {
+                case 1 -> "13050";
+                case 2 -> "13050";
+                case 3 -> "14260";
+                case 4 -> "15500";
+                default -> "0";
+            };
         }
     }
 

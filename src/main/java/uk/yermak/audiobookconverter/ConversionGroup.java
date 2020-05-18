@@ -1,20 +1,16 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static uk.yermak.audiobookconverter.ProgressStatus.*;
 
 /**
  * Created by Yermak on 06-Feb-18.
@@ -22,107 +18,31 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
 public class ConversionGroup {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final static ExecutorService executorService = Executors.newCachedThreadPool();
-    private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
-
     private OutputParameters outputParameters;
-    private Convertable convertable;
     private AudioBookInfo bookInfo;
     private List<ArtWork> posters;
+    private final List<ConversionJob> jobs = new ArrayList<>();
 
-    public List<MediaInfo> getMedia() {
-        return getConverable().getMedia();
-    }
-
-    public void start(Convertable convertable, Refreshable refreshable, String outputDestination) {
-        this.convertable = convertable;
-
-        addStatusChangeListener((observable, oldValue, newValue) -> {
-            if (ProgressStatus.FINISHED.equals(newValue)) {
-                Platform.runLater(() -> ConverterApplication.showNotification(outputDestination));
-            }
-        });
-
-        Executors.newSingleThreadExecutor().execute(refreshable);
+    public ConversionProgress start(Convertable convertable, String outputDestination) {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
+        ConversionJob conversionJob = new ConversionJob(this, convertable, progressCallbacks, outputDestination);
 
-        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, refreshable)));
+        int size = convertable.getMedia().size();
+        long duration = convertable.getDuration();
+        ConversionProgress conversionProgress = new ConversionProgress(conversionJob);
 
+        progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));
+        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, conversionProgress)));
 
-        progressCallbacks.put("output", new ProgressCallback("output", refreshable));
-        ConversionStrategy conversionStrategy = new ConversionJob(this, progressCallbacks, outputDestination);
-
-        executorService.execute(conversionStrategy);
-        status.set(IN_PROGRESS);
-    }
-
-/*
-    public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo, ObservableList<ArtWork> posters) {
-        this.convertable = convertable;
-        this.outputDestination = outputDestination;
-        this.outputParameters = outputParameters;
-        this.bookInfo = bookInfo;
-        this.posters = new ArrayList<>(posters);
-
-        Executors.newSingleThreadExecutor().execute(refreshable);
-
-        Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
-
-        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, refreshable)));
-
-
-        progressCallbacks.put("output", new ProgressCallback("output", refreshable));
-
-        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks);
-
-        executorService.execute(conversionStrategy);
-        status.set(IN_PROGRESS);
-    }
-
-*/
-
-    public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {
-        status.addListener(listener);
-    }
-
-    public void pause() {
-        if (status.get().equals(IN_PROGRESS)) {
-            status.set(PAUSED);
-        }
-    }
-
-    public void stop() {
-        if (!status.get().equals(FINISHED)) {
-            status.set(CANCELLED);
-        }
-    }
-
-    public ProgressStatus getStatus() {
-        return status.get();
-    }
-
-
-    public void finished() {
-        status.set(FINISHED);
-    }
-
-    public void error(String message) {
-        status.set(ERROR);
-    }
-
-    public void resume() {
-        if (status.get().equals(PAUSED)) {
-            status.set(IN_PROGRESS);
-        }
+        jobs.add(conversionJob);
+        Executors.newSingleThreadExecutor().execute(conversionProgress);
+        ConverterApplication.getContext().addJob(conversionJob);
+        return conversionProgress;
     }
 
     public OutputParameters getOutputParameters() {
         return outputParameters;
-    }
-
-    public Convertable getConverable() {
-        return convertable;
     }
 
     public AudioBookInfo getBookInfo() {
@@ -147,6 +67,14 @@ public class ConversionGroup {
 
     public void setPosters(List<ArtWork> posters) {
         this.posters = posters;
+    }
+
+    public boolean isOver() {
+        if (jobs.isEmpty()) return false;
+        for (ConversionJob job : jobs) {
+            if (!job.getStatus().isOver()) return false;
+        }
+        return true;
     }
 }
 

@@ -1,32 +1,30 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.fx.ConversionProgress;
+
 public class ProgressCallback {
-    private String fileName;
-    private Refreshable refreshable;
+    private final String fileName;
+    private final ConversionProgress conversionProgress;
 
     public String fileName() {
         return this.fileName;
     }
 
-    public Refreshable refreshable() {
-        return this.refreshable;
-    }
-
     public void converted(final long timeInMillis, final long size) {
-        this.refreshable().converted(this.fileName(), timeInMillis, size);
+        this.conversionProgress.converted(this.fileName(), timeInMillis, size);
     }
 
     public void completedConversion() {
-        this.refreshable().incCompleted(this.fileName());
+        this.conversionProgress.incCompleted(this.fileName());
     }
 
     public void reset() {
-        this.refreshable().reset();
+        this.conversionProgress.reset();
     }
 
-    public ProgressCallback(final String fileName, final Refreshable refreshable) {
+    public ProgressCallback(final String fileName, final ConversionProgress refreshable) {
         this.fileName = fileName;
-        this.refreshable = refreshable;
+        this.conversionProgress = refreshable;
     }
 }
 

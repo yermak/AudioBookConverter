@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FFMpegNativeConverter implements Callable<String> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private Conversion conversion;
+    private ConversionGroup conversionGroup;
     private MediaInfo mediaInfo;
     private final String outputFileName;
     private ProgressCallback callback;
@@ -25,8 +25,8 @@ public class FFMpegNativeConverter implements Callable<String> {
     private ProgressParser progressParser = null;
 
 
-    public FFMpegNativeConverter(Conversion conversion, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
-        this.conversion = conversion;
+    public FFMpegNativeConverter(ConversionGroup conversionGroup, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+        this.conversionGroup = conversionGroup;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
@@ -35,8 +35,8 @@ public class FFMpegNativeConverter implements Callable<String> {
     @Override
     public String call() throws Exception {
         try {
-            if (conversion.getStatus().isOver()) return null;
-            while (ProgressStatus.PAUSED.equals(conversion.getStatus())) Thread.sleep(1000);
+            if (conversionGroup.getStatus().isOver()) return null;
+            while (ProgressStatus.PAUSED.equals(conversionGroup.getStatus())) Thread.sleep(1000);
 
             progressParser = new TcpProgressParser(progress -> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);
@@ -49,7 +49,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             progressParser.start();
 
             ProcessBuilder ffmpegProcessBuilder;
-            OutputParameters outputParameters = conversion.getOutputParameters();
+            OutputParameters outputParameters = conversionGroup.getOutputParameters();
 
             if (outputParameters.needReencode(mediaInfo.getCodec())) {
                 logger.debug("Re-encoding to {} for {}", outputParameters.format, outputFileName);
@@ -66,7 +66,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             StreamCopier.copy(process.getErrorStream(), err);
 
             boolean finished = false;
-            while (!conversion.getStatus().isOver() && !finished) {
+            while (!conversionGroup.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
             logger.debug("Converter Out: {}", out.toString());

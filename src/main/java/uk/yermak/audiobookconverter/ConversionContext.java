@@ -21,8 +21,8 @@ public class ConversionContext {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private LinkedList<Conversion> conversionQueue = new LinkedList<>();
-    private SimpleObjectProperty<Conversion> conversionHolder = new SimpleObjectProperty<>(new Conversion());
+    private LinkedList<ConversionGroup> conversionGroupQueue = new LinkedList<>();
+    private SimpleObjectProperty<ConversionGroup> conversionHolder = new SimpleObjectProperty<>(new ConversionGroup());
     private boolean paused;
 
     private ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
@@ -35,7 +35,7 @@ public class ConversionContext {
     private SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
 
     public ConversionContext() {
-        conversionQueue.add(conversionHolder.get());
+        conversionGroupQueue.add(conversionHolder.get());
         resetForNewConversion();
     }
 
@@ -82,9 +82,9 @@ public class ConversionContext {
 
     public void resetForNewConversion() {
         saveGenres();
-        Conversion newConversion = new Conversion();
-        conversionQueue.add(newConversion);
-        conversionHolder.set(newConversion);
+        ConversionGroup newConversionGroup = new ConversionGroup();
+        conversionGroupQueue.add(newConversionGroup);
+        conversionHolder.set(newConversionGroup);
 
         reloadGenres();
         bookInfo.set(new AudioBookInfo());
@@ -111,7 +111,7 @@ public class ConversionContext {
     }
 
     public void stopConversions() {
-        conversionQueue.forEach(Conversion::stop);
+        conversionGroupQueue.forEach(ConversionGroup::stop);
     }
 
     public ObservableList<MediaInfo> getSelectedMedia() {
@@ -119,12 +119,12 @@ public class ConversionContext {
     }
 
     public void pauseConversions() {
-        conversionQueue.forEach(Conversion::pause);
+        conversionGroupQueue.forEach(ConversionGroup::pause);
         paused = true;
     }
 
     public void resumeConversions() {
-        conversionQueue.forEach(Conversion::resume);
+        conversionGroupQueue.forEach(ConversionGroup::resume);
         paused = false;
     }
 
@@ -140,7 +140,7 @@ public class ConversionContext {
         return posters;
     }
 
-    public Conversion getPlannedConversion() {
+    public ConversionGroup getPlannedConversion() {
         return conversionHolder.get();
     }
 

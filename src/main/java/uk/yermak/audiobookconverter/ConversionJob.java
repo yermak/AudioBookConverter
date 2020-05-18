@@ -17,17 +17,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public class ParallelConversionStrategy implements ConversionStrategy {
+public class ConversionJob implements Runnable {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static ExecutorService executorService = Executors.newWorkStealingPool();
-    private Conversion conversion;
+    private ConversionGroup conversionGroup;
     private Map<String, ProgressCallback> progressCallbacks;
     private String outputDestination;
 
 
-    public ParallelConversionStrategy(Conversion conversion, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
-        this.conversion = conversion;
+    public ConversionJob(ConversionGroup conversionGroup, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
+        this.conversionGroup = conversionGroup;
         this.progressCallbacks = progressCallbacks;
         this.outputDestination = outputDestination;
     }
@@ -36,7 +36,7 @@ public class ParallelConversionStrategy implements ConversionStrategy {
         List<Future<String>> futures = new ArrayList<>();
         long jobId = System.currentTimeMillis();
 
-        String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversion.getWorkfileExtension());
+        String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         File fileListFile = null;
         File metaFile = null;
@@ -49,40 +49,40 @@ public class ParallelConversionStrategy implements ConversionStrategy {
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversion.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
-                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(conversion, mediaInfo, tempOutput, callback));
+                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(conversionGroup, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
             }
 
             for (Future<String> future : futures) {
-                if (conversion.getStatus().isOver()) return;
+                if (conversionGroup.getStatus().isOver()) return;
                 String outputFileName = future.get();
                 logger.debug("Waited for completion of {}", outputFileName);
             }
-            if (conversion.getStatus().isOver()) return;
-            metaFile = new MetadataBuilder().prepareMeta(jobId, conversion.getBookInfo(), conversion.getConverable());
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(conversion, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+            if (conversionGroup.getStatus().isOver()) return;
+            metaFile = new MetadataBuilder().prepareMeta(jobId, conversionGroup.getBookInfo(), conversionGroup.getConverable());
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(conversionGroup, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
-            if (conversion.getStatus().isOver()) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversion);
+            if (conversionGroup.getStatus().isOver()) return;
+            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(conversionGroup);
             artBuilder.coverArt(tempFile);
 
-            if (conversion.getStatus().isOver()) return;
+            if (conversionGroup.getStatus().isOver()) return;
             File destFile = new File(outputDestination);
             if (destFile.exists()) FileUtils.deleteQuietly(destFile);
             FileUtils.moveFile(new File(tempFile), destFile);
-            conversion.finished();
+            conversionGroup.finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
             e.printStackTrace();
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            conversion.error(e.getMessage() + "; " + sw.getBuffer().toString());
+            conversionGroup.error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-            for (MediaInfo mediaInfo : conversion.getMedia()) {
-                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversion.getWorkfileExtension())));
+            for (MediaInfo mediaInfo : conversionGroup.getMedia()) {
+                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
@@ -90,13 +90,13 @@ public class ParallelConversionStrategy implements ConversionStrategy {
     }
 
     private List<MediaInfo> prioritiseMedia() {
-        return conversion.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
+        return conversionGroup.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
     }
 
 
     protected File prepareFiles(long jobId) throws IOException {
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = conversion.getMedia().stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversion.getWorkfileExtension()) + "'").collect(Collectors.toList());
+        List<String> outFiles = conversionGroup.getMedia().stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension()) + "'").collect(Collectors.toList());
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
     }

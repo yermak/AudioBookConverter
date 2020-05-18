@@ -149,14 +149,14 @@
                                 GridPane.fillHeight="true"
                                 onAction="#pause">
                             <tooltip>
-                                <Tooltip text="Pause conversion of files"/>
+                                <Tooltip text="Pause conversionGroup of files"/>
                             </tooltip>
                         </Button>
                         <Button fx:id="stopButton" text="Stop all"
                                 minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#stop">
                             <tooltip>
-                                <Tooltip text="Stop conversion of files"/>
+                                <Tooltip text="Stop conversionGroup of files"/>
                             </tooltip>
                         </Button>
                         <Button fx:id="clearQueueButton" text="Clear"
@@ -197,7 +197,7 @@
                     onAction="#addFiles"
             >
                 <tooltip>
-                    <Tooltip text="Add files for conversion to the list"/>
+                    <Tooltip text="Add files for conversionGroup to the list"/>
                 </tooltip>
             </Button>
             <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.05}"
@@ -298,7 +298,7 @@
                     <Font size="16.0"/>
                 </font>
                 <tooltip>
-                    <Tooltip text="Start conversion of files"/>
+                    <Tooltip text="Start conversionGroup of files"/>
                 </tooltip>
             </Button>
         </VBox>

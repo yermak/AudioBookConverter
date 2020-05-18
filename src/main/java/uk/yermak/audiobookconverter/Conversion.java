@@ -1,13 +1,13 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,6 @@ public class Conversion {
     private SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
 
     private OutputParameters outputParameters;
-    private String outputDestination;
     private Convertable convertable;
     private AudioBookInfo bookInfo;
     private List<ArtWork> posters;
@@ -35,7 +34,30 @@ public class Conversion {
         return getConverable().getMedia();
     }
 
+    public void start(Convertable convertable, Refreshable refreshable, String outputDestination) {
+        this.convertable = convertable;
 
+        addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (ProgressStatus.FINISHED.equals(newValue)) {
+                Platform.runLater(() -> ConverterApplication.showNotification(outputDestination));
+            }
+        });
+
+        Executors.newSingleThreadExecutor().execute(refreshable);
+
+        Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
+
+        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, refreshable)));
+
+
+        progressCallbacks.put("output", new ProgressCallback("output", refreshable));
+        ConversionStrategy conversionStrategy = new ParallelConversionStrategy(this, progressCallbacks, outputDestination);
+
+        executorService.execute(conversionStrategy);
+        status.set(IN_PROGRESS);
+    }
+
+/*
     public void start(Convertable convertable, String outputDestination, Refreshable refreshable, OutputParameters outputParameters, AudioBookInfo bookInfo, ObservableList<ArtWork> posters) {
         this.convertable = convertable;
         this.outputDestination = outputDestination;
@@ -58,6 +80,7 @@ public class Conversion {
         status.set(IN_PROGRESS);
     }
 
+*/
 
     public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {
         status.addListener(listener);
@@ -98,11 +121,6 @@ public class Conversion {
         return outputParameters;
     }
 
-
-    public String getOutputDestination() {
-        return outputDestination;
-    }
-
     public Convertable getConverable() {
         return convertable;
     }
@@ -117,6 +135,18 @@ public class Conversion {
 
     public String getWorkfileExtension() {
         return outputParameters.format.extension;
+    }
+
+    public void setOutputParameters(OutputParameters outputParameters) {
+        this.outputParameters = outputParameters;
+    }
+
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        this.bookInfo = bookInfo;
+    }
+
+    public void setPosters(List<ArtWork> posters) {
+        this.posters = posters;
     }
 }
 

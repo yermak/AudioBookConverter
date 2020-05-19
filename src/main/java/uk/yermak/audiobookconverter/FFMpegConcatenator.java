@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -68,8 +69,16 @@ public class FFMpegConcatenator {
             logger.debug("Concat Out: {}", out.toString());
             logger.error("Concat Error: {}", err.toString());
 
+            if (process.exitValue() != 0) {
+                throw new ConversionException("Concatenation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
+            }
+
+            if (!new File(outputFileName).exists()) {
+                throw new ConversionException("Concatenation failed, no output file:" + out.toString(), new Error(err.toString()));
+            }
         } catch (Exception e) {
             logger.error("Error during concatination of files:", e);
+            throw new RuntimeException(e);
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);

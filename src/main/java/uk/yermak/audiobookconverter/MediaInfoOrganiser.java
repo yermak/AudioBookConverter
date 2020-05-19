@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class MediaInfoOrganiser implements Organisable{
+public abstract class MediaInfoOrganiser implements Organisable {
     protected Chapter chapter;
 
     public void split() {

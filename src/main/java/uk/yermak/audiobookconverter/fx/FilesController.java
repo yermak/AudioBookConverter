@@ -152,19 +152,6 @@ public class FilesController {
             }
         });
 
-        /* TODO fix buttons behaviour
-        conversion.addStatusChangeListener((observable, oldValue, newValue) ->
-                updateUI(newValue, media.isEmpty(), fileList.getSelectionModel().getSelectedIndices())
-        );
-*/
-        //TOODO: this section may not work
-  /*      media.addListener((ListChangeListener<MediaInfo>) c -> updateUI(this.conversion.getStatus(), c.getReencodingOptions().isEmpty(), fileList.getSelectionModel().getSelectedIndices()));
-        if (listener != null) {
-            fileList.getSelectionModel().selectedItemProperty().removeListener(listener);
-        }
-        listener = new MediaInfoChangeListener(conversion);
-        fileList.getSelectionModel().selectedItemProperty().addListener(listener);*/
-
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
 

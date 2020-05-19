@@ -22,8 +22,8 @@ import java.util.function.Function;
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static String getTmp(long jobId, long index, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC-" + Version.getVersionString() + "-" + jobId + "-" + index + "." + extension).getAbsolutePath();
+    public static String getTmp(long jobId, long fileId, String extension) {
+        return new File(System.getProperty("java.io.tmpdir"), "~ABC_" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {

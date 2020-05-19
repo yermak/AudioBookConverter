@@ -49,7 +49,6 @@ public class Mp4v2InfoLoader {
             if (duration != 0) {
                 mediaInfo.setDuration(duration);
             }
-            System.out.println("info = " + info);
         } finally {
             Utils.closeSilently(process);
         }

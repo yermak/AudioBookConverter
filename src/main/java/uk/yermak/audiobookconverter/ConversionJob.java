@@ -52,7 +52,7 @@ public class ConversionJob implements Runnable {
         status.set(IN_PROGRESS);
 
         List<Future<String>> futures = new ArrayList<>();
-        long jobId = System.currentTimeMillis();
+        long jobId = outputDestination.hashCode() + System.currentTimeMillis();
 
         String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
@@ -89,8 +89,8 @@ public class ConversionJob implements Runnable {
 
             if (status.get().isOver()) return;
             File destFile = new File(outputDestination);
-            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-            FileUtils.moveFile(new File(tempFile), destFile);
+//            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+//            FileUtils.moveFile(new File(tempFile), destFile);
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
@@ -100,10 +100,10 @@ public class ConversionJob implements Runnable {
             error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             for (MediaInfo mediaInfo : convertable.getMedia()) {
-                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
+//                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
-            FileUtils.deleteQuietly(metaFile);
-            FileUtils.deleteQuietly(fileListFile);
+//            FileUtils.deleteQuietly(metaFile);
+//            FileUtils.deleteQuietly(fileListFile);
         }
     }
 
@@ -118,7 +118,6 @@ public class ConversionJob implements Runnable {
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
     }
-
 
 
     public void addStatusChangeListener(ChangeListener<ProgressStatus> listener) {

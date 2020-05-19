@@ -14,7 +14,7 @@ public interface Convertable {
 
     long getDuration();
 
-    public static final Convertable EMPTY = new EmptyConvertable();
+    Convertable EMPTY = new EmptyConvertable();
 
     class EmptyConvertable implements Convertable {
         @Override

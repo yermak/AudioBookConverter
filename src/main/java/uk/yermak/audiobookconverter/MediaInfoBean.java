@@ -115,7 +115,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.codec = codec;
     }
 
-    @Override
     public void setChapter(Chapter chapter) {
         this.chapter = chapter;
     }
@@ -145,7 +144,7 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName() + getDuration());
+        return Objects.hash(getFileName(), getDuration());
     }
 
 }

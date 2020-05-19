@@ -3,7 +3,9 @@ package uk.yermak.audiobookconverter.fx;
 import com.google.common.collect.ImmutableSet;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -102,7 +104,8 @@ public class FilesController {
     private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC};
 
     private final ContextMenu contextMenu = new ContextMenu();
-    private boolean chaptersMode = false;
+
+    private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
     private boolean split;
 
     @FXML
@@ -142,7 +145,7 @@ public class FilesController {
 
         selectedMedia.addListener((InvalidationListener) observable -> {
             if (selectedMedia.isEmpty()) return;
-            if (!chaptersMode) {
+            if (!chaptersMode.get()) {
                 List<MediaInfo> change = new ArrayList<>(selectedMedia);
                 List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
                 if (!change.containsAll(selection) || !selection.containsAll(change)) {
@@ -160,6 +163,20 @@ public class FilesController {
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
+
+
+        importButton.setDisable(true);
+
+        chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
+        fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
+
+        fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> {
+                    if (fileList.getItems().isEmpty()) {
+                        filesChapters.getTabs().remove(filesTab);
+                    }
+                }
+        );
+
     }
 
     private void addDragEvenHandlers(Control control) {
@@ -175,7 +192,7 @@ public class FilesController {
             processFiles(event.getDragboard().getFiles());
             event.setDropCompleted(true);
             event.consume();
-            if (!chaptersMode) {
+            if (!chaptersMode.get()) {
                 if (!filesChapters.getTabs().contains(filesTab)) {
                     filesChapters.getTabs().add(filesTab);
                     filesChapters.getSelectionModel().select(filesTab);
@@ -206,7 +223,7 @@ public class FilesController {
         if (selectedDirectory != null) {
             processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
-            if (!chaptersMode) {
+            if (!chaptersMode.get()) {
                 filesChapters.getTabs().add(filesTab);
                 filesChapters.getSelectionModel().select(filesTab);
             }
@@ -218,7 +235,7 @@ public class FilesController {
         List<String> fileNames = collectFiles(files);
 
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
-        if (chaptersMode) {
+        if (chaptersMode.get()) {
             Book book = ConverterApplication.getContext().getBook();
             book.construct(FXCollections.observableArrayList(addedMedia));
             updateBookStructure(book, bookStructure.getRoot());
@@ -278,7 +295,7 @@ public class FilesController {
             File firstFile = files.get(0);
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
-            if (!chaptersMode) {
+            if (!chaptersMode.get()) {
                 filesChapters.getTabs().add(filesTab);
                 filesChapters.getSelectionModel().select(filesTab);
             }
@@ -286,13 +303,26 @@ public class FilesController {
     }
 
     public void removeFiles(ActionEvent event) {
-        if (chaptersMode) {
+        if (chaptersMode.get()) {
             ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+//            int min = bookStructure.getExpandedItemCount();
             for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
                 Organisable organisable = selectedCell.getTreeItem().getValue();
                 organisable.remove();
+//                min = Math.min(selectedCell.getRow(), min - 1);
             }
-            updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+
+
+//            int finalMin = min;
+            Platform.runLater(() -> {
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+                //TODO temp hack - can't selection on previous row causes NPE on next removal...
+                bookStructure.getSelectionModel().clearSelection();
+                if (bookStructure.getRoot().getChildren().isEmpty()) {
+                    clear(event);
+                }
+            });
+
         } else {
             ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
             fileList.getItems().removeAll(selected);
@@ -305,16 +335,16 @@ public class FilesController {
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
-        chaptersMode = false;
+        chaptersMode.set(false);
     }
 
     public void moveUp(ActionEvent event) {
-        if (chaptersMode) {
+        if (chaptersMode.get()) {
             ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
             if (selectedCells.size() == 1) {
                 Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
                 organisable.moveUp();
-                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+                Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
             }
         } else {
             ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
@@ -333,12 +363,12 @@ public class FilesController {
     }
 
     public void moveDown(ActionEvent event) {
-        if (chaptersMode) {
+        if (chaptersMode.get()) {
             ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
             if (selectedCells.size() == 1) {
                 Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
                 organisable.moveDown();
-                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+                Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
             }
         } else {
             ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
@@ -361,7 +391,6 @@ public class FilesController {
         if (book == null) {
             book = new Book(ConverterApplication.getContext().getBookInfo().get());
             book.construct(mediaInfos);
-
         }
 
         ObservableList<Part> parts = book.getParts();
@@ -440,7 +469,7 @@ public class FilesController {
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
         fileList.getItems().clear();
-        chaptersMode = false;
+        chaptersMode.set(false);
     }
 
     private static String selectOutputFile(AudioBookInfo audioBookInfo) {
@@ -470,6 +499,8 @@ public class FilesController {
             return;
         }
 
+        startButton.setDisable(true);
+
         filesChapters.getTabs().add(chaptersTab);
         filesChapters.getTabs().remove(filesTab);
 
@@ -488,7 +519,7 @@ public class FilesController {
         ConverterApplication.getContext().setBook(book);
         filesChapters.getSelectionModel().select(chaptersTab);
         fileList.getItems().clear();
-        chaptersMode = true;
+        chaptersMode.set(true);
 
 
         long lastBookUpdate = System.currentTimeMillis();
@@ -500,14 +531,13 @@ public class FilesController {
         });
 
         Executors.newSingleThreadExecutor().submit(() -> {
-            book.construct(mediaInfos);
-            updateBookStructure(book, bookItem);
+            try {
+                book.construct(mediaInfos);
+                updateBookStructure(book, bookItem);
+            } finally {
+                startButton.setDisable(false);
+            }
         });
-
-/*
-        book.construct(mediaInfos);
-        updateBookStructure(book, bookItem);
-*/
     }
 
     private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {

@@ -33,13 +33,24 @@ public class OutputParameters {
             public boolean mp4Compatible() {
                 return true;
             }
+
+            @Override
+            public boolean ffmpegCompatible() {
+                return false;
+            }
         },
         M4A("ipod", "aac", "m4a") {
             @Override
             public boolean mp4Compatible() {
                 return true;
             }
+
+            @Override
+            public boolean ffmpegCompatible() {
+                return false;
+            }
         }, MP3("mp3", "libmp3lame", "mp3") {
+            @Override
             public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
                 String[] strings = {Utils.FFMPEG,
                         "-protocol_whitelist", "file,pipe,concat",
@@ -177,7 +188,7 @@ public class OutputParameters {
                     "-safe", "0",
                     "-i", fileListFileName,
                     "-i", metaDataFileName,
-                    "-map_metadata", "1 ",
+                    "-map_metadata", "1",
                     "-f", format,
                     "-c:a", "copy",
                     "-movflags", "+faststart",
@@ -198,6 +209,10 @@ public class OutputParameters {
 
         public boolean mp4Compatible() {
             return false;
+        }
+
+        public boolean ffmpegCompatible() {
+            return true;
         }
     }
 
@@ -282,10 +297,6 @@ public class OutputParameters {
 
     public String getFFMpegQualityValue() {
         return this.cbr ? this.getBitRate() + "k" : String.valueOf(this.quality);
-    }
-
-    public String getFFMpegFrequencyValue() {
-        return String.valueOf(this.getFrequency());
     }
 
     public String getFFMpegChannelsValue() {

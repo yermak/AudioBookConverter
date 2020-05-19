@@ -88,6 +88,8 @@ public class ConversionJob implements Runnable {
             if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
                 Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
                 artBuilder.coverArt(tempFile);
+            } else if (conversionGroup.getOutputParameters().format.ffmpegCompatible()){
+
             }
 
             if (status.get().isOver()) return;

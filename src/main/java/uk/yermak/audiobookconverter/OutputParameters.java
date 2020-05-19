@@ -28,7 +28,17 @@ public class OutputParameters {
     }
 
     public enum Format {
-        M4B("ipod", "aac", "m4a") {
+        M4B("ipod", "aac", "m4b") {
+            @Override
+            public boolean mp4Compatible() {
+                return true;
+            }
+        },
+        M4A("ipod", "aac", "m4a") {
+            @Override
+            public boolean mp4Compatible() {
+                return true;
+            }
         }, MP3("mp3", "libmp3lame", "mp3") {
             public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
                 String[] strings = {Utils.FFMPEG,
@@ -94,7 +104,7 @@ public class OutputParameters {
             String ext = extension.toLowerCase();
             return switch (ext) {
                 case "m4b" -> Format.M4B;
-                case "m4a" -> Format.M4B;
+                case "m4a" -> Format.M4A;
                 case "mp3" -> Format.MP3;
                 case "ogg" -> Format.OGG;
                 default -> Format.M4B;
@@ -185,8 +195,11 @@ public class OutputParameters {
         public String toString() {
             return format + "[" + codec + "]";
         }
-    }
 
+        public boolean mp4Compatible() {
+            return false;
+        }
+    }
 
 
     private int bitRate = 128;

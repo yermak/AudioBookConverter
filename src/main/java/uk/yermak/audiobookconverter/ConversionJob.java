@@ -84,8 +84,11 @@ public class ConversionJob implements Runnable {
             concatenator.concat();
 
             if (status.get().isOver()) return;
-            Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
-            artBuilder.coverArt(tempFile);
+
+            if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
+                Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
+                artBuilder.coverArt(tempFile);
+            }
 
             if (status.get().isOver()) return;
             File destFile = new File(outputDestination);
@@ -100,7 +103,7 @@ public class ConversionJob implements Runnable {
             error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             for (MediaInfo mediaInfo : convertable.getMedia()) {
-                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
+                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
             FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);

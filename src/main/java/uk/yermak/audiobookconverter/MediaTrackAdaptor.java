@@ -6,10 +6,12 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     private final MediaInfo mediaInfo;
     private final Track track;
+    private long duration;
 
     public MediaTrackAdaptor(MediaInfo mediaInfo, Track track) {
         this.mediaInfo = mediaInfo;
         this.track = track;
+        this.duration = track.getDuration();
     }
 
     @Override
@@ -22,27 +24,10 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return track.getTitle();
     }
 
-/*
-    @Override
-    public void setChannels(int channels) {
-
-    }
-
-    @Override
-    public void setFrequency(int frequency) {
-
-    }
-
-    @Override
-    public void setBitrate(int bitrate) {
-
-    }
-
     @Override
     public void setDuration(long duration) {
-
+        this.duration = duration;
     }
-*/
 
     @Override
     public int getChannels() {
@@ -61,20 +46,13 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public long getDuration() {
-        return track.getDuration();
+        return duration;
     }
 
     @Override
     public String getFileName() {
         return mediaInfo.getFileName();
     }
-
-/*
-    @Override
-    public void setBookInfo(AudioBookInfo bookInfo) {
-
-    }
-*/
 
     @Override
     public AudioBookInfo getBookInfo() {
@@ -86,24 +64,10 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return mediaInfo.getArtWork();
     }
 
-/*
-    @Override
-    public void setArtWork(ArtWork artWork) {
-
-    }
-*/
-
     @Override
     public String getCodec() {
         return mediaInfo.getCodec();
     }
-
-/*
-    @Override
-    public void setCodec(String codec) {
-
-    }
-*/
 
     @Override
     public void setChapter(Chapter chapter) {
@@ -117,7 +81,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName(), track.getTitle(), getDuration());
+        return Objects.hash(getFileName(), track.getTrackNo(), getDuration());
     }
 
 }

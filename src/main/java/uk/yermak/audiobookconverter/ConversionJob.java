@@ -89,8 +89,8 @@ public class ConversionJob implements Runnable {
 
             if (status.get().isOver()) return;
             File destFile = new File(outputDestination);
-//            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-//            FileUtils.moveFile(new File(tempFile), destFile);
+            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+            FileUtils.moveFile(new File(tempFile), destFile);
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
@@ -100,10 +100,10 @@ public class ConversionJob implements Runnable {
             error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
             for (MediaInfo mediaInfo : convertable.getMedia()) {
-//                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
+                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode()+mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
-//            FileUtils.deleteQuietly(metaFile);
-//            FileUtils.deleteQuietly(fileListFile);
+            FileUtils.deleteQuietly(metaFile);
+            FileUtils.deleteQuietly(fileListFile);
         }
     }
 

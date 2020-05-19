@@ -28,8 +28,6 @@ public class ConversionGroup {
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         ConversionJob conversionJob = new ConversionJob(this, convertable, progressCallbacks, outputDestination);
 
-        int size = convertable.getMedia().size();
-        long duration = convertable.getDuration();
         ConversionProgress conversionProgress = new ConversionProgress(conversionJob);
 
         progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));

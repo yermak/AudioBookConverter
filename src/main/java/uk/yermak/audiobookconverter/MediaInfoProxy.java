@@ -15,22 +15,6 @@ public class MediaInfoProxy implements MediaInfo {
         }
     }
 
-    public void setChannels(final int channels) {
-        this.getMediaInfo().setChannels(channels);
-    }
-
-    public void setFrequency(final int frequency) {
-        this.getMediaInfo().setFrequency(frequency);
-    }
-
-    public void setBitrate(final int bitrate) {
-        this.getMediaInfo().setBitrate(bitrate);
-    }
-
-    public void setDuration(final long duration) {
-        this.getMediaInfo().setDuration(duration);
-    }
-
     public int getChannels() {
         return this.getMediaInfo().getChannels();
     }
@@ -81,10 +65,6 @@ public class MediaInfoProxy implements MediaInfo {
         return this.filename;
     }
 
-    public void setBookInfo(final AudioBookInfo bookInfo) {
-        this.getMediaInfo().setBookInfo(bookInfo);
-    }
-
     public AudioBookInfo getBookInfo() {
         return this.getMediaInfo().getBookInfo();
     }
@@ -93,20 +73,12 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getArtWork();
     }
 
-    public void setArtWork(final ArtWork artWork) {
-        this.getMediaInfo().setArtWork(artWork);
-    }
-
     public String toString() {
         return this.filename;
     }
 
     public String getCodec() {
         return this.getMediaInfo().getCodec();
-    }
-
-    public void setCodec(final String codec) {
-        this.getMediaInfo().setCodec(codec);
     }
 
     @Override
@@ -119,6 +91,10 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getOffset();
     }
 
+
+    public void setDuration(long duration) {
+        this.getMediaInfo().setDuration(duration);
+    }
 
     MediaInfoProxy(final String filename, final Future<MediaInfo> futureLoad) {
         this.filename = filename;
@@ -135,7 +111,7 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName()+getDuration()) ;
+        return Objects.hash(getFileName(), getDuration()) ;
     }
 }
 

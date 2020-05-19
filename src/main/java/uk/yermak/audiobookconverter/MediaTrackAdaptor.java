@@ -22,6 +22,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return track.getTitle();
     }
 
+/*
     @Override
     public void setChannels(int channels) {
 
@@ -41,6 +42,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     public void setDuration(long duration) {
 
     }
+*/
 
     @Override
     public int getChannels() {
@@ -67,10 +69,12 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return mediaInfo.getFileName();
     }
 
+/*
     @Override
     public void setBookInfo(AudioBookInfo bookInfo) {
 
     }
+*/
 
     @Override
     public AudioBookInfo getBookInfo() {
@@ -82,20 +86,24 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return mediaInfo.getArtWork();
     }
 
+/*
     @Override
     public void setArtWork(ArtWork artWork) {
 
     }
+*/
 
     @Override
     public String getCodec() {
         return mediaInfo.getCodec();
     }
 
+/*
     @Override
     public void setCodec(String codec) {
 
     }
+*/
 
     @Override
     public void setChapter(Chapter chapter) {
@@ -109,7 +117,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName() + getDuration());
+        return Objects.hash(getFileName(), track.getTitle(), getDuration());
     }
 
 }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -54,7 +55,19 @@ public class Mp4v2ArtBuilder {
             }
             logger.debug("Poster Out: {}", out.toString());
             logger.error("Poster Error: {}", err.toString());
-        } finally {
+
+            if (process.exitValue() != 0) {
+                throw new ConversionException("ArtWork failed with code " + process.exitValue() + "!=0", new Error(err.toString()));
+            }
+
+            if (!new File(outputFileName).exists()) {
+                throw new ConversionException("ArtWork failed, no output file:" + out.toString(), new Error(err.toString()));
+            }
+        } catch (Exception e){
+            logger.error("Failed to apply art work", e);
+            throw new ConversionException("Failed to apply art work",e);
+        }
+        finally {
             Utils.closeSilently(process);
         }
     }

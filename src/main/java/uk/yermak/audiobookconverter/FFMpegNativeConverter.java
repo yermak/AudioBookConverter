@@ -42,7 +42,7 @@ public class FFMpegNativeConverter implements Callable<String> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);
 //                logger.debug("Completed conversion: {} from {}", progress.out_time_ns / 1000000, progress.total_size);
                 if (progress.isEnd()) {
-                    callback.converted(progress.total_size, progress.total_size);
+                    callback.converted(progress.out_time_ns / 1000000, progress.total_size);
                     callback.completedConversion();
                 }
             });

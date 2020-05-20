@@ -66,6 +66,7 @@ public class ProgressComponent extends GridPane {
             fileName = fileName.substring(0, 80) + "...";
         }
         title.setText(fileName);
+        filesCount.setText(conversionProgress.filesCount.get());
 
         pauseButton.setOnAction(event -> pause());
         stopButton.setOnAction(event -> stop());

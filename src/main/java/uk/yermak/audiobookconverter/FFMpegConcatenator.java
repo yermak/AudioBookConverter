@@ -22,16 +22,16 @@ public class FFMpegConcatenator {
     private final ConversionJob conversionJob;
     private final String outputFileName;
 
-    private final String metaDataFileName;
+    private final MetadataBuilder metadataBuilder;
     private final String fileListFileName;
     private final ProgressCallback callback;
     private ProgressParser progressParser;
 
 
-    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, String metaDataFileName, String fileListFileName, ProgressCallback callback) {
+    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, MetadataBuilder metadataBuilder, String fileListFileName, ProgressCallback callback) {
         this.conversionJob = conversionJob;
         this.outputFileName = outputFileName;
-        this.metaDataFileName = metaDataFileName;
+        this.metadataBuilder = metadataBuilder;
         this.fileListFileName = fileListFileName;
         this.callback = callback;
     }
@@ -51,11 +51,12 @@ public class FFMpegConcatenator {
         Process process = null;
         try {
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
-            ProcessBuilder ffmpegProcessBuilder;
-            List<String> concatOptions = outputParameters.getConcatOptions(fileListFileName, metaDataFileName, progressParser.getUri().toString(), outputFileName);
-            ffmpegProcessBuilder = new ProcessBuilder(concatOptions);
-            logger.debug("Starting concat with options {}", String.join("\n", concatOptions));
-            process = ffmpegProcessBuilder.start();
+            List<String> concatOptions = outputParameters.getConcatOptions(fileListFileName, metadataBuilder, progressParser.getUri().toString(), outputFileName);
+
+            logger.debug("Starting concat with options {}", String.join(" ", concatOptions));
+
+            //falling back to Runtime.exec() due to JDK specific way of interpreting quouted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
+            process = Runtime.getRuntime().exec( String.join(" ", concatOptions));
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);

@@ -10,11 +10,15 @@ public interface Convertable {
 
     int getNumber();
 
+    int getTotalNumbers();
+
     boolean isTheOnlyOne();
 
     long getDuration();
 
     Convertable EMPTY = new EmptyConvertable();
+
+    String getDetails();
 
     class EmptyConvertable implements Convertable {
         @Override
@@ -33,6 +37,11 @@ public interface Convertable {
         }
 
         @Override
+        public int getTotalNumbers() {
+            return 0;
+        }
+
+        @Override
         public boolean isTheOnlyOne() {
             return true;
         }
@@ -40,6 +49,11 @@ public interface Convertable {
         @Override
         public long getDuration() {
             return 0;
+        }
+
+        @Override
+        public String getDetails() {
+            return "";
         }
     }
 }

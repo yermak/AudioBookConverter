@@ -40,6 +40,10 @@ public class Chapter implements Organisable, Convertable {
         return part.getChapters().indexOf(this) + 1;
     }
 
+    public int getTotalNumbers() {
+        return part.getChapters().size();
+    }
+
     @Override
     public boolean isTheOnlyOne() {
         return part.getChapters().size() == 1;

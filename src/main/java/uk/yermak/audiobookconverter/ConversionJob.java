@@ -79,8 +79,8 @@ public class ConversionJob implements Runnable {
                 logger.debug("Waited for completion of {}", outputFileName);
             }
             if (status.get().isOver()) return;
-            metaFile = new MetadataBuilder().prepareMeta(jobId, conversionGroup.getBookInfo(), convertable);
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, metaFile.getAbsolutePath(), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(jobId, conversionGroup, convertable), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;
@@ -88,8 +88,6 @@ public class ConversionJob implements Runnable {
             if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
                 Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
                 artBuilder.coverArt(tempFile);
-            } else if (conversionGroup.getOutputParameters().format.ffmpegCompatible()){
-
             }
 
             if (status.get().isOver()) return;

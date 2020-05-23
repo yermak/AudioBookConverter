@@ -64,6 +64,11 @@ public class Part implements Organisable, Convertable {
     }
 
     @Override
+    public int getTotalNumbers() {
+        return getBook().getParts().size();
+    }
+
+    @Override
     public boolean isTheOnlyOne() {
         return book.getParts().size() == 1;
     }

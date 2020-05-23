@@ -7,8 +7,8 @@ import java.util.List;
 
 public class OutputParameters {
 
-    public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
-        return format.getConcatOptions(fileListFileName, metaDataFileName, progressUri, outputFileName);
+    public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
+        return format.getConcatOptions(fileListFileName, metadataBuilder, progressUri, outputFileName);
     }
 
     public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
@@ -51,18 +51,42 @@ public class OutputParameters {
             }
         }, MP3("mp3", "libmp3lame", "mp3") {
             @Override
-            public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
-                String[] strings = {Utils.FFMPEG,
-                        "-protocol_whitelist", "file,pipe,concat",
-                        "-vn",
-                        "-f", "concat",
-                        "-safe", "0",
-                        "-i", fileListFileName,
-                        "-f", format,
-                        "-c:a", "copy",
-                        "-progress", progressUri,
-                        outputFileName};
-                return Arrays.asList(strings);
+            public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
+                List<String> options = new ArrayList<>();
+                options.add(Utils.FFMPEG);
+                options.add("-protocol_whitelist");
+                options.add("file,pipe,concat");
+                options.add("-f");
+                options.add("concat");
+                options.add("-safe");
+                options.add("0");
+                options.add("-i");
+                options.add(fileListFileName);
+                String artWorkFile = metadataBuilder.getArtWorkFile();
+                if (artWorkFile != null) {
+                    options.add("-i");
+                    options.add(artWorkFile);
+                    options.add("-c:v");
+                    options.add("copy");
+                    options.add("-map");
+                    options.add("0:0");
+                    options.add("-map");
+                    options.add("1:0");
+                } else {
+                    options.add("-vn");
+                }
+                options.add("-c:a");
+                options.add("copy");
+                options.add("-id3v2_version");
+                options.add("4");
+                options.addAll(metadataBuilder.prepareId3v2Meta());
+                options.add("-f");
+                options.add(format);
+                options.add("-progress");
+                options.add(progressUri);
+                options.add(outputFileName);
+
+                return options;
             }
         }, OGG("ogg", "libopus", "ogg") {
             @Override
@@ -180,14 +204,14 @@ public class OutputParameters {
             return options;
         }
 
-        public List<String> getConcatOptions(String fileListFileName, String metaDataFileName, String progressUri, String outputFileName) {
+        public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             String[] strings = {Utils.FFMPEG,
                     "-protocol_whitelist", "file,pipe,concat",
                     "-vn",
                     "-f", "concat",
                     "-safe", "0",
                     "-i", fileListFileName,
-                    "-i", metaDataFileName,
+                    "-i", metadataBuilder.prepareMp4MetaFile().getAbsolutePath(),
                     "-map_metadata", "1",
                     "-f", format,
                     "-c:a", "copy",

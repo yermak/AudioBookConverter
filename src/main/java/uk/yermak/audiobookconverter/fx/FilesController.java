@@ -624,6 +624,10 @@ public class FilesController {
         ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/faq");
     }
 
+    public void openDonate() {
+        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/donate");
+    }
+
     public void checkVersion(ActionEvent actionEvent) {
         ConverterApplication.checkNewVersion();
     }

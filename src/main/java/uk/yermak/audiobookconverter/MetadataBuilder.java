@@ -56,6 +56,55 @@ public class MetadataBuilder {
         }
     }
 
+    public File prepareOggMetaFile() {
+        try {
+            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
+
+            List<String> metaData = new ArrayList<>();
+            metaData.add(";FFMETADATA1");
+            metaData.add("major_brand=OGG");
+/*
+            metaData.add("minor_version=512");
+            metaData.add("compatible_brands=isomiso2");
+*/
+
+            metaData.add("title=" + bookInfo.getTitle() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
+
+            if (StringUtils.isNotBlank(bookInfo.getWriter())) {
+                metaData.add("artist=" + bookInfo.getWriter());
+            }
+
+
+            if (StringUtils.isNotBlank(bookInfo.getSeries())) {
+                metaData.add("album=" + bookInfo.getSeries());
+            } else if (StringUtils.isNotBlank(bookInfo.getTitle())) {
+                metaData.add("album=" + bookInfo.getTitle());
+            }
+            if (StringUtils.isNotBlank(bookInfo.getNarrator())) {
+                metaData.add("composer=" + bookInfo.getNarrator());
+            }
+            if (StringUtils.isNotBlank(bookInfo.getYear())) {
+                metaData.add("date=" + bookInfo.getYear());
+            }
+            if (StringUtils.isNotBlank(bookInfo.getComment())) {
+                metaData.add("comment=" + bookInfo.getComment());
+            }
+            if (StringUtils.isNotBlank(bookInfo.getGenre())) {
+                metaData.add("genre=" + bookInfo.getGenre());
+            }
+
+            metaData.add("track=" + bookInfo.getBookNumber() + "/" + bookInfo.getTotalTracks());
+            FlacPicture picture = FlacPicture.load(getArtWorkFile());
+            metaData.add("metadata_block_picture="+picture.write());
+            metaData.addAll(convertable.getMetaData(bookInfo));
+            logger.debug("Saving metadata:" + String.join("\n", metaData));
+            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            return metaFile;
+        } catch (IOException e) {
+            throw new ConversionException(e);
+        }
+    }
+
     public List<String> prepareId3v2Meta() {
         List<String> meta = new ArrayList<>();
         if (StringUtils.isNotBlank(convertable.getDetails())) {
@@ -89,7 +138,7 @@ public class MetadataBuilder {
             meta.add("comment=\"" + escapeQuotes(bookInfo.getComment()) + "\"");
         }
         meta.add("-metadata");
-        meta.add("track=\"" + convertable.getNumber()+"/"+convertable.getTotalNumbers() + "\"");
+        meta.add("track=\"" + convertable.getNumber() + "/" + convertable.getTotalNumbers() + "\"");
         return meta;
     }
 

@@ -55,7 +55,7 @@ public class FFMpegConcatenator {
 
             logger.debug("Starting concat with options {}", String.join(" ", concatOptions));
 
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quouted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
+            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
             process = Runtime.getRuntime().exec( String.join(" ", concatOptions));
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();

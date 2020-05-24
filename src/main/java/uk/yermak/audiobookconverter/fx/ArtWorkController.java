@@ -55,7 +55,7 @@ public class ArtWorkController {
         File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
         logger.debug("Opened dialog for art image in folder: {}", new Object[]{sourceFolder});
         if (file != null) {
-            imageList.getItems().add(new ArtWorkBean(file.getName()));
+            imageList.getItems().add(new ArtWorkBean(file.getAbsolutePath()));
             logger.info("Added art work from file: {}", new Object[]{file});
         }
     }

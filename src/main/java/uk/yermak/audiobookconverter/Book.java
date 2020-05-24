@@ -28,11 +28,11 @@ public class Book implements Organisable, InvalidationListener {
         try {
             Part part = new Part(this);
             for (MediaInfo item : items) {
-                if (item.getBookInfo().getTracks().isEmpty()) {
+                if (item.getBookInfo().tracks().isEmpty()) {
                     Chapter chapter = new Chapter(part, Collections.singletonList(item));
                     part.getChapters().add(chapter);
                 } else {
-                    List<Track> tracks = item.getBookInfo().getTracks();
+                    List<Track> tracks = item.getBookInfo().tracks();
                     for (Track track : tracks) {
                         Chapter chapter = trackToChapter(part, item, track);
                         part.getChapters().add(chapter);

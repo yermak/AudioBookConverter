@@ -50,7 +50,7 @@ class ChapterEditor {
         bookNo.setSelected(context.containsKey("BOOK_NUMBER"));
         bookNo.setOnAction(event -> {
             if (bookNo.isSelected()) {
-                context.put("BOOK_NUMBER", c -> String.valueOf(c.getPart().getBook().getBookInfo().getBookNumber()));
+                context.put("BOOK_NUMBER", c -> String.valueOf(c.getPart().getBook().getBookInfo().bookNumber()));
             } else {
                 context.remove("BOOK_NUMBER");
             }
@@ -65,7 +65,7 @@ class ChapterEditor {
 
         bookTitle.setOnAction(event -> {
             if (bookTitle.isSelected()) {
-                context.put("BOOK_TITLE", c -> c.getPart().getBook().getBookInfo().getTitle());
+                context.put("BOOK_TITLE", c -> c.getPart().getBook().getBookInfo().title());
             } else {
                 context.remove("BOOK_TITLE");
             }
@@ -116,31 +116,31 @@ class ChapterEditor {
                     break;
                 case 1:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.1", chapter -> chapter.getMedia().get(0).getBookInfo().getTitle());
+                    context.put("TAG.1", chapter -> chapter.getMedia().get(0).getBookInfo().title());
                     break;
                 case 2:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.2", chapter -> chapter.getMedia().get(0).getBookInfo().getWriter());
+                    context.put("TAG.2", chapter -> chapter.getMedia().get(0).getBookInfo().writer());
                     break;
                 case 3:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.3", chapter -> chapter.getMedia().get(0).getBookInfo().getNarrator());
+                    context.put("TAG.3", chapter -> chapter.getMedia().get(0).getBookInfo().narrator());
                     break;
                 case 4:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.4", chapter -> chapter.getMedia().get(0).getBookInfo().getSeries());
+                    context.put("TAG.4", chapter -> chapter.getMedia().get(0).getBookInfo().series());
                     break;
                 case 5:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.5", chapter -> chapter.getMedia().get(0).getBookInfo().getGenre());
+                    context.put("TAG.5", chapter -> chapter.getMedia().get(0).getBookInfo().genre());
                     break;
                 case 6:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.6", chapter -> chapter.getMedia().get(0).getBookInfo().getYear());
+                    context.put("TAG.6", chapter -> chapter.getMedia().get(0).getBookInfo().year());
                     break;
                 case 7:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);
-                    context.put("TAG.7", chapter -> chapter.getMedia().get(0).getBookInfo().getComment());
+                    context.put("TAG.7", chapter -> chapter.getMedia().get(0).getBookInfo().comment());
                     break;
                 case 8:
                     for (int i = 1; i < 9; i++) context.remove("TAG." + i);

@@ -90,11 +90,11 @@ public class Utils {
         }
 
         ST filenameTemplate = new ST(filenameFormat);
-        filenameTemplate.add("WRITER", StringUtils.isEmpty(bookInfo.getWriter()) ? null : bookInfo.getWriter());
-        filenameTemplate.add("TITLE", StringUtils.isEmpty(bookInfo.getTitle()) ? null : bookInfo.getTitle());
-        filenameTemplate.add("SERIES", StringUtils.isEmpty(bookInfo.getSeries()) ? null : bookInfo.getSeries());
-        filenameTemplate.add("NARRATOR", StringUtils.isEmpty(bookInfo.getNarrator()) ? null : bookInfo.getNarrator());
-        filenameTemplate.add("BOOK_NUMBER", bookInfo.getBookNumber() == 0 ? null : bookInfo.getBookNumber());
+        filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
+        filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
+        filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
+        filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
+        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().zeroToNull());
 
         String result = filenameTemplate.render();
         char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};

@@ -74,7 +74,7 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public String getTitle() {
-        return this.getBookInfo().getTitle();
+        return this.getBookInfo().title().get();
     }
 
     @Override

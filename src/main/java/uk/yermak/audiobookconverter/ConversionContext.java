@@ -67,22 +67,23 @@ public class ConversionContext {
     }
 
     public void saveGenres() {
-        if (bookInfo.get()!=null) {
-            if (StringUtils.isNotEmpty(bookInfo.get().getGenre()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().getGenre()))) {
-                genres.add(bookInfo.get().getGenre());
+        if (bookInfo.get() != null) {
+            if (StringUtils.isNotEmpty(bookInfo.get().genre().get()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().genre().get()))) {
+                genres.add(bookInfo.get().genre().get());
             }
             String collect = String.join("::", genres);
             AppProperties.setProperty("genres", collect);
         }
     }
 
-    private void reloadGenres() {
+    public ObservableList<String> loadGenres() {
         genres.clear();
         String genresProperty = AppProperties.getProperty("genres");
         if (genresProperty != null) {
             String[] genres = genresProperty.split("::");
             this.genres.addAll(Arrays.stream(genres).sorted().collect(Collectors.toList()));
         }
+        return genres;
     }
 
     public void resetForNewConversion() {
@@ -90,8 +91,8 @@ public class ConversionContext {
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
 
-        reloadGenres();
-        bookInfo.set(new AudioBookInfo());
+//        reloadGenres();
+        bookInfo.set(AudioBookInfo.instance());
         outputParameters.set(new OutputParameters());
         book = null;
         posters.clear();
@@ -154,10 +155,6 @@ public class ConversionContext {
 
     public void removePoster(int toRemove) {
         Platform.runLater(() -> posters.remove(toRemove));
-    }
-
-    public ObservableList<String> getGenres() {
-        return genres;
     }
 
     public void addJob(ConversionJob conversionJob) {

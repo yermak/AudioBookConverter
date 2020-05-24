@@ -45,16 +45,16 @@ public class FFMediaLoaderTest {
     public void testParseCueChapters() throws IOException {
         InputStream stream = this.getClass().getResourceAsStream("/Брамс.cue");
         String cue = IOUtils.toString(stream, "cp1251");
-        AudioBookInfo bookInfo = new AudioBookInfo();
+        AudioBookInfo bookInfo = AudioBookInfo.instance();
         MediaInfoBean mediaInfo = new MediaInfoBean("test");
         mediaInfo.setBookInfo(bookInfo);
         mediaInfo.setDuration(2305071);
         FFMediaLoader.parseCue(mediaInfo, cue);
-        assertEquals(bookInfo.getGenre(), "Classical");
-        assertEquals(bookInfo.getTitle(), "Брамс");
-        assertEquals(bookInfo.getYear(), "2007");
-        assertEquals(bookInfo.getNarrator(), "DeAgostini Classica");
-        List<Track> tracks = bookInfo.getTracks();
+        assertEquals(bookInfo.genre().get(), "Classical");
+        assertEquals(bookInfo.title().get(), "Брамс");
+        assertEquals(bookInfo.year().get(), "2007");
+        assertEquals(bookInfo.narrator().get(), "DeAgostini Classica");
+        List<Track> tracks = bookInfo.tracks();
         assertEquals(tracks.size(), 3);
 
         Track track1 = tracks.get(0);

@@ -11,8 +11,8 @@ public class MediaInfoBeanTest {
     @Test
     public void testRemove() {
         MediaInfoBean media = new MediaInfoBean("file.mp3");
-        media.setBookInfo(new AudioBookInfo());
-        Book book = new Book(new AudioBookInfo());
+        media.setBookInfo(AudioBookInfo.instance());
+        Book book = new Book(AudioBookInfo.instance());
         book.construct(FXCollections.observableArrayList(media));
         Part part = book.getParts().get(0);
         Chapter chapter = part.getChapters().get(0);
@@ -25,12 +25,12 @@ public class MediaInfoBeanTest {
     @Test
     public void testCombine_Move() {
         MediaInfoBean media1 = new MediaInfoBean("file1.mp3");
-        media1.setBookInfo(new AudioBookInfo());
+        media1.setBookInfo(AudioBookInfo.instance());
 
         MediaInfoBean media2 = new MediaInfoBean("file2.mp3");
-        media2.setBookInfo(new AudioBookInfo());
+        media2.setBookInfo(AudioBookInfo.instance());
 
-        Book book = new Book(new AudioBookInfo());
+        Book book = new Book(AudioBookInfo.instance());
         book.construct(FXCollections.observableArrayList(media1, media2));
         Chapter chapter = book.getParts().get(0).getChapters().get(0);
         chapter.combine(book.getParts().get(0).getChapters().subList(1, 2));

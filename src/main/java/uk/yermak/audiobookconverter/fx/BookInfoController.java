@@ -44,7 +44,7 @@ public class BookInfoController {
     private void initialize() {
 
         MenuItem menuItem = new MenuItem("Remove");
-        genre.setItems(ConverterApplication.getContext().getGenres());
+        genre.setItems(ConverterApplication.getContext().loadGenres());
         menuItem.setOnAction(event -> {
             genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
             ConverterApplication.getContext().saveGenres();
@@ -70,20 +70,21 @@ public class BookInfoController {
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> bookInfo.get().setTitle(title.getText()));
-        writer.textProperty().addListener(o -> bookInfo.get().setWriter(writer.getText()));
-        narrator.textProperty().addListener(o -> bookInfo.get().setNarrator(narrator.getText()));
+        title.textProperty().addListener(o -> bookInfo.get().title().set(title.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.get().setGenre(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> bookInfo.get().setGenre(genre.getEditor().getText()));
+        writer.textProperty().addListener(o -> bookInfo.get().writer().set(writer.getText()));
+        narrator.textProperty().addListener(o -> bookInfo.get().narrator().set(narrator.getText()));
 
-        series.textProperty().addListener(o -> bookInfo.get().setSeries(series.getText()));
+        genre.valueProperty().addListener(o -> bookInfo.get().genre().set(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> bookInfo.get().genre().set(genre.getEditor().getText()));
+
+        series.textProperty().addListener(o -> bookInfo.get().series().set(series.getText()));
         bookNo.textProperty().addListener(o -> {
             if (StringUtils.isNotBlank(bookNo.getText()))
-                bookInfo.get().setBookNumber(Integer.parseInt(bookNo.getText()));
+                bookInfo.get().bookNumber().set(bookNo.getText());
         });
-        year.textProperty().addListener(o -> bookInfo.get().setYear(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.get().setComment(comment.getText()));
+        year.textProperty().addListener(o -> bookInfo.get().year().set(year.getText()));
+        comment.textProperty().addListener(o -> bookInfo.get().comment().set(comment.getText()));
 
         ConverterApplication.getContext().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo.get())));
 
@@ -107,16 +108,17 @@ public class BookInfoController {
 
 
     private void copyTags(AudioBookInfo bookInfo) {
-        title.setText(bookInfo.getSeries());
-        writer.setText(bookInfo.getWriter());
-        narrator.setText(bookInfo.getNarrator());
-        genre.getEditor().setText(bookInfo.getGenre());
-        series.setText(bookInfo.getSeries());
-        if (bookInfo.getBookNumber() != 0) {
-            bookNo.setText(String.valueOf(bookInfo.getBookNumber()));
+
+        title.setText(bookInfo.series().get());
+        writer.setText(bookInfo.writer().get());
+        narrator.setText(bookInfo.narrator().get());
+        genre.getEditor().setText(bookInfo.genre().get());
+        series.setText(bookInfo.series().get());
+        if (bookInfo.bookNumber().get() != 0) {
+            bookNo.setText(bookInfo.bookNumber().toString());
         }
-        year.setText(bookInfo.getYear());
-        comment.setText(bookInfo.getComment());
+        year.setText(bookInfo.year().get());
+        comment.setText(bookInfo.comment().get());
     }
 
     private void clearTags() {

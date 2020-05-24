@@ -22,6 +22,7 @@ public class ConversionGroup {
     private AudioBookInfo bookInfo;
     private List<ArtWork> posters;
     private final List<ConversionJob> jobs = new ArrayList<>();
+    private boolean cancelled;
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -68,11 +69,16 @@ public class ConversionGroup {
     }
 
     public boolean isOver() {
+        if (cancelled) return true;
         if (jobs.isEmpty()) return false;
         for (ConversionJob job : jobs) {
             if (!job.getStatus().isOver()) return false;
         }
         return true;
+    }
+
+    public void cancel() {
+        cancelled = true;
     }
 }
 

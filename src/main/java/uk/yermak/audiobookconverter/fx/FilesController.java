@@ -331,6 +331,7 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
+        ConverterApplication.getContext().getPlannedConversionGroup().cancel();
         ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);

@@ -23,11 +23,11 @@ public class Part implements Organisable, Convertable {
         book.getParts().add(this);
         chapters.addListener(book);
         renderMap.put("BOOK_NUMBER", Part::getBookNumberString);
-        renderMap.put("SERIES", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getSeries()));
-        renderMap.put("TITLE", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getTitle()));
-        renderMap.put("WRITER", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getWriter()));
-        renderMap.put("NARRATOR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getNarrator()));
-        renderMap.put("YEAR", part -> StringUtils.trimToNull(part.getBook().getBookInfo().getYear()));
+        renderMap.put("SERIES", part -> part.getBook().getBookInfo().series().trimToNull());
+        renderMap.put("TITLE", part -> part.getBook().getBookInfo().title().trimToNull());
+        renderMap.put("WRITER", part -> part.getBook().getBookInfo().writer().trimToNull());
+        renderMap.put("NARRATOR", part -> part.getBook().getBookInfo().narrator().trimToNull());
+        renderMap.put("YEAR", part -> part.getBook().getBookInfo().year().trimToNull());
         renderMap.put("PART", Part::getNumberString);
         renderMap.put("DURATION", Part::getDurationString);
 
@@ -39,8 +39,8 @@ public class Part implements Organisable, Convertable {
     }
 
     private String getBookNumberString() {
-        if (getBook().getBookInfo().getBookNumber() == 0) return null;
-        return String.valueOf(getBook().getBookInfo().getBookNumber());
+        if (getBook().getBookInfo().bookNumber().get() == 0) return null;
+        return String.valueOf(getBook().getBookInfo().bookNumber());
     }
 
     private String getNumberString() {

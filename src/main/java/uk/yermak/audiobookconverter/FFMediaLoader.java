@@ -115,7 +115,7 @@ public class FFMediaLoader {
                 if (streamTags != null) {
                     tags.putAll(streamTags);
                 }
-                AudioBookInfo bookInfo = new AudioBookInfo(tags);
+                AudioBookInfo bookInfo = AudioBookInfo.instance(tags);
                 mediaInfo.setBookInfo(bookInfo);
 
                 processEmbededChapter(mediaInfo, probeResult.getChapters());
@@ -142,7 +142,7 @@ public class FFMediaLoader {
                 track.setTitle(chapter.tags.title);
                 track.setStart((long) (Double.parseDouble(chapter.start_time) * 1000));
                 track.setEnd((long) (Double.parseDouble(chapter.end_time) * 1000));
-                bookInfo.getTracks().add(track);
+                bookInfo.tracks().add(track);
             }
         }
     }
@@ -162,32 +162,32 @@ public class FFMediaLoader {
         String[] split = StringUtils.split(cue, "\n");
         for (String line : split) {
             int i = -1;
-            if (bookInfo.getTracks().isEmpty()) {
-                if ((i = line.indexOf("GENRE")) != -1) bookInfo.setGenre(cleanText(line.substring(i + 5)));
-                if ((i = line.indexOf("TITLE")) != -1) bookInfo.setTitle(cleanText(line.substring(i + 5)));
-                if ((i = line.indexOf("DATE")) != -1) bookInfo.setYear(cleanText(line.substring(i + 4)));
-                if ((i = line.indexOf("PERFORMER")) != -1) bookInfo.setNarrator(cleanText(line.substring(i + 9)));
+            if (bookInfo.tracks().isEmpty()) {
+                if ((i = line.indexOf("GENRE")) != -1) bookInfo.genre().set(cleanText(line.substring(i + 5)));
+                if ((i = line.indexOf("TITLE")) != -1) bookInfo.title().set(cleanText(line.substring(i + 5)));
+                if ((i = line.indexOf("DATE")) != -1) bookInfo.year().set(cleanText(line.substring(i + 4)));
+                if ((i = line.indexOf("PERFORMER")) != -1) bookInfo.narrator().set(cleanText(line.substring(i + 9)));
             } else {
-                Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 1);
+                Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 1);
                 if ((i = line.indexOf("TITLE")) != -1) track.setTitle(cleanText(line.substring(i + 5)));
                 if ((i = line.indexOf("PERFORMER")) != -1) track.setWriter(cleanText(line.substring(i + 9)));
             }
             if ((i = line.indexOf("TRACK")) != -1) {
-                bookInfo.getTracks().add(new Track(cleanText(line.substring(i + 5))));
+                bookInfo.tracks().add(new Track(cleanText(line.substring(i + 5))));
             } else {
                 if ((i = line.indexOf("INDEX 01")) != -1) {
                     long time = parseCueTime(line.substring(i + 8));
-                    if (bookInfo.getTracks().size() > 1) {
-                        Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 2);
+                    if (bookInfo.tracks().size() > 1) {
+                        Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 2);
                         track.setEnd(time);
                     }
-                    Track track = bookInfo.getTracks().get(bookInfo.getTracks().size() - 1);
+                    Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 1);
                     track.setStart(time);
                 }
             }
         }
-        if (!bookInfo.getTracks().isEmpty()) {
-            bookInfo.getTracks().get(bookInfo.getTracks().size() - 1).setEnd(mediaInfo.getDuration());
+        if (!bookInfo.tracks().isEmpty()) {
+            bookInfo.tracks().get(bookInfo.tracks().size() - 1).setEnd(mediaInfo.getDuration());
         }
     }
 

@@ -39,6 +39,7 @@ public class Book implements Organisable, InvalidationListener {
                     }
                 }
             }
+            parts.add(part);
         } catch (Throwable e) {
             logger.error("Error constructing book:",e);
         }

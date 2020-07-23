@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.Version;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
@@ -26,6 +27,14 @@ import java.util.Scanner;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
+    static {
+        File APP_DIR = new File(System.getenv("APPDATA"), Version.getVersionString());
+        if (APP_DIR.exists() || APP_DIR.mkdir()) {
+            System.setProperty("APPDATA", APP_DIR.getAbsolutePath());
+        } else {
+            System.setProperty("APPDATA", System.getProperty("user.home"));
+        }
+    }
     private static final ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {

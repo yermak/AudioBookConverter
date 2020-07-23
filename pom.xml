@@ -7,8 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.2.0</version>
-
+    <version>5.3.0</version>
 
     <properties>
         <maven.compiler.source>14</maven.compiler.source>
@@ -17,7 +16,7 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>14</javafx.version>
+        <javafx.version>14.0.2.1</javafx.version>
     </properties>
 
     <dependencies>
@@ -232,8 +231,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.1</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14</javafx.mods>
+                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.2</java.home>
+                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14.0.2.1</javafx.mods>
                 <installer.script>windows/package.bat</installer.script>
                 <installer.assmebly>windows-installer.xml</installer.assmebly>
             </properties>
@@ -247,8 +246,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.1</java.home>
-                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14</javafx.mods>
+                <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.2</java.home>
+                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14.0.2.1</javafx.mods>
                 <installer.script>linux/package.sh</installer.script>
                 <installer.assmebly>linux-installer.xml</installer.assmebly>
             </properties>

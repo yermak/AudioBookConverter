@@ -23,7 +23,7 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
         String trackCount = tags.get("track count");
 
         return new AudioBookInfo(
-                new SmartStringProperty(trimToEmpty(tags.get("album"))),
+                new SmartStringProperty(trimToEmpty(tags.get("title"))),
                 new SmartStringProperty(trimToEmpty(tags.get("artist"))),
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("narratedby")), trimToEmpty(tags.get("composer")))),
                 new SmartStringProperty(trimToEmpty(tags.get("album"))),

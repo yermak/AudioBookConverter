@@ -12,38 +12,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     private ArtWork artWork;
     private String codec;
 
-    public String fileName() {
-        return this.fileName;
-    }
-
-    private int channels() {
-        return this.channels;
-    }
-
-    private int frequency() {
-        return this.frequency;
-    }
-
-    private int bitrate() {
-        return this.bitrate;
-    }
-
-    private long duration() {
-        return this.duration;
-    }
-
-    private AudioBookInfo bookInfo() {
-        return this.bookInfo;
-    }
-
-    private ArtWork artWork() {
-        return this.artWork;
-    }
-
-    private String codec() {
-        return this.codec;
-    }
-
     public void setChannels(final int channels) {
         this.channels = channels;
     }
@@ -61,15 +29,15 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     }
 
     public int getChannels() {
-        return this.channels();
+        return this.channels;
     }
 
     public int getFrequency() {
-        return this.frequency();
+        return this.frequency;
     }
 
     public int getBitrate() {
-        return this.bitrate();
+        return this.bitrate;
     }
 
     @Override
@@ -83,12 +51,12 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     }
 
     public long getDuration() {
-        return this.duration();
+        return this.duration;
     }
 
 
     public String getFileName() {
-        return this.fileName();
+        return this.fileName;
     }
 
     public void setBookInfo(final AudioBookInfo bookInfo) {
@@ -96,11 +64,11 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     }
 
     public AudioBookInfo getBookInfo() {
-        return this.bookInfo();
+        return this.bookInfo;
     }
 
     public ArtWork getArtWork() {
-        return this.artWork();
+        return this.artWork;
     }
 
     public void setArtWork(final ArtWork artWork) {
@@ -108,7 +76,7 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     }
 
     public String getCodec() {
-        return this.codec();
+        return this.codec;
     }
 
     public void setCodec(final String codec) {
@@ -149,4 +117,3 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
 }
 
-        

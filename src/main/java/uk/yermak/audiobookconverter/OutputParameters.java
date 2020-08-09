@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class OutputParameters {
@@ -320,28 +321,15 @@ public class OutputParameters {
         this.cbr = cbr;
     }
 
-
-    //TODO reconsider
     public void updateAuto(final List<MediaInfo> media) {
-        int maxChannels = 0;
-        int maxFrequency = 0;
-        int maxBitRate = 0;
 
-        if (getChannels() > maxChannels) {
-            maxChannels = getChannels();
-        }
-        if (getFrequency() > maxFrequency) {
-            maxFrequency = getFrequency();
-        }
-        if (getBitRate() > maxBitRate) {
-            maxBitRate = getBitRate();
-        }
-        this.setChannels(maxChannels);
-        this.setFrequency(maxFrequency);
+        Integer maxChannels = media.parallelStream().map(MediaInfo::getChannels).max(Comparator.naturalOrder()).get();
+        Integer maxFrequency = media.parallelStream().map(MediaInfo::getFrequency).max(Comparator.naturalOrder()).get();
+        Integer maxBitRate = media.parallelStream().map(MediaInfo::getBitrate).max(Comparator.naturalOrder()).get();
 
-        if (this.cbr) {
-            this.setBitRate(maxBitRate / 1000);
-        }
+        setChannels(maxChannels);
+        setFrequency(maxFrequency);
+        setBitRate(maxBitRate / 1000);
     }
 
     public String getFFMpegQualityParameter() {
@@ -376,4 +364,3 @@ public class OutputParameters {
 
 }
 
-        

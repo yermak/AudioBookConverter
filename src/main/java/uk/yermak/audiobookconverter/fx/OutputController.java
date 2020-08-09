@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.Executors;
 
 /**
  * Created by yermak on 08/09/2018.
@@ -68,16 +70,16 @@ public class OutputController {
 */
 
         frequency.getItems().addAll(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);
-        frequency.getSelectionModel().select(new Integer(44100));
+        frequency.getSelectionModel().select(Integer.valueOf(44100));
 
         bitRate.getItems().addAll(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320);
-        bitRate.getSelectionModel().select(new Integer(128));
+        bitRate.getSelectionModel().select(Integer.valueOf(128));
 
         channels.getItems().addAll(1, 2, 4, 6);
-        channels.getSelectionModel().select(new Integer(2));
+        channels.getSelectionModel().select(Integer.valueOf(2));
 
         cutoff.getItems().addAll(8000, 10000, 12000, 14000, 16000, 20000);
-        cutoff.getSelectionModel().select(new Integer(12000));
+        cutoff.getSelectionModel().select(Integer.valueOf(12000));
 
 
         ConversionContext context = ConverterApplication.getContext();
@@ -119,19 +121,30 @@ public class OutputController {
         });
 
 */
-        media.addListener((InvalidationListener) observable -> updateParameters(media, media.isEmpty()));
+        media.addListener((InvalidationListener) observable -> updateParameters(media));
     }
 
-    private void updateParameters(ObservableList<MediaInfo> media, boolean empty) {
-        if (!empty) {
-            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
-            //TODO
-//            params.updateAuto(media);
-            frequency.setValue(params.getFrequency());
-            bitRate.setValue(params.getBitRate());
-            channels.setValue(params.getChannels());
-            quality.setValue(params.getQuality());
+    private void updateParameters(ObservableList<MediaInfo> media) {
+        if (media.isEmpty()) {
+            frequency.setValue(44100);
+            bitRate.setValue(128);
+            channels.setValue(2);
+            quality.setValue(3);
+        } else {
+            Executors.newSingleThreadExecutor().submit(() -> {
+                OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+                params.updateAuto(media);
+                Platform.runLater(() -> {
+                    frequency.setValue(params.getFrequency());
+                    bitRate.setValue(params.getBitRate());
+                    channels.setValue(params.getChannels());
+                    quality.setValue(params.getQuality());
+                });
+
+            });
+
         }
     }
-
 }
+
+

@@ -18,6 +18,14 @@ Supported source formats:
 * flac
 * wma
 * m4a/m4b
+* aac
+
+-----
+Supported output (codec) formats:
+-----
+* m4b (aac)
+* ogg (opus)
+* mp3 (lame)
 
 Main features:
 -----
@@ -25,7 +33,7 @@ Main features:
 * Parallel processing of conversions queue: prepare next book while encoding another
 * Smart artwork support: combined from MP3 artwork and cover files from MP3 directory
 * Unicode tags support: keep tags in own language
-* Advanced chapters support
+* Advanced chapters support, including re-import of chapters from flac (cue) and m4b.
 * Flexible quality management: find balance between size and quality
 * Instant playback: listen what you are going to encode
 * Simple and lightweigh user interface: Convert a book with few clicks

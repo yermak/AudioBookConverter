@@ -7,12 +7,19 @@ import java.util.List;
 public abstract class MediaInfoOrganiser implements Organisable {
     protected Chapter chapter;
 
-    public void split() {
+    public boolean split() {
+        if (chapter.getMedia().size() == 1) {
+            return false;
+        }
+        if (getNumber() == 1) {
+            return false;
+        }
         List<MediaInfo> currentMedia = new ArrayList<>(chapter.getMedia().subList(0, getNumber() - 1));
         List<MediaInfo> nextMedia = new ArrayList<>(chapter.getMedia().subList(getNumber() - 1, chapter.getMedia().size()));
         chapter.getMedia().clear();
         chapter.getMedia().addAll(currentMedia);
         chapter.createNextChapter(nextMedia);
+        return true;
     }
 
     public void remove() {

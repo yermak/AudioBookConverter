@@ -72,8 +72,8 @@ public class Book implements Organisable, InvalidationListener {
     }
 
     @Override
-    public void split() {
-
+    public boolean split() {
+        return false;
     }
 
     @Override

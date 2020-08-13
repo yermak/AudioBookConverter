@@ -554,6 +554,7 @@ public class FilesController {
         });
         bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
         bookStructure.refresh();
+        ConverterApplication.getContext().getOutputParameters().updateAuto(book.getMedia());
     }
 
     public void combine(ActionEvent actionEvent) {

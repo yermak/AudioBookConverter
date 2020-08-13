@@ -7,7 +7,7 @@ public interface Organisable {
 
     long getDuration();
 
-    void split();
+    boolean split();
 
     void remove();
 

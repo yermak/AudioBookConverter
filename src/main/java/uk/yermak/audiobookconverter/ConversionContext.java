@@ -31,7 +31,7 @@ public class ConversionContext {
     private final ObservableList<String> genres = FXCollections.observableArrayList();
 
     private final SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
-    private Book book;
+    private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
@@ -94,7 +94,7 @@ public class ConversionContext {
 //        reloadGenres();
         bookInfo.set(AudioBookInfo.instance());
         outputParameters.set(new OutputParameters());
-        book = null;
+        book.set(null);
         posters.clear();
         media.clear();
     }
@@ -104,11 +104,11 @@ public class ConversionContext {
     }
 
     public Book getBook() {
-        return book;
+        return book.get();
     }
 
     public void setBook(Book book) {
-        this.book = book;
+        this.book.set(book);
     }
 
     public ObservableList<MediaInfo> getMedia() {
@@ -160,5 +160,9 @@ public class ConversionContext {
     public void addJob(ConversionJob conversionJob) {
         conversionQueue.add(conversionJob);
         executorService.execute(conversionJob);
+    }
+
+    public void addBookChangeListener(ChangeListener<Book> listener) {
+        book.addListener(listener);
     }
 }

@@ -83,8 +83,8 @@ public class Part implements Organisable, Convertable {
     }
 
     @Override
-    public void split() {
-
+    public boolean split() {
+        return false;
     }
 
     @Override

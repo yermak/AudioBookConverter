@@ -42,8 +42,8 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
-    public void split() {
-        this.getMediaInfo().split();
+    public boolean split() {
+        return this.getMediaInfo().split();
     }
 
     @Override

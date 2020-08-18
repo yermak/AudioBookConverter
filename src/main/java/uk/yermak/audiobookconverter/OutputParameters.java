@@ -322,6 +322,7 @@ public class OutputParameters {
     }
 
     public void updateAuto(final List<MediaInfo> media) {
+        if (media.isEmpty()) return;
 
         Integer maxChannels = media.parallelStream().map(MediaInfo::getChannels).max(Comparator.naturalOrder()).get();
         Integer maxFrequency = media.parallelStream().map(MediaInfo::getFrequency).max(Comparator.naturalOrder()).get();

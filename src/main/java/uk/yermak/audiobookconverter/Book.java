@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import com.google.common.collect.ImmutableList;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +20,7 @@ public class Book implements Organisable, InvalidationListener {
     private final AudioBookInfo audioBookInfo;
 
     private final ObservableList<Part> parts = FXCollections.observableArrayList();
-    private InvalidationListener listener;
+    private List<InvalidationListener> listeners = new ArrayList<>();
 
     public Book(AudioBookInfo audioBookInfo) {
         this.audioBookInfo = audioBookInfo;
@@ -41,7 +43,7 @@ public class Book implements Organisable, InvalidationListener {
             }
             parts.add(part);
         } catch (Throwable e) {
-            logger.error("Error constructing book:",e);
+            logger.error("Error constructing book:", e);
         }
     }
 
@@ -72,8 +74,8 @@ public class Book implements Organisable, InvalidationListener {
     }
 
     @Override
-    public void split() {
-
+    public boolean split() {
+        return false;
     }
 
     @Override
@@ -100,17 +102,21 @@ public class Book implements Organisable, InvalidationListener {
         return parts.stream().flatMap(part -> part.getChapters().stream()).collect(Collectors.toList());
     }
 
+    public List<MediaInfo> getMedia() {
+        return parts.stream().flatMap(part -> part.getChapters().stream().flatMap(chapter -> chapter.getMedia().stream())).collect(Collectors.toList());
+    }
+
     public AudioBookInfo getBookInfo() {
         return audioBookInfo;
     }
 
-
     @Override
     public void invalidated(Observable observable) {
-        if (listener!=null)  listener.invalidated(observable);
+        ImmutableList<InvalidationListener> list = ImmutableList.copyOf(listeners);
+        list.forEach(invalidationListener -> invalidationListener.invalidated(observable));
     }
 
     public void addListener(InvalidationListener listener) {
-        this.listener = listener;
+        this.listeners.add(listener);
     }
 }

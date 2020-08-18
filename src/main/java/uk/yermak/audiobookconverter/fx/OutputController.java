@@ -10,11 +10,13 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.Book;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
@@ -122,28 +124,42 @@ public class OutputController {
 
 */
         media.addListener((InvalidationListener) observable -> updateParameters(media));
+        ConverterApplication.getContext().addBookChangeListener((observableValue, oldBook, newBook) -> {
+            if (newBook != null) {
+                newBook.addListener(observable -> updateParameters(newBook.getMedia()));
+            }
+        });
     }
 
-    private void updateParameters(ObservableList<MediaInfo> media) {
-        if (media.isEmpty()) {
+    private void updateParameters(List<MediaInfo> media) {
+        Book book = ConverterApplication.getContext().getBook();
+
+        if (media.isEmpty() && book == null) {
             frequency.setValue(44100);
             bitRate.setValue(128);
             channels.setValue(2);
             quality.setValue(3);
-        } else {
-            Executors.newSingleThreadExecutor().submit(() -> {
-                OutputParameters params = ConverterApplication.getContext().getOutputParameters();
-                params.updateAuto(media);
-                Platform.runLater(() -> {
-                    frequency.setValue(params.getFrequency());
-                    bitRate.setValue(params.getBitRate());
-                    channels.setValue(params.getChannels());
-                    quality.setValue(params.getQuality());
-                });
+            return;
+        }
 
+        Executors.newSingleThreadExecutor().submit(() -> {
+            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+            if (book != null) {
+                params.updateAuto(book.getMedia());
+//                book.addListener(observable -> updateParameters(book.getMedia()));
+            } else {
+                params.updateAuto(media);
+            }
+            Platform.runLater(() -> {
+                frequency.setValue(params.getFrequency());
+                bitRate.setValue(params.getBitRate());
+                channels.setValue(params.getChannels());
+                quality.setValue(params.getQuality());
             });
 
-        }
+        });
+
+
     }
 }
 

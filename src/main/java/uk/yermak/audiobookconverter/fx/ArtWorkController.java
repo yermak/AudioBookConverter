@@ -63,6 +63,7 @@ public class ArtWorkController {
     @FXML
     private void removeImage(ActionEvent actionEvent) {
         int toRemove = imageList.getSelectionModel().getSelectedIndex();
+        if (toRemove == -1) return;
         ConverterApplication.getContext().removePoster(toRemove);
 //        imageList.getItems().remove(toRemove);
         logger.info("Removed art work #{}", toRemove);

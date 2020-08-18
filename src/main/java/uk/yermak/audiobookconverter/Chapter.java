@@ -64,12 +64,19 @@ public class Chapter implements Organisable, Convertable {
     }
 
     @Override
-    public void split() {
+    public boolean split() {
+        if (part.getChapters().size() == 1) {
+            return false;
+        }
+        if (getNumber() == 1) {
+            return false;
+        }
         List<Chapter> currentChapters = new ArrayList<>(part.getChapters().subList(0, getNumber() - 1));
         List<Chapter> nextChapters = new ArrayList<>(part.getChapters().subList(getNumber() - 1, part.getChapters().size()));
         part.getChapters().clear();
         part.getChapters().addAll(currentChapters);
         part.createNextPart(nextChapters);
+        return true;
     }
 
     @Override

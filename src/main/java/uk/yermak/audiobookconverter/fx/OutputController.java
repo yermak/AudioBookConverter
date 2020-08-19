@@ -24,6 +24,15 @@ import java.util.concurrent.Executors;
  */
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final Integer[] CHANNELS = {1, 2, 4, 6};
+    public static final Integer[] CUTOFFS = {8000, 10000, 12000, 14000, 16000, 20000};
+    public static final Integer[] FREQUENCIES = new Integer[]{8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000};
+    public static final Integer[] BITRATES = new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320};
+    public static final Integer DEFAULT_CHANNELS = 2;
+    public static final Integer DEFAULT_CUTOFF = 12000;
+    public static final Integer DEFAULT_FREQUENCY = 44100;
+    public static final Integer DEFAULT_BITRATE = 128;
+
 
     @FXML
     public ComboBox<Integer> cutoff;
@@ -71,17 +80,17 @@ public class OutputController {
         volume.getSelectionModel().select(0);
 */
 
-        frequency.getItems().addAll(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);
-        frequency.getSelectionModel().select(Integer.valueOf(44100));
+        frequency.getItems().addAll(FREQUENCIES);
+        frequency.getSelectionModel().select(DEFAULT_FREQUENCY);
 
-        bitRate.getItems().addAll(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320);
-        bitRate.getSelectionModel().select(Integer.valueOf(128));
+        bitRate.getItems().addAll(BITRATES);
+        bitRate.getSelectionModel().select(DEFAULT_BITRATE);
 
-        channels.getItems().addAll(1, 2, 4, 6);
-        channels.getSelectionModel().select(Integer.valueOf(2));
+        channels.getItems().addAll(CHANNELS);
+        channels.getSelectionModel().select(DEFAULT_CHANNELS);
 
-        cutoff.getItems().addAll(8000, 10000, 12000, 14000, 16000, 20000);
-        cutoff.getSelectionModel().select(Integer.valueOf(12000));
+        cutoff.getItems().addAll(CUTOFFS);
+        cutoff.getSelectionModel().select(DEFAULT_CUTOFF);
 
 
         ConversionContext context = ConverterApplication.getContext();
@@ -151,15 +160,23 @@ public class OutputController {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
-                frequency.setValue(params.getFrequency());
-                bitRate.setValue(params.getBitRate());
-                channels.setValue(params.getChannels());
+                frequency.setValue(findNearestMatch(params.getFrequency(), FREQUENCIES, DEFAULT_FREQUENCY));
+                bitRate.setValue(findNearestMatch(params.getBitRate(), BITRATES, DEFAULT_BITRATE));
+                channels.setValue(findNearestMatch(params.getChannels(), CHANNELS, DEFAULT_CHANNELS));
                 quality.setValue(params.getQuality());
             });
 
         });
 
 
+    }
+
+    private static Integer findNearestMatch(int value, Integer[] array, int defaultValue) {
+        for (Integer integer : array) {
+            if (integer >= value)
+                return integer;
+        }
+        return defaultValue;
     }
 }
 

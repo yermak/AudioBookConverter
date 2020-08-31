@@ -55,7 +55,7 @@ public class ArtWorkController {
         File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
         logger.debug("Opened dialog for art image in folder: {}", new Object[]{sourceFolder});
         if (file != null) {
-            imageList.getItems().add(new ArtWorkBean(file.getAbsolutePath()));
+            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
             logger.info("Added art work from file: {}", new Object[]{file});
         }
     }
@@ -110,7 +110,7 @@ public class ArtWorkController {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(f));
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
                     });
                 }
             }

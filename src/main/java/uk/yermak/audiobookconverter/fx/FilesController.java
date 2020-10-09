@@ -41,6 +41,8 @@ public class FilesController {
 
     @FXML
     public ComboBox outputFormatBox;
+    @FXML
+    public ComboBox presetBox;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -112,6 +114,7 @@ public class FilesController {
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
     private boolean split;
     private final SimpleStringProperty outputFormat = new SimpleStringProperty("m4b");
+    private final SimpleStringProperty preset = new SimpleStringProperty("none");
 
     @FXML
     public void initialize() {
@@ -138,6 +141,18 @@ public class FilesController {
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             outputFormat.set(newValue.toString());
         });
+
+        presetBox.getItems().addAll(Preset.values());
+//        presetBox.getItems().addAll(Arrays.stream(Preset.values()).map(Preset::presetName).collect(Collectors.toList()));
+        presetBox.getSelectionModel().select(0);
+        presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            Preset preset = (Preset) newValue;
+            this.preset.set(preset.name());
+            OutputParameters outputParameters = ConverterApplication.getContext().getOutputParameters();
+            outputParameters.setBitRate(preset.getOutputParameters().getBitRate());
+        });
+
+
 
 
 //        fileList.setCellFactory(new ListViewListCellCallback());

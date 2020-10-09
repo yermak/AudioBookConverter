@@ -102,7 +102,22 @@ public class OutputController {
         channels.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setChannels(newValue));
         quality.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setQuality((int) Math.round(newValue.doubleValue())));
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setCutoff(newValue));
+
 //        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
+
+
+        context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
+            bitRate.valueProperty().set(newValue.getBitRate());
+            frequency.valueProperty().set(newValue.getFrequency());
+            channels.valueProperty().set(newValue.getChannels());
+            quality.valueProperty().set(newValue.getQuality());
+            cutoff.valueProperty().set(newValue.getCutoff());
+            if (newValue.getCbr()) {
+                cbr.fire();
+            } else {
+                vbr.fire();
+            }
+        });
 
 /*
         auto.selectedProperty().addListener((observable, oldValue, newValue) -> {

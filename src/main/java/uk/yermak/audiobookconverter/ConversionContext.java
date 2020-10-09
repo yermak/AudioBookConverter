@@ -165,4 +165,12 @@ public class ConversionContext {
     public void addBookChangeListener(ChangeListener<Book> listener) {
         book.addListener(listener);
     }
+
+    public void setOutputParameters(OutputParameters parameters) {
+        outputParameters.set(parameters);
+    }
+
+    public void addOutputParametersChangeListener(ChangeListener<OutputParameters> listener) {
+        outputParameters.addListener(listener);
+    }
 }

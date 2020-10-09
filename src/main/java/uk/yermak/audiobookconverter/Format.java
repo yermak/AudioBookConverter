@@ -234,7 +234,7 @@ public enum Format {
 
     @Override
     public String toString() {
-        return format + "[" + codec + "]";
+        return extension;
     }
 
     public boolean mp4Compatible() {

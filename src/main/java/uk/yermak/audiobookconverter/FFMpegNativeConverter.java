@@ -53,10 +53,10 @@ public class FFMpegNativeConverter implements Callable<String> {
 
             if (outputParameters.needReencode(mediaInfo.getCodec())) {
                 logger.debug("Re-encoding to {} for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
             } else {
                 logger.debug("Transcoding {} stream for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
             }
             process = ffmpegProcessBuilder.start();
 

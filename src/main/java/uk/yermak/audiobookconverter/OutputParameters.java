@@ -13,7 +13,7 @@ public class OutputParameters {
     private boolean cbr = true;
     private int cutoff = 10000;
     private final int volume = 100;
-    Format format = Format.M4B;
+    public Format format = Format.M4B;
 
 
     public boolean needReencode(String codec) {
@@ -106,5 +106,13 @@ public class OutputParameters {
         this.cutoff = cutoff;
     }
 
+
+    public int getCutoff() {
+        return cutoff;
+    }
+
+    public boolean getCbr() {
+        return cbr;
+    }
 }
 

@@ -6,7 +6,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -113,8 +112,6 @@ public class FilesController {
 
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
     private boolean split;
-    private final SimpleStringProperty outputFormat = new SimpleStringProperty("m4b");
-    private final SimpleStringProperty preset = new SimpleStringProperty("none");
 
     @FXML
     public void initialize() {
@@ -137,19 +134,19 @@ public class FilesController {
             }
         });
 
+        outputFormatBox.getItems().addAll(Format.values());
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            outputFormat.set(newValue.toString());
+            ConverterApplication.getContext().getOutputParameters().setupFormat(newValue.toString());
         });
 
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldValue, newValue) -> outputFormatBox.getSelectionModel().select(newValue.format.name()));
+
         presetBox.getItems().addAll(Preset.values());
-//        presetBox.getItems().addAll(Arrays.stream(Preset.values()).map(Preset::presetName).collect(Collectors.toList()));
         presetBox.getSelectionModel().select(0);
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             Preset preset = (Preset) newValue;
-            this.preset.set(preset.name());
-            OutputParameters outputParameters = ConverterApplication.getContext().getOutputParameters();
-            outputParameters.setBitRate(preset.getOutputParameters().getBitRate());
+            ConverterApplication.getContext().setOutputParameters(preset.getOutputParameters());
         });
 
 
@@ -423,7 +420,7 @@ public class FilesController {
         }
 
         ObservableList<Part> parts = book.getParts();
-        String extension = outputFormat.get();
+        String extension = ConverterApplication.getContext().getOutputParameters().format.name();
 //        String extension = FilenameUtils.getExtension(outputDestination);
         conversionGroup.getOutputParameters().setupFormat(extension);
 
@@ -510,8 +507,9 @@ public class FilesController {
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
+        String format = ConverterApplication.getContext().getOutputParameters().format.name();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(outputFormat.get(), "*." + outputFormat.get())
+                new FileChooser.ExtensionFilter(format, "*." + format)
 /*
                 new FileChooser.ExtensionFilter(M4A, "*." + M4A),
                 new FileChooser.ExtensionFilter(MP3, "*." + MP3),

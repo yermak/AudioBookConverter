@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.stage.Screen?>
-<?import java.lang.*?>
+<?import java.lang.String?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
@@ -313,14 +313,6 @@
                             </Label>
                             <ComboBox fx:id="outputFormatBox"
                                       minWidth="${screen.visualBounds.width * 0.05}" >
-                                <items>
-                                    <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="m4b"/>
-                                        <String fx:value="ogg"/>
-                                        <String fx:value="mp3"/>
-                                        <String fx:value="m4a"/>
-                                    </FXCollections>
-                                </items>
                             </ComboBox>
                             <Label text="Split by" textAlignment="LEFT" >
                                 <font>

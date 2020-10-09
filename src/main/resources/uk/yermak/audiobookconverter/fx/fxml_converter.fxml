@@ -302,17 +302,7 @@
                                     <Font size="14.0"/>
                                 </font>
                             </Label>
-                            <ComboBox fx:id="outputFormatBox1"
-                                      minWidth="${screen.visualBounds.width * 0.05}">
-                                <items>
-                                    <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="ipod nano"/>
-                                        <String fx:value="ipod classic"/>
-                                        <String fx:value="iphone"/>
-                                        <String fx:value="android"/>
-                                        <String fx:value="legacy"/>
-                                    </FXCollections>
-                                </items>
+                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}">
                             </ComboBox>
 
 

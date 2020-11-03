@@ -66,7 +66,13 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.0.1</version>
+            <version>11.0.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -202,7 +208,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
-                <executions>
+                 <executions>
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>
@@ -231,8 +237,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-14.0.2</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-14</javafx.mods>
+                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.1</java.home>
+                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1</javafx.mods>
                 <installer.script>windows/package.bat</installer.script>
                 <installer.assmebly>windows-installer.xml</installer.assmebly>
             </properties>
@@ -246,8 +252,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>/home/yermak/Programs/OpenJDK/jdk-14.0.2</java.home>
-                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-14</javafx.mods>
+                <java.home>/home/yermak/Programs/OpenJDK/jdk-15.0.1</java.home>
+                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
                 <installer.script>linux/package.sh</installer.script>
                 <installer.assmebly>linux-installer.xml</installer.assmebly>
             </properties>

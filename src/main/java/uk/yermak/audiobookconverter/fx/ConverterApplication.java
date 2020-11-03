@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;/**
  */
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,9 +25,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
 
 public class ConverterApplication extends Application {
     private static JfxEnv env;
+
     static {
         File APP_DIR = new File(System.getenv("APPDATA"), Version.getVersionString());
         if (APP_DIR.exists() || APP_DIR.mkdir()) {
@@ -35,6 +38,7 @@ public class ConverterApplication extends Application {
             System.setProperty("APPDATA", System.getProperty("user.home"));
         }
     }
+
     private static final ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {
@@ -46,6 +50,10 @@ public class ConverterApplication extends Application {
     }
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    public static void checkNewVersion() {
+        Executors.newSingleThreadExecutor().submit(new VersionChecker());
+    }
 
     @Override
     public void start(Stage stage) {
@@ -86,24 +94,6 @@ public class ConverterApplication extends Application {
         }
     }
 
-    public static void checkNewVersion() {
-        try {
-            String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
-            if (!Version.getVersionString().equals(StringUtils.trim(version))) {
-                logger.info("New version found: {}", version);
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("New Version Available!");
-                String s = "Would you like to download new version?";
-                alert.setContentText(s);
-                Optional<ButtonType> result = alert.showAndWait();
-                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-                    ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/releases/latest");
-                }
-            }
-        } catch (IOException e) {
-            logger.info(e.getMessage());
-        }
-    }
 
     private static String readStringFromURL(String requestURL) throws IOException {
         try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
@@ -124,5 +114,28 @@ public class ConverterApplication extends Application {
         Notifications.create()
                 .title("AudioBookConverter: Conversion is completed")
                 .text(finalOutputDestination).show();
+    }
+
+    static class VersionChecker implements Runnable {
+        @Override
+        public void run() {
+            try {
+                String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
+                if (!Version.getVersionString().equals(StringUtils.trim(version))) {
+                    logger.info("New version found: {}", version);
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("New Version Available!");
+                        alert.setContentText("Would you like to download new version?");
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                            ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/releases/latest");
+                        }
+                    });
+                }
+            } catch (IOException e) {
+                logger.info(e.getMessage());
+            }
+        }
     }
 }

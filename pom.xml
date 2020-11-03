@@ -7,16 +7,16 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.3.1</version>
+    <version>5.4.0</version>
 
     <properties>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>14</javafx.version>
+        <javafx.version>15.0.1</javafx.version>
     </properties>
 
     <dependencies>
@@ -130,8 +130,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>14</source>
-                    <target>14</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
                     <compilerArgs>${compiler.args.main}</compilerArgs>
                 </configuration>

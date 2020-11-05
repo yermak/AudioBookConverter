@@ -140,6 +140,7 @@ public class FilesController {
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             outputFormat.set(newValue.toString());
+            ConverterApplication.getContext().getOutputParameters().setupFormat(newValue.toString());
         });
 
         presetBox.getItems().addAll(Preset.values());
@@ -148,9 +149,10 @@ public class FilesController {
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             Preset preset = (Preset) newValue;
             this.preset.set(preset.name());
-            OutputParameters outputParameters = ConverterApplication.getContext().getOutputParameters();
-            outputParameters.setBitRate(preset.getOutputParameters().getBitRate());
+            ConverterApplication.getContext().setOutputParameters(preset.getOutputParameters());
         });
+
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> outputFormatBox.setValue(newParams.getFormat()));
 
 
 
@@ -482,7 +484,7 @@ public class FilesController {
 
         ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
 
-        conversionGroup.setOutputParameters(context.getOutputParameters());
+        conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
         conversionGroup.setBookInfo(context.getBookInfo().get());
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 

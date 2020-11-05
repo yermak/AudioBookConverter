@@ -1,13 +1,18 @@
 package uk.yermak.audiobookconverter;
 
 public enum Preset {
-    CUSTOM("custom", "m4b", 128, 44100, 2, 20000, true, 3),
-    NANO ("ipod nano", "m4b", 64, 44100, 1, 10000, true, 3),
-    CLASSIC ("ipod classic", "m4b", 96, 44100, 2, 12000, true, 3),
+    CUSTOM("custom", "m4b", 128, 44100, 2, 20000, true, 3) {
+        @Override
+        public OutputParameters getOutputParameters() {
+            return OutputParameters.customInstance;
+        }
+    },
+    NANO("ipod nano", "m4b", 64, 44100, 1, 10000, true, 2),
+    CLASSIC("ipod classic", "m4b", 96, 44100, 2, 12000, true, 3),
     IPHONE("iphone", "m4b", 128, 44100, 2, 14000, true, 3),
-    OLD_ANDROID ("old android", "m4b", 64, 44100, 2, 10000, true, 3),
-    ANDROID ("android 5+", "ogg", 96, 44100, 2, 12000, true, 3),
-    LEGACY ("legacy", "mp3", 128, 44100, 2, 12000, true, 3);
+    OLD_ANDROID("old android", "m4b", 64, 44100, 2, 10000, true, 3),
+    ANDROID("android 5+", "ogg", 96, 44100, 2, 12000, true, 3),
+    LEGACY("legacy", "mp3", 128, 44100, 2, 12000, true, 3);
 
     private final OutputParameters parameters = new OutputParameters();
     private String presetName;
@@ -24,7 +29,7 @@ public enum Preset {
     }
 
     public OutputParameters getOutputParameters() {
-        return parameters;
+        return new OutputParameters(parameters);
     }
 
     public String presetName() {

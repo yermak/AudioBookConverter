@@ -93,7 +93,7 @@ public class ConversionContext {
 
 //        reloadGenres();
         bookInfo.set(AudioBookInfo.instance());
-        outputParameters.set(new OutputParameters());
+        outputParameters.set(OutputParameters.customInstance);
         book.set(null);
         posters.clear();
         media.clear();
@@ -164,5 +164,13 @@ public class ConversionContext {
 
     public void addBookChangeListener(ChangeListener<Book> listener) {
         book.addListener(listener);
+    }
+
+    public void addOutputParametersChangeListener(ChangeListener<OutputParameters> changeListener) {
+        outputParameters.addListener(changeListener);
+    }
+
+    public void setOutputParameters(OutputParameters outputParameters) {
+        this.outputParameters.set(outputParameters);
     }
 }

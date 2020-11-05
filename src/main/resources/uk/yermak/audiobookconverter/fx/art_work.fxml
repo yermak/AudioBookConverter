@@ -20,7 +20,10 @@
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
     <children>
-        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4" maxHeight="${screen.visualBounds.height*0.07}"
+        <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"
+
+                  minHeight="${screen.visualBounds.height*0.06}"
+                  maxHeight="${screen.visualBounds.height*0.12}"
                   orientation="HORIZONTAL" GridPane.fillHeight="false"/>
 
         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"

@@ -222,12 +222,16 @@
                                 <argument>${javafx.mods}</argument>
                                 <argument>${project.version}</argument>
                             </arguments>
+                            <environmentVariables>
+                                <ARC7ZIP_HOME>${arc7zip.home}</ARC7ZIP_HOME>
+                            </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>win</id>
@@ -239,6 +243,7 @@
             <properties>
                 <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.1</java.home>
                 <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1</javafx.mods>
+                <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
                 <installer.script>windows/package.bat</installer.script>
                 <installer.assmebly>windows-installer.xml</installer.assmebly>
             </properties>
@@ -254,6 +259,7 @@
             <properties>
                 <java.home>/home/yermak/Programs/OpenJDK/jdk-15.0.1</java.home>
                 <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
+                <arc7zip.home></arc7zip.home>
                 <installer.script>linux/package.sh</installer.script>
                 <installer.assmebly>linux-installer.xml</installer.assmebly>
             </properties>

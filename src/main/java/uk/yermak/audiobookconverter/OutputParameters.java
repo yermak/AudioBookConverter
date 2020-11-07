@@ -1,8 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 
-import com.google.gson.Gson;
-
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,8 +20,6 @@ public class OutputParameters {
     private int cutoff = DEFAULT_CUTOFF;
     Format format = Format.M4B;
 
-    public static final OutputParameters customInstance = new SavableOutputParameters();
-
     public OutputParameters(OutputParameters parameters) {
         this.bitRate = parameters.bitRate;
         this.frequency = parameters.frequency;
@@ -36,6 +32,17 @@ public class OutputParameters {
 
     OutputParameters() {
     }
+
+    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality) {
+        this.format = format;
+        this.bitRate = bitRate;
+        this.frequency = frequency;
+        this.channels = channels;
+        this.quality = quality;
+        this.cbr = cbr;
+        this.cutoff = cutoff;
+    }
+
 
     public boolean needReencode(String codec) {
         return format.needsReencode(codec);
@@ -134,136 +141,6 @@ public class OutputParameters {
 
     public String getFormat() {
         return format.extension;
-    }
-
-    static class SavableOutputParameters extends OutputParameters {
-        private OutputParameters save;
-
-        public SavableOutputParameters() {
-
-            String property = AppProperties.getProperty("preset.custom");
-            if (property == null) {
-                save = new OutputParameters();
-                saveProperty();
-            } else {
-                Gson gson = new Gson();
-                save = gson.fromJson(property, OutputParameters.class);
-            }
-        }
-
-        private void saveProperty() {
-            Gson gson = new Gson();
-            String gsonString = gson.toJson(save);
-            AppProperties.setProperty("preset.custom", gsonString);
-        }
-
-        @Override
-        public boolean needReencode(String codec) {
-            return save.needReencode(codec);
-        }
-
-        @Override
-        public void setupFormat(String extension) {
-            save.setupFormat(extension);
-            saveProperty();
-        }
-
-        @Override
-        public int getBitRate() {
-            return save.getBitRate();
-        }
-
-        @Override
-        public void setBitRate(int bitRate) {
-            save.setBitRate(bitRate);
-            saveProperty();
-        }
-
-        @Override
-        public int getFrequency() {
-            return save.getFrequency();
-        }
-
-        @Override
-        public void setFrequency(int frequency) {
-            save.setFrequency(frequency);
-            saveProperty();
-        }
-
-        @Override
-        public int getChannels() {
-            return save.getChannels();
-        }
-
-        @Override
-        public void setChannels(int channels) {
-            save.setChannels(channels);
-            saveProperty();
-        }
-
-        @Override
-        public int getQuality() {
-            return save.getQuality();
-        }
-
-        @Override
-        public void setQuality(int quality) {
-            save.setQuality(quality);
-            saveProperty();
-        }
-
-        @Override
-        public boolean isCbr() {
-            return save.isCbr();
-        }
-
-        @Override
-        public void setCbr(boolean cbr) {
-            save.setCbr(cbr);
-            saveProperty();
-        }
-
-        @Override
-        public void updateAuto(List<MediaInfo> media) {
-            save.updateAuto(media);
-            saveProperty();
-        }
-
-        @Override
-        public String getFFMpegQualityParameter() {
-            return save.getFFMpegQualityParameter();
-        }
-
-        @Override
-        public String getFFMpegQualityValue() {
-            return save.getFFMpegQualityValue();
-        }
-
-        @Override
-        public String getFFMpegChannelsValue() {
-            return save.getFFMpegChannelsValue();
-        }
-
-        @Override
-        public String getCutoffValue() {
-            return save.getCutoffValue();
-        }
-
-        @Override
-        public int getCutoff() {
-            return save.getCutoff();
-        }
-
-        @Override
-        public void setCutoff(int cutoff) {
-            save.setCutoff(cutoff);
-            saveProperty();
-        }
-
-        @Override
-        public String getFormat() {
-            return save.getFormat();
-        }
     }
 
 }

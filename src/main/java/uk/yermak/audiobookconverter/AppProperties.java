@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Enumeration;
 import java.util.Properties;
 
 public class AppProperties {
@@ -32,6 +33,20 @@ public class AppProperties {
     public static String getProperty(String key) {
         Properties applicationProps = getAppProperties();
         return applicationProps.getProperty(key);
+    }
+
+    public static Properties getProperties(String group) {
+        Properties properties = new Properties();
+        Properties applicationProps = getAppProperties();
+        Enumeration<Object> keys = applicationProps.keys();
+        while (keys.hasMoreElements()) {
+            String propName = (String) keys.nextElement();
+            if (propName.startsWith(group + ".")) {
+                String nameWithoutGroup = propName.substring(group.length()+1);
+                properties.setProperty(nameWithoutGroup, applicationProps.getProperty(propName));
+            }
+        }
+        return properties;
     }
 
     public static void setProperty(String key, String value) {

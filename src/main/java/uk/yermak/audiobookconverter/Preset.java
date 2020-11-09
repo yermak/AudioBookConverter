@@ -6,7 +6,9 @@ import java.util.*;
 
 public class Preset extends OutputParameters {
 
+    public static final String LAST_USED = "last used";
     private final String presetName;
+
 
     @Override
     public String toString() {
@@ -15,20 +17,19 @@ public class Preset extends OutputParameters {
 
 
     static Map<String, OutputParameters> defaultValues = Map.of(
-            "nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2),
-            "classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3),
+            "ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2),
+            "ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3),
             "iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4),
-            "android-5+", new OutputParameters(Format.OGG, 128, 44100, 2, 12000, true, 3),
-            "android_old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3),
+            "android 5+", new OutputParameters(Format.OGG, 128, 44100, 2, 12000, true, 3),
+            "android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3),
             "legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3)
     );
 
-    public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset("custom");
+    public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset(Preset.LAST_USED);
 
 
     public static List<Preset> loadPresets() {
         List<Preset> list = new ArrayList<>();
-        list.add(DEFAULT_OUTPUT_PARAMETERS);
         Properties savedPresets = AppProperties.getProperties("preset");
         savedPresets.keySet().forEach(p -> list.add(new Preset((String) p)));
         Set<String> presetNames = defaultValues.keySet();
@@ -43,96 +44,87 @@ public class Preset extends OutputParameters {
         return list;
     }
 
-    private final OutputParameters save;
+//    private final OutputParameters save;
 
-    public Preset(String presetName) {
+    private Preset(String presetName, OutputParameters preset) {
         this.presetName = presetName;
+        this.bitRate = preset.getBitRate();
+        this.frequency = preset.getFrequency();
+        this.channels = preset.getChannels();
+        this.quality = preset.getQuality();
+        this.cbr = preset.isCbr();
+        this.cutoff = preset.getCutoff();
+        this.format = Format.instance(preset.getFormat());
+        saveProperty();
+    }
+
+
+    private Preset(String presetName) {
+        this.presetName = presetName;
+    }
+
+    public static Preset copy(String presetName, Preset copy) {
+        return new Preset(presetName, copy);
+    }
+
+    public static Preset instance(String presetName) {
         String property = AppProperties.getProperty(presetName);
-        if (property == null) {
-            save = Objects.requireNonNullElseGet(defaultValues.get(presetName), OutputParameters::new);
-            saveProperty();
-        } else {
+        if (property != null) {
             Gson gson = new Gson();
-            save = gson.fromJson(property, OutputParameters.class);
+            return gson.fromJson(property, Preset.class);
         }
+        return new Preset(presetName, Objects.requireNonNullElseGet(defaultValues.get(presetName), OutputParameters::new));
     }
 
     private void saveProperty() {
         Gson gson = new Gson();
-        String gsonString = gson.toJson(save);
+        String gsonString = gson.toJson(this);
         AppProperties.setProperty("preset." + presetName, gsonString);
     }
 
-    @Override
-    public boolean needReencode(String codec) {
-        return save.needReencode(codec);
-    }
 
     @Override
     public void setupFormat(String extension) {
-        save.setupFormat(extension);
+        super.setupFormat(extension);
         saveProperty();
     }
 
-    @Override
-    public int getBitRate() {
-        return save.getBitRate();
-    }
 
     @Override
     public void setBitRate(int bitRate) {
-        save.setBitRate(bitRate);
+        super.setBitRate(bitRate);
         saveProperty();
-    }
-
-    @Override
-    public int getFrequency() {
-        return save.getFrequency();
     }
 
     @Override
     public void setFrequency(int frequency) {
-        save.setFrequency(frequency);
+        super.setFrequency(frequency);
         saveProperty();
     }
 
-    @Override
-    public int getChannels() {
-        return save.getChannels();
-    }
 
     @Override
     public void setChannels(int channels) {
-        save.setChannels(channels);
+        super.setChannels(channels);
         saveProperty();
-    }
-
-    @Override
-    public int getQuality() {
-        return save.getQuality();
     }
 
     @Override
     public void setQuality(int quality) {
-        save.setQuality(quality);
+        super.setQuality(quality);
         saveProperty();
     }
 
     @Override
-    public boolean isCbr() {
-        return save.isCbr();
-    }
-
-    @Override
     public void setCbr(boolean cbr) {
-        save.setCbr(cbr);
+        super.setCbr(cbr);
         saveProperty();
     }
 
     @Override
     public void updateAuto(List<MediaInfo> media) {
-        if (presetName.equals("custom")) {
-            save.updateAuto(media);
+        if (!defaultValues.keySet().contains(presetName)) {
+            super.updateAuto(media);
             saveProperty();
         } else {
             //Ignoring auto-update and save for all other preset
@@ -140,39 +132,9 @@ public class Preset extends OutputParameters {
     }
 
     @Override
-    public String getFFMpegQualityParameter() {
-        return save.getFFMpegQualityParameter();
-    }
-
-    @Override
-    public String getFFMpegQualityValue() {
-        return save.getFFMpegQualityValue();
-    }
-
-    @Override
-    public String getFFMpegChannelsValue() {
-        return save.getFFMpegChannelsValue();
-    }
-
-    @Override
-    public String getCutoffValue() {
-        return save.getCutoffValue();
-    }
-
-    @Override
-    public int getCutoff() {
-        return save.getCutoff();
-    }
-
-    @Override
     public void setCutoff(int cutoff) {
-        save.setCutoff(cutoff);
+        super.setCutoff(cutoff);
         saveProperty();
-    }
-
-    @Override
-    public String getFormat() {
-        return save.getFormat();
     }
 
     public String getPresetName() {

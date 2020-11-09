@@ -95,7 +95,7 @@ public class ConversionContext {
 
 //        reloadGenres();
         bookInfo.set(AudioBookInfo.instance());
-        outputParameters.set(new OutputParameters(Preset.DEFAULT_OUTPUT_PARAMETERS));
+        outputParameters.set(Preset.DEFAULT_OUTPUT_PARAMETERS);
         book.set(null);
         posters.clear();
         media.clear();

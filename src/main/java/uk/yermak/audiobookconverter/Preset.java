@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Preset extends OutputParameters {
 
-    private String presetName;
+    private final String presetName;
 
     @Override
     public String toString() {
@@ -43,7 +43,7 @@ public class Preset extends OutputParameters {
         return list;
     }
 
-    private OutputParameters save;
+    private final OutputParameters save;
 
     public Preset(String presetName) {
         this.presetName = presetName;

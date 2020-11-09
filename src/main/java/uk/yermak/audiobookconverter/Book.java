@@ -20,7 +20,7 @@ public class Book implements Organisable, InvalidationListener {
     private final AudioBookInfo audioBookInfo;
 
     private final ObservableList<Part> parts = FXCollections.observableArrayList();
-    private List<InvalidationListener> listeners = new ArrayList<>();
+    private final List<InvalidationListener> listeners = new ArrayList<>();
 
     public Book(AudioBookInfo audioBookInfo) {
         this.audioBookInfo = audioBookInfo;

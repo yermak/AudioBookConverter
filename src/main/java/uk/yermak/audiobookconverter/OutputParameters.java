@@ -12,22 +12,22 @@ public class OutputParameters {
     public static final Integer DEFAULT_FREQUENCY = 44100;
     public static final Integer DEFAULT_BITRATE = 128;
 
-    private int bitRate = DEFAULT_BITRATE;
-    private int frequency = DEFAULT_FREQUENCY;
-    private int channels = DEFAULT_CHANNELS;
-    private int quality = DEFAULT_QUALITY;
-    private boolean cbr = true;
-    private int cutoff = DEFAULT_CUTOFF;
-    Format format = Format.M4B;
+    protected int bitRate = DEFAULT_BITRATE;
+    protected int frequency = DEFAULT_FREQUENCY;
+    protected int channels = DEFAULT_CHANNELS;
+    protected int quality = DEFAULT_QUALITY;
+    protected boolean cbr = true;
+    protected int cutoff = DEFAULT_CUTOFF;
+    protected Format format = Format.M4B;
 
     public OutputParameters(OutputParameters parameters) {
-        this.bitRate = parameters.bitRate;
-        this.frequency = parameters.frequency;
-        this.channels = parameters.channels;
-        this.quality = parameters.quality;
-        this.cbr = parameters.cbr;
-        this.cutoff = parameters.cutoff;
-        this.format = parameters.format;
+        this.bitRate = parameters.getBitRate();
+        this.frequency = parameters.getFrequency();
+        this.channels = parameters.getChannels();
+        this.quality = parameters.getQuality();
+        this.cbr = parameters.isCbr();
+        this.cutoff = parameters.getCutoff();
+        this.format = Format.instance(parameters.getFormat());
     }
 
     OutputParameters() {

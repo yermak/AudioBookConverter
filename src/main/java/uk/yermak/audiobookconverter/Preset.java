@@ -13,17 +13,8 @@ public class Preset extends OutputParameters {
         return presetName;
     }
 
-    public static final OutputParameters DEFAULT_OUTPUT_PARAMETERS = new OutputParameters(
-            Format.M4B,
-            OutputParameters.DEFAULT_BITRATE,
-            OutputParameters.DEFAULT_FREQUENCY,
-            OutputParameters.DEFAULT_CHANNELS,
-            OutputParameters.DEFAULT_CUTOFF,
-            true,
-            OutputParameters.DEFAULT_QUALITY);
 
     static Map<String, OutputParameters> defaultValues = Map.of(
-            "custom", DEFAULT_OUTPUT_PARAMETERS,
             "nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2),
             "classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3),
             "iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4),
@@ -32,8 +23,12 @@ public class Preset extends OutputParameters {
             "legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3)
     );
 
+    public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset("custom");
+
+
     public static List<Preset> loadPresets() {
         List<Preset> list = new ArrayList<>();
+        list.add(DEFAULT_OUTPUT_PARAMETERS);
         Properties savedPresets = AppProperties.getProperties("preset");
         savedPresets.keySet().forEach(p -> list.add(new Preset((String) p)));
         Set<String> presetNames = defaultValues.keySet();
@@ -136,7 +131,12 @@ public class Preset extends OutputParameters {
 
     @Override
     public void updateAuto(List<MediaInfo> media) {
-        save.updateAuto(media);
+        if (presetName.equals("custom")) {
+            save.updateAuto(media);
+            saveProperty();
+        } else {
+            //Ignoring auto-update and save for all other preset
+        }
     }
 
     @Override

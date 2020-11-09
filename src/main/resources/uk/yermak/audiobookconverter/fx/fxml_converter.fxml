@@ -304,8 +304,8 @@
                                     <Font size="14.0"/>
                                 </font>
                             </Label>
-                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}">
-                            </ComboBox>
+                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}" editable="true"/>
+
 
 
                             <Label text="Format" textAlignment="LEFT" >

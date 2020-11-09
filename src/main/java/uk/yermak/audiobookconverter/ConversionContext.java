@@ -37,7 +37,7 @@ public class ConversionContext {
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
     private final SimpleStringProperty outputFormat = new SimpleStringProperty("m4b");
-    private final SimpleStringProperty preset = new SimpleStringProperty("custom");
+    private final SimpleStringProperty preset = new SimpleStringProperty(Preset.LAST_USED);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 

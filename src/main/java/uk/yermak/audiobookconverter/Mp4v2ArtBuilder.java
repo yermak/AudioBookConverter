@@ -53,8 +53,8 @@ public class Mp4v2ArtBuilder {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("Poster Out: {}", out.toString());
-            logger.error("Poster Error: {}", err.toString());
+            logger.debug("mp4art out: {}", out.toString());
+            logger.warn("mp4art err: {}", err.toString());
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("ArtWork failed with code " + process.exitValue() + "!=0", new Error(err.toString()));

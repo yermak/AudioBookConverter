@@ -53,10 +53,10 @@ public class FFMpegNativeConverter implements Callable<String> {
 
             if (outputParameters.needReencode(mediaInfo.getCodec())) {
                 logger.debug("Re-encoding to {} for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
             } else {
                 logger.debug("Transcoding {} stream for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
             }
             process = ffmpegProcessBuilder.start();
 
@@ -69,8 +69,8 @@ public class FFMpegNativeConverter implements Callable<String> {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("Converter Out: {}", out.toString());
-            logger.error("Converter Error: {}", err.toString());
+            logger.debug("ffmpeg out: {}", out.toString());
+            logger.warn("ffmpeg err: {}", err.toString());
 
             Mp4v2InfoLoader.updateDuration(mediaInfo, outputFileName);
             return outputFileName;

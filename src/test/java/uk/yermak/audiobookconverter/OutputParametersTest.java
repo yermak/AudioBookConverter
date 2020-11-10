@@ -3,7 +3,7 @@ package uk.yermak.audiobookconverter;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static uk.yermak.audiobookconverter.OutputParameters.Format.toFFMpegTime;
+import static uk.yermak.audiobookconverter.Format.toFFMpegTime;
 
 public class OutputParametersTest {
     @Test

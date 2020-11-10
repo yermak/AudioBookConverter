@@ -53,10 +53,10 @@ public class ArtWorkController {
                 new FileChooser.ExtensionFilter("bmp", "*.bmp"));
 
         File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
-        logger.debug("Opened dialog for art image in folder: {}", new Object[]{sourceFolder});
+        logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
         if (file != null) {
             imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
-            logger.info("Added art work from file: {}", new Object[]{file});
+            logger.info("Added art work from file: {}", file);
         }
     }
 
@@ -77,7 +77,7 @@ public class ArtWorkController {
             if (selected > 0) {
                 ConverterApplication.getContext().movePosterLeft(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
-                logger.debug("Image {} moved left", new Object[]{selected});
+                logger.debug("Image {} moved left", selected);
             }
         }
 
@@ -92,7 +92,7 @@ public class ArtWorkController {
             if (selected < items.size() - 1) {
                 ConverterApplication.getContext().movePosterLeft(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
-                logger.debug("Image {} moved right", new Object[]{selected});
+                logger.debug("Image {} moved right", selected);
             }
         }
     }

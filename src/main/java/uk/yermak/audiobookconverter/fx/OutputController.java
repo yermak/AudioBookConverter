@@ -10,14 +10,12 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Book;
-import uk.yermak.audiobookconverter.ConversionContext;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.OutputParameters;
+import uk.yermak.audiobookconverter.*;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static uk.yermak.audiobookconverter.OutputParameters.*;
 
@@ -32,15 +30,17 @@ public class OutputController {
     public static final Integer[] BITRATES = new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320};
 
 
+    @FXML
+    public ComboBox<Format> outputFormatBox;
+    @FXML
+    public ComboBox<String> presetBox;
+
+    @FXML
+    private ComboBox<String> splitFileBox;
+
 
     @FXML
     public ComboBox<Integer> cutoff;
-    @FXML
-    private ComboBox<String> volume;
-/*
-    @FXML
-    private CheckBox auto;
-*/
 
     @FXML
     private ComboBox<Integer> frequency;
@@ -74,10 +74,41 @@ public class OutputController {
     @FXML
     private void initialize() {
 
-/*
-        volume.getItems().addAll("100%", "200%", "300%");
-        volume.getSelectionModel().select(0);
-*/
+        splitFileBox.getSelectionModel().select(0);
+        splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            switch (newValue) {
+                case "parts" -> ConverterApplication.getContext().setSplit(false);
+                case "chapters" -> ConverterApplication.getContext().setSplit(true);
+            }
+        });
+
+        outputFormatBox.getItems().addAll(Format.values());
+        outputFormatBox.getSelectionModel().select(0);
+        outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            ConverterApplication.getContext().setOutputFormat(newValue);
+        });
+
+        List<Preset> presets = Preset.loadPresets();
+//        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
+//        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
+
+        presetBox.getItems().addAll(presets.stream().map(Preset::getName).collect(Collectors.toList()));
+
+        presetBox.getSelectionModel().select(Preset.DEFAULT);
+        presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!presetBox.getItems().contains(newValue)) {
+                presetBox.getItems().add(newValue);
+                Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
+                ConverterApplication.getContext().setOutputParameters(preset);
+            } else {
+                Preset preset = Preset.instance(newValue);
+                ConverterApplication.getContext().setOutputParameters(preset);
+            }
+        });
+
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+            outputFormatBox.setValue(newParams.getFormat());
+        });
 
         frequency.getItems().addAll(FREQUENCIES);
         frequency.getSelectionModel().select(DEFAULT_FREQUENCY);
@@ -95,43 +126,25 @@ public class OutputController {
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
 
-
-//        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setBitRate(newValue));
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setFrequency(newValue));
         channels.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setChannels(newValue));
         quality.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setQuality((int) Math.round(newValue.doubleValue())));
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setCutoff(newValue));
-//        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
 
-/*
-        auto.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-            bitRate.setDisable(newValue);
-            frequency.setDisable(newValue);
-            channels.setDisable(newValue);
-            quality.setDisable(newValue);
-            cbr.setDisable(newValue);
-            vbr.setDisable(newValue);
-            cutoff.setDisable(newValue);
-
-            if (!newValue) {
-                if (cbr.isSelected()) {
-                    bitRate.setDisable(false);
-                    cutoff.setDisable(false);
-                    quality.setDisable(true);
-
-                }
-                if (vbr.isSelected()) {
-                    bitRate.setDisable(true);
-                    cutoff.setDisable(false);
-                    quality.setDisable(false);
-                }
+        context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
+            bitRate.valueProperty().set(newValue.getBitRate());
+            frequency.valueProperty().set(newValue.getFrequency());
+            channels.valueProperty().set(newValue.getChannels());
+            quality.valueProperty().set(newValue.getQuality());
+            cutoff.valueProperty().set(newValue.getCutoff());
+            if (newValue.isCbr()) {
+                cbr.fire();
+            } else {
+                vbr.fire();
             }
-            updateParameters(media, media.isEmpty());
         });
 
-*/
         media.addListener((InvalidationListener) observable -> updateParameters(media));
         ConverterApplication.getContext().addBookChangeListener((observableValue, oldBook, newBook) -> {
             if (newBook != null) {

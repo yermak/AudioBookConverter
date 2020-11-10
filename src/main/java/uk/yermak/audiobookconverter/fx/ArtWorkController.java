@@ -110,7 +110,7 @@ public class ArtWorkController {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(f));
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
                     });
                 }
             }

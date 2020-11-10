@@ -168,8 +168,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-<!--                <version>3.2.0</version>-->
-
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>mega-jar</id>
@@ -196,7 +195,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/deploy/assembly/${installer.assmebly}</descriptor>
+                                <descriptor>src/main/deploy/assembly/${installer.assembly}</descriptor>
                             </descriptors>
                             <outputDirectory>target/package</outputDirectory>
                         </configuration>
@@ -208,7 +207,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
-                 <executions>
+                <executions>
                     <execution>
                         <id>installer</id>
                         <phase>package</phase>
@@ -245,7 +244,7 @@
                 <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1</javafx.mods>
                 <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
                 <installer.script>windows/package.bat</installer.script>
-                <installer.assmebly>windows-installer.xml</installer.assmebly>
+                <installer.assembly>windows-installer.xml</installer.assembly>
             </properties>
         </profile>
 
@@ -261,7 +260,7 @@
                 <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
                 <arc7zip.home></arc7zip.home>
                 <installer.script>linux/package.sh</installer.script>
-                <installer.assmebly>linux-installer.xml</installer.assmebly>
+                <installer.assembly>linux-installer.xml</installer.assembly>
             </properties>
         </profile>
     </profiles>

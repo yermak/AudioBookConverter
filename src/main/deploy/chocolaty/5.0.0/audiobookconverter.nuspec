@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>audiobookconverter</id>
+    <version>5.0.0</version>
+    <title>AudioBookConverter (Install)</title>
+    <authors>Yarick Yermak</authors>
+    <projectUrl>https://www.recoupler.com/products/audiobookconverter</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/yermak/AudioBookConverter/master/AudioBookConverter.png</iconUrl>
+    <tags>audiobook converter m4b mp3 ogg flac m4a</tags>
+    <summary>AudioBookConverter from mp3/flac/m4a/ogg to m4b/ogg/mp3. Multiparts, chapter and artwork are supported.</summary>
+    <description>AudioBookConverter was originally designed as simple and lightweigh application to convert set of mp3 files to single or set of m4b (aac) files to be played on your i-device (or any device now). 
+
+Overtime AudioBookConverter evolved and currently can support converion of most of popular formats to m4b (mp3, wma, m4a, flac), it also can handle existing m4b files and process them with meta information.
+
+AudioBookConverter can work smart to find relevant artwork and can do avanced chapter management. </description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

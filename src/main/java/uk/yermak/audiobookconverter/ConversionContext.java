@@ -35,7 +35,7 @@ public class ConversionContext {
     private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
     private final SimpleObjectProperty<Format> outputFormat = new SimpleObjectProperty<>(Format.M4B);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();

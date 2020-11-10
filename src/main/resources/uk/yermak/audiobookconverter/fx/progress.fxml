@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.stage.Screen?>
@@ -19,29 +20,30 @@
     </columnConstraints>
 
     <children>
-        <Label fx:id="title" text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="4"
+        <ImageView fitHeight="${screen.visualBounds.height * 0.075}" preserveRatio="true" fx:id="imageView" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
+        <Label fx:id="title" text="Title" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="4"
                GridPane.valignment="TOP">
             <font>
                 <Font name="Arial Black" size="12.0"/>
             </font>
         </Label>
-        <Label fx:id="state" GridPane.columnIndex="4" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label fx:id="state" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
-        <ProgressBar fx:id="progressBar" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="5"
+        <ProgressBar fx:id="progressBar" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="5"
                      GridPane.halignment="CENTER"/>
 
-        <Label text="Converted files" GridPane.columnIndex="0" GridPane.rowIndex="2"
+        <Label text="Converted files" GridPane.columnIndex="1" GridPane.rowIndex="2"
                GridPane.halignment="LEFT"/>
-        <Label fx:id="filesCount" text="0/0" GridPane.columnIndex="1" GridPane.rowIndex="2"
+        <Label fx:id="filesCount" text="0/0" GridPane.columnIndex="2" GridPane.rowIndex="2"
                GridPane.halignment="LEFT" GridPane.columnSpan="3"/>
 
-        <Label text="Estimated output file size" GridPane.columnIndex="2" GridPane.rowIndex="2"
+        <Label text="Estimated output file size" GridPane.columnIndex="3" GridPane.rowIndex="2"
                GridPane.halignment="RIGHT" />
-        <Label fx:id="estimatedSize" text="0MB" GridPane.columnIndex="3" GridPane.rowIndex="2"
+        <Label fx:id="estimatedSize" text="0MB" GridPane.columnIndex="4" GridPane.rowIndex="2"
                GridPane.halignment="LEFT"/>
         <Button fx:id="pauseButton" text="Pause"
                 minWidth="${screen.visualBounds.width * 0.05}"
-                GridPane.columnIndex="4" GridPane.rowIndex="2"
+                GridPane.columnIndex="5" GridPane.rowIndex="2"
                 GridPane.fillHeight="true" GridPane.halignment="RIGHT"
         >
             <tooltip>
@@ -50,18 +52,18 @@
         </Button>
 
 
-        <Label text="Time elapsed" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
-        <Label fx:id="elapsedTime" text="0:00:00" GridPane.columnIndex="1" GridPane.rowIndex="3"
+        <Label text="Time elapsed" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
+        <Label fx:id="elapsedTime" text="0:00:00" GridPane.columnIndex="2" GridPane.rowIndex="3"
                GridPane.halignment="LEFT"/>
 
-        <Label text="Estimated time remaining" GridPane.columnIndex="2" GridPane.rowIndex="3"
+        <Label text="Estimated time remaining" GridPane.columnIndex="3" GridPane.rowIndex="3"
                GridPane.halignment="RIGHT"/>
-        <Label fx:id="remainingTime" text="0:00:00" GridPane.columnIndex="3" GridPane.rowIndex="3"
+        <Label fx:id="remainingTime" text="0:00:00" GridPane.columnIndex="4" GridPane.rowIndex="3"
                GridPane.halignment="RIGHT"/>
 
         <Button fx:id="stopButton" text="Stop"
                 minWidth="${screen.visualBounds.width * 0.05}"
-                GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT"
+                GridPane.columnIndex="5" GridPane.rowIndex="3" GridPane.halignment="RIGHT"
         >
             <tooltip>
                 <Tooltip text="Stop conversionGroup of files"/>

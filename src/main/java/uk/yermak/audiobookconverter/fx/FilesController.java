@@ -134,6 +134,7 @@ public class FilesController {
             }
         });
 
+//        outputFormatBox.getItems().addAll(Format.values());
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             ConverterApplication.getContext().setOutputFormat(newValue.toString());
@@ -483,13 +484,15 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
         ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
 
         conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
         conversionGroup.setBookInfo(context.getBookInfo().get());
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
+
+        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+
 
         Executors.newSingleThreadExecutor().submit(() -> {
             Platform.runLater(() -> {

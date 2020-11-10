@@ -112,7 +112,7 @@ public class OutputController {
             channels.valueProperty().set(newValue.getChannels());
             quality.valueProperty().set(newValue.getQuality());
             cutoff.valueProperty().set(newValue.getCutoff());
-            if (newValue.getCbr()) {
+            if (newValue.isCbr()) {
                 cbr.fire();
             } else {
                 vbr.fire();

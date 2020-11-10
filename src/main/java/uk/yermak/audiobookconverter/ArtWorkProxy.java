@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,11 @@ public class ArtWorkProxy implements ArtWork {
     @Override
     public boolean matchCrc32(long crc32) {
         return this.getArtWork().matchCrc32(crc32);
+    }
+
+    @Override
+    public Image image() {
+        return getArtWork().image();
     }
 
     public long getCrc32() {

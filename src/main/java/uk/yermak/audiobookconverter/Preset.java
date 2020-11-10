@@ -54,7 +54,7 @@ public class Preset extends OutputParameters {
         this.quality = preset.getQuality();
         this.cbr = preset.isCbr();
         this.cutoff = preset.getCutoff();
-        this.format = Format.instance(preset.getFormat());
+        this.format = preset.getFormat();
         saveProperty();
     }
 
@@ -84,8 +84,8 @@ public class Preset extends OutputParameters {
 
 
     @Override
-    public void setupFormat(String extension) {
-        super.setupFormat(extension);
+    public void setupFormat(Format format) {
+        super.setupFormat(format);
         saveProperty();
     }
 
@@ -123,7 +123,7 @@ public class Preset extends OutputParameters {
 
     @Override
     public void updateAuto(List<MediaInfo> media) {
-        if (!defaultValues.keySet().contains(presetName)) {
+        if (!defaultValues.containsKey(presetName)) {
             super.updateAuto(media);
             saveProperty();
         } else {

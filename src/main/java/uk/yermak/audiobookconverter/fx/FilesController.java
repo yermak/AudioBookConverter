@@ -39,7 +39,7 @@ public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
-    public ComboBox<String> outputFormatBox;
+    public ComboBox<Format> outputFormatBox;
     @FXML
     public ComboBox<String> presetBox;
 
@@ -134,10 +134,10 @@ public class FilesController {
             }
         });
 
-//        outputFormatBox.getItems().addAll(Format.values());
+        outputFormatBox.getItems().addAll(Format.values());
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            ConverterApplication.getContext().setOutputFormat(newValue.toString());
+            ConverterApplication.getContext().setOutputFormat(newValue);
 
         });
 
@@ -429,9 +429,9 @@ public class FilesController {
         }
 
         ObservableList<Part> parts = book.getParts();
-        String extension = ConverterApplication.getContext().getOutputFormat();
+        Format format = ConverterApplication.getContext().getOutputFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
-        conversionGroup.getOutputParameters().setupFormat(extension);
+        conversionGroup.getOutputParameters().setupFormat(format);
 
         if (split) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
@@ -440,7 +440,7 @@ public class FilesController {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
@@ -457,7 +457,7 @@ public class FilesController {
                 Part part = parts.get(i);
                 String finalDesination = outputDestination;
                 if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
@@ -519,7 +519,7 @@ public class FilesController {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputFormat(), "*." + ConverterApplication.getContext().getOutputFormat())
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputFormat().toString(), "*." + ConverterApplication.getContext().getOutputFormat().toString())
 /*
                 new FileChooser.ExtensionFilter(M4A, "*." + M4A),
                 new FileChooser.ExtensionFilter(MP3, "*." + MP3),
@@ -704,9 +704,5 @@ public class FilesController {
                 progressQueue.getItems().remove(done);
             }
         });
-    }
-
-    public void changeFormat(ActionEvent actionEvent) {
-
     }
 }

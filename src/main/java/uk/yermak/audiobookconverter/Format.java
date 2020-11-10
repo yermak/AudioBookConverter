@@ -26,7 +26,8 @@ public enum Format {
         public boolean ffmpegCompatible() {
             return false;
         }
-    }, MP3("mp3", "libmp3lame", "mp3") {
+    },
+    MP3("mp3", "libmp3lame", "mp3") {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
@@ -65,7 +66,8 @@ public enum Format {
 
             return options;
         }
-    }, OGG("ogg", "libopus", "ogg") {
+    },
+    OGG("ogg", "libopus", "ogg") {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();

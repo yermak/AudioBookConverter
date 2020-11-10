@@ -142,9 +142,9 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-    <HBox VBox.vgrow="ALWAYS" prefHeight="${screen.visualBounds.height * 0.25}">
+    <HBox VBox.vgrow="ALWAYS" prefHeight="${screen.visualBounds.height * 0.45}">
 
-        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS">
+        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS" >
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
@@ -175,13 +175,13 @@
                             </tooltip>
                         </Button>
                     </HBox>
-                    <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS" />
                 </VBox>
             </Tab>
 
 
             <Tab fx:id="filesTab" text="Audio files" closable="false">
-                <ListView fx:id="fileList"/>
+                <ListView fx:id="fileList" />
             </Tab>
             <Tab fx:id="chaptersTab" text="Chapters" closable="false">
                 <TreeTableView fx:id="bookStructure" editable="true">
@@ -256,7 +256,9 @@
                             <padding>
                                 <Insets top="10" right="5" bottom="10" left="5"/>
                             </padding>
-                            <Button fx:id="importButton" text="Import" minWidth="${screen.visualBounds.width * 0.05}"
+                            <Button fx:id="importButton" text="Import"
+                                    minWidth="${screen.visualBounds.width * 0.05}"
+                                    prefWidth="${screen.visualBounds.width * 0.05}"
                                     onAction="#importChapters"
                                     GridPane.valignment="TOP"
                             >
@@ -302,8 +304,8 @@
                                     <Font size="14.0"/>
                                 </font>
                             </Label>
-                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}">
-                            </ComboBox>
+                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}" editable="true"/>
+
 
 
                             <Label text="Format" textAlignment="LEFT" >

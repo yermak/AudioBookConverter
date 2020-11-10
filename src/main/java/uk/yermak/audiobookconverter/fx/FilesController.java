@@ -39,9 +39,9 @@ public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
-    public ComboBox outputFormatBox;
+    public ComboBox<String> outputFormatBox;
     @FXML
-    public ComboBox presetBox;
+    public ComboBox<String> presetBox;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -134,23 +134,31 @@ public class FilesController {
             }
         });
 
-        outputFormatBox.getItems().addAll(Format.values());
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            ConverterApplication.getContext().getOutputParameters().setupFormat(newValue.toString());
+            ConverterApplication.getContext().setOutputFormat(newValue.toString());
+
         });
 
-        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldValue, newValue) -> outputFormatBox.getSelectionModel().select(newValue.format.name()));
+        List<Preset> presets = Preset.loadPresets();
+//        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
+//        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
 
-        presetBox.getItems().addAll(Preset.values());
-        presetBox.getSelectionModel().select(0);
+        presetBox.getItems().addAll(presets.stream().map(Preset::getPresetName).collect(Collectors.toList()));
+
+        presetBox.getSelectionModel().select(Preset.LAST_USED);
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            Preset preset = (Preset) newValue;
-            ConverterApplication.getContext().setOutputParameters(preset.getOutputParameters());
+            if (!presetBox.getItems().contains(newValue)) {
+                presetBox.getItems().add(newValue);
+                Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
+                ConverterApplication.getContext().setOutputParameters(preset);
+            } else {
+                Preset preset = Preset.instance(newValue);
+                ConverterApplication.getContext().setOutputParameters(preset);
+            }
         });
 
-
-
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> outputFormatBox.setValue(newParams.getFormat()));
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -420,7 +428,7 @@ public class FilesController {
         }
 
         ObservableList<Part> parts = book.getParts();
-        String extension = ConverterApplication.getContext().getOutputParameters().format.name();
+        String extension = ConverterApplication.getContext().getOutputFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
         conversionGroup.getOutputParameters().setupFormat(extension);
 
@@ -479,7 +487,7 @@ public class FilesController {
 
         ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
 
-        conversionGroup.setOutputParameters(context.getOutputParameters());
+        conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
         conversionGroup.setBookInfo(context.getBookInfo().get());
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 
@@ -507,9 +515,8 @@ public class FilesController {
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
-        String format = ConverterApplication.getContext().getOutputParameters().format.name();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(format, "*." + format)
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputFormat(), "*." + ConverterApplication.getContext().getOutputFormat())
 /*
                 new FileChooser.ExtensionFilter(M4A, "*." + M4A),
                 new FileChooser.ExtensionFilter(MP3, "*." + MP3),

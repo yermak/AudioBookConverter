@@ -19,6 +19,7 @@ public class OutputParameters {
     protected boolean cbr = true;
     protected int cutoff = DEFAULT_CUTOFF;
     protected Format format = Format.M4B;
+    private boolean splitChapters = false;
 
     public OutputParameters(OutputParameters parameters) {
         this.bitRate = parameters.getBitRate();
@@ -143,5 +144,12 @@ public class OutputParameters {
         return format;
     }
 
+    public boolean isSplitChapters() {
+        return splitChapters;
+    }
+
+    public void setSplitChapters(boolean splitChapters) {
+        this.splitChapters = splitChapters;
+    }
 }
 

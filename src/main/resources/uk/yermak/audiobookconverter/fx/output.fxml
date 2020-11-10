@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
+<?import java.lang.String?>
 <GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
           fx:controller="uk.yermak.audiobookconverter.fx.OutputController"
           gridLinesVisible="false">
@@ -18,6 +20,10 @@
         <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
@@ -26,28 +32,60 @@
             <ToggleGroup fx:id="br"/>
         </fx:define>
 
-        <Label text="Sampling frequency, Hz" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="frequency" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        <Label text="Channels" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="channels" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+        <Label text="Preset" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+
+        <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}" editable="true"
+                  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
 
+        <Label text="Format" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+        <ComboBox fx:id="outputFormatBox"
+                  minWidth="${screen.visualBounds.width * 0.05}" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                  GridPane.halignment="RIGHT"/>
+
+        <Label text="Split by" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="splitFileBox"
+                  minWidth="${screen.visualBounds.width * 0.05}" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                  GridPane.halignment="RIGHT">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="parts"/>
+                    <String fx:value="chapters"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+
+        <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
+
+        <Label text="Sampling frequency, Hz" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="frequency" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
         <RadioButton fx:id="cbr" text="Constant bitrate, kb/s"
-                     GridPane.columnIndex="0" GridPane.rowIndex="1"
+                     GridPane.columnIndex="3" GridPane.rowIndex="1"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT"/>
 
-        <ComboBox fx:id="bitRate" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <ComboBox fx:id="bitRate" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+
+        <Label text="Cut-off frequencies higher then" GridPane.columnIndex="3" GridPane.rowIndex="2"
+               GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="cutoff" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+
+        <Pane prefWidth="50" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
+
+
+        <Label text="Channels" GridPane.columnIndex="6" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="channels" GridPane.columnIndex="7" GridPane.rowIndex="0"/>
 
         <RadioButton fx:id="vbr" text="Variable bitrate, Quality" GridPane.columnSpan="2"
-                     GridPane.columnIndex="2" GridPane.rowIndex="1"
+                     GridPane.columnIndex="6" GridPane.rowIndex="1"
                      toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT"/>
 
-        <Label text="Cut-off frequencies higher then" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="cutoff" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-
-
-        <Slider fx:id="quality" GridPane.columnIndex="2" GridPane.rowIndex="2" min="1" max="5" GridPane.columnSpan="2" value="4"
-                showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0" disable="true"/>
+        <Slider fx:id="quality" GridPane.columnIndex="6" GridPane.rowIndex="2" min="1" max="5" GridPane.columnSpan="2"
+                value="4"
+                showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"
+                disable="true"/>
 
     </children>
 </GridPane>

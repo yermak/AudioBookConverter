@@ -7,22 +7,22 @@ import java.util.*;
 public class Preset extends OutputParameters {
 
     public static final String LAST_USED = "last used";
-    private final String presetName;
+    private final String name;
 
 
     @Override
     public String toString() {
-        return presetName;
+        return name;
     }
 
 
     static Map<String, OutputParameters> defaultValues = Map.of(
-            "ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2),
-            "ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3),
-            "iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4),
-            "android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, true, 3),
-            "android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3),
-            "legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3)
+            "ipod nano", new Preset("ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2)),
+            "ipod classic", new Preset("ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3)),
+            "iphone", new Preset("iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4)),
+            "android 5+", new Preset("android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, true, 3)),
+            "android old", new Preset("android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3)),
+            "legacy", new Preset("legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3))
     );
 
     public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset(Preset.LAST_USED);
@@ -46,8 +46,8 @@ public class Preset extends OutputParameters {
 
 //    private final OutputParameters save;
 
-    private Preset(String presetName, OutputParameters preset) {
-        this.presetName = presetName;
+    private Preset(String name, OutputParameters preset) {
+        this.name = name;
         this.bitRate = preset.getBitRate();
         this.frequency = preset.getFrequency();
         this.channels = preset.getChannels();
@@ -59,8 +59,8 @@ public class Preset extends OutputParameters {
     }
 
 
-    private Preset(String presetName) {
-        this.presetName = presetName;
+    private Preset(String name) {
+        this.name = name;
     }
 
     public static Preset copy(String presetName, Preset copy) {
@@ -68,7 +68,7 @@ public class Preset extends OutputParameters {
     }
 
     public static Preset instance(String presetName) {
-        String property = AppProperties.getProperty(presetName);
+        String property = AppProperties.getProperty("preset." + presetName);
         if (property != null) {
             Gson gson = new Gson();
             return gson.fromJson(property, Preset.class);
@@ -79,7 +79,7 @@ public class Preset extends OutputParameters {
     private void saveProperty() {
         Gson gson = new Gson();
         String gsonString = gson.toJson(this);
-        AppProperties.setProperty("preset." + presetName, gsonString);
+        AppProperties.setProperty("preset." + name, gsonString);
     }
 
 
@@ -123,7 +123,7 @@ public class Preset extends OutputParameters {
 
     @Override
     public void updateAuto(List<MediaInfo> media) {
-        if (!defaultValues.containsKey(presetName)) {
+        if (!defaultValues.containsKey(name)) {
             super.updateAuto(media);
             saveProperty();
         } else {
@@ -137,7 +137,7 @@ public class Preset extends OutputParameters {
         saveProperty();
     }
 
-    public String getPresetName() {
-        return presetName;
+    public String getName() {
+        return name;
     }
 }

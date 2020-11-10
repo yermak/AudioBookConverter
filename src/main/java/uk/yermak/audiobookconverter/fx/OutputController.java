@@ -94,7 +94,7 @@ public class OutputController {
 
         presetBox.getItems().addAll(presets.stream().map(Preset::getName).collect(Collectors.toList()));
 
-        presetBox.getSelectionModel().select(Preset.LAST_USED);
+        presetBox.getSelectionModel().select(Preset.DEFAULT);
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);

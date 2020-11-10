@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Preset extends OutputParameters {
 
-    public static final String LAST_USED = "last used";
+    public static final String DEFAULT = "default";
     private final String name;
 
 
@@ -25,7 +25,7 @@ public class Preset extends OutputParameters {
             "legacy", new Preset("legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3))
     );
 
-    public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset(Preset.LAST_USED);
+    public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset(Preset.DEFAULT);
 
 
     public static List<Preset> loadPresets() {

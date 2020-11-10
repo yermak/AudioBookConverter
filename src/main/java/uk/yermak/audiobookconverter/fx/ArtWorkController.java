@@ -53,10 +53,10 @@ public class ArtWorkController {
                 new FileChooser.ExtensionFilter("bmp", "*.bmp"));
 
         File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
-        logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
+        logger.debug("Opened dialog for art image in folder: {}", new Object[]{sourceFolder});
         if (file != null) {
             imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
-            logger.info("Added art work from file: {}", file);
+            logger.info("Added art work from file: {}", new Object[]{file});
         }
     }
 
@@ -77,7 +77,7 @@ public class ArtWorkController {
             if (selected > 0) {
                 ConverterApplication.getContext().movePosterLeft(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
-                logger.debug("Image {} moved left", selected);
+                logger.debug("Image {} moved left", new Object[]{selected});
             }
         }
 
@@ -92,7 +92,7 @@ public class ArtWorkController {
             if (selected < items.size() - 1) {
                 ConverterApplication.getContext().movePosterLeft(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
-                logger.debug("Image {} moved right", selected);
+                logger.debug("Image {} moved right", new Object[]{selected});
             }
         }
     }
@@ -110,7 +110,7 @@ public class ArtWorkController {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(f));
                     });
                 }
             }

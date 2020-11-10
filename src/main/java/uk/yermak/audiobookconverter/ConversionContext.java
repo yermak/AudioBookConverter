@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,8 +35,7 @@ public class ConversionContext {
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
-    private final SimpleStringProperty outputFormat = new SimpleStringProperty("m4b");
-    private final SimpleStringProperty preset = new SimpleStringProperty(Preset.LAST_USED);
+
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -95,7 +93,7 @@ public class ConversionContext {
 
 //        reloadGenres();
         bookInfo.set(AudioBookInfo.instance());
-        outputParameters.set(Preset.DEFAULT_OUTPUT_PARAMETERS);
+        outputParameters.set(OutputParameters.customInstance);
         book.set(null);
         posters.clear();
         media.clear();
@@ -174,14 +172,5 @@ public class ConversionContext {
 
     public void setOutputParameters(OutputParameters outputParameters) {
         this.outputParameters.set(outputParameters);
-    }
-
-    public void setOutputFormat(String outputFormat) {
-        this.outputFormat.set(outputFormat);
-        getOutputParameters().setupFormat(outputFormat);
-    }
-
-    public String getOutputFormat() {
-        return outputFormat.get();
     }
 }

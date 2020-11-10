@@ -142,7 +142,7 @@
 
     <HBox VBox.vgrow="ALWAYS" prefHeight="${screen.visualBounds.height * 0.45}">
 
-        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS" >
+        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
@@ -173,24 +173,124 @@
                             </tooltip>
                         </Button>
                     </HBox>
-                    <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS" />
+                    <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
 
 
             <Tab fx:id="filesTab" text="Audio files" closable="false">
-                <ListView fx:id="fileList" />
+                <VBox>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button fx:id="removeButton" text="Remove"
+                                minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#removeFiles" disable="false"
+                        >
+                            <tooltip>
+                                <Tooltip text="Removes selected files from the list"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="clearButton" text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#clear"
+                                disable="false"
+                        >
+                            <tooltip>
+                                <Tooltip text="Remove all files from the list"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="upButton" text="Up" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#moveUp"
+                                disable="false"
+                        >
+                            <tooltip>
+                                <Tooltip text="Move selected file up"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="downButton" text="Down" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#moveDown"
+                                disable="false" GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Move selected file down"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <ListView fx:id="fileList"/>
+                </VBox>
             </Tab>
             <Tab fx:id="chaptersTab" text="Chapters" closable="false">
-                <TreeTableView fx:id="bookStructure" editable="true">
-                    <columns>
-                        <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
-                                         prefWidth="${screen.visualBounds.width * 0.1}"/>
-                        <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
-                        <TreeTableColumn text="Details" fx:id="detailsColumn" sortable="false"
-                                         prefWidth="${screen.visualBounds.width * 0.2}"/>
-                    </columns>
-                </TreeTableView>
+                <VBox>
+                    <HBox alignment="CENTER_RIGHT">
+                        <!--
+                                                <Button fx:id="removeButton" text="Remove"
+                                                        minWidth="${screen.visualBounds.width * 0.05}"
+                                                        onAction="#removeFiles" disable="false"
+                                                >
+                                                    <tooltip>
+                                                        <Tooltip text="Removes selected files from the list"/>
+                                                    </tooltip>
+                                                </Button>
+                                                <Button fx:id="clearButton" text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
+                                                        onAction="#clear"
+                                                        disable="false"
+                                                >
+                                                    <tooltip>
+                                                        <Tooltip text="Remove all files from the list"/>
+                                                    </tooltip>
+                                                </Button>
+                                                <Button fx:id="upButton" text="Up" minWidth="${screen.visualBounds.width * 0.05}"
+                                                        onAction="#moveUp"
+                                                        disable="false"
+                                                >
+                                                    <tooltip>
+                                                        <Tooltip text="Move selected file up"/>
+                                                    </tooltip>
+                                                </Button>
+                                                <Button fx:id="downButton" text="Down" minWidth="${screen.visualBounds.width * 0.05}"
+                                                        onAction="#moveDown"
+                                                        disable="false" GridPane.valignment="TOP"
+                                                >
+                                                    <tooltip>
+                                                        <Tooltip text="Move selected file down"/>
+                                                    </tooltip>
+                                                </Button>
+                        -->
+
+                        <Button fx:id="combineButton" text="Combine" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#combine"
+                                disable="false"
+                        >
+                            <tooltip>
+                                <Tooltip text="Combine selected"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="splitButton" text="Split" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#split"
+                                disable="false" GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Split here"/>
+                            </tooltip>
+                        </Button>
+
+                        <Button fx:id="editButton" text="Edit" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#edit"
+                                disable="false" GridPane.valignment="TOP"
+                        >
+                            <tooltip>
+                                <Tooltip text="Edit chapter"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <TreeTableView fx:id="bookStructure" editable="true">
+                        <columns>
+                            <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
+                                             prefWidth="${screen.visualBounds.width * 0.1}"/>
+                            <TreeTableColumn text="Duration" fx:id="durationColumn" sortable="false"/>
+                            <TreeTableColumn text="Details" fx:id="detailsColumn" sortable="false"
+                                             prefWidth="${screen.visualBounds.width * 0.2}"/>
+                        </columns>
+                    </TreeTableView>
+                </VBox>
             </Tab>
         </TabPane>
 
@@ -215,38 +315,6 @@
                                     <Tooltip text="Add files for conversionGroup to the list"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="removeButton" text="Remove"
-                                    minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#removeFiles" disable="false"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Removes selected files from the list"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="clearButton" text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#clear"
-                                    disable="false"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Remove all files from the list"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="upButton" text="Up" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#moveUp"
-                                    disable="false"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Move selected file up"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="downButton" text="Down" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#moveDown"
-                                    disable="false" GridPane.valignment="TOP"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Move selected file down"/>
-                                </tooltip>
-                            </Button>
                         </VBox>
                     </TitledPane>
                     <TitledPane text="Chapters">
@@ -265,31 +333,7 @@
                                 </tooltip>
                             </Button>
 
-                            <Button fx:id="combineButton" text="Combine" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#combine"
-                                    disable="false"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Combine selected"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="splitButton" text="Split" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#split"
-                                    disable="false" GridPane.valignment="TOP"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Split here"/>
-                                </tooltip>
-                            </Button>
 
-                            <Button fx:id="editButton" text="Edit" minWidth="${screen.visualBounds.width * 0.05}"
-                                    onAction="#edit"
-                                    disable="false" GridPane.valignment="TOP"
-                            >
-                                <tooltip>
-                                    <Tooltip text="Edit chapter"/>
-                                </tooltip>
-                            </Button>
                         </VBox>
                     </TitledPane>
                 </panes>

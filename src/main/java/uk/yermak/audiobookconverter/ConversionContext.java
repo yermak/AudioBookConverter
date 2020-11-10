@@ -1,8 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,8 +36,7 @@ public class ConversionContext {
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<Format> outputFormat = new SimpleObjectProperty(Format.M4B);
-    private final SimpleStringProperty preset = new SimpleStringProperty(Preset.LAST_USED);
+    private final SimpleObjectProperty<Format> outputFormat = new SimpleObjectProperty<>(Format.M4B);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -73,8 +72,9 @@ public class ConversionContext {
             if (StringUtils.isNotEmpty(bookInfo.get().genre().get()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().genre().get()))) {
                 genres.add(bookInfo.get().genre().get());
             }
-            String collect = String.join("::", genres);
-            AppProperties.setProperty("genres", collect);
+            Gson gson = new Gson();
+            String genresString = gson.toJson(new ArrayList<>(genres));
+            AppProperties.setProperty("genres", genresString);
         }
     }
 
@@ -82,8 +82,9 @@ public class ConversionContext {
         genres.clear();
         String genresProperty = AppProperties.getProperty("genres");
         if (genresProperty != null) {
-            String[] genres = genresProperty.split("::");
-            this.genres.addAll(Arrays.stream(genres).sorted().collect(Collectors.toList()));
+            Gson gson = new Gson();
+            ArrayList<String> list = gson.fromJson(genresProperty, ArrayList.class);
+            this.genres.addAll(list.stream().sorted().collect(Collectors.toList()));
         }
         return genres;
     }
@@ -92,10 +93,7 @@ public class ConversionContext {
         saveGenres();
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
-
-//        reloadGenres();
         bookInfo.set(AudioBookInfo.instance());
-        outputParameters.set(Preset.DEFAULT_OUTPUT_PARAMETERS);
         book.set(null);
         posters.clear();
         media.clear();

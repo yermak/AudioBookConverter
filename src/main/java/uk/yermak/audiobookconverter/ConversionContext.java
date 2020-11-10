@@ -182,4 +182,8 @@ public class ConversionContext {
     public Format getOutputFormat() {
         return outputFormat.get();
     }
+
+    public void setSplit(boolean split) {
+        this.outputParameters.get().setSplitChapters(split);
+    }
 }

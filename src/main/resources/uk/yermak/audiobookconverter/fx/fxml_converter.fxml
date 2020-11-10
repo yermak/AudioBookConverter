@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.stage.Screen?>
-<?import java.lang.String?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
@@ -294,6 +292,7 @@
                             </Button>
                         </VBox>
                     </TitledPane>
+<!--
                     <TitledPane text="Output">
                         <VBox>
                             <padding>
@@ -331,6 +330,7 @@
                             </ComboBox>
                         </VBox>
                     </TitledPane>
+-->
                 </panes>
             </Accordion>
             <Pane GridPane.columnIndex="0" GridPane.rowIndex="1"/>

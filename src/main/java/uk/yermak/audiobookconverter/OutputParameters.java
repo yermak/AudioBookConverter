@@ -6,14 +6,42 @@ import java.util.List;
 
 public class OutputParameters {
 
-    private int bitRate = 128;
-    private int frequency = 44100;
-    private int channels = 2;
-    private int quality = 3;
-    private boolean cbr = true;
-    private int cutoff = 10000;
-    private final int volume = 100;
-    public Format format = Format.M4B;
+    public static final Integer DEFAULT_CHANNELS = 2;
+    public static final Integer DEFAULT_QUALITY = 3;
+    public static final Integer DEFAULT_CUTOFF = 12000;
+    public static final Integer DEFAULT_FREQUENCY = 44100;
+    public static final Integer DEFAULT_BITRATE = 128;
+
+    protected int bitRate = DEFAULT_BITRATE;
+    protected int frequency = DEFAULT_FREQUENCY;
+    protected int channels = DEFAULT_CHANNELS;
+    protected int quality = DEFAULT_QUALITY;
+    protected boolean cbr = true;
+    protected int cutoff = DEFAULT_CUTOFF;
+    protected Format format = Format.M4B;
+
+    public OutputParameters(OutputParameters parameters) {
+        this.bitRate = parameters.getBitRate();
+        this.frequency = parameters.getFrequency();
+        this.channels = parameters.getChannels();
+        this.quality = parameters.getQuality();
+        this.cbr = parameters.isCbr();
+        this.cutoff = parameters.getCutoff();
+        this.format = Format.instance(parameters.getFormat());
+    }
+
+    OutputParameters() {
+    }
+
+    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality) {
+        this.format = format;
+        this.bitRate = bitRate;
+        this.frequency = frequency;
+        this.channels = channels;
+        this.quality = quality;
+        this.cbr = cbr;
+        this.cutoff = cutoff;
+    }
 
 
     public boolean needReencode(String codec) {
@@ -89,30 +117,31 @@ public class OutputParameters {
     }
 
     public String getCutoffValue() {
+        return Integer.toString(getCutoff());
+    }
+
+    public int getCutoff() {
         if (this.cbr) {
-            return String.valueOf(this.cutoff);
+            return this.cutoff;
         } else {
             return switch (this.quality) {
-                case 1 -> "13050";
-                case 2 -> "13050";
-                case 3 -> "14260";
-                case 4 -> "15500";
-                default -> "0";
+                case 1 -> 13050;
+                case 2 -> 13050;
+                case 3 -> 14260;
+                case 4 -> 15500;
+                default -> 0;
             };
         }
     }
+
 
     public void setCutoff(final int cutoff) {
         this.cutoff = cutoff;
     }
 
-
-    public int getCutoff() {
-        return cutoff;
+    public String getFormat() {
+        return format.extension;
     }
 
-    public boolean getCbr() {
-        return cbr;
-    }
 }
 

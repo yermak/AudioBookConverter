@@ -19,6 +19,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import static uk.yermak.audiobookconverter.OutputParameters.*;
+
 /**
  * Created by yermak on 08/09/2018.
  */
@@ -28,10 +30,7 @@ public class OutputController {
     public static final Integer[] CUTOFFS = {8000, 10000, 12000, 14000, 16000, 20000};
     public static final Integer[] FREQUENCIES = new Integer[]{8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000};
     public static final Integer[] BITRATES = new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320};
-    public static final Integer DEFAULT_CHANNELS = 2;
-    public static final Integer DEFAULT_CUTOFF = 12000;
-    public static final Integer DEFAULT_FREQUENCY = 44100;
-    public static final Integer DEFAULT_BITRATE = 128;
+
 
 
     @FXML
@@ -96,6 +95,7 @@ public class OutputController {
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
 
+
 //        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setBitRate(newValue));
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setFrequency(newValue));
@@ -153,16 +153,24 @@ public class OutputController {
                 newBook.addListener(observable -> updateParameters(newBook.getMedia()));
             }
         });
+
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+            bitRate.setValue(findNearestMatch(newParams.getBitRate(), BITRATES, DEFAULT_BITRATE));
+            frequency.setValue(findNearestMatch(newParams.getFrequency(), FREQUENCIES, DEFAULT_FREQUENCY));
+            channels.setValue(findNearestMatch(newParams.getChannels(), CHANNELS, DEFAULT_CHANNELS));
+            quality.setValue(newParams.getQuality());
+            cutoff.setValue(findNearestMatch(newParams.getCutoff(), CUTOFFS, DEFAULT_CUTOFF));
+        });
     }
 
     private void updateParameters(List<MediaInfo> media) {
         Book book = ConverterApplication.getContext().getBook();
 
         if (media.isEmpty() && book == null) {
-            frequency.setValue(44100);
-            bitRate.setValue(128);
-            channels.setValue(2);
-            quality.setValue(3);
+            frequency.setValue(DEFAULT_FREQUENCY);
+            bitRate.setValue(DEFAULT_BITRATE);
+            channels.setValue(DEFAULT_CHANNELS);
+            quality.setValue(DEFAULT_QUALITY);
             return;
         }
 

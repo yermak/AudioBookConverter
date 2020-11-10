@@ -27,7 +27,7 @@ public record FlacPicture(int type, String description, String mime, int width, 
             switch (extension) {
                 case "png" -> mime = "image/png";
                 case "jpg", "jfif", "jpeg" -> mime = "image/jpeg";
-                default -> logger.warn("Image formate {} is not supported for OGG files", extension);
+                default -> logger.warn("Image format {} is not supported for OGG files", extension);
             }
             return new FlacPicture(3, "Cover", mime, ((int) image.getWidth()), ((int) image.getHeight()), 24, FileUtils.readFileToByteArray(new File(artWorkFile)));
         } catch (IOException e) {

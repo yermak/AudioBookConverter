@@ -292,45 +292,6 @@
                             </Button>
                         </VBox>
                     </TitledPane>
-<!--
-                    <TitledPane text="Output">
-                        <VBox>
-                            <padding>
-                                <Insets top="10" right="5" bottom="10" left="5"/>
-                            </padding>
-                            <Label text="Preset" textAlignment="LEFT" >
-                                <font>
-                                    <Font size="14.0"/>
-                                </font>
-                            </Label>
-                            <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}" editable="true"/>
-
-
-
-                            <Label text="Format" textAlignment="LEFT" >
-                                <font>
-                                    <Font size="14.0"/>
-                                </font>
-                            </Label>
-                            <ComboBox fx:id="outputFormatBox"
-                                      minWidth="${screen.visualBounds.width * 0.05}"/>
-                            <Label text="Split by" textAlignment="LEFT" >
-                                <font>
-                                    <Font size="14.0"/>
-                                </font>
-                            </Label>
-                            <ComboBox fx:id="splitFileBox"
-                                      minWidth="${screen.visualBounds.width * 0.05}" >
-                                <items>
-                                    <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="parts"/>
-                                        <String fx:value="chapters"/>
-                                    </FXCollections>
-                                </items>
-                            </ComboBox>
-                        </VBox>
-                    </TitledPane>
--->
                 </panes>
             </Accordion>
             <Pane GridPane.columnIndex="0" GridPane.rowIndex="1"/>

@@ -42,7 +42,7 @@ public class AppProperties {
         while (keys.hasMoreElements()) {
             String propName = (String) keys.nextElement();
             if (propName.startsWith(group + ".")) {
-                String nameWithoutGroup = propName.substring(group.length()+1);
+                String nameWithoutGroup = propName.substring(group.length() + 1);
                 properties.setProperty(nameWithoutGroup, applicationProps.getProperty(propName));
             }
         }

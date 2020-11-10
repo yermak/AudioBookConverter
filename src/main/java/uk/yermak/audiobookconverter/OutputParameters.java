@@ -27,7 +27,7 @@ public class OutputParameters {
         this.quality = parameters.getQuality();
         this.cbr = parameters.isCbr();
         this.cutoff = parameters.getCutoff();
-        this.format = Format.instance(parameters.getFormat());
+        this.format = parameters.getFormat();
     }
 
     OutputParameters() {
@@ -48,8 +48,8 @@ public class OutputParameters {
         return format.needsReencode(codec);
     }
 
-    public void setupFormat(String extension) {
-        format = Format.instance(extension);
+    public void setupFormat(Format format) {
+        this.format = format;
     }
 
     public int getBitRate() {
@@ -139,8 +139,8 @@ public class OutputParameters {
         this.cutoff = cutoff;
     }
 
-    public String getFormat() {
-        return format.extension;
+    public Format getFormat() {
+        return format;
     }
 
 }

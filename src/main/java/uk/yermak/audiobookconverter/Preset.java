@@ -20,7 +20,7 @@ public class Preset extends OutputParameters {
             "ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2),
             "ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3),
             "iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4),
-            "android 5+", new OutputParameters(Format.OGG, 128, 44100, 2, 12000, true, 3),
+            "android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, true, 3),
             "android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3),
             "legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3)
     );

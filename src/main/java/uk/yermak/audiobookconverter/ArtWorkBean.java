@@ -1,6 +1,10 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.scene.image.Image;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class ArtWorkBean implements ArtWork {
     private final String fileName;
@@ -25,6 +29,15 @@ public class ArtWorkBean implements ArtWork {
     @Override
     public boolean matchCrc32(long crc32) {
         return this.crc32 == crc32;
+    }
+
+    @Override
+    public Image image() {
+        try {
+            return  new Image(new FileInputStream(getFileName()));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ArtWorkBean(final String fileName, final long crc32) {

@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @FXML
-    private ComboBox<String> splitFile;
 
     @FXML
     private Button addButton;
@@ -106,7 +104,7 @@ public class FilesController {
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
-    private boolean split;
+
 
     @FXML
     public void initialize() {
@@ -121,13 +119,6 @@ public class FilesController {
             ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
         });
 
-        splitFile.getSelectionModel().select(0);
-        splitFile.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            switch (newValue) {
-                case "parts" -> split = false;
-                case "chapters" -> split = true;
-            }
-        });
 
 //        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
@@ -169,13 +160,6 @@ public class FilesController {
 
         chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
         fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
-
-        fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> {
-                    if (fileList.getItems().isEmpty()) {
-                        filesChapters.getTabs().remove(filesTab);
-                    }
-                }
-        );
 
     }
 
@@ -224,7 +208,9 @@ public class FilesController {
             processFiles(Collections.singleton(selectedDirectory));
             AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
             if (!chaptersMode.get()) {
-                filesChapters.getTabs().add(filesTab);
+                if (!filesChapters.getTabs().contains(filesTab)) {
+                    filesChapters.getTabs().add(filesTab);
+                }
                 filesChapters.getSelectionModel().select(filesTab);
             }
         }
@@ -296,7 +282,9 @@ public class FilesController {
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
             if (!chaptersMode.get()) {
-                filesChapters.getTabs().add(filesTab);
+                if (!filesChapters.getTabs().contains(filesTab)) {
+                    filesChapters.getTabs().add(filesTab);
+                }
                 filesChapters.getSelectionModel().select(filesTab);
             }
         }
@@ -326,10 +314,14 @@ public class FilesController {
         } else {
             ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
             fileList.getItems().removeAll(selected);
+            if (fileList.getItems().isEmpty()) {
+                filesChapters.getTabs().remove(filesTab);
+            }
         }
     }
 
     public void clear(ActionEvent event) {
+
         fileList.getItems().clear();
         ConverterApplication.getContext().getPlannedConversionGroup().cancel();
         ConverterApplication.getContext().resetForNewConversion();
@@ -337,6 +329,7 @@ public class FilesController {
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
         chaptersMode.set(false);
+
     }
 
     public void moveUp(ActionEvent event) {
@@ -395,17 +388,18 @@ public class FilesController {
         }
 
         ObservableList<Part> parts = book.getParts();
-        String extension = FilenameUtils.getExtension(outputDestination);
-        conversionGroup.getOutputParameters().setupFormat(extension);
+        Format format = ConverterApplication.getContext().getOutputFormat();
+//        String extension = FilenameUtils.getExtension(outputDestination);
+        conversionGroup.getOutputParameters().setupFormat(format);
 
-        if (split) {
+        if (ConverterApplication.getContext().getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + extension, ", Chapter " + (i + 1) + "." + extension);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
@@ -422,7 +416,7 @@ public class FilesController {
                 Part part = parts.get(i);
                 String finalDesination = outputDestination;
                 if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + extension, ", Part " + (i + 1) + "." + extension);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
@@ -437,7 +431,7 @@ public class FilesController {
         Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
     }
 
-    public synchronized void start(ActionEvent actionEvent) {
+    public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
         if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
@@ -449,13 +443,15 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
         ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
 
-        conversionGroup.setOutputParameters(context.getOutputParameters());
+        conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
         conversionGroup.setBookInfo(context.getBookInfo().get());
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
+
+        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+
 
         Executors.newSingleThreadExecutor().submit(() -> {
             Platform.runLater(() -> {
@@ -473,7 +469,7 @@ public class FilesController {
         chaptersMode.set(false);
     }
 
-    private static String selectOutputFile(AudioBookInfo audioBookInfo) {
+    private String selectOutputFile(AudioBookInfo audioBookInfo) {
         JfxEnv env = ConverterApplication.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
@@ -482,11 +478,21 @@ public class FilesController {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputFormat().toString(), "*." + ConverterApplication.getContext().getOutputFormat().toString())
+/*
+                new FileChooser.ExtensionFilter(M4A, "*." + M4A),
+                new FileChooser.ExtensionFilter(MP3, "*." + MP3),
+                new FileChooser.ExtensionFilter(OGG, "*." + OGG)
+*/
+        );
+/*
+        fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter(M4B, "*." + M4B),
                 new FileChooser.ExtensionFilter(M4A, "*." + M4A),
                 new FileChooser.ExtensionFilter(MP3, "*." + MP3),
                 new FileChooser.ExtensionFilter(OGG, "*." + OGG)
         );
+*/
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
         File parentFolder = file.getParentFile();
@@ -495,7 +501,7 @@ public class FilesController {
     }
 
 
-    public synchronized void importChapters(ActionEvent actionEvent) {
+    public void importChapters(ActionEvent actionEvent) {
         if (fileList.getItems().isEmpty()) {
             return;
         }
@@ -658,9 +664,4 @@ public class FilesController {
             }
         });
     }
-
-    public void splitFile(ActionEvent actionEvent) {
-
-    }
-
 }

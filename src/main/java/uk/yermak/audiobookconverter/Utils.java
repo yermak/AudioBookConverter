@@ -95,6 +95,7 @@ public class Utils {
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
         filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
         filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().zeroToNull());
+        filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();
         char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};

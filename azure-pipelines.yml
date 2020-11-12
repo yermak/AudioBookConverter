@@ -1,22 +1,30 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
-trigger:
-- master
-
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
+
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)\.m2\repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
 
 steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+  - checkout: self
+    clean: 'true'
+    fetchDepth: '1'
+
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)"'
+      path: $(MAVEN_CACHE_FOLDER)
+    displayName: 'Cache Maven local repo'
+
+  - script: |
+      echo ON
+      choco install openjdk --no-progress
+      call refreshenv
+      echo ON
+      call mvn -version
+      cd lib
+      call mvn install:install-file -Dfile=ffmpeg-0.6.3-SNAPSHOT.jar -DpomFile=pom.xml --no-transfer-progress $(MAVEN_OPTS)
+      cd ..
+      call mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
+      echo OFF
+    displayName: 'Build app without installer'

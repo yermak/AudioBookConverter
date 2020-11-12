@@ -51,7 +51,7 @@ public class FFMpegConcatenator {
         Process process = null;
         try {
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
-            List<String> concatOptions = outputParameters.getConcatOptions(fileListFileName, metadataBuilder, progressParser.getUri().toString(), outputFileName);
+            List<String> concatOptions = outputParameters.format.getConcatOptions(fileListFileName, metadataBuilder, progressParser.getUri().toString(), outputFileName);
 
             logger.debug("Starting concat with options {}", String.join(" ", concatOptions));
 

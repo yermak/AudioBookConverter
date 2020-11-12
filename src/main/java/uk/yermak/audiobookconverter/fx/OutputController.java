@@ -10,29 +10,37 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Book;
-import uk.yermak.audiobookconverter.ConversionContext;
-import uk.yermak.audiobookconverter.MediaInfo;
-import uk.yermak.audiobookconverter.OutputParameters;
+import uk.yermak.audiobookconverter.*;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static uk.yermak.audiobookconverter.OutputParameters.*;
 
 /**
  * Created by yermak on 08/09/2018.
  */
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final Integer[] CHANNELS = {1, 2, 4, 6};
+    public static final Integer[] CUTOFFS = {8000, 10000, 12000, 14000, 16000, 20000};
+    public static final Integer[] FREQUENCIES = new Integer[]{8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000};
+    public static final Integer[] BITRATES = new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320};
+
+
+    @FXML
+    public ComboBox<Format> outputFormatBox;
+    @FXML
+    public ComboBox<String> presetBox;
+
+    @FXML
+    private ComboBox<String> splitFileBox;
+
 
     @FXML
     public ComboBox<Integer> cutoff;
-    @FXML
-    private ComboBox<String> volume;
-/*
-    @FXML
-    private CheckBox auto;
-*/
 
     @FXML
     private ComboBox<Integer> frequency;
@@ -66,68 +74,90 @@ public class OutputController {
     @FXML
     private void initialize() {
 
-/*
-        volume.getItems().addAll("100%", "200%", "300%");
-        volume.getSelectionModel().select(0);
-*/
+        splitFileBox.getSelectionModel().select(0);
+        splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            switch (newValue) {
+                case "parts" -> ConverterApplication.getContext().setSplit(false);
+                case "chapters" -> ConverterApplication.getContext().setSplit(true);
+            }
+        });
 
-        frequency.getItems().addAll(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000);
-        frequency.getSelectionModel().select(Integer.valueOf(44100));
+        outputFormatBox.getItems().addAll(Format.values());
+        outputFormatBox.getSelectionModel().select(0);
+        outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            ConverterApplication.getContext().setOutputFormat(newValue);
+        });
 
-        bitRate.getItems().addAll(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320);
-        bitRate.getSelectionModel().select(Integer.valueOf(128));
+        List<Preset> presets = Preset.loadPresets();
+//        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
+//        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
 
-        channels.getItems().addAll(1, 2, 4, 6);
-        channels.getSelectionModel().select(Integer.valueOf(2));
+        presetBox.getItems().addAll(presets.stream().map(Preset::getName).collect(Collectors.toList()));
 
-        cutoff.getItems().addAll(8000, 10000, 12000, 14000, 16000, 20000);
-        cutoff.getSelectionModel().select(Integer.valueOf(12000));
+        presetBox.getSelectionModel().select(Preset.DEFAULT);
+        presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!presetBox.getItems().contains(newValue)) {
+                presetBox.getItems().add(newValue);
+                Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
+                ConverterApplication.getContext().setOutputParameters(preset);
+            } else {
+                Preset preset = Preset.instance(newValue);
+                ConverterApplication.getContext().setOutputParameters(preset);
+            }
+        });
+
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+            outputFormatBox.setValue(newParams.getFormat());
+        });
+
+        frequency.getItems().addAll(FREQUENCIES);
+        frequency.getSelectionModel().select(DEFAULT_FREQUENCY);
+
+        bitRate.getItems().addAll(BITRATES);
+        bitRate.getSelectionModel().select(DEFAULT_BITRATE);
+
+        channels.getItems().addAll(CHANNELS);
+        channels.getSelectionModel().select(DEFAULT_CHANNELS);
+
+        cutoff.getItems().addAll(CUTOFFS);
+        cutoff.getSelectionModel().select(DEFAULT_CUTOFF);
 
 
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
 
-//        auto.selectedProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setAuto(newValue));
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setBitRate(newValue));
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setFrequency(newValue));
         channels.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setChannels(newValue));
         quality.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setQuality((int) Math.round(newValue.doubleValue())));
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setCutoff(newValue));
-//        volume.valueProperty().addListener((observable, oldValue, newValue) -> context.getOutputParameters().setVolume(volume.getSelectionModel().getSelectedIndex() + 1));
 
-/*
-        auto.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-            bitRate.setDisable(newValue);
-            frequency.setDisable(newValue);
-            channels.setDisable(newValue);
-            quality.setDisable(newValue);
-            cbr.setDisable(newValue);
-            vbr.setDisable(newValue);
-            cutoff.setDisable(newValue);
-
-            if (!newValue) {
-                if (cbr.isSelected()) {
-                    bitRate.setDisable(false);
-                    cutoff.setDisable(false);
-                    quality.setDisable(true);
-
-                }
-                if (vbr.isSelected()) {
-                    bitRate.setDisable(true);
-                    cutoff.setDisable(false);
-                    quality.setDisable(false);
-                }
+        context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
+            bitRate.valueProperty().set(newValue.getBitRate());
+            frequency.valueProperty().set(newValue.getFrequency());
+            channels.valueProperty().set(newValue.getChannels());
+            quality.valueProperty().set(newValue.getQuality());
+            cutoff.valueProperty().set(newValue.getCutoff());
+            if (newValue.isCbr()) {
+                cbr.fire();
+            } else {
+                vbr.fire();
             }
-            updateParameters(media, media.isEmpty());
         });
 
-*/
         media.addListener((InvalidationListener) observable -> updateParameters(media));
         ConverterApplication.getContext().addBookChangeListener((observableValue, oldBook, newBook) -> {
             if (newBook != null) {
                 newBook.addListener(observable -> updateParameters(newBook.getMedia()));
             }
+        });
+
+        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+            bitRate.setValue(findNearestMatch(newParams.getBitRate(), BITRATES, DEFAULT_BITRATE));
+            frequency.setValue(findNearestMatch(newParams.getFrequency(), FREQUENCIES, DEFAULT_FREQUENCY));
+            channels.setValue(findNearestMatch(newParams.getChannels(), CHANNELS, DEFAULT_CHANNELS));
+            quality.setValue(newParams.getQuality());
+            cutoff.setValue(findNearestMatch(newParams.getCutoff(), CUTOFFS, DEFAULT_CUTOFF));
         });
     }
 
@@ -135,10 +165,10 @@ public class OutputController {
         Book book = ConverterApplication.getContext().getBook();
 
         if (media.isEmpty() && book == null) {
-            frequency.setValue(44100);
-            bitRate.setValue(128);
-            channels.setValue(2);
-            quality.setValue(3);
+            frequency.setValue(DEFAULT_FREQUENCY);
+            bitRate.setValue(DEFAULT_BITRATE);
+            channels.setValue(DEFAULT_CHANNELS);
+            quality.setValue(DEFAULT_QUALITY);
             return;
         }
 
@@ -151,15 +181,23 @@ public class OutputController {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
-                frequency.setValue(params.getFrequency());
-                bitRate.setValue(params.getBitRate());
-                channels.setValue(params.getChannels());
+                frequency.setValue(findNearestMatch(params.getFrequency(), FREQUENCIES, DEFAULT_FREQUENCY));
+                bitRate.setValue(findNearestMatch(params.getBitRate(), BITRATES, DEFAULT_BITRATE));
+                channels.setValue(findNearestMatch(params.getChannels(), CHANNELS, DEFAULT_CHANNELS));
                 quality.setValue(params.getQuality());
             });
 
         });
 
 
+    }
+
+    private static Integer findNearestMatch(int value, Integer[] array, int defaultValue) {
+        for (Integer integer : array) {
+            if (integer >= value)
+                return integer;
+        }
+        return defaultValue;
     }
 }
 

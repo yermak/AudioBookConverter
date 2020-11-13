@@ -1,3 +1,5 @@
+[![Build Status](https://recoupler.visualstudio.com/AudioBookConverter/_apis/build/status/yermak.AudioBookConverter?branchName=development)](https://recoupler.visualstudio.com/AudioBookConverter/_build/latest?definitionId=2&branchName=development)
+
 Official web-site
 https://www.recoupler.com/products/audiobookconverter
 

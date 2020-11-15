@@ -7,7 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.4.0</version>
+    <version>5.4.1</version>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
@@ -263,6 +263,23 @@
                 <installer.assembly>linux-installer.xml</installer.assembly>
             </properties>
         </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <java.home>/Users/yarick_yermak/Programs/OpenJDK/jdk-15.0.1</java.home>
+                <javafx.mods>/Users/yarick_yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
+                <arc7zip.home></arc7zip.home>
+                <installer.script>mac/package.sh</installer.script>
+                <installer.assembly>mac-installer.xml</installer.assembly>
+            </properties>
+        </profile>
+
     </profiles>
+
 
 </project>

@@ -1,1 +1,0 @@
-mvn install:install-file -Dfile=ffmpeg-0.6.3-SNAPSHOT.jar -DpomFile=pom.xml

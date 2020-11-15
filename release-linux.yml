@@ -17,6 +17,6 @@ steps:
     displayName: 'Cache Maven local repo'
 
   - script: |
-      apt install openjdk-15
+      sudo apt install openjdk-15
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'

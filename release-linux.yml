@@ -20,6 +20,6 @@ steps:
     displayName: 'Cache Maven local repo'
 
   - script: |
-      call mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
+      mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
       echo OFF
     displayName: 'Build app without installer'

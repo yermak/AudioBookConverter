@@ -17,12 +17,7 @@ steps:
     displayName: 'Cache Maven local repo'
 
   - script: |
-      echo ON
       choco install openjdk --no-progress
       call refreshenv
-      echo ON
-      call mvn -version
-      call mvn install:install-file -Dfile=lib\ffmpeg-0.6.3-SNAPSHOT.jar -DpomFile=lib\pom.xml --no-transfer-progress $(MAVEN_OPTS)
       call mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
-      echo OFF
     displayName: 'Build app without installer'

@@ -19,6 +19,18 @@
         <javafx.version>15.0.1</javafx.version>
     </properties>
 
+
+    <repositories>
+        <repository>
+            <id>github-mvn-repo-ffmpeg-cli-wrapper-snapshot</id>
+            <url>https://github.com/yermak/ffmpeg-cli-wrapper/raw/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>

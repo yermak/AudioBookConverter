@@ -20,6 +20,6 @@ steps:
     displayName: 'Cache Maven local repo'
 
   - script: |
-      mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
-      echo OFF
-    displayName: 'Build app without installer'
+      apt install openjdk-15
+      mvn clean package --no-transfer-progress $(MAVEN_OPTS)
+    displayName: 'Build deb package'

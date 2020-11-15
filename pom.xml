@@ -188,23 +188,6 @@
                 <version>3.3.0</version>
                 <executions>
                     <execution>
-                        <id>mega-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>installer</id>
                         <phase>package</phase>
                         <goals>

@@ -17,8 +17,8 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file README.md --i
 --linux-package-deps mp4v2-utils \
 --input target/package/audiobookconverter-$APP_VERSION-linux-installer/audiobookconverter-$APP_VERSION/app \
 --main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
-ls
-mv audiobookconverter_$APP_VERSION-1_amd64.deb target/
+mkdir target/release
+mv audiobookconverter_$APP_VERSION-1_amd64.deb target/release/
 
 #$JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file README.md --icon AudioBookConverter.png \
 #-t rpm --name AudioBookConverter --vendor Recoupler \

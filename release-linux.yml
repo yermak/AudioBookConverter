@@ -31,6 +31,6 @@ steps:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: 'target/audiobookconverter_5.4.1-1_amd64.deb'
-      ArtifactName: 'AudioBookConverter'
+      PathtoPublish: 'target/release'
+      ArtifactName: 'AudioBookConverter-Release'
       publishLocation: 'Container'

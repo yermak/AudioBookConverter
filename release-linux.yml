@@ -20,7 +20,9 @@ steps:
       wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
       sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
       sudo apt-get install adoptopenjdk-15-hotspot
-      echo $JAVA_HOME
       export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
+      wget https://gluonhq.com/download/javafx-15-0-1-jmods-linux/ -o openjfx-15.0.1_linux-x64_bin-jmods.zip
+      unzip openjfx-15.0.1_linux-x64_bin-jmods.zip
+      export JAVAFX_JMODS=javafx-jmods-15.0.1
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'

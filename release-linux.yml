@@ -21,6 +21,6 @@ steps:
       sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
       sudo apt-get install adoptopenjdk-15-hotspot
       echo $JAVA_HOME
-      sudo update-java-alternatives -s /usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
+      export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'

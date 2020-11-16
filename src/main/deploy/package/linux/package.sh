@@ -13,7 +13,7 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  -t app-image --name AudioBoo
 $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file README.md --icon AudioBookConverter.png \
 -t deb --name AudioBookConverter --vendor Recoupler \
 --linux-menu-group AudioBookConverter --linux-shortcut \
---linux-package-deps ffmpeg mp4v2-utils \
+#--linux-package-deps ffmpeg mp4v2-utils \
 --input target/package/audiobookconverter-$APP_VERSION-linux-installer/audiobookconverter-$APP_VERSION/app \
 --main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
 mv audiobookconverter-$APP_VERSION-1_amd64.deb target/

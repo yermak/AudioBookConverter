@@ -240,8 +240,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.1</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1</javafx.mods>
+                <java.home>${JAVA_HOME}</java.home>
+                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
                 <installer.script>windows/package.bat</installer.script>
                 <installer.assembly>windows-installer.xml</installer.assembly>

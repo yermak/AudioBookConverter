@@ -33,5 +33,5 @@ steps:
     inputs:
       artifact: DEB
       patterns: '**/*.deb'
-      targetPath: $(System.DefaultWorkingDirectory)/target
+      targetPath: $(System.DefaultWorkingDirectory)
       path: artifacts/

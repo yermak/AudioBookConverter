@@ -26,7 +26,7 @@ steps:
       unzip openjfx-15.0.1_windows-x64_bin-jmods.zip
       dir
       ECHO ON
-      SET JAVAFX_MODS=javafx-jmods-15.0.1
+      SET JAVAFX_JMODS=javafx-jmods-15.0.1
       call mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build MSI installers'
 

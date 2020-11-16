@@ -23,6 +23,7 @@ steps:
       call refreshenv
       wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-windows/ -O openjfx-15.0.1_windows-x64_bin-jmods.zip
       unzip openjfx-15.0.1_windows-x64_bin-jmods.zip
+      dir
       SET JAVAFX_MODS=javafx-jmods-15.0.1
       call mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build MSI installers'

@@ -28,5 +28,7 @@ steps:
       export JAVAFX_JMODS=javafx-jmods-15.0.1
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'
-  - publish: target/
-      patterns: '*.deb'
+
+  - download: current
+    patterns: '*.deb'
+    displayName: AudioBookConverter.deb

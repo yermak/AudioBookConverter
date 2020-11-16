@@ -19,9 +19,9 @@ steps:
   - script: |
       wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
       sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
-      sudo apt-get install adoptopenjdk-15-hotspot
-      sudo apt-get install ffmpeg
-      sudo apt-get install mp4v2-utils
+      sudo apt-get -qq install adoptopenjdk-15-hotspot
+      sudo apt-get -qq install ffmpeg
+      sudo apt-get -qq install mp4v2-utils
       export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
       wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-linux/ -O openjfx-15.0.1_linux-x64_bin-jmods.zip
       unzip openjfx-15.0.1_linux-x64_bin-jmods.zip
@@ -31,6 +31,7 @@ steps:
 
   - task: DownloadPipelineArtifact@2
     inputs:
-      artifact: AudioBookConverter
+      artifact: audiobookconverter_5.4.1-1_amd64.deb
       patterns: '**/*.deb'
-      path: target/
+      targetPath: target/
+      path: artifacts/

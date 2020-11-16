@@ -29,5 +29,4 @@ steps:
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'
   - publish: target/
-      artifact: AudioBookConverter
       patterns: '*.deb'

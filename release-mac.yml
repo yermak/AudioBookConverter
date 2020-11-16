@@ -20,10 +20,9 @@ steps:
       pwd
       wget -q https://download.java.net/java/GA/jdk15.0.1/51f4f36ad4ef43e39d0dfdbaf6549e32/9/GPL/openjdk-15.0.1_osx-x64_bin.tar.gz -O openjdk-15.0.1_osx-x64_bin.tar.gz
       tar -xzf openjdk-15.0.1_osx-x64_bin.tar.gz
-      ls
       sudo mv jdk-15.0.1.jdk /Library/Java/JavaVirtualMachines/
       rm openjdk-15.0.1_osx-x64_bin.tar.gz
-      export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk
+      export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home
       brew install ffmpeg
       brew install mp4v2
       wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-mac/ -O openjfx-15.0.1_osx-x64_bin-jmods.zip

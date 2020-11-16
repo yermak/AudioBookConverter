@@ -29,8 +29,8 @@ steps:
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build deb package'
 
-  - task: DownloadPipelineArtifact@2
+  - task: PublishBuildArtifacts@1
     inputs:
-      artifact: ABC
-      patterns: '**/*.deb'
-      targetPath: $(System.DefaultWorkingDirectory)/target
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'

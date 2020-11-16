@@ -23,7 +23,7 @@ steps:
       sudo apt-get install ffmpeg
       sudo apt-get install mp4v2-utils
       export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
-      wget https://gluonhq.com/download/javafx-15-0-1-jmods-linux/ -O openjfx-15.0.1_linux-x64_bin-jmods.zip
+      wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-linux/ -O openjfx-15.0.1_linux-x64_bin-jmods.zip
       unzip openjfx-15.0.1_linux-x64_bin-jmods.zip
       export JAVAFX_JMODS=javafx-jmods-15.0.1
       mvn clean package --no-transfer-progress $(MAVEN_OPTS)

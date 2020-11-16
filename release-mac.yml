@@ -1,0 +1,38 @@
+pool:
+  vmImage: 'macOS-10.15'
+  
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+steps:
+  - checkout: self
+    clean: 'true'
+    fetchDepth: '1'
+
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)"'
+      path: $(MAVEN_CACHE_FOLDER)
+    displayName: 'Cache Maven local repo'
+
+  - script: |
+      wget -q https://download.java.net/java/GA/jdk15.0.1/51f4f36ad4ef43e39d0dfdbaf6549e32/9/GPL/openjdk-15.0.1_osx-x64_bin.tar.gz -O openjdk-15.0.1_osx-x64_bin.tar.gz
+      sudo mv openjdk-15.0.1_osx-x64_bin.tar.gz /Library/Java/JavaVirtualMachines/
+      cd /Library/Java/JavaVirtualMachines/
+      sudo tar -xzf openjdk-15.0.1_osx-x64_bin.tar.gz
+      sudo rm openjdk-15.0.1_osx-x64_bin.tar.gz
+      brew install ffmpeg
+      brew install mp4v2-utils
+      export JAVA_HOME=jdk-15.0.1.jdk
+      wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-mac/ -O openjfx-15.0.1_osx-x64_bin-jmods.zip
+      unzip openjfx-15.0.1_osx-x64_bin-jmods.zip
+      export JAVAFX_JMODS=javafx-jmods-15.0.1
+      mvn clean package --no-transfer-progress $(MAVEN_OPTS)
+    displayName: 'Build dmg package'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'target/release'
+      ArtifactName: 'AudioBookConverter-Release'
+      publishLocation: 'Container'

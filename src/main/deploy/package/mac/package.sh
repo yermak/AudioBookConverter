@@ -10,3 +10,5 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file README.md --i
 --type dmg \
 --input target/package/audiobookconverter-$APP_VERSION-mac-installer/audiobookconverter-$APP_VERSION/app \
 --main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
+mkdir target/release
+mv *.dmg target/release

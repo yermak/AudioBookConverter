@@ -271,8 +271,8 @@
                 </os>
             </activation>
             <properties>
-                <java.home>/Users/yarick_yermak/Programs/OpenJDK/jdk-15.0.1</java.home>
-                <javafx.mods>/Users/yarick_yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
+                <java.home>${JAVA_HOME}</java.home>
+                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home></arc7zip.home>
                 <installer.script>mac/package.sh</installer.script>
                 <installer.assembly>mac-installer.xml</installer.assembly>

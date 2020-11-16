@@ -31,7 +31,6 @@ steps:
 
   - task: DownloadPipelineArtifact@2
     inputs:
-      artifact: audiobookconverter_5.4.1-1_amd64.deb
+      artifact: ABC
       patterns: '**/*.deb'
-      targetPath: $(System.DefaultWorkingDirectory)
-      path: artifacts/
+      targetPath: $(System.DefaultWorkingDirectory)/target

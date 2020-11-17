@@ -12,6 +12,7 @@ rmdir /s /q target\image\AudioBookConverter
 cd target\image\
 7z.exe a -t7z -mx9 -mmt8 -sfx7z.sfx AudioBookConverter-Portable-%APP_VERSION%.exe AudioBookConverter
 dir
+mkdir target\release
 move AudioBookConverter-Portable-%APP_VERSION%.exe ..\release\
 cd ..\..
 

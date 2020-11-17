@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class AppProperties {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    public static final File APP_DIR = new File(System.getenv("APPDATA"), Version.getVersionString());
+    public static final File APP_DIR = new File(System.getProperty("APP_HOME"));
     public static final File PROP_FILE = new File(APP_DIR, Version.getVersionString() + ".properties");
 
     private static Properties getAppProperties() {

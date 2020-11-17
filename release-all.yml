@@ -17,7 +17,7 @@ pool:
   vmImage: $(imageName)
 
 variables:
-  APP_VERSION: '5.4.1-'$(Build.BuildNumber)
+  APP_VERSION: '5.4.1-$(Build.BuildNumber)'
 
 steps:
   - checkout: self

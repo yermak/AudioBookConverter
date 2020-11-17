@@ -23,6 +23,13 @@ steps:
   - checkout: self
     clean: 'true'
     fetchDepth: '1'
+    persistCredentials: true`
+
+  - task: replacetokens@3
+    inputs:
+      targetFiles: 'pom.xml'
+      tokenPrefix: '#{'
+      tokenSuffix: '}#'
 
   - script: |
       wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
@@ -123,3 +130,8 @@ steps:
       PathtoPublish: 'target/release'
       ArtifactName: 'AudioBookConverter-$(APP_VERSION)'
       publishLocation: 'Container'
+
+  - script: |
+      git tag rel_$(APP_VERSION)
+      git push origin rel_$(APP_VERSION)
+    workingDirectory: $(Build.SourcesDirectory)

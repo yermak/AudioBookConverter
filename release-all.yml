@@ -1,0 +1,124 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - feature/107_fully_auto_build
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-18.04'
+    mac:
+      imageName: 'macos-10.15'
+    windows:
+      imageName: 'windows-latest'
+
+pool:
+  vmImage: $(imageName)
+
+APP_VERSION: '5.4.1'
+
+steps:
+  - checkout: self
+    clean: 'true'
+    fetchDepth: '1'
+
+  - script: |
+      wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+      sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+      sudo apt-get install adoptopenjdk-15-hotspot
+      sudo apt-get install ffmpeg
+      sudo apt-get install mp4v2-utils
+      export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-15-hotspot-amd64
+      wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-linux/ -O openjfx-15.0.1_linux-x64_bin-jmods.zip
+      unzip openjfx-15.0.1_linux-x64_bin-jmods.zip
+      export JAVAFX_JMODS=javafx-jmods-15.0.1
+      mvn clean package --no-transfer-progress $(MAVEN_OPTS)
+
+      $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
+      --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/fx-jre
+
+      $JAVA_HOME/bin/jpackage --app-version $(APP_VERSION)  -t app-image --name AudioBookConverter --vendor Recoupler \
+      --input target/package/audiobookconverter-$(APP_VERSION)-linux-installer/audiobookconverter-$(APP_VERSION)/app \
+      --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --dest target/image --java-options '--enable-preview'
+
+
+      $JAVA_HOME/bin/jpackage --app-version $(APP_VERSION)  --license-file LICENSE --icon AudioBookConverter.png \
+      -t deb --name AudioBookConverter --vendor Recoupler \
+      --linux-menu-group AudioBookConverter --linux-shortcut \
+      --linux-package-deps ffmpeg \
+      --linux-package-deps mp4v2-utils \
+      --input target/package/audiobookconverter-$(APP_VERSION)-linux-installer/audiobookconverter-$(APP_VERSION)/app \
+      --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
+      mkdir target/release
+      mv audiobookconverter_$(APP_VERSION)-1_amd64.deb target/release/
+
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: 'Build deb package'
+
+  - script: |
+      wget -q https://download.java.net/java/GA/jdk15.0.1/51f4f36ad4ef43e39d0dfdbaf6549e32/9/GPL/openjdk-15.0.1_osx-x64_bin.tar.gz -O openjdk-15.0.1_osx-x64_bin.tar.gz
+      tar -xzf openjdk-15.0.1_osx-x64_bin.tar.gz
+      sudo mv jdk-15.0.1.jdk /Library/Java/JavaVirtualMachines/
+      rm openjdk-15.0.1_osx-x64_bin.tar.gz
+      export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home
+      brew install ffmpeg
+      brew install mp4v2
+      wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-mac/ -O openjfx-15.0.1_osx-x64_bin-jmods.zip
+      unzip openjfx-15.0.1_osx-x64_bin-jmods.zip
+      rm openjfx-15.0.1_osx-x64_bin-jmods.zip
+      export JAVAFX_JMODS=javafx-jmods-15.0.1
+      mvn clean package --no-transfer-progress
+
+      $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
+      --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/fx-jre
+
+      $JAVA_HOME/bin/jpackage --app-version $(APP_VERSION)  --license-file LICENSE --icon AudioBookConverter.icns \
+      --type dmg \
+      --input target/package/audiobookconverter-$(APP_VERSION)-mac-installer/audiobookconverter-$(APP_VERSION)/app \
+      --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
+      mkdir target/release
+      mv -f *.dmg target/release
+
+    condition: eq( variables['Agent.OS'], 'Darwin' )
+    displayName: 'Build dmg package'
+
+
+  - script: |
+      ECHO ON
+      choco install openjdk --no-progress
+      choco install 7zip --no-progress
+      choco install wget --no-progress
+      call refreshenv
+      wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-windows/ -O openjfx-15.0.1_windows-x64_bin-jmods.zip
+      unzip openjfx-15.0.1_windows-x64_bin-jmods.zip
+      SET JAVAFX_JMODS=javafx-jmods-15.0.1
+      call mvn clean package --no-transfer-progress
+
+      %JAVA_HOME%\bin\jlink.exe --module-path %JAVA_HOME%\jmods;%JAVAFX_JMODS% --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target\fx-jre
+
+      rmdir /s /q target\image\AudioBookConverter
+      %JAVA_HOME%\bin\jpackage.exe --app-version $(APP_VERSION)  --icon AudioBookConverter.ico -t app-image --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --dest target/image --java-options '--enable-preview'
+
+      mkdir target\release
+
+      cd target\image\
+      7z.exe a -t7z -mx9 -mmt8 -sfx7z.sfx AudioBookConverter-Portable-$(APP_VERSION).exe AudioBookConverter
+      move AudioBookConverter-Portable-$(APP_VERSION).exe ..\release\
+      cd ..\..
+
+      %JAVA_HOME%\bin\jpackage.exe --app-version $(APP_VERSION)  --license-file README.md --icon AudioBookConverter.ico -t msi --win-dir-chooser --win-shortcut --win-menu --win-menu-group AudioBookConverter --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
+      move AudioBookConverter-$(APP_VERSION).msi target/release/AudioBookConverter-All-Users-$(APP_VERSION).msi
+
+      %JAVA_HOME%\bin\jpackage.exe --app-version $(APP_VERSION)  --license-file README.md --icon AudioBookConverter.ico --win-per-user-install -t msi --win-shortcut --win-menu --win-menu-group AudioBookConverter --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
+      move AudioBookConverter-$(APP_VERSION).msi target/release/AudioBookConverter-Single-User-$(APP_VERSION).msi
+
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    displayName: 'Build MSI installers'
+
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'target/release'
+      ArtifactName: 'AudioBookConverter-$(APP_VERSION)'
+      publishLocation: 'Container'

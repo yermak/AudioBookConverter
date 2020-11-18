@@ -145,7 +145,7 @@ jobs:
     vmImage: 'ubuntu-18.04'
 
   steps:
-  - download: DownloadPipelineArtifact@2
+  - download: current
     artifact: 'AudioBookConverter-$(APP_VERSION)'
 
   - task: GitHubRelease@0

@@ -145,7 +145,7 @@ steps:
       repositoryName: '$(Build.Repository.Name)'
       action: 'create' # Options: create, edit, delete
       target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
-      tagSource: 'manual' # Required when action == Create# Options: auto, manual
+      tagSource: 'auto' # Required when action == Create# Options: auto, manual
       tagPattern: 'version_$(APP_VERSION)'
       title: 'Release $(APP_VERSION)'
       #releaseNotesSource: 'file' # Optional. Options: file, input
@@ -158,3 +158,4 @@ steps:
       #addChangeLog: true # Optional
       #compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
       #releaseTag: # Required when compareWith == LastReleaseByTag
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )]

@@ -7,7 +7,7 @@ trigger:
 name: $(BuildID)
 
 jobs:
--job: 'Build All'
+- job: 'Build All'
 
 strategy:
     matrix:

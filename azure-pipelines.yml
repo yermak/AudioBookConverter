@@ -1,0 +1,23 @@
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)\.m2\repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+steps:
+  - checkout: self
+    clean: 'true'
+    fetchDepth: '1'
+
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)"'
+      path: $(MAVEN_CACHE_FOLDER)
+    displayName: 'Cache Maven local repo'
+
+  - script: |
+      choco install openjdk --no-progress
+      call refreshenv
+      call mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
+    displayName: 'Build app without installer'

@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -151,7 +152,7 @@ public class FFMediaLoader {
         String filename = mediaInfo.getFileName();
         File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
         if (file.exists()) {
-            String cue = FileUtils.readFileToString(file);
+            String cue = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
             parseCue(mediaInfo, cue);
         }

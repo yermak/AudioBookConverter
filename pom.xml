@@ -7,7 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.4.0</version>
+    <version>#{APP_VERSION}#</version>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
@@ -17,7 +17,20 @@
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
         <javafx.version>15.0.1</javafx.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+
+    <repositories>
+        <repository>
+            <id>github-mvn-repo-ffmpeg-cli-wrapper-snapshot</id>
+            <url>https://github.com/yermak/ffmpeg-cli-wrapper/raw/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -139,9 +152,13 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <failOnWarning>true</failOnWarning>
                     <compilerArgs>${compiler.args.main}</compilerArgs>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -171,23 +188,6 @@
                 <version>3.3.0</version>
                 <executions>
                     <execution>
-                        <id>mega-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>installer</id>
                         <phase>package</phase>
                         <goals>
@@ -203,7 +203,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
@@ -227,7 +227,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
@@ -240,10 +240,12 @@
                 </os>
             </activation>
             <properties>
-                <java.home>C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.1</java.home>
-                <javafx.mods>C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1</javafx.mods>
+<!--
+                <java.home>${JAVA_HOME}</java.home>
+                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
                 <installer.script>windows/package.bat</installer.script>
+-->
                 <installer.assembly>windows-installer.xml</installer.assembly>
             </properties>
         </profile>
@@ -256,13 +258,34 @@
                 </os>
             </activation>
             <properties>
-                <java.home>/home/yermak/Programs/OpenJDK/jdk-15.0.1</java.home>
-                <javafx.mods>/home/yermak/Programs/JavaFX/javafx-jmods-15.0.1</javafx.mods>
+<!--
+                <java.home>${JAVA_HOME}</java.home>
+                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home></arc7zip.home>
                 <installer.script>linux/package.sh</installer.script>
+-->
                 <installer.assembly>linux-installer.xml</installer.assembly>
             </properties>
         </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+<!--
+                <java.home>${JAVA_HOME}</java.home>
+                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
+                <arc7zip.home></arc7zip.home>
+                <installer.script>mac/package.sh</installer.script>
+-->
+                <installer.assembly>mac-installer.xml</installer.assembly>
+            </properties>
+        </profile>
+
     </profiles>
+
 
 </project>

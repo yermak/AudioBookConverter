@@ -142,16 +142,14 @@ jobs:
   #    condition: eq( variables['Agent.OS'], 'Windows_NT' )
 - job: Release_GitHub
   dependsOn:
-    - 'Build windows'
-    - 'Build linux'
-    - 'Build mac'
+    - 'Build_All'
   pool:
     vmImage: 'ubuntu-18.04'
 
     variables:
       APP_VERSION: '5.4.$(Build.BuildNumber)'
 
-      IncrementReleaseTagNumber: $[counter(variables['InitialReleaseTagNumber'], 0)]
+#      IncrementReleaseTagNumber: $[counter(variables['InitialReleaseTagNumber'], 0)]
 
 
   steps:

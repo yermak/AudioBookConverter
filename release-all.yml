@@ -32,9 +32,7 @@ jobs:
 
     - task: replacetokens@3
       inputs:
-        targetFiles:
-          - 'pom.xml'
-          - 'src/main/java/uk/yermak/audiobookconverter/Version.java'
+        targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java'
         tokenPrefix: '#{'
         tokenSuffix: '}#'
 

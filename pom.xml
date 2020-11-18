@@ -7,7 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.4.1</version>
+    <version>#{APP_VERSION}#</version>
 
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
@@ -203,7 +203,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
@@ -227,7 +227,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
@@ -240,10 +240,12 @@
                 </os>
             </activation>
             <properties>
+<!--
                 <java.home>${JAVA_HOME}</java.home>
                 <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
                 <installer.script>windows/package.bat</installer.script>
+-->
                 <installer.assembly>windows-installer.xml</installer.assembly>
             </properties>
         </profile>
@@ -256,10 +258,12 @@
                 </os>
             </activation>
             <properties>
+<!--
                 <java.home>${JAVA_HOME}</java.home>
                 <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home></arc7zip.home>
                 <installer.script>linux/package.sh</installer.script>
+-->
                 <installer.assembly>linux-installer.xml</installer.assembly>
             </properties>
         </profile>
@@ -271,10 +275,12 @@
                 </os>
             </activation>
             <properties>
+<!--
                 <java.home>${JAVA_HOME}</java.home>
                 <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
                 <arc7zip.home></arc7zip.home>
                 <installer.script>mac/package.sh</installer.script>
+-->
                 <installer.assembly>mac-installer.xml</installer.assembly>
             </properties>
         </profile>

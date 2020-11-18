@@ -144,7 +144,7 @@ jobs:
   #    workingDirectory: $(Build.SourcesDirectory)
   #    condition: eq( variables['Agent.OS'], 'Windows_NT' )
   - job: Release
-  - steps:
+    steps:
     - task: GitHubRelease@0
       inputs:
         gitHubConnection: 'github.com_yermak'

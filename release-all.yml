@@ -7,7 +7,7 @@ trigger:
 name: $(BuildID)
 
 jobs:
-- job: 'Build_All'
+- job: Build_All
 
   strategy:
       matrix:
@@ -140,7 +140,8 @@ jobs:
   #      git push origin rel_$(APP_VERSION)
   #    workingDirectory: $(Build.SourcesDirectory)
   #    condition: eq( variables['Agent.OS'], 'Windows_NT' )
-  - job: 'Release_GitHub'
+  - job: Release_GitHub
+    dependsOn: Build_All
     steps:
     - task: GitHubRelease@0
       inputs:

@@ -13,10 +13,10 @@ jobs:
       matrix:
         linux:
           imageName: 'ubuntu-18.04'
-        mac:
-          imageName: 'macos-10.15'
-        windows:
-          imageName: 'windows-latest'
+#        mac:
+#          imageName: 'macos-10.15'
+#        windows:
+#          imageName: 'windows-latest'
 
   pool:
     vmImage: $(imageName)
@@ -162,7 +162,7 @@ jobs:
       tagSource: 'manual' # Required when action == Create# Options: auto, manual
 #      tagPattern: 'version_$(APP_VERSION)'
       title: 'Release $(APP_VERSION)'
-#      tag: 'version_$(APP_VERSION)'
+      tag: 'version_$(APP_VERSION)'
       #releaseNotesSource: 'file' # Optional. Options: file, input
       #releaseNotesFile: # Optional
       #releaseNotes: # Optional
@@ -171,6 +171,6 @@ jobs:
       #isDraft: false # Optional
       #isPreRelease: false # Optional
       #addChangeLog: true # Optional
-      #compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
-      releaseTag: 'version_$(APP_VERSION)' # Required when compareWith == LastReleaseByTag
+#      compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
+#      releaseTag: 'version_$(APP_VERSION)' # Required when compareWith == LastReleaseByTag
 #    condition: eq( variables['Agent.OS'], 'Windows_NT' )

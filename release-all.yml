@@ -1,10 +1,9 @@
 trigger:
-#  batch: true
   branches:
     include:
       - feature/107_fully_auto_build
 
-name: $(BuildID)
+#name: $(BuildID)
 
 variables:
 #  APP_VERSION: '5.4.$(Build.BuildNumber)'
@@ -19,10 +18,10 @@ jobs:
       matrix:
         linux:
           imageName: 'ubuntu-18.04'
-#        mac:
-#          imageName: 'macos-10.15'
-#        windows:
-#          imageName: 'windows-latest'
+        mac:
+          imageName: 'macos-10.15'
+        windows:
+          imageName: 'windows-latest'
 
   pool:
     vmImage: $(imageName)
@@ -146,9 +145,8 @@ jobs:
     vmImage: 'ubuntu-18.04'
 
   steps:
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      artifact: 'AudioBookConverter-$(APP_VERSION)'
+  - download: DownloadPipelineArtifact@2
+    artifact: 'AudioBookConverter-$(APP_VERSION)'
 
   - task: GitHubRelease@0
     inputs:
@@ -157,18 +155,9 @@ jobs:
       action: 'create' # Options: create, edit, delete
       target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
       tagSource: 'manual' # Required when action == Create# Options: auto, manual
-#      tagPattern: 'version_$(APP_VERSION)'
       title: 'Release $(APP_VERSION)'
       tag: 'version_$(APP_VERSION)'
       #releaseNotesSource: 'file' # Optional. Options: file, input
       #releaseNotesFile: # Optional
       #releaseNotes: # Optional
-#      assets: '$(Build.ArtifactStagingDirectory)*' # Optional
       assets: '$(Pipeline.Workspace)/*' # Optional
-# assetUploadMode: 'delete' # Optional. Options: delete, replace
-      #isDraft: false # Optional
-      #isPreRelease: false # Optional
-      #addChangeLog: true # Optional
-#      compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
-#      releaseTag: 'version_$(APP_VERSION)' # Required when compareWith == LastReleaseByTag
-#    condition: eq( variables['Agent.OS'], 'Windows_NT' )

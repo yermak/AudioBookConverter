@@ -4,6 +4,8 @@ trigger:
     include:
       - feature/107_fully_auto_build
 
+name: $(BuildID)
+
 strategy:
     matrix:
       linux:
@@ -17,7 +19,7 @@ pool:
   vmImage: $(imageName)
 
 variables:
-  APP_VERSION: '5.4.$(Rev:r)'
+  APP_VERSION: '5.4.$(Build.BuildNumber)'
 
 steps:
   - checkout: self

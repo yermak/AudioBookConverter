@@ -7,7 +7,10 @@ trigger:
 name: $(BuildID)
 
 variables:
-  APP_VERSION: '5.4.$(Build.BuildNumber)'
+#  APP_VERSION: '5.4.$(Build.BuildNumber)'
+  Release_5_5 : 0
+  APP_VERSION: '5.5.'$[counter(variables['Release_5_5'], 0)]
+
 
 jobs:
 - job: Build_All
@@ -136,22 +139,11 @@ jobs:
         ArtifactName: 'AudioBookConverter-$(APP_VERSION)'
         publishLocation: 'Container'
 
-  #  - script: |
-  #      git tag rel_$(APP_VERSION)
-  #      git push origin rel_$(APP_VERSION)
-  #    workingDirectory: $(Build.SourcesDirectory)
-  #    condition: eq( variables['Agent.OS'], 'Windows_NT' )
 - job: Release_GitHub
   dependsOn:
     - 'Build_All'
   pool:
     vmImage: 'ubuntu-18.04'
-
-#    variables:
-#      APP_VERSION: '5.4.$(Build.BuildNumber)'
-
-#      IncrementReleaseTagNumber: $[counter(variables['InitialReleaseTagNumber'], 0)]
-
 
   steps:
   - task: DownloadPipelineArtifact@2

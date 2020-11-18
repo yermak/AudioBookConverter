@@ -145,10 +145,11 @@ jobs:
     vmImage: 'ubuntu-18.04'
 
   steps:
-  - download: current
-    artifact: 'AudioBookConverter-$(APP_VERSION)'
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: 'AudioBookConverter-$(APP_VERSION)'
 
-  - task: GitHubRelease@0
+    - task: GitHubRelease@0
     inputs:
       gitHubConnection: 'github.com_yermak'
       repositoryName: '$(Build.Repository.Name)'

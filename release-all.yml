@@ -159,4 +159,4 @@ steps:
       #addChangeLog: true # Optional
       #compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
       #releaseTag: # Required when compareWith == LastReleaseByTag
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )]
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )

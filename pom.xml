@@ -202,32 +202,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <id>installer</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/src/main/deploy/package/${installer.script}</executable>
-                            <arguments>
-                                <argument>${java.home}</argument>
-                                <argument>${javafx.mods}</argument>
-                                <argument>${project.version}</argument>
-                            </arguments>
-                            <environmentVariables>
-                                <ARC7ZIP_HOME>${arc7zip.home}</ARC7ZIP_HOME>
-                            </environmentVariables>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
         </plugins>
     </build>
 
@@ -240,12 +214,6 @@
                 </os>
             </activation>
             <properties>
-<!--
-                <java.home>${JAVA_HOME}</java.home>
-                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
-                <arc7zip.home>c:\Program Files\7-Zip</arc7zip.home>
-                <installer.script>windows/package.bat</installer.script>
--->
                 <installer.assembly>windows-installer.xml</installer.assembly>
             </properties>
         </profile>
@@ -258,12 +226,6 @@
                 </os>
             </activation>
             <properties>
-<!--
-                <java.home>${JAVA_HOME}</java.home>
-                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
-                <arc7zip.home></arc7zip.home>
-                <installer.script>linux/package.sh</installer.script>
--->
                 <installer.assembly>linux-installer.xml</installer.assembly>
             </properties>
         </profile>
@@ -275,12 +237,6 @@
                 </os>
             </activation>
             <properties>
-<!--
-                <java.home>${JAVA_HOME}</java.home>
-                <javafx.mods>${JAVAFX_JMODS}</javafx.mods>
-                <arc7zip.home></arc7zip.home>
-                <installer.script>mac/package.sh</installer.script>
--->
                 <installer.assembly>mac-installer.xml</installer.assembly>
             </properties>
         </profile>

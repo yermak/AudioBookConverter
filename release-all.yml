@@ -174,8 +174,8 @@ jobs:
       #releaseNotesFile: # Optional
       #releaseNotes: # Optional
 #      assets: '$(Build.ArtifactStagingDirectory)*' # Optional
-      assets: '$(Pipeline.Workspace)/* # Optional
-      #assetUploadMode: 'delete' # Optional. Options: delete, replace
+      assets: '$(Pipeline.Workspace)/*' # Optional
+# assetUploadMode: 'delete' # Optional. Options: delete, replace
       #isDraft: false # Optional
       #isPreRelease: false # Optional
       #addChangeLog: true # Optional

@@ -2,6 +2,10 @@ trigger:
   branches:
     include:
       - master
+  paths:
+    exclude:
+      version.txt
+pr:none
 
 #name: $(BuildID)
 

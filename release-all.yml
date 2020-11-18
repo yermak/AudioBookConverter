@@ -1,14 +1,14 @@
 trigger:
   branches:
     include:
-      - feature/107_fully_auto_build
+      - master
 
 #name: $(BuildID)
 
 variables:
 #  APP_VERSION: '5.4.$(Build.BuildNumber)'
-  Release_X : 0
-  BUILD_COUNTER: $[counter(variables['Release_X'], 0)]
+  Release_5_5 : 0
+  BUILD_COUNTER: $[counter(variables['Release_5_5'], 0)]
   APP_VERSION: '5.5.$(BUILD_COUNTER)'
 
 jobs:

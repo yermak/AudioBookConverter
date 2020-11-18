@@ -5,6 +5,8 @@ trigger:
       - feature/107_fully_auto_build
 
 name: $(BuildID)
+jobs:
+-job: 'Build All'
 
 strategy:
     matrix:
@@ -20,6 +22,8 @@ pool:
 
 variables:
   APP_VERSION: '5.4.$(Build.BuildNumber)'
+
+
 
 steps:
   - checkout: self
@@ -138,7 +142,8 @@ steps:
 #      git push origin rel_$(APP_VERSION)
 #    workingDirectory: $(Build.SourcesDirectory)
 #    condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
+- job: Release
+- steps:
   - task: GitHubRelease@0
     inputs:
       gitHubConnection: 'github.com_yermak'
@@ -146,7 +151,7 @@ steps:
       action: 'create' # Options: create, edit, delete
       target: '$(Build.SourceVersion)' # Required when action == Create || Action == Edit
       tagSource: 'auto' # Required when action == Create# Options: auto, manual
-#      tagPattern: 'version_$(APP_VERSION)'
+      tagPattern: 'version_$(APP_VERSION)'
       title: 'Release $(APP_VERSION)'
       tag: 'version_$(APP_VERSION)'
       #releaseNotesSource: 'file' # Optional. Options: file, input
@@ -159,4 +164,4 @@ steps:
       #addChangeLog: true # Optional
       #compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
       #releaseTag: # Required when compareWith == LastReleaseByTag
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+  condition: eq( variables['Agent.OS'], 'Windows_NT' ) and

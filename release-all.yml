@@ -1,5 +1,3 @@
-pr:none
-
 trigger:
   branches:
     include:
@@ -9,8 +7,6 @@ trigger:
       - '*.txt'
       - '*.md'
 
-
-#name: $(BuildID)
 
 variables:
 #  APP_VERSION: '5.4.$(Build.BuildNumber)'

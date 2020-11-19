@@ -1,10 +1,13 @@
+pr:none
+
 trigger:
   branches:
     include:
       - master
-  paths:
+  path:
     exclude:
-      version.txt
+      - '*.txt'
+      - '*.md'
 
 
 #name: $(BuildID)

@@ -65,7 +65,7 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public List<MediaInfo> getMedia() {
-        return List.of(getMediaInfo());
+        return getMediaInfo().getMedia();
     }
 
     public String getFileName() {

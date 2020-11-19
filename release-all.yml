@@ -1,8 +1,10 @@
+pr: none
+
 trigger:
   branches:
     include:
       - master
-  path:
+  paths:
     exclude:
       - '*.txt'
       - '*.md'

@@ -153,13 +153,8 @@ public class FilesController {
         bookStructure.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<Organisable>>) c -> {
             List<MediaInfo> list = ConverterApplication.getContext().getSelectedMedia();
             list.clear();
-            for (TreeItem<Organisable> item : c.getList()) {
-                if (item.getValue() instanceof Chapter chapter) {
-                    list.addAll(chapter.getMedia());
-                } else if (item.getValue() instanceof MediaInfoProxy mediaInfoProxy) {
-                    list.add(mediaInfoProxy);
-                }
-            }
+            List<MediaInfo> newList = c.getList().stream().flatMap(item -> item.getValue().getMedia().stream()).collect(Collectors.toList());
+            list.addAll(newList);
         });
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));

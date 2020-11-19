@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
@@ -47,6 +48,11 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     @Override
     public long getDuration() {
         return duration;
+    }
+
+    @Override
+    public List<MediaInfo> getMedia() {
+        return List.of(mediaInfo);
     }
 
     @Override

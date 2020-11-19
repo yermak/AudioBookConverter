@@ -1,6 +1,9 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.List;
+
 public interface Organisable {
+
     String getTitle();
 
     String getDetails();
@@ -14,4 +17,9 @@ public interface Organisable {
     void moveUp();
 
     void moveDown();
+
+    /**
+     * @return full list of all inner MediaInfo objects
+     */
+    List<MediaInfo> getMedia();
 }

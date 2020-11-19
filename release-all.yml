@@ -5,7 +5,7 @@ trigger:
   paths:
     exclude:
       version.txt
-pr:none
+
 
 #name: $(BuildID)
 

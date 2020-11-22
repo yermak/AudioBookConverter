@@ -6,8 +6,8 @@ trigger:
       - master
   paths:
     exclude:
-      - '*.txt'
-      - '*.md'
+      - version.txt
+      - README.md
 
 
 variables:

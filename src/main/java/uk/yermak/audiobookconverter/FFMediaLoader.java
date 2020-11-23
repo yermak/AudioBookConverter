@@ -24,7 +24,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * Created by yermak on 1/10/2018.
+ * Background media info loader. Media files are processed in the same order as passed to the constructor.
+ *
+ * @author yermak
  */
 public class FFMediaLoader {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -37,7 +39,6 @@ public class FFMediaLoader {
     public FFMediaLoader(List<String> files, ConversionGroup conversionGroup) {
         this.fileNames = files;
         this.conversionGroup = conversionGroup;
-        Collections.sort(fileNames);
     }
 
     public List<MediaInfo> loadMediaInfo() {

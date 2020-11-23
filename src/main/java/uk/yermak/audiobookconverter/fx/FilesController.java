@@ -260,6 +260,9 @@ public class FilesController {
                 }
             }
         }
+
+        Comparator<String> cmp = Comparators.comparingAlphaDecimal(Comparator.comparing(CharSequence::toString, String::compareToIgnoreCase));
+        fileNames.sort(cmp);
         return fileNames;
     }
 

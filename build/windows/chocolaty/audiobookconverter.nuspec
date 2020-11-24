@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>audiobookconverter</id>
-    <version>5.2.0</version>
+    <version>#{APP_VERSION}#</version>
     <title>AudioBookConverter (Install)</title>
     <authors>Yarick Yermak</authors>
     <projectUrl>https://www.recoupler.com/products/audiobookconverter</projectUrl>

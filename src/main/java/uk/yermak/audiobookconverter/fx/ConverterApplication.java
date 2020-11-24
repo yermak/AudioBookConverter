@@ -132,7 +132,7 @@ static class VersionChecker implements Runnable {
     @Override
     public void run() {
         try {
-            String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/master/version.txt");
+            String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/version.txt");
             if (!Version.getVersionString().equals(StringUtils.trim(version))) {
                 logger.info("New version found: {}", version);
                 Platform.runLater(() -> {

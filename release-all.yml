@@ -109,25 +109,10 @@ jobs:
         wget -q https://gluonhq.com/download/javafx-15-0-1-jmods-windows/ -O openjfx-15.0.1_windows-x64_bin-jmods.zip
         unzip openjfx-15.0.1_windows-x64_bin-jmods.zip
         SET JAVAFX_JMODS=javafx-jmods-15.0.1
+
         call mvn clean package --no-transfer-progress
 
-        jlink.exe --module-path "%JAVA_HOME%\jmods";%JAVAFX_JMODS% --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target\fx-jre
-
-        rmdir /s /q target\image\AudioBookConverter
-        jpackage.exe --app-version $(APP_VERSION)  --icon AudioBookConverter.ico -t app-image --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --dest target/image --java-options '--enable-preview'
-
-        mkdir target\release
-
-        cd target\image\
-        7z.exe a -t7z -mx9 -mmt8 -sfx7z.sfx AudioBookConverter-Portable-$(APP_VERSION).exe AudioBookConverter
-        move AudioBookConverter-Portable-$(APP_VERSION).exe ..\release\
-        cd ..\..
-
-        jpackage.exe --app-version $(APP_VERSION)  --license-file README.md --icon AudioBookConverter.ico -t msi --win-dir-chooser --win-shortcut --win-menu --win-menu-group AudioBookConverter --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
-        move AudioBookConverter-$(APP_VERSION).msi target/release/AudioBookConverter-All-Users-$(APP_VERSION).msi
-
-        jpackage.exe --app-version $(APP_VERSION)  --license-file README.md --icon AudioBookConverter.ico --win-per-user-install -t msi --win-shortcut --win-menu --win-menu-group AudioBookConverter --name AudioBookConverter --vendor Recoupler --input target/package/audiobookconverter-$(APP_VERSION)-windows-installer/audiobookconverter-$(APP_VERSION)/app --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
-        move AudioBookConverter-$(APP_VERSION).msi target/release/AudioBookConverter-Single-User-$(APP_VERSION).msi
+        call build/windows/package.bat %JAVA_HOME% %JAVAFX_JMODS% $(APP_VERSION)
 
       condition: eq( variables['Agent.OS'], 'Windows_NT' )
       displayName: 'Build MSI installers'

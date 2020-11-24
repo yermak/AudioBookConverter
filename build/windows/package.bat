@@ -1,6 +1,6 @@
-SET JAVA_HOME=C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.1
-SET JAVAFX_JMODS=C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1
-SET APP_VERSION=5.5.5
+SET JAVA_HOME=%1
+SET JAVAFX_JMODS=%2
+SET APP_VERSION=%3
 mkdir target\release
 rmdir /s /q target\image\AudioBookConverter
 

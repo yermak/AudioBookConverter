@@ -112,7 +112,7 @@ jobs:
 
         call mvn clean package --no-transfer-progress
 
-        call build/windows/package.bat %JAVA_HOME% %JAVAFX_JMODS% $(APP_VERSION)
+        call build/windows/package.bat "%JAVA_HOME%" %JAVAFX_JMODS% $(APP_VERSION)
 
       condition: eq( variables['Agent.OS'], 'Windows_NT' )
       displayName: 'Build MSI installers'

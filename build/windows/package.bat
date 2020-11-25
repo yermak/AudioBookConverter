@@ -5,6 +5,7 @@ SET JAVAFX_JMODS=%~2
 ECHO %JAVAFX_JMODS%
 SET APP_VERSION=%~3
 ECHO %APP_VERSION%
+
 mkdir target\release
 rmdir /s /q target\image\AudioBookConverter
 

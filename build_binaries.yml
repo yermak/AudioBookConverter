@@ -7,7 +7,7 @@ trigger:
 
 
 variables:
-  VERSION: 999.999
+  VERSION: 99.99
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
 

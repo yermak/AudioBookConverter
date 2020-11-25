@@ -1,9 +1,9 @@
 ECHO ON
-SET JAVA_HOME=%~1
+SET JAVA_HOME="%~1"
 ECHO %JAVA_HOME%
-SET JAVAFX_JMODS=%~2
+SET JAVAFX_JMODS="%~2"
 ECHO %JAVAFX_JMODS%
-SET APP_VERSION=%~3
+SET APP_VERSION="%~3"
 ECHO %APP_VERSION%
 mkdir target\release
 rmdir /s /q target\image\AudioBookConverter

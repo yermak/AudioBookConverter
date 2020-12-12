@@ -1,0 +1,27 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>linux-nodeps-installer</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>README*</include>
+                <include>*.txt</include>
+                <include>*.ico</include>
+            </includes>
+            <outputDirectory>app</outputDirectory>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>*:jar</include>
+            </includes>
+            <outputDirectory>app/lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>

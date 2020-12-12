@@ -122,6 +122,7 @@
 
         <Menu fx:id="mAbout" text="About">
             <MenuItem text="FAQ" onAction="#openFAQ"/>
+            <MenuItem text="Discussions" onAction="#openDiscussions"/>
             <MenuItem text="Web-site" onAction="#openWebSite"/>
             <MenuItem text="About" onAction="#openAboutPage"/>
             <MenuItem text="Check new version" onAction="#checkVersion"/>

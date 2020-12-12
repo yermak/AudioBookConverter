@@ -1,6 +1,6 @@
 ﻿$ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://github.com/yermak/AudioBookConverter/releases/download/version_#{APP_VERSION}#/AudioBookConverter-#{APP_VERSION}#.msi' # download url, HTTPS preferred
+$url        = 'https://github.com/yermak/AudioBookConverter/releases/download/version_#{APP_VERSION}#/AudioBookConverter-NoDeps-#{APP_VERSION}#.msi' # download url, HTTPS preferred
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName

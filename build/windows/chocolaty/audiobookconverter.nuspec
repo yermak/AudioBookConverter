@@ -3,7 +3,7 @@
   <metadata>
     <id>audiobookconverter</id>
     <version>#{APP_VERSION}#</version>
-    <title>AudioBookConverter (Install)</title>
+    <title>AudioBookConverter</title>
     <authors>Yarick Yermak</authors>
     <projectUrl>https://www.recoupler.com/products/audiobookconverter</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/yermak/AudioBookConverter/master/AudioBookConverter.png</iconUrl>
@@ -17,6 +17,12 @@
 Overtime AudioBookConverter evolved and currently can support converion of most of popular formats to m4b (mp3, wma, m4a, flac), it also can handle existing m4b files and process them with meta information.
 
 AudioBookConverter can work smart to find relevant artwork and can do avanced chapter management. </description>
+
+      <dependencies>
+          <dependency id="chocolatey" version="0.10.5" />
+          <dependency id="ffmpeg" version="4.3.1" />
+          <dependency id="mp4v2" version="4.1.3" />
+      </dependencies>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

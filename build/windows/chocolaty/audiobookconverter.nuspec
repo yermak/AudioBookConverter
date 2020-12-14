@@ -12,11 +12,11 @@
     <bugTrackerUrl>https://github.com/yermak/AudioBookConverter/issues</bugTrackerUrl>
     <tags>audiobook converter m4b mp3 ogg flac m4a</tags>
     <summary>AudioBookConverter from mp3/flac/m4a/ogg to m4b/ogg/mp3. Multiparts, chapter and artwork are supported.</summary>
-    <description>AudioBookConverter was originally designed as simple and lightweigh application to convert set of mp3 files to single or set of m4b (aac) files to be played on your i-device (or any device now). 
+    <description>AudioBookConverter was originally designed as simple and lightweight application to convert set of mp3 files to single or set of m4b (aac) files to be played on your i-device (or any device now).
 
-Overtime AudioBookConverter evolved and currently can support converion of most of popular formats to m4b (mp3, wma, m4a, flac), it also can handle existing m4b files and process them with meta information.
+Overtime AudioBookConverter evolved and currently can support conversion of most of popular formats to m4b (mp3, wma, m4a, flac), it also can handle existing m4b files and process them with meta information.
 
-AudioBookConverter can work smart to find relevant artwork and can do avanced chapter management. </description>
+AudioBookConverter can work smart to find relevant artwork and can do advanced chapter management. </description>
 
       <dependencies>
           <dependency id="chocolatey" version="0.10.5" />

@@ -1,7 +1,7 @@
 [![Build Status](https://recoupler.visualstudio.com/AudioBookConverter/_apis/build/status/yermak.AudioBookConverter?branchName=development)](https://recoupler.visualstudio.com/AudioBookConverter/_build/latest?definitionId=2&branchName=development)
 
 Official web-site
-https://www.recoupler.com/products/audiobookconverter
+<a href="https://www.recoupler.com/products/audiobookconverter">Recoupler AudioBookConverter</a>
 
 
 AudioBookConverter
@@ -9,8 +9,9 @@ AudioBookConverter
 AudioBookConverter was originally designed as simple and lightweigh application to convert set of mp3 files to single m4b (aac) file to be played on your i-device (or any device now)
 Overtime AudioBookConverter evolved and currently can support converion of most of popular formats to m4b, it also can handle existing m4b files and process them. AudioBookConverter can working smart to find relevant artwork and can do avanced chapter management.
 
+**Note:** Mac and Linux versions are experimental and may require some skills to install and run them and may not work as you expect
 
-<a href="https://paypal.me/pools/c/8l28GKocaS">Donate</a> if you have found AudioBookConverter helpful!
+<a href="https://paypal.me/pools/c/8l28GKocaS">Donate</a> or give a star to project if you have found AudioBookConverter helpful!
 -----
 
 
@@ -44,6 +45,8 @@ Just download the file from link bellow, no QuickTime or iTunes is required.
 ----
 <a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
 =======
+You may want to check <a href="https://github.com/yermak/AudioBookConverter/wiki/Installation">Installation Manual</a>
+----
 
 Usage:
 -----

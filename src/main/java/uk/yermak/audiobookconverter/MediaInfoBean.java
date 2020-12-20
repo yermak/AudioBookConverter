@@ -1,8 +1,10 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
+
     private final String fileName;
     private int channels;
     private int frequency;
@@ -54,6 +56,10 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         return this.duration;
     }
 
+    @Override
+    public List<MediaInfo> getMedia() {
+        return List.of(this);
+    }
 
     public String getFileName() {
         return this.fileName;

@@ -150,6 +150,12 @@ public class FilesController {
         filesChapters.getTabs().remove(chaptersTab);
 
         bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        bookStructure.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<Organisable>>) c -> {
+            List<MediaInfo> list = ConverterApplication.getContext().getSelectedMedia();
+            list.clear();
+            List<MediaInfo> newList = c.getList().stream().flatMap(item -> item.getValue().getMedia().stream()).collect(Collectors.toList());
+            list.addAll(newList);
+        });
 
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
@@ -254,6 +260,9 @@ public class FilesController {
                 }
             }
         }
+
+        Comparator<String> cmp = Comparators.comparingAlphaDecimal(Comparator.comparing(CharSequence::toString, String::compareToIgnoreCase));
+        fileNames.sort(cmp);
         return fileNames;
     }
 
@@ -630,6 +639,10 @@ public class FilesController {
 
     public void openFAQ(ActionEvent actionEvent) {
         ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/faq");
+    }
+
+    public void openDiscussions(ActionEvent actionEvent) {
+        ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/discussions");
     }
 
     public void openDonate() {

@@ -1,9 +1,11 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class MediaInfoProxy implements MediaInfo {
+
     private final String filename;
     private final Future<MediaInfo> futureLoad;
 
@@ -59,6 +61,11 @@ public class MediaInfoProxy implements MediaInfo {
     @Override
     public void moveDown() {
         this.getMediaInfo().moveDown();
+    }
+
+    @Override
+    public List<MediaInfo> getMedia() {
+        return getMediaInfo().getMedia();
     }
 
     public String getFileName() {

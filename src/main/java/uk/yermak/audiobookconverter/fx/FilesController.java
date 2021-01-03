@@ -397,7 +397,7 @@ public class FilesController {
         }
 
         ObservableList<Part> parts = book.getParts();
-        Format format = ConverterApplication.getContext().getOutputFormat();
+        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
         conversionGroup.getOutputParameters().setupFormat(format);
 
@@ -487,7 +487,7 @@ public class FilesController {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputFormat().toString(), "*." + ConverterApplication.getContext().getOutputFormat().toString())
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().getOutputParameters().getFormat().toString())
 /*
                 new FileChooser.ExtensionFilter(M4A, "*." + M4A),
                 new FileChooser.ExtensionFilter(MP3, "*." + MP3),

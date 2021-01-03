@@ -349,7 +349,7 @@ public enum Format {
     protected void addBitrateAndQuality(OutputParameters outputParameters, List<String> options) {
         options.addAll(outputParameters.cbr
                 ? List.of("-b:a", outputParameters.getBitRate() + "k")
-                : List.of("-vbr", String.valueOf(outputParameters.vbrQuality))
+                : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
         );
     }
 

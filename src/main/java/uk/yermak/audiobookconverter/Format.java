@@ -29,17 +29,41 @@ public enum Format {
     },
 
     MP3("mp3", "libmp3lame", "mp3") {
-        /**
-         * https://trac.ffmpeg.org/wiki/Encode/MP3
-         * @param outputParameters
-         * @param options
-         */
         @Override
-        protected void addBitrateAndQuality(OutputParameters outputParameters, List<String> options) {
+        public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
+            List<String> options = new ArrayList<>();
+            options.add(Utils.FFMPEG);
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-ss");
+                options.add(toFFMpegTime(mediaInfo.getOffset()));
+            }
+            options.add("-i");
+            options.add(mediaInfo.getFileName());
+            options.add("-vn");
+            options.add("-codec:a");
+            options.add(codec);
+            options.add("-f");
+            options.add(format);
+
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
                     : List.of("-q:a", String.valueOf(10 - outputParameters.vbrQuality * 2))
             );
+
+
+            options.add("-ac");
+            options.add(String.valueOf(outputParameters.getChannels()));
+            if (mediaInfo.getOffset() != -1) {
+                options.add("-t");
+                options.add(toFFMpegTime(mediaInfo.getDuration()));
+            }
+            options.add("-cutoff");
+            options.add(Integer.toString(outputParameters.getCutoff()));
+            options.add("-progress");
+            options.add(progressUri);
+            options.add(outputFileName);
+            return options;
+
         }
 
         @Override
@@ -112,17 +136,6 @@ public enum Format {
         }
     },
     OGG("ogg", "libopus", "ogg") {
-        @Override
-        protected void addBitrateAndQuality(OutputParameters outputParameters, List<String> options) {
-            if (outputParameters.cbr) {
-                options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
-                options.addAll(List.of("-vbr", "off"));
-            } else {
-                options.addAll(List.of("-b:a", outputParameters.getVbrQuality() * 32 + "k"));
-                options.addAll(List.of("-vbr", "on"));
-            }
-        }
-
         @Override
         public Integer[] cutoffs() {
             return new Integer[]{4000, 6000, 8000, 12000, 20000};
@@ -203,16 +216,22 @@ public enum Format {
             options.add("-f");
             options.add(format);
 
-            addBitrateAndQuality(outputParameters, options);
+            if (outputParameters.cbr) {
+                options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
+                options.addAll(List.of("-vbr", "off"));
+            } else {
+                options.addAll(List.of("-b:a", outputParameters.getVbrQuality() * outputParameters.getVbrQuality() * 16 + "k"));
+                options.addAll(List.of("-vbr", "on"));
+            }
 
             options.add("-ac");
-            options.add(String.valueOf(String.valueOf(outputParameters.getChannels())));
+            options.add(String.valueOf(outputParameters.getChannels()));
             if (mediaInfo.getOffset() != -1) {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
             options.add("-cutoff");
-            options.add(outputParameters.getCutoffValue());
+            options.add(Integer.toString(outputParameters.getCutoff()));
             options.add("-progress");
             options.add(progressUri);
             options.add(outputFileName);
@@ -314,7 +333,7 @@ public enum Format {
             options.add(toFFMpegTime(mediaInfo.getDuration()));
         }
         options.add("-cutoff");
-        options.add(outputParameters.getCutoffValue());
+        options.add(Integer.toString(outputParameters.getCutoff()));
         options.add("-progress");
         options.add(progressUri);
         options.add(outputFileName);

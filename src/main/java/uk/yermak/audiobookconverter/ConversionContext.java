@@ -36,7 +36,6 @@ public class ConversionContext {
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
-    private final SimpleObjectProperty<Format> outputFormat = new SimpleObjectProperty<>(Format.M4B);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -172,18 +171,5 @@ public class ConversionContext {
 
     public void setOutputParameters(OutputParameters outputParameters) {
         this.outputParameters.set(outputParameters);
-    }
-
-    public void setOutputFormat(Format outputFormat) {
-        this.outputFormat.set(outputFormat);
-        getOutputParameters().setupFormat(outputFormat);
-    }
-
-    public Format getOutputFormat() {
-        return outputFormat.get();
-    }
-
-    public void setSplit(boolean split) {
-        this.outputParameters.get().setSplitChapters(split);
     }
 }

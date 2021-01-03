@@ -57,8 +57,10 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            options.add("-cutoff");
-            options.add(Integer.toString(outputParameters.getCutoff()));
+            if (outputParameters.getCutoff() != null) {
+                options.add("-cutoff");
+                options.add(Integer.toString(outputParameters.getCutoff()));
+            }
             options.add("-progress");
             options.add(progressUri);
             options.add(outputFileName);
@@ -77,18 +79,18 @@ public enum Format {
         }
 
         @Override
-        public Integer[] channels() {
-            return new Integer[]{1, 2, 6};
+        public List<Integer> channels() {
+            return List.of(1, 2, 6);
         }
 
         @Override
-        public Integer[] frequencies() {
-            return new Integer[]{8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000};
+        public List<Integer> frequencies() {
+            return List.of(8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000);
         }
 
         @Override
-        public Integer[] bitrates() {
-            return new Integer[]{32, 48, 64, 96, 112, 128, 160, 192, 224, 256, 320};
+        public List<Integer> bitrates() {
+            return List.of(32, 48, 64, 96, 112, 128, 160, 192, 224, 256, 320);
         }
 
         @Override
@@ -137,18 +139,18 @@ public enum Format {
     },
     OGG("ogg", "libopus", "ogg") {
         @Override
-        public Integer[] cutoffs() {
-            return new Integer[]{4000, 6000, 8000, 12000, 20000};
+        public List<Integer> cutoffs() {
+            return List.of(4000, 6000, 8000, 12000, 20000);
         }
 
         @Override
-        public Integer[] frequencies() {
-            return new Integer[]{8000, 12000, 16000, 24000, 32000, 48000};
+        public List<Integer> frequencies() {
+            return List.of(8000, 12000, 16000, 24000, 32000, 48000);
         }
 
         @Override
-        public Integer[] bitrates() {
-            return new Integer[]{16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320, 512};
+        public List<Integer> bitrates() {
+            return List.of(16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320, 512);
         }
 
         @Override
@@ -230,8 +232,10 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            options.add("-cutoff");
-            options.add(Integer.toString(outputParameters.getCutoff()));
+            if (outputParameters.getCutoff() != null) {
+                options.add("-cutoff");
+                options.add(Integer.toString(outputParameters.getCutoff()));
+            }
             options.add("-progress");
             options.add(progressUri);
             options.add(outputFileName);
@@ -249,24 +253,24 @@ public enum Format {
         this.extension = extension;
     }
 
-    public Integer[] channels() {
-        return new Integer[]{1, 2, 4, 6};
+    public List<Integer> channels() {
+        return List.of(1, 2, 4, 6);
     }
 
-    public Integer[] vbrQualities() {
-        return new Integer[]{1, 2, 3, 4, 5};
+    public List<Integer> vbrQualities() {
+        return List.of(1, 2, 3, 4, 5);
     }
 
-    public Integer[] cutoffs() {
-        return new Integer[]{8000, 10000, 12000, 16000, 20000};
+    public List<Integer> cutoffs() {
+        return List.of(8000, 10000, 12000, 16000, 20000);
     }
 
-    public Integer[] frequencies() {
-        return new Integer[]{8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000};
+    public List<Integer> frequencies() {
+        return List.of(8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000);
     }
 
-    public Integer[] bitrates() {
-        return new Integer[]{8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320};
+    public List<Integer> bitrates() {
+        return List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320);
     }
 
     public Integer defaultBitrate() {
@@ -332,8 +336,10 @@ public enum Format {
             options.add("-t");
             options.add(toFFMpegTime(mediaInfo.getDuration()));
         }
-        options.add("-cutoff");
-        options.add(Integer.toString(outputParameters.getCutoff()));
+        if (outputParameters.getCutoff() != null) {
+            options.add("-cutoff");
+            options.add(Integer.toString(outputParameters.getCutoff()));
+        }
         options.add("-progress");
         options.add(progressUri);
         options.add(outputFileName);

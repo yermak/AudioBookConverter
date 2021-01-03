@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String DISABLED = "Disabled";
 
     @FXML
     public ComboBox<Format> outputFormatBox;
@@ -33,16 +34,16 @@ public class OutputController {
 
 
     @FXML
-    public ComboBox<Integer> cutoff;
+    public ComboBox<String> cutoff;
 
     @FXML
-    private ComboBox<Integer> frequency;
+    private ComboBox<String> frequency;
     @FXML
-    private ComboBox<Integer> channels;
+    private ComboBox<String> channels;
     @FXML
     private RadioButton cbr;
     @FXML
-    private ComboBox<Integer> bitRate;
+    private ComboBox<String> bitRate;
     @FXML
     private RadioButton vbr;
     @FXML
@@ -129,27 +130,36 @@ public class OutputController {
         media = context.getMedia();
 
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) context.getOutputParameters().setBitRate(newValue);
+            if (newValue == null) return;
+            context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
         });
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) context.getOutputParameters().setFrequency(newValue);
+            if (newValue == null) return;
+            context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
         });
         channels.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) context.getOutputParameters().setChannels(newValue);
+            if (newValue == null) return;
+            context.getOutputParameters().setChannels(Integer.valueOf(newValue));
         });
         vbrQuality.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            if (newValue == null) return;
+            context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
         });
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) context.getOutputParameters().setCutoff(newValue);
+            if (newValue == null) return;
+            if (DISABLED.equals(newValue)) {
+                context.getOutputParameters().setCutoff(null);
+            } else {
+                context.getOutputParameters().setCutoff(Integer.valueOf(newValue));
+            }
         });
 
         context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
-            bitRate.valueProperty().set(newValue.getBitRate());
-            frequency.valueProperty().set(newValue.getFrequency());
-            channels.valueProperty().set(newValue.getChannels());
+            bitRate.valueProperty().set(String.valueOf(newValue.getBitRate()));
+            frequency.valueProperty().set(String.valueOf(newValue.getFrequency()));
+            channels.valueProperty().set(String.valueOf(newValue.getChannels()));
             vbrQuality.valueProperty().set(newValue.getVbrQuality());
-            cutoff.valueProperty().set(newValue.getCutoff());
+            cutoff.valueProperty().set(String.valueOf(newValue.getCutoff()));
             if (newValue.isCbr()) {
                 cbr.fire();
             } else {
@@ -166,11 +176,11 @@ public class OutputController {
 
         ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
             Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
-            bitRate.setValue(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate()));
-            frequency.setValue(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency()));
-            channels.setValue(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel()));
+            bitRate.setValue(String.valueOf(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate())));
+            frequency.setValue(String.valueOf(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency())));
+            channels.setValue(String.valueOf(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel())));
             vbrQuality.setValue(findNearestMatch(newParams.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
-            cutoff.setValue(findNearestMatch(newParams.getCutoff(), format.cutoffs(), format.defaultCutoff()));
+            cutoff.setValue(String.valueOf(findNearestMatch(newParams.getCutoff(), format.cutoffs(), format.defaultCutoff())));
         });
     }
 
@@ -191,29 +201,31 @@ public class OutputController {
     private void refreshCutoffs() {
         Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
         cutoff.getItems().clear();
-        cutoff.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().cutoffs());
-        cutoff.getSelectionModel().select(format.defaultCutoff());
+        cutoff.getItems().add(DISABLED);
+        cutoff.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).collect(Collectors.toList()));
+        cutoff.getSelectionModel().select(String.valueOf(format.defaultCutoff()));
     }
 
     private void refreshChannels() {
         Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
         channels.getItems().clear();
-        channels.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().channels());
-        channels.getSelectionModel().select(format.defaultChannel());
+        channels.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).collect(Collectors.toList()));
+        channels.getSelectionModel().select(String.valueOf(format.defaultChannel()));
     }
 
     private void refreshBitrates() {
         Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
         bitRate.getItems().clear();
-        bitRate.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().bitrates());
-        bitRate.getSelectionModel().select(format.defaultBitrate());
+        bitRate.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).collect(Collectors.toList()));
+        bitRate.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
     }
 
     private void refreshFrequencies() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        OutputParameters outputParameters = ConverterApplication.getContext().getOutputParameters();
+        Format format = outputParameters.getFormat();
         frequency.getItems().clear();
-        frequency.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().frequencies());
-        frequency.getSelectionModel().select(format.defaultFrequency());
+        frequency.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).collect(Collectors.toList()));
+        frequency.getSelectionModel().select(String.valueOf(format.defaultFrequency()));
     }
 
     private void updateParameters(List<MediaInfo> media) {
@@ -221,9 +233,9 @@ public class OutputController {
 
         if (media.isEmpty() && book == null) {
             Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
-            frequency.setValue(format.defaultFrequency());
-            bitRate.setValue(format.defaultBitrate());
-            channels.setValue(format.defaultChannel());
+            frequency.setValue(String.valueOf(format.defaultFrequency()));
+            bitRate.setValue(String.valueOf(format.defaultBitrate()));
+            channels.setValue(String.valueOf(format.defaultChannel()));
             vbrQuality.setValue(format.defaultVbrQuality());
             return;
         }
@@ -238,9 +250,9 @@ public class OutputController {
             }
             Platform.runLater(() -> {
                 Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
-                frequency.setValue(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency()));
-                bitRate.setValue(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate()));
-                channels.setValue(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel()));
+                frequency.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
+                bitRate.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
+                channels.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));
                 vbrQuality.setValue(findNearestMatch(params.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
             });
 
@@ -249,8 +261,8 @@ public class OutputController {
 
     }
 
-    private static Integer findNearestMatch(int value, Integer[] array, int defaultValue) {
-        for (Integer integer : array) {
+    private static Integer findNearestMatch(int value, List<Integer> list, int defaultValue) {
+        for (Integer integer : list) {
             if (integer >= value)
                 return integer;
         }

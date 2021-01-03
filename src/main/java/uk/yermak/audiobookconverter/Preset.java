@@ -91,32 +91,32 @@ public class Preset extends OutputParameters {
 
 
     @Override
-    public void setBitRate(int bitRate) {
+    public void setBitRate(Integer bitRate) {
         super.setBitRate(bitRate);
         saveProperty();
     }
 
     @Override
-    public void setFrequency(int frequency) {
+    public void setFrequency(Integer frequency) {
         super.setFrequency(frequency);
         saveProperty();
     }
 
 
     @Override
-    public void setChannels(int channels) {
+    public void setChannels(Integer channels) {
         super.setChannels(channels);
         saveProperty();
     }
 
     @Override
-    public void setVbrQuality(int vbrQuality) {
+    public void setVbrQuality(Integer vbrQuality) {
         super.setVbrQuality(vbrQuality);
         saveProperty();
     }
 
     @Override
-    public void setCbr(boolean cbr) {
+    public void setCbr(Boolean cbr) {
         super.setCbr(cbr);
         saveProperty();
     }
@@ -132,7 +132,7 @@ public class Preset extends OutputParameters {
     }
 
     @Override
-    public void setCutoff(int cutoff) {
+    public void setCutoff(Integer cutoff) {
         super.setCutoff(cutoff);
         saveProperty();
     }

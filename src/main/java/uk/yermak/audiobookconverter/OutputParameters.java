@@ -101,10 +101,6 @@ public class OutputParameters {
         setBitRate(maxBitRate / 1000);
     }
 
-    public String getCutoffValue() {
-        return Integer.toString(getCutoff());
-    }
-
     public int getCutoff() {
         return this.cutoff;
     }

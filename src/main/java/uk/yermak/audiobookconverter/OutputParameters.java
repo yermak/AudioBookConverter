@@ -7,12 +7,12 @@ import java.util.List;
 public class OutputParameters {
 
     protected Format format = Format.M4B;
-    protected int bitRate = format.defaultBitrate();
-    protected int frequency = format.defaultFrequency();
-    protected int channels = format.defaultChannel();
-    protected int vbrQuality = format.defaultVbrQuality();
+    protected Integer bitRate = format.defaultBitrate();
+    protected Integer frequency = format.defaultFrequency();
+    protected Integer channels = format.defaultChannel();
+    protected Integer vbrQuality = format.defaultVbrQuality();
     protected boolean cbr = format.defaultCBR();
-    protected int cutoff = format.defaultCutoff();
+    protected Integer cutoff = format.defaultCutoff();
 
     private boolean splitChapters = false;
 
@@ -49,43 +49,43 @@ public class OutputParameters {
         this.format = format;
     }
 
-    public int getBitRate() {
+    public Integer getBitRate() {
         return bitRate;
     }
 
-    public void setBitRate(final int bitRate) {
+    public void setBitRate(final Integer bitRate) {
         this.bitRate = bitRate;
     }
 
-    public int getFrequency() {
+    public Integer getFrequency() {
         return this.frequency;
     }
 
-    public void setFrequency(final int frequency) {
+    public void setFrequency(final Integer frequency) {
         this.frequency = frequency;
     }
 
-    public int getChannels() {
+    public Integer getChannels() {
         return this.channels;
     }
 
-    public void setChannels(final int channels) {
+    public void setChannels(final Integer channels) {
         this.channels = channels;
     }
 
-    public int getVbrQuality() {
+    public Integer getVbrQuality() {
         return this.vbrQuality;
     }
 
-    public void setVbrQuality(final int vbrQuality) {
+    public void setVbrQuality(final Integer vbrQuality) {
         this.vbrQuality = vbrQuality;
     }
 
-    public boolean isCbr() {
+    public Boolean isCbr() {
         return this.cbr;
     }
 
-    public void setCbr(final boolean cbr) {
+    public void setCbr(final Boolean cbr) {
         this.cbr = cbr;
     }
 
@@ -101,11 +101,11 @@ public class OutputParameters {
         setBitRate(maxBitRate / 1000);
     }
 
-    public int getCutoff() {
+    public Integer getCutoff() {
         return this.cutoff;
     }
 
-    public void setCutoff(final int cutoff) {
+    public void setCutoff(final Integer cutoff) {
         this.cutoff = cutoff;
     }
 

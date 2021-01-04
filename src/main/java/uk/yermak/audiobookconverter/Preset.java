@@ -20,7 +20,7 @@ public class Preset extends OutputParameters {
             "ipod nano", new Preset("ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2)),
             "ipod classic", new Preset("ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3)),
             "iphone", new Preset("iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4)),
-            "android 5+", new Preset("android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, true, 3)),
+            "android 5+", new Preset("android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, false, 3)),
             "android old", new Preset("android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3)),
             "legacy", new Preset("legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3))
     );
@@ -51,7 +51,7 @@ public class Preset extends OutputParameters {
         this.bitRate = preset.getBitRate();
         this.frequency = preset.getFrequency();
         this.channels = preset.getChannels();
-        this.quality = preset.getQuality();
+        this.vbrQuality = preset.getVbrQuality();
         this.cbr = preset.isCbr();
         this.cutoff = preset.getCutoff();
         this.format = preset.getFormat();
@@ -91,32 +91,32 @@ public class Preset extends OutputParameters {
 
 
     @Override
-    public void setBitRate(int bitRate) {
+    public void setBitRate(Integer bitRate) {
         super.setBitRate(bitRate);
         saveProperty();
     }
 
     @Override
-    public void setFrequency(int frequency) {
+    public void setFrequency(Integer frequency) {
         super.setFrequency(frequency);
         saveProperty();
     }
 
 
     @Override
-    public void setChannels(int channels) {
+    public void setChannels(Integer channels) {
         super.setChannels(channels);
         saveProperty();
     }
 
     @Override
-    public void setQuality(int quality) {
-        super.setQuality(quality);
+    public void setVbrQuality(Integer vbrQuality) {
+        super.setVbrQuality(vbrQuality);
         saveProperty();
     }
 
     @Override
-    public void setCbr(boolean cbr) {
+    public void setCbr(Boolean cbr) {
         super.setCbr(cbr);
         saveProperty();
     }
@@ -132,7 +132,7 @@ public class Preset extends OutputParameters {
     }
 
     @Override
-    public void setCutoff(int cutoff) {
+    public void setCutoff(Integer cutoff) {
         super.setCutoff(cutoff);
         saveProperty();
     }

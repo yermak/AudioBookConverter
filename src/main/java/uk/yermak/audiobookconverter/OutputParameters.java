@@ -6,26 +6,22 @@ import java.util.List;
 
 public class OutputParameters {
 
-    public static final Integer DEFAULT_CHANNELS = 2;
-    public static final Integer DEFAULT_QUALITY = 3;
-    public static final Integer DEFAULT_CUTOFF = 12000;
-    public static final Integer DEFAULT_FREQUENCY = 44100;
-    public static final Integer DEFAULT_BITRATE = 128;
-
-    protected int bitRate = DEFAULT_BITRATE;
-    protected int frequency = DEFAULT_FREQUENCY;
-    protected int channels = DEFAULT_CHANNELS;
-    protected int quality = DEFAULT_QUALITY;
-    protected boolean cbr = true;
-    protected int cutoff = DEFAULT_CUTOFF;
     protected Format format = Format.M4B;
+    protected Integer bitRate = format.defaultBitrate();
+    protected Integer frequency = format.defaultFrequency();
+    protected Integer channels = format.defaultChannel();
+    protected Integer vbrQuality = format.defaultVbrQuality();
+    protected boolean cbr = format.defaultCBR();
+    protected Integer cutoff = format.defaultCutoff();
+
     private boolean splitChapters = false;
+
 
     public OutputParameters(OutputParameters parameters) {
         this.bitRate = parameters.getBitRate();
         this.frequency = parameters.getFrequency();
         this.channels = parameters.getChannels();
-        this.quality = parameters.getQuality();
+        this.vbrQuality = parameters.getVbrQuality();
         this.cbr = parameters.isCbr();
         this.cutoff = parameters.getCutoff();
         this.format = parameters.getFormat();
@@ -39,7 +35,7 @@ public class OutputParameters {
         this.bitRate = bitRate;
         this.frequency = frequency;
         this.channels = channels;
-        this.quality = quality;
+        this.vbrQuality = quality;
         this.cbr = cbr;
         this.cutoff = cutoff;
     }
@@ -53,43 +49,43 @@ public class OutputParameters {
         this.format = format;
     }
 
-    public int getBitRate() {
+    public Integer getBitRate() {
         return bitRate;
     }
 
-    public void setBitRate(final int bitRate) {
+    public void setBitRate(final Integer bitRate) {
         this.bitRate = bitRate;
     }
 
-    public int getFrequency() {
+    public Integer getFrequency() {
         return this.frequency;
     }
 
-    public void setFrequency(final int frequency) {
+    public void setFrequency(final Integer frequency) {
         this.frequency = frequency;
     }
 
-    public int getChannels() {
+    public Integer getChannels() {
         return this.channels;
     }
 
-    public void setChannels(final int channels) {
+    public void setChannels(final Integer channels) {
         this.channels = channels;
     }
 
-    public int getQuality() {
-        return this.quality;
+    public Integer getVbrQuality() {
+        return this.vbrQuality;
     }
 
-    public void setQuality(final int quality) {
-        this.quality = quality;
+    public void setVbrQuality(final Integer vbrQuality) {
+        this.vbrQuality = vbrQuality;
     }
 
-    public boolean isCbr() {
+    public Boolean isCbr() {
         return this.cbr;
     }
 
-    public void setCbr(final boolean cbr) {
+    public void setCbr(final Boolean cbr) {
         this.cbr = cbr;
     }
 
@@ -105,38 +101,11 @@ public class OutputParameters {
         setBitRate(maxBitRate / 1000);
     }
 
-    public String getFFMpegQualityParameter() {
-        return this.cbr ? "-b:a" : "-vbr";
+    public Integer getCutoff() {
+        return this.cutoff;
     }
 
-    public String getFFMpegQualityValue() {
-        return this.cbr ? this.getBitRate() + "k" : String.valueOf(this.quality);
-    }
-
-    public String getFFMpegChannelsValue() {
-        return String.valueOf(this.getChannels());
-    }
-
-    public String getCutoffValue() {
-        return Integer.toString(getCutoff());
-    }
-
-    public int getCutoff() {
-        if (this.cbr) {
-            return this.cutoff;
-        } else {
-            return switch (this.quality) {
-                case 1 -> 13050;
-                case 2 -> 13050;
-                case 3 -> 14260;
-                case 4 -> 15500;
-                default -> 0;
-            };
-        }
-    }
-
-
-    public void setCutoff(final int cutoff) {
+    public void setCutoff(final Integer cutoff) {
         this.cutoff = cutoff;
     }
 

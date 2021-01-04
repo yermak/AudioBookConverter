@@ -4,6 +4,14 @@ Official web-site
 <a href="https://www.recoupler.com/products/audiobookconverter">Recoupler AudioBookConverter</a>
 
 
+Version 5.5.8 - released!
+
+https://github.com/yermak/AudioBookConverter/releases/tag/version_5.5.8
+
+GitHub does not show it as the latest :(
+
+
+
 AudioBookConverter
 ===============
 AudioBookConverter was originally designed as simple and lightweigh application to convert set of mp3 files to single m4b (aac) file to be played on your i-device (or any device now)

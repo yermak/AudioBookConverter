@@ -42,14 +42,14 @@ public enum Format {
             options.add("-vn");
             options.add("-codec:a");
             options.add(codec);
-            options.add("-f");
-            options.add(format);
+
+            options.add("-map_metadata");
+            options.add( "-1");
 
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
                     : List.of("-q:a", String.valueOf(10 - outputParameters.vbrQuality * 2))
             );
-
 
             options.add("-ac");
             options.add(String.valueOf(outputParameters.getChannels()));
@@ -61,6 +61,8 @@ public enum Format {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }
+            options.add("-f");
+            options.add(format);
             options.add("-progress");
             options.add(progressUri);
             options.add(outputFileName);
@@ -215,8 +217,9 @@ public enum Format {
             options.add("-vn");
             options.add("-codec:a");
             options.add(codec);
-            options.add("-f");
-            options.add(format);
+
+            options.add("-map_metadata");
+            options.add( "-1");
 
             if (outputParameters.cbr) {
                 options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
@@ -236,6 +239,9 @@ public enum Format {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }
+            options.add("-f");
+            options.add(format);
+
             options.add("-progress");
             options.add(progressUri);
             options.add(outputFileName);
@@ -325,10 +331,14 @@ public enum Format {
         options.add("-vn");
         options.add("-codec:a");
         options.add(codec);
-        options.add("-f");
-        options.add(format);
 
-        addBitrateAndQuality(outputParameters, options);
+        options.add("-map_metadata");
+        options.add( "-1");
+
+        options.addAll(outputParameters.cbr
+                ? List.of("-b:a", outputParameters.getBitRate() + "k")
+                : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
+        );
 
         options.add("-ac");
         options.add(String.valueOf(outputParameters.getChannels()));
@@ -340,17 +350,13 @@ public enum Format {
             options.add("-cutoff");
             options.add(Integer.toString(outputParameters.getCutoff()));
         }
+        options.add("-f");
+        options.add(format);
+
         options.add("-progress");
         options.add(progressUri);
         options.add(outputFileName);
         return options;
-    }
-
-    protected void addBitrateAndQuality(OutputParameters outputParameters, List<String> options) {
-        options.addAll(outputParameters.cbr
-                ? List.of("-b:a", outputParameters.getBitRate() + "k")
-                : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
-        );
     }
 
     public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {

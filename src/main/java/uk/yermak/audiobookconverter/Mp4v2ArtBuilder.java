@@ -38,7 +38,7 @@ public class Mp4v2ArtBuilder {
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(Utils.MP4ART,
                     "--art-index", String.valueOf(index),
-                    "--add", "\"" + poster.getFileName() + "\"",
+                    "--add", poster.getFileName(),
                     outputFileName);
 
             process = artProcessBuilder.start();
@@ -63,11 +63,10 @@ public class Mp4v2ArtBuilder {
             if (!new File(outputFileName).exists()) {
                 throw new ConversionException("ArtWork failed, no output file:" + out.toString(), new Error(err.toString()));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to apply art work", e);
-            throw new ConversionException("Failed to apply art work",e);
-        }
-        finally {
+            throw new ConversionException("Failed to apply art work", e);
+        } finally {
             Utils.closeSilently(process);
         }
     }

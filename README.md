@@ -4,13 +4,6 @@ Official web-site
 <a href="https://www.recoupler.com/products/audiobookconverter">Recoupler AudioBookConverter</a>
 
 
-Version 5.5.8 - released!
-
-https://github.com/yermak/AudioBookConverter/releases/tag/version_5.5.8
-
-GitHub does not show it as the latest :(
-
-
 
 AudioBookConverter
 ===============

@@ -17,6 +17,7 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  */
 public class FilesController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public MenuItem removeMenu;
 
 
     @FXML
@@ -110,6 +112,18 @@ public class FilesController {
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
+        ContextMenu fileListMenu = new ContextMenu();
+        MenuItem moveUp = new MenuItem("Move up");
+        moveUp.setOnAction(this::moveUp);
+        MenuItem moveDown = new MenuItem("Move down");
+        moveDown.setOnAction(this::moveDown);
+        MenuItem removeMenu = new MenuItem("Remove");
+        removeMenu.setOnAction(this::removeFiles);
+        fileListMenu.getItems().addAll(moveUp, moveDown, new SeparatorMenuItem(), removeMenu);
+
+        fileList.setCellFactory(ContextMenuListCell.forListView(fileListMenu));
+
+
         addDragEvenHandlers(bookStructure);
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
@@ -120,7 +134,6 @@ public class FilesController {
         });
 
 
-//        fileList.setCellFactory(new ListViewListCellCallback());
         MenuItem item1 = new MenuItem("Files");
         item1.setOnAction(e -> selectFilesDialog());
         MenuItem item2 = new MenuItem("Folder");
@@ -676,5 +689,6 @@ public class FilesController {
                 progressQueue.getItems().remove(done);
             }
         });
+
     }
 }

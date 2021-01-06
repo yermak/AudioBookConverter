@@ -17,7 +17,6 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
@@ -112,16 +111,9 @@ public class FilesController {
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-        ContextMenu fileListMenu = new ContextMenu();
-        MenuItem moveUp = new MenuItem("Move up");
-        moveUp.setOnAction(this::moveUp);
-        MenuItem moveDown = new MenuItem("Move down");
-        moveDown.setOnAction(this::moveDown);
-        MenuItem removeMenu = new MenuItem("Remove");
-        removeMenu.setOnAction(this::removeFiles);
-        fileListMenu.getItems().addAll(moveUp, moveDown, new SeparatorMenuItem(), removeMenu);
+        ContextMenu filesMenu = buildFilesContextMenu();
 
-        fileList.setCellFactory(ContextMenuListCell.forListView(fileListMenu));
+        fileList.setCellFactory(ContextMenuListCell.forListView(filesMenu));
 
 
         addDragEvenHandlers(bookStructure);
@@ -162,6 +154,9 @@ public class FilesController {
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
 
+
+        bookStructure.setRowFactory(ContextMenuTreeTableRow.forListView(buildChaptersContextMenu()));
+
         bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         bookStructure.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<Organisable>>) c -> {
             List<MediaInfo> list = ConverterApplication.getContext().getSelectedMedia();
@@ -179,6 +174,45 @@ public class FilesController {
 
         chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
         fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
+
+    }
+
+    private ContextMenu buildFilesContextMenu() {
+        MenuItem moveUp = new MenuItem("Move up");
+        moveUp.setOnAction(this::moveUp);
+        MenuItem moveDown = new MenuItem("Move down");
+        moveDown.setOnAction(this::moveDown);
+        MenuItem removeMenu = new MenuItem("Remove");
+        removeMenu.setOnAction(this::removeFiles);
+        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), removeMenu);
+    }
+
+    private ContextMenu buildChaptersContextMenu() {
+
+
+        MenuItem edit = new MenuItem("Edit");
+        edit.setOnAction(this::edit);
+
+        MenuItem moveUp = new MenuItem("Move up");
+        moveUp.setOnAction(this::moveUp);
+        MenuItem moveDown = new MenuItem("Move down");
+        moveDown.setOnAction(this::moveDown);
+
+        MenuItem split = new MenuItem("Split from here");
+        split.setOnAction(this::split);
+        MenuItem combine = new MenuItem("Combine selected");
+        combine.setOnAction(this::combine);
+
+//        MenuItem subTracks = new MenuItem("Sub-tracks");
+//        combine.setOnAction(this::subTracks);
+
+
+        MenuItem removeMenu = new MenuItem("Remove");
+        removeMenu.setOnAction(this::removeFiles);
+        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), /*subTracks,*/ new SeparatorMenuItem(), removeMenu);
+    }
+
+    private void subTracks(ActionEvent actionEvent) {
 
     }
 

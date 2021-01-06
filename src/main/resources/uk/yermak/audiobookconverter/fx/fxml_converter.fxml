@@ -273,6 +273,7 @@
                             </tooltip>
                         </Button>
 
+<!--
                         <Button text="Edit" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#edit"
                                 disable="false" GridPane.valignment="TOP">
@@ -284,7 +285,9 @@
                                 <Tooltip text="Edit chapter"/>
                             </tooltip>
                         </Button>
+-->
 
+<!--
                         <Button text="Combine" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#combine"
                                 disable="false">
@@ -299,8 +302,10 @@
                                 <Tooltip text="Split here"/>
                             </tooltip>
                         </Button>
+-->
 
 
+<!--
                         <Button text="Up" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#moveUp"
                                 disable="false">
@@ -315,7 +320,9 @@
                                 <Tooltip text="Move selected file down"/>
                             </tooltip>
                         </Button>
+-->
 
+<!--
                         <Button text="Remove"
                                 minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#removeFiles" disable="false">
@@ -323,6 +330,7 @@
                                 <Tooltip text="Removes selected files from the list"/>
                             </tooltip>
                         </Button>
+-->
                         <Button text="Clear" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#clear"
                                 disable="false">

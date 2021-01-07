@@ -94,10 +94,14 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
+    public Chapter getChapter() {
+        return this.getMediaInfo().getChapter();
+    }
+
+    @Override
     public long getOffset() {
         return this.getMediaInfo().getOffset();
     }
-
 
     public void setDuration(long duration) {
         this.getMediaInfo().setDuration(duration);

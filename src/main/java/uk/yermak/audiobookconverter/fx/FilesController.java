@@ -127,11 +127,7 @@ public class FilesController {
         });
 
 
-        MenuItem item1 = new MenuItem("Files");
-        item1.setOnAction(e -> selectFilesDialog());
-        MenuItem item2 = new MenuItem("Folder");
-        item2.setOnAction(e -> selectFolderDialog());
-        contextMenu.getItems().addAll(item1, item2);
+        initFileOpenMenu();
 
         ObservableList<MediaInfo> media = context.getMedia();
         fileList.setItems(media);
@@ -178,6 +174,14 @@ public class FilesController {
 
     }
 
+    private void initFileOpenMenu() {
+        MenuItem item1 = new MenuItem("Files");
+        item1.setOnAction(e -> selectFilesDialog());
+        MenuItem item2 = new MenuItem("Folder");
+        item2.setOnAction(e -> selectFolderDialog());
+        contextMenu.getItems().addAll(item1, item2);
+    }
+
     private ContextMenu buildFilesContextMenu() {
         MenuItem moveUp = new MenuItem("Move up");
         moveUp.setOnAction(this::moveUp);
@@ -189,8 +193,6 @@ public class FilesController {
     }
 
     private ContextMenu buildChaptersContextMenu() {
-
-
         MenuItem edit = new MenuItem("Edit");
         edit.setOnAction(this::edit);
 
@@ -210,7 +212,7 @@ public class FilesController {
 
         MenuItem removeMenu = new MenuItem("Remove");
         removeMenu.setOnAction(this::removeFiles);
-        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
+        return new ContextMenu(edit, new SeparatorMenuItem(), moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
     }
 
     private void subTracks(ActionEvent actionEvent) {
@@ -218,17 +220,41 @@ public class FilesController {
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
 
-        SubTracksDialog dialog = new SubTracksDialog(ConverterApplication.getEnv().getWindow());
+        if (organisable instanceof MediaInfo) {
+            SubTracksDialog dialog = new SubTracksDialog(ConverterApplication.getEnv().getWindow());
 
-        Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
-        result.ifPresent(r -> {
+            Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
+            result.ifPresent(r -> {
 
-//            organisable.subtracks(result.get().getKey());
-            boolean split = organisable.split();
-            if (split) updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-        });
+                MediaInfo mediaInfo = (MediaInfo) organisable;
 
+                extractSubtracks(mediaInfo, r.getValue(), r.getKey() * 60000);
 
+//                if (subtracks)
+                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+            });
+        }
+    }
+
+    private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
+        long duration = mediaInfo.getDuration();
+        long fullTracks = duration / interval;
+        List<Track> tracks = new ArrayList<>();
+        for (int i = 1; i <= fullTracks + (duration % interval > 0 ? 1 : 0); i++) {
+            Track track = new Track(String.valueOf(i));
+            track.setTitle(mediaInfo.getTitle());
+            track.setStart((i - 1) * interval);
+            track.setEnd(Math.min(i * interval-1, duration));
+            tracks.add(track);
+        }
+
+        if (wrapWithChapters) {
+            Part part = mediaInfo.getChapter().getPart();
+            part.replaceMediaChapterByTracksChapters(mediaInfo, tracks);
+        } else {
+            Chapter chapter = mediaInfo.getChapter();
+            chapter.replaceMediaWithTracks(mediaInfo, tracks);
+        }
     }
 
     private void addDragEvenHandlers(Control control) {
@@ -364,7 +390,6 @@ public class FilesController {
     public void removeFiles(ActionEvent event) {
         if (chaptersMode.get()) {
             ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-//            int min = bookStructure.getExpandedItemCount();
             for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
                 Organisable organisable = selectedCell.getTreeItem().getValue();
                 organisable.remove();
@@ -550,20 +575,7 @@ public class FilesController {
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().getOutputParameters().getFormat().toString())
-/*
-                new FileChooser.ExtensionFilter(M4A, "*." + M4A),
-                new FileChooser.ExtensionFilter(MP3, "*." + MP3),
-                new FileChooser.ExtensionFilter(OGG, "*." + OGG)
-*/
         );
-/*
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(M4B, "*." + M4B),
-                new FileChooser.ExtensionFilter(M4A, "*." + M4A),
-                new FileChooser.ExtensionFilter(MP3, "*." + MP3),
-                new FileChooser.ExtensionFilter(OGG, "*." + OGG)
-        );
-*/
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
         File parentFolder = file.getParentFile();

@@ -43,4 +43,11 @@ public abstract class MediaInfoOrganiser implements Organisable {
         return chapter.getMedia().indexOf(this) + 1;
     }
 
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public Chapter getChapter() {
+        return chapter;
+    }
 }

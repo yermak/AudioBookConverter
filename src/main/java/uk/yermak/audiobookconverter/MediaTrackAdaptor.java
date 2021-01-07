@@ -11,6 +11,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     public MediaTrackAdaptor(MediaInfo mediaInfo, Track track) {
         this.mediaInfo = mediaInfo;
+        this.chapter = mediaInfo.getChapter();
         this.track = track;
         this.duration = track.getDuration();
     }

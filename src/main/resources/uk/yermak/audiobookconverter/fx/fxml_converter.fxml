@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.stage.Screen?>
+<?import uk.yermak.audiobookconverter.fx.FileListComponent?>
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
@@ -34,7 +35,7 @@
 
             </Menu>
             <SeparatorMenuItem/>
-            <MenuItem fx:id="removeMenu" text="Remove" onAction="#removeFiles">
+            <MenuItem fx:id="removeMenu" text="Remove" onAction="#remove">
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
@@ -257,7 +258,7 @@
                         </Button>
 
                     </HBox>
-                    <ListView fx:id="fileList" VBox.vgrow="ALWAYS"/>
+                    <FileListComponent fx:id="fileList" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
             <Tab fx:id="chaptersTab" text="Chapters" closable="false">

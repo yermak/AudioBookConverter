@@ -109,4 +109,14 @@ public class Book implements Organisable, InvalidationListener {
     public void addListener(InvalidationListener listener) {
         this.listeners.add(listener);
     }
+
+    @Override
+    public int getNumber() {
+        return 1;
+    }
+
+    @Override
+    public int getTotalNumbers() {
+        return 1;
+    }
 }

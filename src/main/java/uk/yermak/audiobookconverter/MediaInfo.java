@@ -8,8 +8,6 @@ public interface MediaInfo extends Organisable {
 
     int getBitrate();
 
-    long getDuration();
-
     String getFileName();
 
     AudioBookInfo getBookInfo();
@@ -19,7 +17,6 @@ public interface MediaInfo extends Organisable {
     String getCodec();
 
     long getOffset();
-
 
     void setDuration(final long duration);
 

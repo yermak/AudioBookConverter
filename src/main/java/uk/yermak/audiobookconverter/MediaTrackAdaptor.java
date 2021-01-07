@@ -91,4 +91,8 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return Objects.hash(getFileName(), track.getTrackNo(), getDuration());
     }
 
+    @Override
+    public int getTotalNumbers() {
+        return 0;
+    }
 }

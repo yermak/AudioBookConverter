@@ -17,7 +17,6 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
@@ -44,13 +43,7 @@ public class FilesController {
     @FXML
     private Button addButton;
     @FXML
-    private Button removeButton;
-    @FXML
     private Button clearButton;
-    @FXML
-    private Button upButton;
-    @FXML
-    private Button downButton;
 
     @FXML
     private Button importButton;
@@ -82,13 +75,7 @@ public class FilesController {
     private FileListComponent fileList;
 
     @FXML
-    TreeTableView<Organisable> bookStructure;
-    @FXML
-    private TreeTableColumn<Organisable, String> chapterColumn;
-    @FXML
-    private TreeTableColumn<Organisable, String> durationColumn;
-    @FXML
-    private TreeTableColumn<Organisable, String> detailsColumn;
+    BookStructureComponent bookStructure;
 
     @FXML
     private Button startButton;
@@ -108,48 +95,34 @@ public class FilesController {
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
 
 
+    //TODO move columns into BookStructureComponent
+    @FXML
+    private TreeTableColumn<Organisable, String> chapterColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> durationColumn;
+    @FXML
+    private TreeTableColumn<Organisable, String> detailsColumn;
+
+
     @FXML
     public void initialize() {
-        ConversionContext context = ConverterApplication.getContext();
-
-//        ContextMenu filesMenu = buildFilesContextMenu();
-
         addDragEvenHandlers(bookStructure);
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
 
-        fileList.getSelectionModel().getSelectedItems().addListener((ListChangeListener<MediaInfo>) c -> {
-            ConverterApplication.getContext().getSelectedMedia().clear();
-            ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
-        });
-
-
         initFileOpenMenu();
 
-        ObservableList<MediaInfo> media = context.getMedia();
-        fileList.setItems(media);
-        fileList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-
+        ConversionContext context = ConverterApplication.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
         selectedMedia.addListener((InvalidationListener) observable -> {
-            if (selectedMedia.isEmpty()) return;
-            if (!chaptersMode.get()) {
-                List<MediaInfo> change = new ArrayList<>(selectedMedia);
-                List<MediaInfo> selection = new ArrayList<>(fileList.getSelectionModel().getSelectedItems());
-                if (!change.containsAll(selection) || !selection.containsAll(change)) {
-                    fileList.getSelectionModel().clearSelection();
-                    change.forEach(m -> fileList.getSelectionModel().select(media.indexOf(m)));
-                }
-            }
+            if (selectedMedia.isEmpty() || chaptersMode.get()) return;
+            fileList.reselect();
         });
 
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
 
-
-        bookStructure.setRowFactory(ContextMenuTreeTableRow.forListView(buildChaptersContextMenu()));
 
         bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         bookStructure.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<Organisable>>) c -> {
@@ -162,7 +135,6 @@ public class FilesController {
         chapterColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getTitle()));
         detailsColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue().getDetails()));
         durationColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(Utils.formatTime(p.getValue().getValue().getDuration())));
-
 
         importButton.setDisable(true);
 
@@ -179,71 +151,6 @@ public class FilesController {
         contextMenu.getItems().addAll(item1, item2);
     }
 
-
-    private ContextMenu buildChaptersContextMenu() {
-        MenuItem edit = new MenuItem("Edit");
-        edit.setOnAction(this::edit);
-
-        MenuItem moveUp = new MenuItem("Move up");
-        moveUp.setOnAction(this::moveUp);
-        MenuItem moveDown = new MenuItem("Move down");
-        moveDown.setOnAction(this::moveDown);
-
-        MenuItem split = new MenuItem("Split from here");
-        split.setOnAction(this::split);
-        MenuItem combine = new MenuItem("Combine selected");
-        combine.setOnAction(this::combine);
-
-        MenuItem subTracks = new MenuItem("Sub-tracks");
-        subTracks.setOnAction(this::subTracks);
-
-
-        MenuItem removeMenu = new MenuItem("Remove");
-        removeMenu.setOnAction(this::remove);
-        return new ContextMenu(edit, new SeparatorMenuItem(), moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
-    }
-
-    private void subTracks(ActionEvent actionEvent) {
-        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        if (selectedCells.size() != 1) return;
-        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
-
-        if (organisable instanceof MediaInfo) {
-            SubTracksDialog dialog = new SubTracksDialog(ConverterApplication.getEnv().getWindow());
-
-            Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
-            result.ifPresent(r -> {
-
-                MediaInfo mediaInfo = (MediaInfo) organisable;
-
-                extractSubtracks(mediaInfo, r.getValue(), r.getKey() * 60000);
-
-//                if (subtracks)
-                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-            });
-        }
-    }
-
-    private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
-        long duration = mediaInfo.getDuration();
-        long fullTracks = duration / interval;
-        List<Track> tracks = new ArrayList<>();
-        for (int i = 1; i <= fullTracks + (duration % interval > 0 ? 1 : 0); i++) {
-            Track track = new Track(String.valueOf(i));
-            track.setTitle(mediaInfo.getTitle());
-            track.setStart((i - 1) * interval);
-            track.setEnd(Math.min(i * interval - 1, duration));
-            tracks.add(track);
-        }
-
-        if (wrapWithChapters) {
-            Part part = mediaInfo.getChapter().getPart();
-            part.replaceMediaChapterByTracksChapters(mediaInfo, tracks);
-        } else {
-            Chapter chapter = mediaInfo.getChapter();
-            chapter.replaceMediaWithTracks(mediaInfo, tracks);
-        }
-    }
 
     private void addDragEvenHandlers(Control control) {
         control.setOnDragOver(event -> {
@@ -306,7 +213,7 @@ public class FilesController {
         if (chaptersMode.get()) {
             Book book = ConverterApplication.getContext().getBook();
             book.construct(FXCollections.observableArrayList(addedMedia));
-            updateBookStructure(book, bookStructure.getRoot());
+            bookStructure.updateBookStructure();
         } else {
             fileList.getItems().addAll(addedMedia);
         }
@@ -375,26 +282,10 @@ public class FilesController {
         }
     }
 
+    @FXML
     public void remove(ActionEvent event) {
         if (chaptersMode.get()) {
-            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-            for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
-                Organisable organisable = selectedCell.getTreeItem().getValue();
-                organisable.remove();
-//                min = Math.min(selectedCell.getRow(), min - 1);
-            }
-
-
-//            int finalMin = min;
-            Platform.runLater(() -> {
-                updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-                //TODO temp hack - can't selection on previous row causes NPE on next removal...
-                bookStructure.getSelectionModel().clearSelection();
-                if (bookStructure.getRoot().getChildren().isEmpty()) {
-                    clear(event);
-                }
-            });
-
+            bookStructure.removeChapters(event);
         } else {
             fileList.removeFiles(event);
         }
@@ -413,12 +304,7 @@ public class FilesController {
 
     public void moveUp(ActionEvent event) {
         if (chaptersMode.get()) {
-            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-            if (selectedCells.size() == 1) {
-                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
-                organisable.moveUp();
-                Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
-            }
+            bookStructure.moveChapterUp(event);
         } else {
             fileList.moveFileUp(event);
         }
@@ -426,12 +312,7 @@ public class FilesController {
 
     public void moveDown(ActionEvent event) {
         if (chaptersMode.get()) {
-            ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-            if (selectedCells.size() == 1) {
-                Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
-                organisable.moveDown();
-                Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
-            }
+            bookStructure.moveChapterDown(event);
         } else {
             fileList.moveFileDown(event);
         }
@@ -563,11 +444,12 @@ public class FilesController {
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
+        ConverterApplication.getContext().setBook(book);
 
-        updateBookStructure(book, bookItem);
+        bookStructure.updateBookStructure();
 
         bookItem.setExpanded(true);
-        ConverterApplication.getContext().setBook(book);
+
         filesChapters.getSelectionModel().select(chaptersTab);
         fileList.getItems().clear();
         chaptersMode.set(true);
@@ -577,72 +459,32 @@ public class FilesController {
         book.addListener(observable -> {
             logger.debug("Captured book modification");
             if (System.currentTimeMillis() - lastBookUpdate > 1000) {
-                Platform.runLater(() -> updateBookStructure(book, bookItem));
+                Platform.runLater(() -> bookStructure.updateBookStructure());
             }
         });
 
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
                 book.construct(mediaInfos);
-                updateBookStructure(book, bookItem);
+                bookStructure.updateBookStructure();
             } finally {
                 startButton.setDisable(false);
             }
         });
     }
 
-    private void updateBookStructure(Book book, TreeItem<Organisable> bookItem) {
-        bookStructure.getRoot().getChildren().clear();
-        book.getParts().forEach(p -> {
-            TreeItem<Organisable> partItem = new TreeItem<>(p);
-            bookItem.getChildren().add(partItem);
-            p.getChapters().forEach(c -> {
-                TreeItem<Organisable> chapterItem = new TreeItem<>(c);
-                partItem.getChildren().add(chapterItem);
-                c.getMedia().forEach(m -> chapterItem.getChildren().add(new TreeItem<>(m)));
-            });
-        });
-        bookStructure.getRoot().getChildren().forEach(t -> t.setExpanded(true));
-        bookStructure.refresh();
-        ConverterApplication.getContext().getOutputParameters().updateAuto(book.getMedia());
+    @FXML
+    public void combine(ActionEvent event) {
+        bookStructure.combineChapters(event);
     }
 
-    public void combine(ActionEvent actionEvent) {
-        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        if (selectedCells.isEmpty()) return;
-        List<Part> partMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Part)).map(c -> (Part) c).collect(Collectors.toList());
-        if (partMergers.size() > 1) {
-            Part recipient = partMergers.remove(0);
-            recipient.combine(partMergers);
-        } else {
-            List<Chapter> chapterMergers = selectedCells.stream().map(s -> s.getTreeItem().getValue()).filter(v -> (v instanceof Chapter)).map(c -> (Chapter) c).collect(Collectors.toList());
-            if (chapterMergers.size() > 1) {
-                Chapter recipient = chapterMergers.remove(0);
-                recipient.combine(chapterMergers);
-            }
-        }
-        updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-    }
-
-    public void split(ActionEvent actionEvent) {
-        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        if (selectedCells.size() != 1) return;
-        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
-        boolean split = organisable.split();
-        if (split) updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
-    }
-
-    public void edit(ActionEvent actionEvent) {
-        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
-        if (selectedCells.size() != 1) return;
-        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
-        if (organisable instanceof Chapter) {
-            new ChapterEditor((Chapter) organisable).editChapter();
-            bookStructure.refresh();
-        }
+    @FXML
+    public void split(ActionEvent event) {
+        bookStructure.splitChapters(event);
     }
 
 
+    @FXML
     public void pause(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
         if (context.isPaused()) {
@@ -711,6 +553,5 @@ public class FilesController {
                 progressQueue.getItems().remove(done);
             }
         });
-
     }
 }

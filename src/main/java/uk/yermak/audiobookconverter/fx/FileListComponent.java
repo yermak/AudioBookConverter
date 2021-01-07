@@ -1,17 +1,31 @@
 package uk.yermak.audiobookconverter.fx;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
+import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileListComponent extends ListView<MediaInfo> {
 
     public FileListComponent() {
         setCellFactory(ContextMenuListCell.forListView(filesContextMenuBuilder()));
+
+        getSelectionModel().getSelectedItems().addListener((ListChangeListener<MediaInfo>) c -> {
+            ConverterApplication.getContext().getSelectedMedia().clear();
+            ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
+        });
+
+
+        ConversionContext context = ConverterApplication.getContext();
+        ObservableList<MediaInfo> media = context.getMedia();
+        setItems(media);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 
     }
 
@@ -83,5 +97,18 @@ public class FileListComponent extends ListView<MediaInfo> {
 //        if (getItems().isEmpty()) {
 //            filesChapters.getTabs().remove(filesTab);
 //        }
+    }
+
+    public void reselect() {
+        ConversionContext context = ConverterApplication.getContext();
+        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
+        List<MediaInfo> change = new ArrayList<>(selectedMedia);
+        List<MediaInfo> selection = new ArrayList<>(getSelectionModel().getSelectedItems());
+        if (!change.containsAll(selection) || !selection.containsAll(change)) {
+            getSelectionModel().clearSelection();
+            change.forEach(m ->getSelectionModel().select(media.indexOf(m)));
+        }
+
     }
 }

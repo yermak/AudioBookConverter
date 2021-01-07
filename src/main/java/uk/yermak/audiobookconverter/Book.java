@@ -36,7 +36,7 @@ public class Book implements Organisable, InvalidationListener {
                 } else {
                     List<Track> tracks = item.getBookInfo().tracks();
                     for (Track track : tracks) {
-                        Chapter chapter = trackToChapter(part, item, track);
+                        Chapter chapter = track.toChapter(part, item);
                         part.getChapters().add(chapter);
                     }
                 }
@@ -45,16 +45,6 @@ public class Book implements Organisable, InvalidationListener {
         } catch (Throwable e) {
             logger.error("Error constructing book:", e);
         }
-    }
-
-    private Chapter trackToChapter(Part part, MediaInfo m, Track track) {
-        MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, track);
-        Chapter chapter = new Chapter(part, Collections.singletonList(mediaTrackAdaptor));
-        chapter.setCustomTitle(track.getTitle());
-        chapter.getRenderMap().clear();
-        chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-        mediaTrackAdaptor.setChapter(chapter);
-        return chapter;
     }
 
 

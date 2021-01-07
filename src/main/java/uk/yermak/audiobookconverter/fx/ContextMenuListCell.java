@@ -7,18 +7,18 @@ import javafx.util.Callback;
 
 public class ContextMenuListCell<T> extends ListCell<T> {
 
-    public static <T> Callback<ListView<T>, ListCell<T>> forListView(ContextMenu contextMenu) {
-        return forListView(contextMenu, null);
+    public static <T> Callback<ListView<T>, ListCell<T>> forListView(ContextMenuBuilder contextMenuBuilder) {
+        return forListView(contextMenuBuilder, null);
     }
 
-    public static <T> Callback<ListView<T>, ListCell<T>> forListView(final ContextMenu contextMenu, final Callback<ListView<T>, ListCell<T>> cellFactory) {
+    public static <T> Callback<ListView<T>, ListCell<T>> forListView(final ContextMenuBuilder contextMenuBuilder, final Callback<ListView<T>, ListCell<T>> cellFactory) {
         return listView -> {
             ListCell<T> cell = cellFactory == null ? new DefaultListCell<>() : cellFactory.call(listView);
             cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
                 if (isNowEmpty) {
                     cell.setContextMenu(null);
                 } else {
-                    cell.setContextMenu(contextMenu);
+                    cell.setContextMenu(contextMenuBuilder.menu(cell.getItem()));
                 }
             });
             return cell;

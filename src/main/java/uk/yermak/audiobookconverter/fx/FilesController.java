@@ -79,7 +79,7 @@ public class FilesController {
     private Button stopButton;
 
     @FXML
-    private ListView<MediaInfo> fileList;
+    private FileListComponent fileList;
 
     @FXML
     TreeTableView<Organisable> bookStructure;
@@ -112,10 +112,7 @@ public class FilesController {
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
 
-        ContextMenu filesMenu = buildFilesContextMenu();
-
-        fileList.setCellFactory(ContextMenuListCell.forListView(filesMenu));
-
+//        ContextMenu filesMenu = buildFilesContextMenu();
 
         addDragEvenHandlers(bookStructure);
         addDragEvenHandlers(fileList);
@@ -182,15 +179,6 @@ public class FilesController {
         contextMenu.getItems().addAll(item1, item2);
     }
 
-    private ContextMenu buildFilesContextMenu() {
-        MenuItem moveUp = new MenuItem("Move up");
-        moveUp.setOnAction(this::moveUp);
-        MenuItem moveDown = new MenuItem("Move down");
-        moveDown.setOnAction(this::moveDown);
-        MenuItem removeMenu = new MenuItem("Remove");
-        removeMenu.setOnAction(this::removeFiles);
-        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), removeMenu);
-    }
 
     private ContextMenu buildChaptersContextMenu() {
         MenuItem edit = new MenuItem("Edit");
@@ -211,7 +199,7 @@ public class FilesController {
 
 
         MenuItem removeMenu = new MenuItem("Remove");
-        removeMenu.setOnAction(this::removeFiles);
+        removeMenu.setOnAction(this::remove);
         return new ContextMenu(edit, new SeparatorMenuItem(), moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
     }
 
@@ -244,7 +232,7 @@ public class FilesController {
             Track track = new Track(String.valueOf(i));
             track.setTitle(mediaInfo.getTitle());
             track.setStart((i - 1) * interval);
-            track.setEnd(Math.min(i * interval-1, duration));
+            track.setEnd(Math.min(i * interval - 1, duration));
             tracks.add(track);
         }
 
@@ -387,7 +375,7 @@ public class FilesController {
         }
     }
 
-    public void removeFiles(ActionEvent event) {
+    public void remove(ActionEvent event) {
         if (chaptersMode.get()) {
             ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
             for (TreeTablePosition<Organisable, ?> selectedCell : selectedCells) {
@@ -408,16 +396,11 @@ public class FilesController {
             });
 
         } else {
-            ObservableList<MediaInfo> selected = fileList.getSelectionModel().getSelectedItems();
-            fileList.getItems().removeAll(selected);
-            if (fileList.getItems().isEmpty()) {
-                filesChapters.getTabs().remove(filesTab);
-            }
+            fileList.removeFiles(event);
         }
     }
 
     public void clear(ActionEvent event) {
-
         fileList.getItems().clear();
         ConverterApplication.getContext().getPlannedConversionGroup().cancel();
         ConverterApplication.getContext().resetForNewConversion();
@@ -437,18 +420,7 @@ public class FilesController {
                 Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
             }
         } else {
-            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-            if (selectedIndices.size() == 1) {
-                ObservableList<MediaInfo> items = fileList.getItems();
-                int selected = selectedIndices.get(0);
-                if (selected > 0) {
-                    MediaInfo upper = items.get(selected - 1);
-                    MediaInfo lower = items.get(selected);
-                    items.set(selected - 1, lower);
-                    items.set(selected, upper);
-                    fileList.getSelectionModel().clearAndSelect(selected - 1);
-                }
-            }
+            fileList.moveFileUp(event);
         }
     }
 
@@ -461,18 +433,7 @@ public class FilesController {
                 Platform.runLater(() -> updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot()));
             }
         } else {
-            ObservableList<Integer> selectedIndices = fileList.getSelectionModel().getSelectedIndices();
-            if (selectedIndices.size() == 1) {
-                ObservableList<MediaInfo> items = fileList.getItems();
-                int selected = selectedIndices.get(0);
-                if (selected < items.size() - 1) {
-                    MediaInfo lower = items.get(selected + 1);
-                    MediaInfo upper = items.get(selected);
-                    items.set(selected, lower);
-                    items.set(selected + 1, upper);
-                    fileList.getSelectionModel().clearAndSelect(selected + 1);
-                }
-            }
+            fileList.moveFileDown(event);
         }
     }
 

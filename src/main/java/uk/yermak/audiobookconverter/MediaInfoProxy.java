@@ -122,7 +122,17 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName(), getDuration()) ;
+        return Objects.hash(getFileName(), getDuration());
+    }
+
+    @Override
+    public int getNumber() {
+        return this.getMediaInfo().getNumber();
+    }
+
+    @Override
+    public int getTotalNumbers() {
+        return this.getMediaInfo().getTotalNumbers();
     }
 }
 

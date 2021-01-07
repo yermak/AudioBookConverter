@@ -17,6 +17,7 @@ import javafx.scene.input.TransferMode;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
@@ -203,16 +204,30 @@ public class FilesController {
         MenuItem combine = new MenuItem("Combine selected");
         combine.setOnAction(this::combine);
 
-//        MenuItem subTracks = new MenuItem("Sub-tracks");
-//        combine.setOnAction(this::subTracks);
+        MenuItem subTracks = new MenuItem("Sub-tracks");
+        subTracks.setOnAction(this::subTracks);
 
 
         MenuItem removeMenu = new MenuItem("Remove");
         removeMenu.setOnAction(this::removeFiles);
-        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), /*subTracks,*/ new SeparatorMenuItem(), removeMenu);
+        return new ContextMenu(moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
     }
 
     private void subTracks(ActionEvent actionEvent) {
+        ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = bookStructure.getSelectionModel().getSelectedCells();
+        if (selectedCells.size() != 1) return;
+        Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
+
+        SubTracksDialog dialog = new SubTracksDialog(ConverterApplication.getEnv().getWindow());
+
+        Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
+        result.ifPresent(r -> {
+
+//            organisable.subtracks(result.get().getKey());
+            boolean split = organisable.split();
+            if (split) updateBookStructure(ConverterApplication.getContext().getBook(), bookStructure.getRoot());
+        });
+
 
     }
 

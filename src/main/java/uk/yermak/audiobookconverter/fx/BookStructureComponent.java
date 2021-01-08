@@ -19,29 +19,71 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
 
     }
 
-    private ContextMenu buildChaptersContextMenu() {
+    private ContextMenuBuilder buildChaptersContextMenu() {
 
-        MenuItem edit = new MenuItem("Edit");
-        edit.setOnAction(this::editChapter);
+        return new ContextMenuBuilder<Organisable>() {
+            @Override
+            public ContextMenu menu(Organisable item) {
+                ContextMenu contextMenu = new ContextMenu();
+                if (item instanceof Chapter && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem edit = new MenuItem("Edit");
+                    edit.setOnAction(BookStructureComponent.this::editChapter);
+                    contextMenu.getItems().add(edit);
+                }
 
-        MenuItem moveUp = new MenuItem("Move up");
-        moveUp.setOnAction(this::moveChapterUp);
+                if (!contextMenu.getItems().isEmpty() && !(contextMenu.getItems().get(contextMenu.getItems().size() - 1) instanceof SeparatorMenuItem)) {
+                    contextMenu.getItems().add(new SeparatorMenuItem());
+                }
 
-        MenuItem moveDown = new MenuItem("Move down");
-        moveDown.setOnAction(this::moveChapterDown);
+                if (item.getTotalNumbers() > 1 && item.getNumber() > 1 && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem moveUp = new MenuItem("Move up");
+                    moveUp.setOnAction(BookStructureComponent.this::moveChapterUp);
+                    contextMenu.getItems().add(moveUp);
+                }
 
-        MenuItem split = new MenuItem("Split from here");
-        split.setOnAction(this::splitChapters);
+                if (item.getTotalNumbers() > 1 && item.getNumber() < item.getTotalNumbers() && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem moveDown = new MenuItem("Move down");
+                    moveDown.setOnAction(BookStructureComponent.this::moveChapterDown);
+                    contextMenu.getItems().add(moveDown);
+                }
 
-        MenuItem combine = new MenuItem("Combine selected");
-        combine.setOnAction(this::combineChapters);
+                if (!contextMenu.getItems().isEmpty() && !(contextMenu.getItems().get(contextMenu.getItems().size() - 1) instanceof SeparatorMenuItem)) {
+                    contextMenu.getItems().add(new SeparatorMenuItem());
+                }
 
-        MenuItem subTracks = new MenuItem("Sub-tracks");
-        subTracks.setOnAction(this::subTracks);
+                if (item instanceof MediaInfo && item.getTotalNumbers() > 1 && item.getNumber() > 1 && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem split = new MenuItem("Split from here");
+                    split.setOnAction(BookStructureComponent.this::splitChapters);
+                    contextMenu.getItems().add(split);
+                }
 
-        MenuItem removeMenu = new MenuItem("Remove");
-        removeMenu.setOnAction(this::removeChapters);
-        return new ContextMenu(edit, new SeparatorMenuItem(), moveUp, moveDown, new SeparatorMenuItem(), split, combine, new SeparatorMenuItem(), subTracks, new SeparatorMenuItem(), removeMenu);
+                if (item instanceof Chapter && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() > 1 /*&& getSelectionModel().getSelectedItems().contains(item)*/) {
+                    MenuItem combine = new MenuItem("Combine");
+                    combine.setOnAction(BookStructureComponent.this::combineChapters);
+                    contextMenu.getItems().add(combine);
+                }
+
+                if (!contextMenu.getItems().isEmpty() && !(contextMenu.getItems().get(contextMenu.getItems().size() - 1) instanceof SeparatorMenuItem)) {
+                    contextMenu.getItems().add(new SeparatorMenuItem());
+                }
+
+                if (item instanceof MediaInfo && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem subTracks = new MenuItem("Sub-tracks");
+                    subTracks.setOnAction(BookStructureComponent.this::subTracks);
+                    contextMenu.getItems().add(subTracks);
+                }
+
+                if (!contextMenu.getItems().isEmpty() && !(contextMenu.getItems().get(contextMenu.getItems().size() - 1) instanceof SeparatorMenuItem)) {
+                    contextMenu.getItems().add(new SeparatorMenuItem());
+                }
+
+                MenuItem removeMenu = new MenuItem("Remove");
+                removeMenu.setOnAction(BookStructureComponent.this::removeChapters);
+                contextMenu.getItems().add(removeMenu);
+                return contextMenu;
+            }
+        };
+
     }
 
     public void editChapter(ActionEvent actionEvent) {

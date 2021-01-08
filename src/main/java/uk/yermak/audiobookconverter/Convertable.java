@@ -3,14 +3,10 @@ package uk.yermak.audiobookconverter;
 import java.util.Collections;
 import java.util.List;
 
-public interface Convertable {
+public interface Convertable extends Countable {
     List<MediaInfo> getMedia();
 
     List<String> getMetaData(AudioBookInfo bookInfo);
-
-    int getNumber();
-
-    int getTotalNumbers();
 
     boolean isTheOnlyOne();
 

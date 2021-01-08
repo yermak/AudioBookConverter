@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+//TODO MediaInfoBean can't interite this class as this it could be in invalid state, when chapters are not created.
+// It's better to use methods of this class as wrapper around MediaInfoBean, when chapters are initalised and this become valid state.
 public abstract class MediaInfoOrganiser implements Organisable {
     protected Chapter chapter;
 
@@ -39,8 +42,21 @@ public abstract class MediaInfoOrganiser implements Organisable {
         Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber());
     }
 
+    @Override
     public int getNumber() {
         return chapter.getMedia().indexOf(this) + 1;
     }
 
+    @Override
+    public int getTotalNumbers() {
+        return getChapter().getMedia().size();
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public Chapter getChapter() {
+        return chapter;
+    }
 }

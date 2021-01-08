@@ -32,6 +32,14 @@ public class Part implements Organisable, Convertable {
 
     }
 
+    public void replaceMediaChapterByTracksChapters(MediaInfo mediaInfo, List<Track> tracks) {
+        List<Chapter> chapters = tracks.stream().map(t -> t.toChapter(this, mediaInfo)).collect(Collectors.toList());
+        Chapter chapter = mediaInfo.getChapter();
+        int position = this.getChapters().indexOf(chapter);
+        mediaInfo.remove();
+        this.getChapters().addAll(position, chapters);
+    }
+
     public void construct(ObservableList<Chapter> chapters){
         chapters.forEach(c -> c.setPart(this));
         this.chapters.addAll(chapters);

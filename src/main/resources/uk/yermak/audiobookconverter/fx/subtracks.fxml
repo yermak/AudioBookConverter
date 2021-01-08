@@ -19,7 +19,7 @@
         <Label text="Select interval, minutes" GridPane.columnIndex="0" GridPane.rowIndex="0"
                GridPane.halignment="LEFT"/>
         <Spinner fx:id="intervalSpinner" initialValue="30" min="1" max="1440" editable="true"
-                 GridPane.columnIndex="1" GridPane.rowIndex="0"  GridPane.halignment="RIGHT"/>
+                 GridPane.columnIndex="1" GridPane.rowIndex="0"  GridPane.halignment="RIGHT" />
         <Label text="Automatically create chapters" GridPane.columnIndex="0" GridPane.rowIndex="1"
                GridPane.halignment="LEFT" />
         <ToggleSwitch fx:id="autoChaptersToggle" GridPane.columnIndex="1" GridPane.rowIndex="1" selected="true" GridPane.halignment="RIGHT"/>

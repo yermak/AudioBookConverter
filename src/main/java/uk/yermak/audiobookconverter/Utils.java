@@ -209,24 +209,18 @@ public class Utils {
     public static boolean isMac() {
         return System.getProperty("os.name").contains("Mac");
     }
+
     private static boolean isSupported() {
-        return isWindows() || isLinux() || isMac();
+        return isWindows() || isLinux();
     }
 
-    private static String getPlatform() {
-        if (isSupported()) return "windows";
-        if (isLinux()) return "linux";
-        if (isMac()) return "mac";
-        throw new RuntimeException("Platform not supported"+ System.getProperty("os.name"));
-    }
+    public final static String FFMPEG = isSupported() ? new File("app/external/ffmpeg"+(isWindows()?".exe":"")).getAbsolutePath() : "ffmpeg";
 
-    public final static String FFMPEG = isSupported() ? new File("app/external/x64/" + getPlatform() + "/ffmpeg.exe").getAbsolutePath() : "ffmpeg";
+    public static final String MP4ART = isSupported() ? new File("app/external/mp4art"+(isWindows()?".exe":"")).getAbsolutePath() : "mp4art";
 
-    public static final String MP4ART = isSupported() ? new File("app/external/x64/"+ getPlatform() +"/mp4art.exe").getAbsolutePath() : "mp4art";
+    public static final String MP4INFO = isSupported() ? new File("app/external/mp4info"+(isWindows()?".exe":"")).getAbsolutePath() : "mp4info";
 
-    public static final String MP4INFO = isSupported() ? new File("app/external/x64/"+ getPlatform() +"/mp4info.exe").getAbsolutePath() : "mp4info";
-
-    public static final String FFPROBE = isSupported() ? new File("app/external/x64/"+ getPlatform() +"/ffprobe.exe").getAbsolutePath() : "ffprobe";
+    public static final String FFPROBE = isSupported() ? new File("app/external/ffprobe"+(isWindows()?".exe":"")).getAbsolutePath() : "ffprobe";
 
 
 }

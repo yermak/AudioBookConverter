@@ -15,6 +15,14 @@
             </includes>
             <outputDirectory>app</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>external/x64/linux</directory>
+            <outputDirectory>app/external/</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+
     </fileSets>
     <dependencySets>
         <dependencySet>

@@ -50,7 +50,7 @@ jobs:
         export JAVAFX_JMODS=javafx-jmods-15.0.1
         mvn clean package --no-transfer-progress
 
-        call build/linux/package.sh $JAVA_HOME $JAVAFX_JMODS $(APP_VERSION)
+        build/linux/package.sh $JAVA_HOME $JAVAFX_JMODS $(APP_VERSION)
 
       condition: eq( variables['Agent.OS'], 'Linux' )
       displayName: 'Build deb package'

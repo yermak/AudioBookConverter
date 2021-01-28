@@ -202,13 +202,30 @@ public class Utils {
         return System.getProperty("os.name").contains("Windows");
     }
 
-    public final static String FFMPEG = isWindows() ? new File("app/external/x64/ffmpeg.exe").getAbsolutePath() : "ffmpeg";
+    public static boolean isLinux() {
+        return System.getProperty("os.name").contains("Linux");
+    }
 
-    public static final String MP4ART = isWindows() ? new File("app/external/x64/mp4art.exe").getAbsolutePath() : "mp4art";
+    public static boolean isMac() {
+        return System.getProperty("os.name").contains("Mac");
+    }
 
-    public static final String MP4INFO = isWindows() ? new File("app/external/x64/mp4info.exe").getAbsolutePath() : "mp4info";
+    private static boolean isSupported() {
+        return isWindows() || isLinux();
+    }
 
-    public static final String FFPROBE = isWindows() ? new File("app/external/x64/ffprobe.exe").getAbsolutePath() : "ffprobe";
+    public final static String FFMPEG = isSupported() ? new File(getFFMpegPath() + "/ffmpeg" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "ffmpeg";
+
+    private static String getFFMpegPath() {
+        if (System.getenv("FFMPEG") != null) return System.getenv("FFMPEG");
+        return (isWindows() ? "" : "../lib/") + "app/external";
+    }
+
+    public static final String MP4ART = isSupported() ? new File(getFFMpegPath() + "/mp4art" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "mp4art";
+
+    public static final String MP4INFO = isSupported() ? new File(getFFMpegPath() + "/mp4info" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "mp4info";
+
+    public static final String FFPROBE = isSupported() ? new File(getFFMpegPath() + "/ffprobe" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "ffprobe";
 
 
 }

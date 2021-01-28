@@ -152,7 +152,7 @@ public enum Format {
 
         @Override
         public List<Integer> bitrates() {
-            return List.of(16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320, 512);
+            return List.of(16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 160, 192, 224, 256, 320, 512);
         }
 
         @Override
@@ -276,7 +276,7 @@ public enum Format {
     }
 
     public List<Integer> bitrates() {
-        return List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 128, 144, 160, 192, 224, 256, 320);
+        return List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 320);
     }
 
     public Integer defaultBitrate() {

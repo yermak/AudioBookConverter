@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ public class ConversionContext {
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
+    private final SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(1.0);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -114,6 +116,14 @@ public class ConversionContext {
         return media;
     }
 
+    public Double getSpeed() {
+        return speed.get();
+    }
+
+    public ObservableValue<Double> getSpeedObservable() {
+        return speed;
+    }
+
     public void stopConversions() {
         conversionQueue.forEach(ConversionJob::stop);
     }
@@ -171,5 +181,13 @@ public class ConversionContext {
 
     public void setOutputParameters(OutputParameters outputParameters) {
         this.outputParameters.set(outputParameters);
+    }
+
+    public void addSpeedChangeListener(ChangeListener<Double> changeListener) {
+        speed.addListener(changeListener);
+    }
+
+    public void setSpeed(Double speed) {
+        this.speed.set(speed);
     }
 }

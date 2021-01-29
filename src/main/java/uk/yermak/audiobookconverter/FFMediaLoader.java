@@ -271,7 +271,7 @@ public class FFMediaLoader {
 
         //adding artificial limit of image count to address issue #153.
         if (!pictures.isEmpty()) {
-            for (int i = 0; i < 10 || i < pictures.size(); i++) {
+            for (int i = 0; i < 10 && i < pictures.size(); i++) {
                 context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
             }
         }

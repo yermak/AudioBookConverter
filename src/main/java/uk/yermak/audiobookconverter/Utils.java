@@ -44,22 +44,6 @@ public class Utils {
         }
     }
 
-    public static String formatChapter(int partNumber, Chapter chapter) {
-        String chapterFormat = AppProperties.getProperty("chapter_format");
-        if (chapterFormat == null) {
-            chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>- <CHAPTER_TITLE><endif> - <DURATION>";
-            AppProperties.setProperty("chapter_format", chapterFormat);
-        }
-
-        ST chapterTemplate = new ST(chapterFormat);
-        chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
-        chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
-        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getDetails()) ? chapter.getTitle() : chapter.getDetails());
-        chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));
-        return chapterTemplate.render();
-
-    }
-
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         String chapterFormat = AppProperties.getProperty("chapter_format");
         if (chapterFormat == null) {
@@ -91,11 +75,15 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
+            filenameFormat = "<WRITER> <if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>] <endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 
-        ST filenameTemplate = new ST(filenameFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        g.registerRenderer(Duration.class, new DurationRender());
+
+        ST filenameTemplate = new ST(g, filenameFormat);
         filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
@@ -142,12 +130,6 @@ public class Utils {
 
     public static String formatTime(long millis) {
         return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
-    }
-
-    public static String formatTimeForFilename(long millis) {
-        return String.format("%02d-%02d-%02d", TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
     }

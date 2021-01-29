@@ -15,11 +15,13 @@ public class AppProperties {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final File APP_DIR = new File(System.getProperty("APP_HOME"));
     public static final File PROP_FILE = new File(APP_DIR, Version.getVersionString() + ".properties");
+    private static final Properties applicationProps = new Properties();
 
-    private static Properties getAppProperties() {
-        //TODO:add default props here
-        Properties defaultProperties = new Properties();
-        Properties applicationProps = new Properties(defaultProperties);
+    static {
+        loadAppProperties();
+    }
+
+    private static synchronized Properties loadAppProperties() {
         if (PROP_FILE.exists()) {
             try (FileInputStream in = new FileInputStream(PROP_FILE)) {
                 applicationProps.load(in);
@@ -31,13 +33,11 @@ public class AppProperties {
     }
 
     public static String getProperty(String key) {
-        Properties applicationProps = getAppProperties();
         return applicationProps.getProperty(key);
     }
 
     public static Properties getProperties(String group) {
         Properties properties = new Properties();
-        Properties applicationProps = getAppProperties();
         Enumeration<Object> keys = applicationProps.keys();
         while (keys.hasMoreElements()) {
             String propName = (String) keys.nextElement();
@@ -49,8 +49,7 @@ public class AppProperties {
         return properties;
     }
 
-    public static void setProperty(String key, String value) {
-        Properties applicationProps = getAppProperties();
+    public static synchronized void setProperty(String key, String value) {
         applicationProps.put(key, value);
         File appDir = APP_DIR;
         if (appDir.exists() || appDir.mkdir()) {

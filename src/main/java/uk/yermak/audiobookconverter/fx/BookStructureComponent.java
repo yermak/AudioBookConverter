@@ -176,7 +176,14 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
+        double speed = ConverterApplication.getContext().getSpeed();
         long duration = mediaInfo.getDuration();
+
+        if (speed != 1.0) {
+            interval = (long) (interval * speed);
+            duration = (long) (duration * speed);
+        }
+
         long fullTracks = duration / interval;
         List<Track> tracks = new ArrayList<>();
         for (int i = 1; i <= fullTracks + (duration % interval > 0 ? 1 : 0); i++) {

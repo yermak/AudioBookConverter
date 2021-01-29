@@ -141,6 +141,11 @@ public class FilesController {
         chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
         fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
 
+        context.addSpeedChangeListener((observableValue, oldValue, newValue) -> {
+            if (chaptersMode.get()) {
+                Platform.runLater(() -> bookStructure.updateBookStructure());
+            }
+        });
     }
 
     private void initFileOpenMenu() {

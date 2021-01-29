@@ -120,6 +120,9 @@ public class MediaPlayerController  {
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(1.0);
 
+        mediaPlayer.rateProperty().bind(context.getSpeedObservable());
+        mediaPlayer.rateProperty().set(context.getSpeed());
+
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
                 playTime.setText(Utils.formatTime(timelapse.getValue() * 1000));

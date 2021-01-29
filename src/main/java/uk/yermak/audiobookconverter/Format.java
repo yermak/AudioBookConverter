@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -361,9 +363,9 @@ public enum Format {
         options.add("-f");
         options.add(format);
 
-        if (outputParameters.getSpeed() != 1.0) {
+        if (ConverterApplication.getContext().getSpeed() != 1.0) {
             options.add("-filter:a");
-            options.add("atempo=" + outputParameters.getSpeed());
+            options.add("atempo=" + ConverterApplication.getContext().getSpeed());
         }
 
         options.add("-progress");

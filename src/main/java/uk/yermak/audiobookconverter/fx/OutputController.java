@@ -81,7 +81,7 @@ public class OutputController {
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            ConverterApplication.getContext().getOutputParameters().setSpeed(Double.valueOf(newValue));
+            ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
         });
 
         outputFormatBox.getItems().addAll(Format.values());
@@ -113,7 +113,6 @@ public class OutputController {
                 Preset preset = Preset.instance(newValue);
                 ConverterApplication.getContext().setOutputParameters(preset);
             }
-            refreshSpeeds();
         });
 
         ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {

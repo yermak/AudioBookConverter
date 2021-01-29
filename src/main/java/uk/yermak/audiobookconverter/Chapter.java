@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.util.*;
 import java.util.function.Function;
@@ -64,7 +65,7 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public long getDuration() {
-        return media.stream().mapToLong(MediaInfo::getDuration).sum();
+        return (long) (media.stream().mapToLong(MediaInfo::getDuration).sum() / ConverterApplication.getContext().getSpeed());
     }
 
     public String getDurationString() {

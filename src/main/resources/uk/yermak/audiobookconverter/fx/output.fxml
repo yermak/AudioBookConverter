@@ -57,6 +57,9 @@
             </items>
         </ComboBox>
 
+        <Label text="Speed" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="speedBox" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+
 
         <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
 

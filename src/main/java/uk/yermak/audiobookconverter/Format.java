@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -279,8 +281,16 @@ public enum Format {
         return List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 320);
     }
 
+    public List<Double> speeds() {
+        return List.of(0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0);
+    }
+
     public Integer defaultBitrate() {
         return 128;
+    }
+
+    public Double defaultSpeed() {
+        return 1.0;
     }
 
     public Integer defaultChannel() {
@@ -352,6 +362,11 @@ public enum Format {
         }
         options.add("-f");
         options.add(format);
+
+        if (ConverterApplication.getContext().getSpeed() != 1.0) {
+            options.add("-filter:a");
+            options.add("atempo=" + ConverterApplication.getContext().getSpeed());
+        }
 
         options.add("-progress");
         options.add(progressUri);

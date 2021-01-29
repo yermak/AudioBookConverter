@@ -32,6 +32,9 @@ public class OutputController {
     @FXML
     private ComboBox<String> splitFileBox;
 
+    @FXML
+    private ComboBox<String> speedBox;
+
 
     @FXML
     public ComboBox<String> cutoff;
@@ -74,6 +77,11 @@ public class OutputController {
                 case "parts" -> ConverterApplication.getContext().getOutputParameters().setSplitChapters(false);
                 case "chapters" -> ConverterApplication.getContext().getOutputParameters().setSplitChapters(true);
             }
+        });
+
+        speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) return;
+            ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
         });
 
         outputFormatBox.getItems().addAll(Format.values());
@@ -125,6 +133,7 @@ public class OutputController {
         refreshCutoffs();
         refreshVbrQuality();
         refreshCBR();
+        refreshSpeeds();
 
         ConversionContext context = ConverterApplication.getContext();
         media = context.getMedia();
@@ -218,6 +227,13 @@ public class OutputController {
         bitRate.getItems().clear();
         bitRate.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).collect(Collectors.toList()));
         bitRate.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
+    }
+
+    private void refreshSpeeds() {
+        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        speedBox.getItems().clear();
+        speedBox.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).collect(Collectors.toList()));
+        speedBox.getSelectionModel().select(String.valueOf(format.defaultSpeed()));
     }
 
     private void refreshFrequencies() {

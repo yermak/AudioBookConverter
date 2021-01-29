@@ -8,6 +8,7 @@ public class OutputParameters {
 
     protected Format format = Format.M4B;
     protected Integer bitRate = format.defaultBitrate();
+    protected Double speed = format.defaultSpeed();
     protected Integer frequency = format.defaultFrequency();
     protected Integer channels = format.defaultChannel();
     protected Integer vbrQuality = format.defaultVbrQuality();
@@ -19,6 +20,7 @@ public class OutputParameters {
 
     public OutputParameters(OutputParameters parameters) {
         this.bitRate = parameters.getBitRate();
+        this.speed = parameters.getSpeed();
         this.frequency = parameters.getFrequency();
         this.channels = parameters.getChannels();
         this.vbrQuality = parameters.getVbrQuality();
@@ -33,6 +35,7 @@ public class OutputParameters {
     OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality) {
         this.format = format;
         this.bitRate = bitRate;
+        this.speed = format.defaultSpeed();
         this.frequency = frequency;
         this.channels = channels;
         this.vbrQuality = quality;
@@ -55,6 +58,14 @@ public class OutputParameters {
 
     public void setBitRate(final Integer bitRate) {
         this.bitRate = bitRate;
+    }
+
+    public Double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(final Double speed) {
+        this.speed = speed;
     }
 
     public Integer getFrequency() {

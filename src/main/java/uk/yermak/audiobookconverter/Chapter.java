@@ -2,9 +2,8 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,9 +20,9 @@ public class Chapter implements Organisable, Convertable {
         this.media.addListener(part.getBook());
         media.forEach(mediaInfo -> mediaInfo.setChapter(this));
         this.media.addAll(media);
-        renderMap.put("CHAPTER_NUMBER", Chapter::getNumberString);
+        renderMap.put("CHAPTER_NUMBER", Chapter::getNumber);
         renderMap.put("CHAPTER_TEXT", c -> "Chapter");
-        renderMap.put("DURATION", Chapter::getDurationString);
+        renderMap.put("DURATION", c->Duration.ofMillis(c.getDuration()));
     }
 
     public void replaceMediaWithTracks(MediaInfo mediaInfo, List<Track> tracks) {
@@ -31,10 +30,6 @@ public class Chapter implements Organisable, Convertable {
         int position = this.getMedia().indexOf(mediaInfo);
         this.getMedia().remove(position);
         this.getMedia().addAll(position, adaptors);
-    }
-
-    public String getNumberString() {
-        return StringUtils.leftPad(String.valueOf(getNumber()), 3, "0");
     }
 
     public Chapter(MediaInfo mediaInfo) {
@@ -65,12 +60,14 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public long getDuration() {
-        return (long) (media.stream().mapToLong(MediaInfo::getDuration).sum() / ConverterApplication.getContext().getSpeed());
+        return media.stream().mapToLong(MediaInfo::getDuration).sum();
     }
 
+/*
     public String getDurationString() {
         return Utils.formatTime(getDuration());
     }
+*/
 
     @Override
     public boolean split() {

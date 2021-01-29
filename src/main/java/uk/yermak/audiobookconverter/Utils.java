@@ -6,12 +6,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -64,13 +66,17 @@ public class Utils {
             chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
                     "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
                     "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
-                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER> <endif>" +
+                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER; format=\"%,03d\"> <endif>" +
                     "<if(TAG)><TAG> <endif>" +
                     "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
-                    "<if(DURATION)> - <DURATION><endif>";
+                    "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
             AppProperties.setProperty("chapter_format", chapterFormat);
         }
-        ST chapterTemplate = new ST(chapterFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        g.registerRenderer(Duration.class, new DurationRender());
+        ST chapterTemplate = new ST(g, chapterFormat);
+
         context.forEach((key, value) -> {
             if (key.contains("TAG")) {
                 chapterTemplate.add("TAG", value.apply(chapter));
@@ -173,11 +179,15 @@ public class Utils {
                     "<if(TITLE)><TITLE><endif>" +
                     "<if(NARRATOR)> (<NARRATOR>)<endif>" +
                     "<if(YEAR)>-<YEAR><endif>" +
-                    "<if(PART)>, Part <PART><endif>";
+                    "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
             AppProperties.setProperty("part_format", partFormat);
         }
 
-        ST partTemplate = new ST(partFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        ST partTemplate = new ST(g, partFormat);
+
+
         context.forEach((key, value) -> {
             partTemplate.add(key, value.apply(part));
         });
@@ -228,4 +238,16 @@ public class Utils {
     public static final String FFPROBE = isSupported() ? new File(getFFMpegPath() + "/ffprobe" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "ffprobe";
 
 
+    private static class DurationRender implements AttributeRenderer<Duration> {
+
+        @Override
+        public String toString(Duration duration, String format, Locale locale) {
+            if (format == null) {
+                format = "%02d:%02d:%02d";
+            }
+            return String.format(format, duration.toHoursPart(),
+                    duration.toMinutesPart(),
+                    duration.toSecondsPart());
+        }
+    }
 }

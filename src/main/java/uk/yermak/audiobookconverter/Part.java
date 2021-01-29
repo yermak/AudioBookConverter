@@ -2,8 +2,8 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +27,8 @@ public class Part implements Organisable, Convertable {
         renderMap.put("WRITER", part -> part.getBook().getBookInfo().writer().trimToNull());
         renderMap.put("NARRATOR", part -> part.getBook().getBookInfo().narrator().trimToNull());
         renderMap.put("YEAR", part -> part.getBook().getBookInfo().year().trimToNull());
-        renderMap.put("PART", Part::getNumberString);
-        renderMap.put("DURATION", Part::getDurationString);
+        renderMap.put("PART", Part::getNumber);
+        renderMap.put("DURATION", p -> Duration.ofMillis(p.getDuration()));
 
     }
 
@@ -40,7 +40,7 @@ public class Part implements Organisable, Convertable {
         this.getChapters().addAll(position, chapters);
     }
 
-    public void construct(ObservableList<Chapter> chapters){
+    public void construct(ObservableList<Chapter> chapters) {
         chapters.forEach(c -> c.setPart(this));
         this.chapters.addAll(chapters);
     }
@@ -50,6 +50,7 @@ public class Part implements Organisable, Convertable {
         return String.valueOf(getBook().getBookInfo().bookNumber());
     }
 
+/*
     private String getNumberString() {
         if (getBook().getParts().size() > 1) {
             return StringUtils.leftPad(String.valueOf(getNumber()), 2, '0');
@@ -57,10 +58,13 @@ public class Part implements Organisable, Convertable {
             return null;
         }
     }
+*/
 
+/*
     private String getDurationString() {
         return Utils.formatTimeForFilename(getDuration());
     }
+*/
 
     public String getTitle() {
         return "Part " + getNumber();

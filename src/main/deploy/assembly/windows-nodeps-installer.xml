@@ -10,7 +10,6 @@
         <fileSet>
             <includes>
                 <include>README*</include>
-                <include>*.txt</include>
                 <include>*.ico</include>
             </includes>
             <outputDirectory>app</outputDirectory>

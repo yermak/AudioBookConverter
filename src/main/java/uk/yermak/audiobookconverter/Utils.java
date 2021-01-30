@@ -9,12 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -23,6 +25,7 @@ import java.util.function.Function;
  */
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Properties PATH = new Properties();
 
     public static String getTmp(long jobId, long fileId, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC_" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
@@ -198,26 +201,37 @@ public class Utils {
         return System.getProperty("os.name").contains("Linux");
     }
 
-    public static boolean isMac() {
-        return System.getProperty("os.name").contains("Mac");
+    public final static String FFMPEG = getPath("ffmpeg");
+
+    public static final String MP4ART = getPath("mp4art");
+
+    public static final String MP4INFO = getPath("mp4info");
+
+    public static final String FFPROBE = getPath("ffprobe");
+
+    private static String getPath(String binary) {
+        String property = loadAppProperties().getProperty(binary);
+        if (property != null) {
+            return property;
+        }
+        return binary + (isWindows() ? ".exe" : "");
+
     }
 
-    private static boolean isSupported() {
-        return isWindows() || isLinux();
+    private static synchronized Properties loadAppProperties() {
+        if (PATH.isEmpty()) {
+            File file = new File((isLinux()) ? "../lib/app/path.properties" : "path.properties");
+
+            if (file.exists()) {
+                try (FileInputStream in = new FileInputStream(file)) {
+                    PATH.load(in);
+                } catch (IOException e) {
+                    logger.error("Error during loading properties", e);
+                }
+            }
+        }
+        return PATH;
     }
-
-    public final static String FFMPEG = isSupported() ? new File(getFFMpegPath() + "/ffmpeg" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "ffmpeg";
-
-    private static String getFFMpegPath() {
-        if (System.getenv("FFMPEG") != null) return System.getenv("FFMPEG");
-        return (isWindows() ? "" : "../lib/") + "app/external";
-    }
-
-    public static final String MP4ART = isSupported() ? new File(getFFMpegPath() + "/mp4art" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "mp4art";
-
-    public static final String MP4INFO = isSupported() ? new File(getFFMpegPath() + "/mp4info" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "mp4info";
-
-    public static final String FFPROBE = isSupported() ? new File(getFFMpegPath() + "/ffprobe" + (isWindows() ? ".exe" : "")).getAbsolutePath() : "ffprobe";
 
 
     private static class DurationRender implements AttributeRenderer<Duration> {

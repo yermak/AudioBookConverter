@@ -54,6 +54,9 @@ public class ConverterApplication extends Application {
     private static final ConversionContext context = new ConversionContext();
 
     public static void main(String[] args) {
+        //GitHub certificate issue
+        System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
         //-Dprism.allowhidpi=false
         //below does not work
 //        System.setProperty("prism.allowhidpi", "false");

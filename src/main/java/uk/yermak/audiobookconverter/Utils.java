@@ -197,6 +197,10 @@ public class Utils {
         return System.getProperty("os.name").contains("Windows");
     }
 
+    public static boolean isLinux() {
+        return System.getProperty("os.name").contains("Linux");
+    }
+
     public final static String FFMPEG = getPath("ffmpeg");
 
     public static final String MP4ART = getPath("mp4art");
@@ -207,16 +211,17 @@ public class Utils {
 
     private static String getPath(String binary) {
         String property = loadAppProperties().getProperty(binary);
-        if (property == null) {
-            return binary + (isWindows() ? ".exe" : "");
-        } else {
-            return new File(property).getAbsolutePath();
+        if (property != null) {
+            return property;
         }
+        return binary + (isWindows() ? ".exe" : "");
+
     }
 
     private static synchronized Properties loadAppProperties() {
         if (PATH.isEmpty()) {
-            File file = new File("path.properties");
+            File file = new File((isLinux()) ? "../lib/app/path.properties" : "path.properties");
+
             if (file.exists()) {
                 try (FileInputStream in = new FileInputStream(file)) {
                     PATH.load(in);

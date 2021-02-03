@@ -220,7 +220,7 @@ public class Utils {
 
     private static synchronized Properties loadAppProperties() {
         if (PATH.isEmpty()) {
-            File file = new File((isLinux()) ? "../lib/app/path.properties" : "path.properties");
+            File file = new File((isLinux()) ? "../lib/app/path.properties" : "app/path.properties");
 
             if (file.exists()) {
                 try (FileInputStream in = new FileInputStream(file)) {

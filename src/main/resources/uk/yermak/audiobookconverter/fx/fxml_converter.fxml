@@ -128,11 +128,13 @@
             <MenuItem text="Check new version" onAction="#checkVersion"/>
         </Menu>
 
+<!--
         <Menu fx:id="mDonate">
             <graphic>
                 <Label text="Donate!" onMouseClicked="#openDonate"/>
             </graphic>
         </Menu>
+-->
 
 
     </MenuBar>

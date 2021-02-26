@@ -89,9 +89,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.codec = codec;
     }
 
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
 
     @Override
     public long getOffset() {

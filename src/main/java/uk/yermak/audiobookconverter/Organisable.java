@@ -2,7 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import java.util.List;
 
-public interface Organisable {
+public interface Organisable extends Countable {
 
     String getTitle();
 

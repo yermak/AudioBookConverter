@@ -262,7 +262,19 @@ public class FFMediaLoader {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
-        searchDirs.forEach(d -> findPictures(d).forEach(f -> ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f.getPath())))));
+        List<File> pictures = new ArrayList<>();
+
+        ConversionContext context = ConverterApplication.getContext();
+        for (File d : searchDirs) {
+            pictures.addAll(findPictures(d));
+        }
+
+        //adding artificial limit of image count to address issue #153.
+        if (!pictures.isEmpty()) {
+            for (int i = 0; i < 10 && i < pictures.size(); i++) {
+                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+            }
+        }
     }
 
 

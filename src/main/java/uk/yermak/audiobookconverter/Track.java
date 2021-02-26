@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import java.util.Collections;
+
 public class Track {
 
     private long start;
@@ -10,6 +12,16 @@ public class Track {
 
     public Track(String trackNo) {
         this.trackNo = trackNo;
+    }
+
+    public Chapter toChapter(Part part, MediaInfo m) {
+        MediaTrackAdaptor mediaTrackAdaptor = new MediaTrackAdaptor(m, this);
+        Chapter chapter = new Chapter(part, Collections.singletonList(mediaTrackAdaptor));
+        chapter.setCustomTitle(this.getTitle());
+        chapter.getRenderMap().clear();
+        chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
+        mediaTrackAdaptor.setChapter(chapter);
+        return chapter;
     }
 
     public String getTrackNo() {

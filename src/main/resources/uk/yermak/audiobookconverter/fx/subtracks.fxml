@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.Screen?>
+<?import org.controlsfx.control.ToggleSwitch?>
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml"
+         gridLinesVisible="false" hgap="5" vgap="2">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+
+    </fx:define>
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
+
+    <children>
+        <Label text="Select interval, minutes" GridPane.columnIndex="0" GridPane.rowIndex="0"
+               GridPane.halignment="LEFT"/>
+        <Spinner fx:id="intervalSpinner" initialValue="30" min="1" max="1440" editable="true"
+                 GridPane.columnIndex="1" GridPane.rowIndex="0"  GridPane.halignment="RIGHT" />
+        <Label text="Automatically create chapters" GridPane.columnIndex="0" GridPane.rowIndex="1"
+               GridPane.halignment="LEFT" />
+        <ToggleSwitch fx:id="autoChaptersToggle" GridPane.columnIndex="1" GridPane.rowIndex="1" selected="true" GridPane.halignment="RIGHT"/>
+    </children>
+</fx:root>

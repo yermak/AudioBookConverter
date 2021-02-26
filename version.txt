@@ -1,1 +1,1 @@
-AudioBookConverter-5.4.0
+AudioBookConverter-#{APP_VERSION}#

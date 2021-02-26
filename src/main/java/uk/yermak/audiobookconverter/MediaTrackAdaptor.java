@@ -1,5 +1,7 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.fx.ConverterApplication;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     public MediaTrackAdaptor(MediaInfo mediaInfo, Track track) {
         this.mediaInfo = mediaInfo;
+        this.chapter = mediaInfo.getChapter();
         this.track = track;
         this.duration = track.getDuration();
     }
@@ -47,7 +50,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public long getDuration() {
-        return duration;
+        return (long) (duration / ConverterApplication.getContext().getSpeed());
     }
 
     @Override
@@ -90,4 +93,8 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return Objects.hash(getFileName(), track.getTrackNo(), getDuration());
     }
 
+    @Override
+    public int getTotalNumbers() {
+        return 0;
+    }
 }

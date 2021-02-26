@@ -16,13 +16,19 @@
             <outputDirectory>app</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>app/external/x64</directory>
-            <outputDirectory>app/external/x64</outputDirectory>
+            <directory>external/x64/windows</directory>
+            <outputDirectory>app/external/</outputDirectory>
             <includes>
                 <include>*.exe</include>
                 <include>*.dll</include>
-                <include>*.txt</include>
                 <include>*.md</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>external/x64/windows</directory>
+            <outputDirectory>app</outputDirectory>
+            <includes>
+                <include>path.properties</include>
             </includes>
         </fileSet>
     </fileSets>

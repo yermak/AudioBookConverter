@@ -6,13 +6,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -21,6 +25,7 @@ import java.util.function.Function;
  */
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Properties PATH = new Properties();
 
     public static String getTmp(long jobId, long fileId, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC_" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
@@ -42,35 +47,23 @@ public class Utils {
         }
     }
 
-    public static String formatChapter(int partNumber, Chapter chapter) {
-        String chapterFormat = AppProperties.getProperty("chapter_format");
-        if (chapterFormat == null) {
-            chapterFormat = "<if(BOOK_NUMBER)> Book <BOOK_NUMBER>. <endif>Chapter <CHAPTER_NUMBER><if(CHAPTER_TITLE)>- <CHAPTER_TITLE><endif> - <DURATION>";
-            AppProperties.setProperty("chapter_format", chapterFormat);
-        }
-
-        ST chapterTemplate = new ST(chapterFormat);
-        chapterTemplate.add("BOOK_NUMBER", partNumber == 0 ? null : partNumber);
-        chapterTemplate.add("CHAPTER_NUMBER", chapter.getNumber() == 0 ? null : chapter.getNumber());
-        chapterTemplate.add("CHAPTER_TITLE", StringUtils.isEmpty(chapter.getDetails()) ? chapter.getTitle() : chapter.getDetails());
-        chapterTemplate.add("DURATION", Utils.formatTime(chapter.getDuration()));
-        return chapterTemplate.render();
-
-    }
-
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         String chapterFormat = AppProperties.getProperty("chapter_format");
         if (chapterFormat == null) {
             chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
                     "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
                     "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
-                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER> <endif>" +
+                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER; format=\"%,03d\"> <endif>" +
                     "<if(TAG)><TAG> <endif>" +
                     "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
-                    "<if(DURATION)> - <DURATION><endif>";
+                    "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
             AppProperties.setProperty("chapter_format", chapterFormat);
         }
-        ST chapterTemplate = new ST(chapterFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        g.registerRenderer(Duration.class, new DurationRender());
+        ST chapterTemplate = new ST(g, chapterFormat);
+
         context.forEach((key, value) -> {
             if (key.contains("TAG")) {
                 chapterTemplate.add("TAG", value.apply(chapter));
@@ -85,11 +78,15 @@ public class Utils {
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = AppProperties.getProperty("filename_format");
         if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] <endif>- <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
+            filenameFormat = "<WRITER> <if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>] <endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
             AppProperties.setProperty("filename_format", filenameFormat);
         }
 
-        ST filenameTemplate = new ST(filenameFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        g.registerRenderer(Duration.class, new DurationRender());
+
+        ST filenameTemplate = new ST(g, filenameFormat);
         filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
@@ -140,12 +137,6 @@ public class Utils {
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
     }
 
-    public static String formatTimeForFilename(long millis) {
-        return String.format("%02d-%02d-%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
-    }
-
     public static String formatSize(long bytes) {
         if (bytes == -1L) {
             return "---";
@@ -173,11 +164,15 @@ public class Utils {
                     "<if(TITLE)><TITLE><endif>" +
                     "<if(NARRATOR)> (<NARRATOR>)<endif>" +
                     "<if(YEAR)>-<YEAR><endif>" +
-                    "<if(PART)>, Part <PART><endif>";
+                    "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
             AppProperties.setProperty("part_format", partFormat);
         }
 
-        ST partTemplate = new ST(partFormat);
+        STGroup g = new STGroupString("");
+        g.registerRenderer(Number.class, new NumberRenderer());
+        ST partTemplate = new ST(g, partFormat);
+
+
         context.forEach((key, value) -> {
             partTemplate.add(key, value.apply(part));
         });
@@ -202,13 +197,53 @@ public class Utils {
         return System.getProperty("os.name").contains("Windows");
     }
 
-    public final static String FFMPEG = isWindows() ? new File("app/external/x64/ffmpeg.exe").getAbsolutePath() : "ffmpeg";
+    public static boolean isLinux() {
+        return System.getProperty("os.name").contains("Linux");
+    }
 
-    public static final String MP4ART = isWindows() ? new File("app/external/x64/mp4art.exe").getAbsolutePath() : "mp4art";
+    public final static String FFMPEG = getPath("ffmpeg");
 
-    public static final String MP4INFO = isWindows() ? new File("app/external/x64/mp4info.exe").getAbsolutePath() : "mp4info";
+    public static final String MP4ART = getPath("mp4art");
 
-    public static final String FFPROBE = isWindows() ? new File("app/external/x64/ffprobe.exe").getAbsolutePath() : "ffprobe";
+    public static final String MP4INFO = getPath("mp4info");
+
+    public static final String FFPROBE = getPath("ffprobe");
+
+    private static String getPath(String binary) {
+        String property = loadAppProperties().getProperty(binary);
+        if (property != null) {
+            return property;
+        }
+        return binary + (isWindows() ? ".exe" : "");
+
+    }
+
+    private static synchronized Properties loadAppProperties() {
+        if (PATH.isEmpty()) {
+            File file = new File((isLinux()) ? "../lib/app/path.properties" : "app/path.properties");
+
+            if (file.exists()) {
+                try (FileInputStream in = new FileInputStream(file)) {
+                    PATH.load(in);
+                } catch (IOException e) {
+                    logger.error("Error during loading properties", e);
+                }
+            }
+        }
+        return PATH;
+    }
 
 
+    private static class DurationRender implements AttributeRenderer<Duration> {
+
+        @Override
+        public String toString(Duration duration, String format, Locale locale) {
+            if (format == null) {
+                format = "%02d:%02d:%02d";
+            }
+            return String.format(format, duration.toHoursPart(),
+                    duration.toMinutesPart(),
+                    duration.toSecondsPart());
+        }
+    }
 }

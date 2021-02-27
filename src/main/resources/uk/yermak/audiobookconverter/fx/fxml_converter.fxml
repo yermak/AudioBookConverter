@@ -71,6 +71,12 @@
                 </accelerator>
             </MenuItem>
 
+            <MenuItem text="Edit" onAction="#editChapter">
+                <accelerator>
+                    <KeyCodeCombination alt="UP" code="F2" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem/>
             <MenuItem text="Combine" onAction="#combine">
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="PLUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>

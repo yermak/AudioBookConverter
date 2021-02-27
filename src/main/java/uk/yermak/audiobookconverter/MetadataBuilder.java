@@ -94,8 +94,11 @@ public class MetadataBuilder {
             }
 
             metaData.add("track=" + bookInfo.bookNumber() + "/" + bookInfo.totalTracks());
-            FlacPicture picture = FlacPicture.load(getArtWorkFile());
-            metaData.add("metadata_block_picture="+picture.write());
+
+            if (!posters.isEmpty()){
+                FlacPicture picture = FlacPicture.load(posters.get(0).getFileName());
+                metaData.add("metadata_block_picture="+picture.write());
+            }
             metaData.addAll(convertable.getMetaData(bookInfo));
             logger.debug("Saving metadata:" + String.join("\n", metaData));
             FileUtils.writeLines(metaFile, "UTF-8", metaData);

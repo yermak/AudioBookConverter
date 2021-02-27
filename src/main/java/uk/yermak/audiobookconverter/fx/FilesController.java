@@ -323,6 +323,12 @@ public class FilesController {
         }
     }
 
+    public void editChapter(ActionEvent event){
+        if (chaptersMode.get()) {
+            bookStructure.editChapter(event);
+        }
+    }
+
     private void launch(ConversionGroup conversionGroup, Book book, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent, String outputDestination) {
 
         if (book == null) {

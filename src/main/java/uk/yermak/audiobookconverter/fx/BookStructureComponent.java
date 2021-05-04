@@ -52,8 +52,8 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                 }
 
                 if (item instanceof MediaInfo && item.getTotalNumbers() > 1 && item.getNumber() > 1 && getSelectionModel().getSelectedItems().size() == 1) {
-                    MenuItem split = new MenuItem("Split from here");
-                    split.setOnAction(BookStructureComponent.this::splitChapters);
+                    MenuItem split = new MenuItem("Split to new chapter");
+                    split.setOnAction(BookStructureComponent.this::split);
                     contextMenu.getItems().add(split);
                 }
 
@@ -61,6 +61,12 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                     MenuItem combine = new MenuItem("Combine");
                     combine.setOnAction(BookStructureComponent.this::combineChapters);
                     contextMenu.getItems().add(combine);
+                }
+
+                if (item instanceof Chapter && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() == 1) {
+                    MenuItem split = new MenuItem("Split to new part");
+                    split.setOnAction(BookStructureComponent.this::split);
+                    contextMenu.getItems().add(split);
                 }
 
                 if (!contextMenu.getItems().isEmpty() && !(contextMenu.getItems().get(contextMenu.getItems().size() - 1) instanceof SeparatorMenuItem)) {
@@ -132,7 +138,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         }
     }
 
-    void splitChapters(ActionEvent event) {
+    void split(ActionEvent event) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = getSelectionModel().getSelectedCells();
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();

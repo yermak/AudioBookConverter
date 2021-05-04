@@ -116,6 +116,8 @@ public class BookInfoController {
         series.setText(bookInfo.series().get());
         if (bookInfo.bookNumber().get() != 0) {
             bookNo.setText(bookInfo.bookNumber().toString());
+        } else{
+            bookNo.setText("");
         }
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());

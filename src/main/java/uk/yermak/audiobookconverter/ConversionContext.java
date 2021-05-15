@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -122,5 +123,15 @@ public class ConversionContext {
             uiMedia = new DelegatedObservableList<>(next().getMedia());
         }
         return uiMedia;
+    }
+
+    public ConversionGroup detach() {
+        ConversionGroup conversionGroup = conversionGroupHolder.get();
+        resetForNewConversion();
+        return conversionGroup;
+    }
+
+    public void addContextDetachListener(InvalidationListener invalidationListener){
+        conversionGroupHolder.addListener(invalidationListener);
     }
 }

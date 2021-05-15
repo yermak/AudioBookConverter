@@ -58,7 +58,7 @@ public class BookInfoController {
             genre.hide();
         });
 
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().next().getMedia();
+        ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
@@ -86,9 +86,7 @@ public class BookInfoController {
         year.textProperty().addListener(o -> bookInfo.year().set(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.comment().set(comment.getText()));
 
-        //TODO Check if still need this
-//        ConverterApplication.getContext().next().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo)));
-
+        ConverterApplication.getContext().addContextDetachListener(observable -> Platform.runLater(() -> clearTags()));
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {

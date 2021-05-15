@@ -24,7 +24,7 @@ public class FileListComponent extends ListView<MediaInfo> {
 
 
         ConversionContext context = ConverterApplication.getContext();
-        ObservableList<MediaInfo> media = context.next().getMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
         setItems(media);
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -104,7 +104,7 @@ public class FileListComponent extends ListView<MediaInfo> {
     public void reselect() {
         ConversionContext context = ConverterApplication.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
-        ObservableList<MediaInfo> media = context.next().getMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
         List<MediaInfo> change = new ArrayList<>(selectedMedia);
         List<MediaInfo> selection = new ArrayList<>(getSelectionModel().getSelectedItems());
         if (!change.containsAll(selection) || !selection.containsAll(change)) {

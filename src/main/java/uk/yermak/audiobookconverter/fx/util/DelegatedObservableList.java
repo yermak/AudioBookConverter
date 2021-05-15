@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.fx.util;
 
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;

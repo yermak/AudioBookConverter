@@ -20,13 +20,13 @@
     <MenuBar>
         <Menu fx:id="mFile" text="File">
             <Menu text="Add...">
-                <MenuItem text="Files" onAction="#selectFilesDialog">
+                <MenuItem text="Files" onAction="#selectFiles">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="INSERT" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
 
-                <MenuItem text="Folder" onAction="#selectFolderDialog">
+                <MenuItem text="Folder" onAction="#selectFolder">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="INSERT" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                     </accelerator>

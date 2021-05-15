@@ -55,7 +55,11 @@ public class ConversionContext {
         saveGenres();
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
-        uiPosters.setDelegate(newConversionGroup.getPosters());
+        if (uiPosters != null) {
+            uiPosters.setDelegate(newConversionGroup.getPosters());
+        } else {
+            uiPosters = new DelegatedObservableList<>(newConversionGroup.getPosters());
+        }
 //        newConversionGroup.setBookInfo(AudioBookInfo.instance());
 /*
         bookInfo.set(AudioBookInfo.instance());

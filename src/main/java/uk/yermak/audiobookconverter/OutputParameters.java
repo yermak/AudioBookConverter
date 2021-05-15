@@ -16,7 +16,7 @@ public class OutputParameters {
     protected Integer vbrQuality = format.defaultVbrQuality();
     protected boolean cbr = format.defaultCBR();
     protected Integer cutoff = format.defaultCutoff();
-    protected SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
+    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
 
     private boolean splitChapters = false;
 

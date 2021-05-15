@@ -1,9 +1,11 @@
-package uk.yermak.audiobookconverter.fx;
+package uk.yermak.audiobookconverter.fx.util;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
+import uk.yermak.audiobookconverter.fx.util.DefaultListCell;
 
 public class ContextMenuListCell<T> extends ListCell<T> {
 

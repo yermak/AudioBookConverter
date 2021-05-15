@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter.fx;
+package uk.yermak.audiobookconverter.fx.util;
 
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;

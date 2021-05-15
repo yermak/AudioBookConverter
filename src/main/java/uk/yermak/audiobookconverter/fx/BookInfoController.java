@@ -86,7 +86,8 @@ public class BookInfoController {
         year.textProperty().addListener(o -> bookInfo.year().set(year.getText()));
         comment.textProperty().addListener(o -> bookInfo.comment().set(comment.getText()));
 
-        ConverterApplication.getContext().next().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo)));
+        //TODO Check if still need this
+//        ConverterApplication.getContext().next().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo)));
 
     }
 

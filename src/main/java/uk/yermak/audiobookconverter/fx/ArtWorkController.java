@@ -33,12 +33,11 @@ public class ArtWorkController {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-
     @FXML
     private void initialize() {
         ConversionContext context = ConverterApplication.getContext();
         imageList.setCellFactory(param -> new ArtWorkListCell());
-        imageList.setItems(context.next().getPosters());
+        imageList.setItems(context.getPosters());
     }
 
     @FXML

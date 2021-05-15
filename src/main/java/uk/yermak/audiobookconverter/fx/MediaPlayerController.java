@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.fx.util.DelegatedObservableList;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -43,13 +44,12 @@ public class MediaPlayerController  {
     private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
     private ScheduledExecutorService executorService;
-    private ObservableList<MediaInfo> media;
+//    private ObservableList<MediaInfo> media;
 
     @FXML
     public void initialize() {
-        ConversionContext context = ConverterApplication.getContext();
-        media = context.next().getMedia();
-        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
+//        media = context.getMedia();
+//        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 //        selectedMedia.addListener((ListChangeListener<MediaInfo>) c -> disablePlayer(selectedMedia.isEmpty() && mediaPlayer == null));
 
     }
@@ -102,6 +102,7 @@ public class MediaPlayerController  {
     private void playMedias(MediaInfo selected) {
         playingTrack = selected;
         ConversionContext context = ConverterApplication.getContext();
+        ObservableList<MediaInfo> media = context.getMedia();
 
         if (media.indexOf(selected) > media.size() - 1) return;
         timelapse.setValue(0);
@@ -150,6 +151,9 @@ public class MediaPlayerController  {
     }
 
     private MediaInfo findNext(MediaInfo selected) {
+        ConversionContext context = ConverterApplication.getContext();
+        ObservableList<MediaInfo> media = context.getMedia();
+
         int i = media.indexOf(selected);
         if (i < media.size()) {
             return media.get(i + 1);

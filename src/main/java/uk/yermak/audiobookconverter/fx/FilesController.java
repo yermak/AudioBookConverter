@@ -265,19 +265,20 @@ public class FilesController {
         }
     }
 
-    private void launch(ConversionGroup conversionGroup, Book book, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent, String outputDestination) {
+    private void launch(ConversionGroup conversionGroup, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent, String outputDestination) {
 
+        Book book = conversionGroup.getBook();
         if (book == null) {
-            book = new Book(ConverterApplication.getContext().next().getBookInfo());
+            book = new Book(conversionGroup.getBookInfo());
             book.construct(mediaInfos);
         }
 
         ObservableList<Part> parts = book.getParts();
-        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
+        Format format = conversionGroup.getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
         conversionGroup.getOutputParameters().setupFormat(format);
 
-        if (ConverterApplication.getContext().next().getOutputParameters().isSplitChapters()) {
+        if (conversionGroup.getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
@@ -329,7 +330,7 @@ public class FilesController {
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
 
-        ConversionGroup conversionGroup = ConverterApplication.getContext().next();
+        ConversionGroup conversionGroup = ConverterApplication.getContext().detach();
 
 /* TODO!!!!
         conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
@@ -337,7 +338,7 @@ public class FilesController {
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 */
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.next(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
 
         Executors.newSingleThreadExecutor().submit(() -> {
@@ -345,10 +346,10 @@ public class FilesController {
                 progressQueue.getItems().add(0, placeHolderProgress);
                 filesChapters.getSelectionModel().select(queueTab);
             });
-            launch(conversionGroup, context.next().getBook(), mediaInfos, placeHolderProgress, outputDestination);
+            launch(conversionGroup, mediaInfos, placeHolderProgress, outputDestination);
         });
 
-        ConverterApplication.getContext().resetForNewConversion();
+//        ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);

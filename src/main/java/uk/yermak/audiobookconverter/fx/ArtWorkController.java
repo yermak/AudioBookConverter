@@ -38,6 +38,7 @@ public class ArtWorkController {
         ConversionContext context = ConverterApplication.getContext();
         imageList.setCellFactory(param -> new ArtWorkListCell());
         imageList.setItems(context.getPosters());
+        context.addContextDetachListener(observable -> imageList.getItems().clear());
     }
 
     @FXML

@@ -25,6 +25,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;

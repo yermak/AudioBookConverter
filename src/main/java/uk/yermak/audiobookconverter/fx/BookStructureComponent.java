@@ -6,6 +6,8 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.util.Pair;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuTreeTableRow;
 
 import java.util.ArrayList;
 import java.util.List;

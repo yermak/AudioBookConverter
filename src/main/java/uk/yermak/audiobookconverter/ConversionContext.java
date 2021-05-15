@@ -1,22 +1,15 @@
 package uk.yermak.audiobookconverter;
 
-import com.google.gson.Gson;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * Created by yermak on 06-Feb-18.
@@ -42,6 +35,7 @@ public class ConversionContext {
 */
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
+    private DelegatedObservableList<ArtWork> uiPosters;
 
 
     public ConversionContext() {
@@ -61,6 +55,7 @@ public class ConversionContext {
         saveGenres();
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
+        uiPosters.setDelegate(newConversionGroup.getPosters());
 //        newConversionGroup.setBookInfo(AudioBookInfo.instance());
 /*
         bookInfo.set(AudioBookInfo.instance());
@@ -102,4 +97,10 @@ public class ConversionContext {
     }
 
 
+    public ObservableList<ArtWork> getPosters() {
+        if (uiPosters == null) {
+            uiPosters = new DelegatedObservableList<>(next().getPosters());
+        }
+        return uiPosters;
+    }
 }

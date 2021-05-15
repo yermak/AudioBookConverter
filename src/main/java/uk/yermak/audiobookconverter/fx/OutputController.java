@@ -57,7 +57,7 @@ public class OutputController {
         bitRate.setDisable(false);
         vbrQuality.setDisable(true);
         refreshBitrates();
-        ConverterApplication.getContext().getOutputParameters().setCbr(true);
+        ConverterApplication.getContext().next().getOutputParameters().setCbr(true);
 
     }
 
@@ -65,7 +65,7 @@ public class OutputController {
         bitRate.setDisable(true);
         vbrQuality.setDisable(false);
         refreshVbrQuality();
-        ConverterApplication.getContext().getOutputParameters().setCbr(false);
+        ConverterApplication.getContext().next().getOutputParameters().setCbr(false);
     }
 
     @FXML
@@ -74,20 +74,20 @@ public class OutputController {
         splitFileBox.getSelectionModel().select(0);
         splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             switch (newValue) {
-                case "parts" -> ConverterApplication.getContext().getOutputParameters().setSplitChapters(false);
-                case "chapters" -> ConverterApplication.getContext().getOutputParameters().setSplitChapters(true);
+                case "parts" -> ConverterApplication.getContext().next().getOutputParameters().setSplitChapters(false);
+                case "chapters" -> ConverterApplication.getContext().next().getOutputParameters().setSplitChapters(true);
             }
         });
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
+            ConverterApplication.getContext().next().setSpeed(Double.valueOf(newValue));
         });
 
         outputFormatBox.getItems().addAll(Format.values());
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            ConverterApplication.getContext().getOutputParameters().setupFormat(newValue);
+            ConverterApplication.getContext().next().getOutputParameters().setupFormat(newValue);
             refreshFrequencies();
             refreshBitrates();
             refreshChannels();
@@ -108,14 +108,14 @@ public class OutputController {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
-                ConverterApplication.getContext().setOutputParameters(preset);
+                ConverterApplication.getContext().next().setOutputParameters(preset);
             } else {
                 Preset preset = Preset.instance(newValue);
-                ConverterApplication.getContext().setOutputParameters(preset);
+                ConverterApplication.getContext().next().setOutputParameters(preset);
             }
         });
 
-        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+        ConverterApplication.getContext().next().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
             outputFormatBox.setValue(newParams.getFormat());
             if (!oldParams.getFormat().equals(newParams.getFormat())) {
                 refreshFrequencies();
@@ -136,34 +136,34 @@ public class OutputController {
         refreshSpeeds();
 
         ConversionContext context = ConverterApplication.getContext();
-        media = context.getMedia();
+        media = context.next().getMedia();
 
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
-            context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+            context.next().getOutputParameters().setBitRate(Integer.valueOf(newValue));
         });
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
-            context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+            context.next().getOutputParameters().setFrequency(Integer.valueOf(newValue));
         });
         channels.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
-            context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+            context.next().getOutputParameters().setChannels(Integer.valueOf(newValue));
         });
         vbrQuality.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
-            context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            context.next().getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
         });
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
             if (DISABLED.equals(newValue)) {
-                context.getOutputParameters().setCutoff(null);
+                context.next().getOutputParameters().setCutoff(null);
             } else {
-                context.getOutputParameters().setCutoff(Integer.valueOf(newValue));
+                context.next().getOutputParameters().setCutoff(Integer.valueOf(newValue));
             }
         });
 
-        context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
+        context.next().addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
             bitRate.valueProperty().set(String.valueOf(newValue.getBitRate()));
             frequency.valueProperty().set(String.valueOf(newValue.getFrequency()));
             channels.valueProperty().set(String.valueOf(newValue.getChannels()));
@@ -177,14 +177,14 @@ public class OutputController {
         });
 
         media.addListener((InvalidationListener) observable -> updateParameters(media));
-        ConverterApplication.getContext().addBookChangeListener((observableValue, oldBook, newBook) -> {
+        ConverterApplication.getContext().next().addBookChangeListener((observableValue, oldBook, newBook) -> {
             if (newBook != null) {
                 newBook.addListener(observable -> updateParameters(newBook.getMedia()));
             }
         });
 
-        ConverterApplication.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
-            Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        ConverterApplication.getContext().next().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+            Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
             bitRate.setValue(String.valueOf(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate())));
             frequency.setValue(String.valueOf(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency())));
             channels.setValue(String.valueOf(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel())));
@@ -194,7 +194,7 @@ public class OutputController {
     }
 
     private void refreshCBR() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         if (format.defaultCBR()) {
             cbr.fire();
         } else {
@@ -203,41 +203,41 @@ public class OutputController {
     }
 
     private void refreshVbrQuality() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         vbrQuality.setValue(format.defaultVbrQuality());
     }
 
     private void refreshCutoffs() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         cutoff.getItems().clear();
         cutoff.getItems().add(DISABLED);
-        cutoff.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).collect(Collectors.toList()));
+        cutoff.getItems().addAll(ConverterApplication.getContext().next().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).collect(Collectors.toList()));
         cutoff.getSelectionModel().select(String.valueOf(format.defaultCutoff()));
     }
 
     private void refreshChannels() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         channels.getItems().clear();
-        channels.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).collect(Collectors.toList()));
+        channels.getItems().addAll(ConverterApplication.getContext().next().getOutputParameters().getFormat().channels().stream().map(String::valueOf).collect(Collectors.toList()));
         channels.getSelectionModel().select(String.valueOf(format.defaultChannel()));
     }
 
     private void refreshBitrates() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         bitRate.getItems().clear();
-        bitRate.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).collect(Collectors.toList()));
+        bitRate.getItems().addAll(ConverterApplication.getContext().next().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).collect(Collectors.toList()));
         bitRate.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
     }
 
     private void refreshSpeeds() {
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
         speedBox.getItems().clear();
-        speedBox.getItems().addAll(ConverterApplication.getContext().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).collect(Collectors.toList()));
+        speedBox.getItems().addAll(ConverterApplication.getContext().next().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).collect(Collectors.toList()));
         speedBox.getSelectionModel().select(String.valueOf(format.defaultSpeed()));
     }
 
     private void refreshFrequencies() {
-        OutputParameters outputParameters = ConverterApplication.getContext().getOutputParameters();
+        OutputParameters outputParameters = ConverterApplication.getContext().next().getOutputParameters();
         Format format = outputParameters.getFormat();
         frequency.getItems().clear();
         frequency.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).collect(Collectors.toList()));
@@ -245,10 +245,10 @@ public class OutputController {
     }
 
     private void updateParameters(List<MediaInfo> media) {
-        Book book = ConverterApplication.getContext().getBook();
+        Book book = ConverterApplication.getContext().next().getBook();
 
         if (media.isEmpty() && book == null) {
-            Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+            Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
             frequency.setValue(String.valueOf(format.defaultFrequency()));
             bitRate.setValue(String.valueOf(format.defaultBitrate()));
             channels.setValue(String.valueOf(format.defaultChannel()));
@@ -257,7 +257,7 @@ public class OutputController {
         }
 
         Executors.newSingleThreadExecutor().submit(() -> {
-            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+            OutputParameters params = ConverterApplication.getContext().next().getOutputParameters();
             if (book != null) {
                 params.updateAuto(book.getMedia());
 //                book.addListener(observable -> updateParameters(book.getMedia()));
@@ -265,7 +265,7 @@ public class OutputController {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
-                Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+                Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
                 frequency.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
                 bitRate.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
                 channels.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));

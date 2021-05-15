@@ -245,7 +245,7 @@ public class FFMediaLoader {
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversionGroup.isOver())
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                        ConverterApplication.getContext().next().addPosterIfMissingWithDelay(artWorkBean);
                 });
                 return artWorkBean;
             } finally {
@@ -272,7 +272,7 @@ public class FFMediaLoader {
         //adding artificial limit of image count to address issue #153.
         if (!pictures.isEmpty()) {
             for (int i = 0; i < 10 && i < pictures.size(); i++) {
-                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+                context.next().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
             }
         }
     }

@@ -107,7 +107,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     void updateBookStructure() {
-        Book book = ConverterApplication.getContext().getBook();
+        Book book = ConverterApplication.getContext().next().getBook();
         getRoot().getChildren().clear();
         book.getParts().forEach(p -> {
             TreeItem<Organisable> partItem = new TreeItem<>(p);
@@ -120,7 +120,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         });
         getRoot().getChildren().forEach(t -> t.setExpanded(true));
         refresh();
-        ConverterApplication.getContext().getOutputParameters().updateAuto(book.getMedia());
+        ConverterApplication.getContext().next().getOutputParameters().updateAuto(book.getMedia());
     }
 
     void moveChapterDown(ActionEvent event) {
@@ -176,7 +176,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
-        double speed = ConverterApplication.getContext().getSpeed();
+        double speed = ConverterApplication.getContext().next().getSpeed();
         long duration = mediaInfo.getDuration();
 
         if (speed != 1.0) {

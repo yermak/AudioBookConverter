@@ -363,9 +363,9 @@ public enum Format {
         options.add("-f");
         options.add(format);
 
-        if (ConverterApplication.getContext().getSpeed() != 1.0) {
+        if (outputParameters.getSpeed() != 1.0) {
             options.add("-filter:a");
-            options.add("atempo=" + ConverterApplication.getContext().getSpeed());
+            options.add("atempo=" + outputParameters.getSpeed());
         }
 
         options.add("-progress");

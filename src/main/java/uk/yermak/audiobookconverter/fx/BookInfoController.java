@@ -58,40 +58,40 @@ public class BookInfoController {
             genre.hide();
         });
 
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
+        ObservableList<MediaInfo> media = ConverterApplication.getContext().next().getMedia();
         media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
 //        clearTags();
 
-        SimpleObjectProperty<AudioBookInfo> bookInfo = ConverterApplication.getContext().getBookInfo();
+        AudioBookInfo bookInfo = ConverterApplication.getContext().next().getBookInfo();
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> bookInfo.get().title().set(title.getText()));
+        title.textProperty().addListener(o -> bookInfo.title().set(title.getText()));
 
-        writer.textProperty().addListener(o -> bookInfo.get().writer().set(writer.getText()));
-        narrator.textProperty().addListener(o -> bookInfo.get().narrator().set(narrator.getText()));
+        writer.textProperty().addListener(o -> bookInfo.writer().set(writer.getText()));
+        narrator.textProperty().addListener(o -> bookInfo.narrator().set(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.get().genre().set(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> bookInfo.get().genre().set(genre.getEditor().getText()));
+        genre.valueProperty().addListener(o -> bookInfo.genre().set(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> bookInfo.genre().set(genre.getEditor().getText()));
 
-        series.textProperty().addListener(o -> bookInfo.get().series().set(series.getText()));
+        series.textProperty().addListener(o -> bookInfo.series().set(series.getText()));
         bookNo.textProperty().addListener(o -> {
             if (StringUtils.isNotBlank(bookNo.getText()))
-                bookInfo.get().bookNumber().set(bookNo.getText());
+                bookInfo.bookNumber().set(bookNo.getText());
         });
-        year.textProperty().addListener(o -> bookInfo.get().year().set(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.get().comment().set(comment.getText()));
+        year.textProperty().addListener(o -> bookInfo.year().set(year.getText()));
+        comment.textProperty().addListener(o -> bookInfo.comment().set(comment.getText()));
 
-        ConverterApplication.getContext().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo.get())));
+        ConverterApplication.getContext().next().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo)));
 
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
-        if (ConverterApplication.getContext().getBook() == null) {
+        if (ConverterApplication.getContext().next().getBook() == null) {
             if (clear) {
                 clearTags();
             } else {

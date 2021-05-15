@@ -37,6 +37,7 @@ public class ConversionContext {
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
     private DelegatedObservableList<ArtWork> uiPosters;
+    private DelegatedObservableList<MediaInfo> uiMedia;
 
 
     public ConversionContext() {
@@ -61,6 +62,13 @@ public class ConversionContext {
         } else {
             uiPosters = new DelegatedObservableList<>(newConversionGroup.getPosters());
         }
+        if (uiMedia != null) {
+            uiMedia.setDelegate(newConversionGroup.getMedia());
+        } else {
+            uiMedia = new DelegatedObservableList<>(newConversionGroup.getMedia());
+        }
+
+
 //        newConversionGroup.setBookInfo(AudioBookInfo.instance());
 /*
         bookInfo.set(AudioBookInfo.instance());
@@ -107,5 +115,12 @@ public class ConversionContext {
             uiPosters = new DelegatedObservableList<>(next().getPosters());
         }
         return uiPosters;
+    }
+
+    public ObservableList<MediaInfo> getMedia() {
+        if (uiMedia == null) {
+            uiMedia = new DelegatedObservableList<>(next().getMedia());
+        }
+        return uiMedia;
     }
 }

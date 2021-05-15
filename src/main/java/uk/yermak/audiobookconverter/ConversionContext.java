@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.util.DelegatedObservableList;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;

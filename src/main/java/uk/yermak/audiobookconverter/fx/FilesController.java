@@ -141,7 +141,7 @@ public class FilesController {
         chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
         fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
 
-        context.addSpeedChangeListener((observableValue, oldValue, newValue) -> {
+        context.next().addSpeedChangeListener((observableValue, oldValue, newValue) -> {
             if (chaptersMode.get()) {
                 Platform.runLater(() -> bookStructure.updateBookStructure());
             }
@@ -216,7 +216,7 @@ public class FilesController {
 
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
         if (chaptersMode.get()) {
-            Book book = ConverterApplication.getContext().getBook();
+            Book book = ConverterApplication.getContext().next().getBook();
             book.construct(FXCollections.observableArrayList(addedMedia));
             bookStructure.updateBookStructure();
         } else {
@@ -255,7 +255,7 @@ public class FilesController {
     }
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getPlannedConversionGroup());
+        return new FFMediaLoader(fileNames, ConverterApplication.getContext().next());
     }
 
     public void selectFilesDialog() {
@@ -298,7 +298,7 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-        ConverterApplication.getContext().getPlannedConversionGroup().cancel();
+        ConverterApplication.getContext().next().cancel();
         ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
@@ -332,16 +332,16 @@ public class FilesController {
     private void launch(ConversionGroup conversionGroup, Book book, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent, String outputDestination) {
 
         if (book == null) {
-            book = new Book(ConverterApplication.getContext().getBookInfo().get());
+            book = new Book(ConverterApplication.getContext().next().getBookInfo());
             book.construct(mediaInfos);
         }
 
         ObservableList<Part> parts = book.getParts();
-        Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+        Format format = ConverterApplication.getContext().next().getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
         conversionGroup.getOutputParameters().setupFormat(format);
 
-        if (ConverterApplication.getContext().getOutputParameters().isSplitChapters()) {
+        if (ConverterApplication.getContext().next().getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
@@ -382,9 +382,9 @@ public class FilesController {
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
-        if (context.getBook() == null && fileList.getItems().isEmpty()) return;
+        if (context.next().getBook() == null && fileList.getItems().isEmpty()) return;
 
-        String outputDestination = selectOutputFile(ConverterApplication.getContext().getBookInfo().get());
+        String outputDestination = selectOutputFile(ConverterApplication.getContext().next().getBookInfo());
 
         if (outputDestination == null) {
             return;
@@ -393,13 +393,15 @@ public class FilesController {
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
 
-        ConversionGroup conversionGroup = ConverterApplication.getContext().getPlannedConversionGroup();
+        ConversionGroup conversionGroup = ConverterApplication.getContext().next();
 
+/* TODO!!!!
         conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
         conversionGroup.setBookInfo(context.getBookInfo().get());
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
+*/
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.getPlannedConversionGroup(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(context.next(), Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
 
         Executors.newSingleThreadExecutor().submit(() -> {
@@ -407,7 +409,7 @@ public class FilesController {
                 progressQueue.getItems().add(0, placeHolderProgress);
                 filesChapters.getSelectionModel().select(queueTab);
             });
-            launch(conversionGroup, context.getBook(), mediaInfos, placeHolderProgress, outputDestination);
+            launch(conversionGroup, context.next().getBook(), mediaInfos, placeHolderProgress, outputDestination);
         });
 
         ConverterApplication.getContext().resetForNewConversion();
@@ -427,7 +429,7 @@ public class FilesController {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().getOutputParameters().getFormat().toString())
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().next().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().next().getOutputParameters().getFormat().toString())
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
@@ -451,11 +453,11 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        Book book = new Book(ConverterApplication.getContext().getBookInfo().get());
+        Book book = new Book(ConverterApplication.getContext().next().getBookInfo());
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
-        ConverterApplication.getContext().setBook(book);
+        ConverterApplication.getContext().next().setBook(book);
 
         bookStructure.updateBookStructure();
 

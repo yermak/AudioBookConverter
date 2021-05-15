@@ -48,7 +48,7 @@ public class MediaPlayerController  {
     @FXML
     public void initialize() {
         ConversionContext context = ConverterApplication.getContext();
-        media = context.getMedia();
+        media = context.next().getMedia();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 //        selectedMedia.addListener((ListChangeListener<MediaInfo>) c -> disablePlayer(selectedMedia.isEmpty() && mediaPlayer == null));
 
@@ -120,8 +120,8 @@ public class MediaPlayerController  {
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(1.0);
 
-        mediaPlayer.rateProperty().bind(context.getSpeedObservable());
-        mediaPlayer.rateProperty().set(context.getSpeed());
+        mediaPlayer.rateProperty().bind(context.next().getSpeedObservable());
+        mediaPlayer.rateProperty().set(context.next().getSpeed());
 
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {

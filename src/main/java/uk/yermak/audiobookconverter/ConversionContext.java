@@ -30,14 +30,16 @@ public class ConversionContext {
     private boolean paused;
 
     private final ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
-    private final ObservableList<String> genres = FXCollections.observableArrayList();
+    private final GenresManager genresManager = new GenresManager();
 
+/*
     private final SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
     private final SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(1.0);
+*/
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -46,82 +48,26 @@ public class ConversionContext {
         resetForNewConversion();
     }
 
-    //TODO move somewhere
-    public void movePosterLeft(final Integer selected) {
-        Platform.runLater(() -> {
-            ArtWork lower = posters.get(selected);
-            ArtWork upper = posters.get(selected - 1);
-            posters.set(selected - 1, lower);
-            posters.set(selected, upper);
-        });
-    }
-
-    public void addPosterIfMissingWithDelay(ArtWork artWork) {
-        Platform.runLater(() -> {
-            addPosterIfMissing(artWork);
-        });
-    }
-
-    void addPosterIfMissing(ArtWork artWork) {
-        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
-            posters.add(artWork);
-        }
-    }
 
     public void saveGenres() {
-        if (bookInfo.get() != null) {
-            if (StringUtils.isNotEmpty(bookInfo.get().genre().get()) & genres.stream().noneMatch(s -> s.equals(bookInfo.get().genre().get()))) {
-                genres.add(bookInfo.get().genre().get());
-            }
-            Gson gson = new Gson();
-            String genresString = gson.toJson(new ArrayList<>(genres));
-            AppProperties.setProperty("genres", genresString);
-        }
+        genresManager.saveGenres(conversionGroupHolder.get().getBookInfo());
     }
 
     public ObservableList<String> loadGenres() {
-        genres.clear();
-        String genresProperty = AppProperties.getProperty("genres");
-        if (genresProperty != null) {
-            Gson gson = new Gson();
-            ArrayList<String> list = gson.fromJson(genresProperty, ArrayList.class);
-            this.genres.addAll(list.stream().sorted().collect(Collectors.toList()));
-        }
-        return genres;
+        return genresManager.loadGenres();
     }
 
     public void resetForNewConversion() {
         saveGenres();
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
+//        newConversionGroup.setBookInfo(AudioBookInfo.instance());
+/*
         bookInfo.set(AudioBookInfo.instance());
         book.set(null);
         posters.clear();
         media.clear();
-    }
-
-    public OutputParameters getOutputParameters() {
-        return outputParameters.get();
-    }
-
-    public Book getBook() {
-        return book.get();
-    }
-
-    public void setBook(Book book) {
-        this.book.set(book);
-    }
-
-    public ObservableList<MediaInfo> getMedia() {
-        return media;
-    }
-
-    public Double getSpeed() {
-        return speed.get();
-    }
-
-    public ObservableValue<Double> getSpeedObservable() {
-        return speed;
+*/
     }
 
     public void stopConversions() {
@@ -146,24 +92,8 @@ public class ConversionContext {
         return paused;
     }
 
-    public SimpleObjectProperty<AudioBookInfo> getBookInfo() {
-        return bookInfo;
-    }
-
-    public ObservableList<ArtWork> getPosters() {
-        return posters;
-    }
-
-    public ConversionGroup getPlannedConversionGroup() {
+    public ConversionGroup next() {
         return conversionGroupHolder.get();
-    }
-
-    public void addBookInfoChangeListener(ChangeListener<AudioBookInfo> listener) {
-        bookInfo.addListener(listener);
-    }
-
-    public void removePoster(int toRemove) {
-        Platform.runLater(() -> posters.remove(toRemove));
     }
 
     public void addJob(ConversionJob conversionJob) {
@@ -171,23 +101,5 @@ public class ConversionContext {
         executorService.execute(conversionJob);
     }
 
-    public void addBookChangeListener(ChangeListener<Book> listener) {
-        book.addListener(listener);
-    }
 
-    public void addOutputParametersChangeListener(ChangeListener<OutputParameters> changeListener) {
-        outputParameters.addListener(changeListener);
-    }
-
-    public void setOutputParameters(OutputParameters outputParameters) {
-        this.outputParameters.set(outputParameters);
-    }
-
-    public void addSpeedChangeListener(ChangeListener<Double> changeListener) {
-        speed.addListener(changeListener);
-    }
-
-    public void setSpeed(Double speed) {
-        this.speed.set(speed);
-    }
 }

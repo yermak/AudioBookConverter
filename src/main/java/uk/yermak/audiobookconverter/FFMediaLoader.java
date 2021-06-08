@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.ByteArrayOutputStream;
@@ -79,7 +80,7 @@ public class FFMediaLoader {
         @Override
         public MediaInfo call() throws Exception {
             try {
-                if (conversionGroup.isOver())
+                if (conversionGroup.isOver() || conversionGroup.isRunning())
                     throw new InterruptedException("Media Info Loading was interrupted");
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 logger.debug("Extracted ffprobe error: {}", probeResult.getError());
@@ -245,7 +246,7 @@ public class FFMediaLoader {
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversionGroup.isOver())
-                        ConverterApplication.getContext().next().addPosterIfMissingWithDelay(artWorkBean);
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 });
                 return artWorkBean;
             } finally {
@@ -272,7 +273,7 @@ public class FFMediaLoader {
         //adding artificial limit of image count to address issue #153.
         if (!pictures.isEmpty()) {
             for (int i = 0; i < 10 && i < pictures.size(); i++) {
-                context.next().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
             }
         }
     }

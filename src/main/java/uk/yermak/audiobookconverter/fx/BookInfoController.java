@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
@@ -59,13 +60,14 @@ public class BookInfoController {
         });
 
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
-        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+//        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+        media.addListener((ListChangeListener<? super MediaInfo>) change -> updateTags(media, media.isEmpty()));
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
 //        clearTags();
 
-        AudioBookInfo bookInfo = ConverterApplication.getContext().next().getBookInfo();
+        AudioBookInfo bookInfo = ConverterApplication.getContext().getBookInfo();
 
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
@@ -90,7 +92,7 @@ public class BookInfoController {
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
-        if (ConverterApplication.getContext().next().getBook() == null) {
+        if (ConverterApplication.getContext().getBook() == null) {
             if (clear) {
                 clearTags();
             } else {

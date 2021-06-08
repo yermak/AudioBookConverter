@@ -1,22 +1,22 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
+import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 06-Feb-18.
@@ -27,12 +27,11 @@ public class ConversionGroup {
     private final List<ConversionJob> jobs = new ArrayList<>();
     private boolean cancelled;
 
-    private final SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>(AudioBookInfo.instance());
-    private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
-    private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
-    private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
-//    private final SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(1.0);
+    private Book book;
+    private AudioBookInfo bookInfo;
+    private List<MediaInfo> media;
+    private List<ArtWork> posters;
+    private OutputParameters outputParameters;
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -51,28 +50,21 @@ public class ConversionGroup {
     }
 
     public OutputParameters getOutputParameters() {
-        return outputParameters.get();
+        return outputParameters;
     }
 
     public AudioBookInfo getBookInfo() {
-        return bookInfo.get();
+        return bookInfo;
     }
 
-    public ObservableList<ArtWork> getPosters() {
+    public List<ArtWork> getPosters() {
         return posters;
     }
 
     public String getWorkfileExtension() {
-        return outputParameters.get().format.extension;
+        return outputParameters.format.extension;
     }
 
-    public void setOutputParameters(OutputParameters outputParameters) {
-        this.outputParameters.set(outputParameters);
-    }
-
-    public void setBookInfo(AudioBookInfo bookInfo) {
-        this.bookInfo.set(bookInfo);
-    }
 
     public boolean isOver() {
         if (cancelled) return true;
@@ -87,73 +79,90 @@ public class ConversionGroup {
         cancelled = true;
     }
 
-
-    public void movePosterUp(final Integer selected) {
-        Platform.runLater(() -> {
-            ArtWork lower = posters.get(selected);
-            ArtWork upper = posters.get(selected - 1);
-            posters.set(selected - 1, lower);
-            posters.set(selected, upper);
-        });
-    }
-
-    public void addPosterIfMissingWithDelay(ArtWork artWork) {
-        Platform.runLater(() -> {
-            addPosterIfMissing(artWork);
-        });
-    }
-
-    void addPosterIfMissing(ArtWork artWork) {
-        if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
-            posters.add(artWork);
-        }
-    }
-
-    public void addBookInfoChangeListener(ChangeListener<AudioBookInfo> listener) {
-        bookInfo.addListener(listener);
-    }
-
-    public void removePoster(int toRemove) {
-        Platform.runLater(() -> posters.remove(toRemove));
-    }
-
-    public void addOutputParametersChangeListener(ChangeListener<OutputParameters> changeListener) {
-        outputParameters.addListener(changeListener);
-    }
-
-
-    public void addSpeedChangeListener(ChangeListener<Double> changeListener) {
-        outputParameters.get().speed.addListener(changeListener);
-    }
-
-    public void setSpeed(Double speed) {
-        this.outputParameters.get().setSpeed(speed);
-    }
-
     public Book getBook() {
-        return book.get();
+        return book;
     }
 
-    public void setBook(Book book) {
-        this.book.set(book);
-    }
-
-    public ObservableList<MediaInfo> getMedia() {
+    public List<MediaInfo> getMedia() {
         return media;
     }
 
-    public Double getSpeed() {
-        return outputParameters.get().getSpeed();
+    public boolean isRunning() {
+        //TODO add running check to prevent images update
+        return false;
     }
 
-    public ObservableValue<Double> getSpeedObservable() {
-        return outputParameters.get().speed;
+    public void setMedia(List<MediaInfo> media) {
+        this.media = media;
     }
 
-    public void addBookChangeListener(ChangeListener<Book> listener) {
-        book.addListener(listener);
+    public void setPosters(List<ArtWork> posters) {
+        this.posters = posters;
     }
 
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
+    public void setBookInfo(AudioBookInfo bookInfo) {
+        this.bookInfo = bookInfo;
+    }
+
+    public void setOutputParameters(OutputParameters outputParameters) {
+        this.outputParameters = outputParameters;
+    }
+
+    public void launch(ConversionGroup conversionGroup, ListView<ProgressComponent> progressQueue, ProgressComponent progressComponent, String outputDestination) {
+
+        Book book = conversionGroup.getBook();
+        if (book == null) {
+            book = new Book(conversionGroup.getBookInfo());
+            book.construct(conversionGroup.getMedia());
+        }
+
+        ObservableList<Part> parts = book.getParts();
+        Format format = conversionGroup.getOutputParameters().getFormat();
+//        String extension = FilenameUtils.getExtension(outputDestination);
+        conversionGroup.getOutputParameters().setupFormat(format);
+
+        if (conversionGroup.getOutputParameters().isSplitChapters()) {
+            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+            logger.debug("Found {} chapters in the book", chapters.size());
+            for (int i = 0; i < chapters.size(); i++) {
+                Chapter chapter = chapters.get(i);
+                String finalDesination = outputDestination;
+                if (chapters.size() > 1) {
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
+                }
+                String finalName = new File(finalDesination).getName();
+                logger.debug("Adding conversion for chapter {}", finalName);
+
+                ConversionProgress conversionProgress = conversionGroup.start(chapter, finalDesination);
+                Platform.runLater(() -> {
+                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
+                });
+
+            }
+        } else {
+            logger.debug("Found {} parts in the book", parts.size());
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i);
+                String finalDesination = outputDestination;
+                if (parts.size() > 1) {
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
+                }
+                String finalName = new File(finalDesination).getName();
+                logger.debug("Adding conversion for part {}", finalName);
+
+                ConversionProgress conversionProgress = conversionGroup.start(part, finalDesination);
+                Platform.runLater(() -> {
+                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
+                });
+            }
+        }
+
+        Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+    }
 }
 
 

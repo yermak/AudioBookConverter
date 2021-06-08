@@ -39,7 +39,7 @@ public class DialogHelper {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ConverterApplication.getContext().next().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().next().getOutputParameters().getFormat().toString())
+                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().getOutputParameters().getFormat().toString())
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;

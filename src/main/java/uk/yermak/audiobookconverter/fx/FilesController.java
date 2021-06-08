@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.fx;
 
-import com.google.common.collect.ImmutableSet;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -14,15 +13,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.TransferMode;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
-import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -131,7 +124,7 @@ public class FilesController {
         chaptersMode.addListener((observableValue, oldValue, newValue) -> importButton.setDisable(newValue || fileList.getItems().isEmpty()));
         fileList.getItems().addListener((ListChangeListener<MediaInfo>) change -> importButton.setDisable(fileList.getItems().isEmpty()));
 
-        context.next().addSpeedChangeListener((observableValue, oldValue, newValue) -> {
+        context.addSpeedChangeListener((observableValue, oldValue, newValue) -> {
             if (chaptersMode.get()) {
                 Platform.runLater(() -> bookStructure.updateBookStructure());
             }
@@ -197,17 +190,17 @@ public class FilesController {
     private void processFiles(List<String> fileNames) {
         List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
         if (chaptersMode.get()) {
-            Book book = ConverterApplication.getContext().next().getBook();
+            Book book = ConverterApplication.getContext().getBook();
             book.construct(FXCollections.observableArrayList(addedMedia));
             bookStructure.updateBookStructure();
         } else {
-            fileList.getItems().addAll(addedMedia);
+            ConverterApplication.getContext().getMedia().addAll(addedMedia);
         }
     }
 
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, ConverterApplication.getContext().next());
+        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getConversionGroup());
     }
 
     public void selectFiles() {
@@ -234,8 +227,8 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-        ConverterApplication.getContext().next().cancel();
-        ConverterApplication.getContext().resetForNewConversion();
+        ConverterApplication.getContext().getConversionGroup().cancel();
+        ConverterApplication.getContext().detach();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
@@ -265,63 +258,12 @@ public class FilesController {
         }
     }
 
-    private void launch(ConversionGroup conversionGroup, ObservableList<MediaInfo> mediaInfos, ProgressComponent progressComponent, String outputDestination) {
-
-        Book book = conversionGroup.getBook();
-        if (book == null) {
-            book = new Book(conversionGroup.getBookInfo());
-            book.construct(mediaInfos);
-        }
-
-        ObservableList<Part> parts = book.getParts();
-        Format format = conversionGroup.getOutputParameters().getFormat();
-//        String extension = FilenameUtils.getExtension(outputDestination);
-        conversionGroup.getOutputParameters().setupFormat(format);
-
-        if (conversionGroup.getOutputParameters().isSplitChapters()) {
-            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
-            logger.debug("Found {} chapters in the book", chapters.size());
-            for (int i = 0; i < chapters.size(); i++) {
-                Chapter chapter = chapters.get(i);
-                String finalDesination = outputDestination;
-                if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
-                }
-                String finalName = new File(finalDesination).getName();
-                logger.debug("Adding conversion for chapter {}", finalName);
-
-                ConversionProgress conversionProgress = conversionGroup.start(chapter, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
-
-            }
-        } else {
-            logger.debug("Found {} parts in the book", parts.size());
-            for (int i = 0; i < parts.size(); i++) {
-                Part part = parts.get(i);
-                String finalDesination = outputDestination;
-                if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
-                }
-                String finalName = new File(finalDesination).getName();
-                logger.debug("Adding conversion for part {}", finalName);
-
-                ConversionProgress conversionProgress = conversionGroup.start(part, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
-            }
-        }
-
-        Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
-    }
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = ConverterApplication.getContext();
-        if (context.next().getBook() == null && fileList.getItems().isEmpty()) return;
+        if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
-        String outputDestination = DialogHelper.selectOutputFile(ConverterApplication.getContext().next().getBookInfo());
+        String outputDestination = DialogHelper.selectOutputFile(ConverterApplication.getContext().getBookInfo());
 
         if (outputDestination == null) {
             return;
@@ -346,14 +288,18 @@ public class FilesController {
                 progressQueue.getItems().add(0, placeHolderProgress);
                 filesChapters.getSelectionModel().select(queueTab);
             });
-            launch(conversionGroup, mediaInfos, placeHolderProgress, outputDestination);
+            conversionGroup.launch(conversionGroup, progressQueue, placeHolderProgress, outputDestination);
+
+//            launch(conversionGroup, mediaInfos, placeHolderProgress, outputDestination);
         });
 
 //        ConverterApplication.getContext().resetForNewConversion();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
-        fileList.getItems().clear();
+        context.getMedia().clear();
+        context.getPosters().clear();
+//        fileList.getItems().clear();
         chaptersMode.set(false);
     }
 
@@ -371,11 +317,11 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        Book book = new Book(ConverterApplication.getContext().next().getBookInfo());
+        Book book = new Book(ConverterApplication.getContext().getBookInfo());
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
-        ConverterApplication.getContext().next().setBook(book);
+        ConverterApplication.getContext().setBook(book);
 
         bookStructure.updateBookStructure();
 

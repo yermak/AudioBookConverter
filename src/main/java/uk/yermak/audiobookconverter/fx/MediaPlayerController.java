@@ -12,10 +12,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
-import uk.yermak.audiobookconverter.fx.util.DelegatedObservableList;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -121,8 +119,8 @@ public class MediaPlayerController  {
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(1.0);
 
-        mediaPlayer.rateProperty().bind(context.next().getSpeedObservable());
-        mediaPlayer.rateProperty().set(context.next().getSpeed());
+        mediaPlayer.rateProperty().bind(context.getOutputParameters().getSpeedObservable());
+        mediaPlayer.rateProperty().set(context.getOutputParameters().getSpeed());
 
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {

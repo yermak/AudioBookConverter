@@ -3,6 +3,8 @@ package uk.yermak.audiobookconverter;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 
 import java.util.Comparator;
 import java.util.List;
@@ -131,6 +133,10 @@ public class OutputParameters {
 
     public void setSpeed(double speed) {
         this.speed.set(speed);
+    }
+
+    public ObservableValue<Double> getSpeedObservable() {
+        return speed;
     }
 }
 

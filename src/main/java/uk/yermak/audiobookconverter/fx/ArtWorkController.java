@@ -38,7 +38,7 @@ public class ArtWorkController {
         ConversionContext context = ConverterApplication.getContext();
         imageList.setCellFactory(param -> new ArtWorkListCell());
         imageList.setItems(context.getPosters());
-        context.addContextDetachListener(observable -> imageList.getItems().clear());
+        context.addContextDetachListener(observable -> context.getPosters().clear());
     }
 
     @FXML
@@ -64,7 +64,7 @@ public class ArtWorkController {
     private void removeImage(ActionEvent actionEvent) {
         int toRemove = imageList.getSelectionModel().getSelectedIndex();
         if (toRemove == -1) return;
-        ConverterApplication.getContext().next().removePoster(toRemove);
+        ConverterApplication.getContext().removePoster(toRemove);
 //        imageList.getItems().remove(toRemove);
         logger.info("Removed art work #{}", toRemove);
     }
@@ -75,7 +75,7 @@ public class ArtWorkController {
         if (selectedIndices.size() == 1) {
             Integer selected = selectedIndices.get(0);
             if (selected > 0) {
-                ConverterApplication.getContext().next().movePosterUp(selected);
+                ConverterApplication.getContext().movePosterUp(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
                 logger.debug("Image {} moved left", selected);
             }
@@ -90,7 +90,7 @@ public class ArtWorkController {
             ObservableList<ArtWork> items = imageList.getItems();
             Integer selected = selectedIndices.get(0);
             if (selected < items.size() - 1) {
-                ConverterApplication.getContext().next().movePosterUp(selected + 1);
+                ConverterApplication.getContext().movePosterUp(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
                 logger.debug("Image {} moved right", selected);
             }
@@ -105,12 +105,12 @@ public class ArtWorkController {
                 if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
                     Image fimage = awtImageToFX(image);
-                    ConverterApplication.getContext().next().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
+                    ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().next().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
                     });
                 }
             }

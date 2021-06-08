@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
-public class Mp4v2InfoLoaderTest {
+public class DurationVerifierTest {
 
     @Test
     public void testParseInfo() {
@@ -14,7 +14,7 @@ public class Mp4v2InfoLoaderTest {
                 " Comments: null\n" +
                 " Media Type: Audio Book";
 
-        long l = Mp4v2InfoLoader.parseDuration(info);
+        long l = DurationVerifier.parseDuration(info);
         assertEquals(l, 7137041);
     }
 }

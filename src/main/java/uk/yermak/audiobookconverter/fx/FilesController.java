@@ -269,7 +269,7 @@ public class FilesController {
             return;
         }
 
-        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
+//        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
 
         ConversionGroup conversionGroup = ConverterApplication.getContext().detach();

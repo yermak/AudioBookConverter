@@ -72,8 +72,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             logger.debug("ffmpeg out: {}", out.toString());
             logger.warn("ffmpeg err: {}", err.toString());
 
-            //TODO Update dureation for OGG output
-            Mp4v2InfoLoader.updateDuration(mediaInfo, outputFileName);
+            DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
             return outputFileName;
         } catch (CancellationException ce) {
             return null;

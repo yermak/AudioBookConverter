@@ -357,7 +357,7 @@ public class FilesController {
 
     @FXML
     public void split(ActionEvent event) {
-        bookStructure.splitChapters(event);
+        bookStructure.split(event);
     }
 
 

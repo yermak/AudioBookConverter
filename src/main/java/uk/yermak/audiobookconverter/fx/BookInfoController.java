@@ -67,26 +67,24 @@ public class BookInfoController {
 
 //        clearTags();
 
-        AudioBookInfo bookInfo = ConverterApplication.getContext().getBookInfo();
-
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> bookInfo.title().set(title.getText()));
+        title.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().title().set(title.getText()));
 
-        writer.textProperty().addListener(o -> bookInfo.writer().set(writer.getText()));
-        narrator.textProperty().addListener(o -> bookInfo.narrator().set(narrator.getText()));
+        writer.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().writer().set(writer.getText()));
+        narrator.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().narrator().set(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.genre().set(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> bookInfo.genre().set(genre.getEditor().getText()));
+        genre.valueProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
 
-        series.textProperty().addListener(o -> bookInfo.series().set(series.getText()));
+        series.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().series().set(series.getText()));
         bookNo.textProperty().addListener(o -> {
             if (StringUtils.isNotBlank(bookNo.getText()))
-                bookInfo.bookNumber().set(bookNo.getText());
+                ConverterApplication.getContext().getBookInfo().bookNumber().set(bookNo.getText());
         });
-        year.textProperty().addListener(o -> bookInfo.year().set(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.comment().set(comment.getText()));
+        year.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().year().set(year.getText()));
+        comment.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().comment().set(comment.getText()));
 
         ConverterApplication.getContext().addContextDetachListener(observable -> Platform.runLater(() -> clearTags()));
     }

@@ -12,14 +12,13 @@ Overtime AudioBookConverter evolved and currently can support converion of most 
 
 **Note:** Mac and Linux versions are experimental and may require some skills to install and run them and may not work as you expect
 
-<a href="https://paypal.me/pools/c/8l28GKocaS">Donate</a> or give a star to project if you have found AudioBookConverter helpful!
 -----
 
 
 Supported source formats:
 -----
 * mp3
-* flac
+* flac/cue
 * wma
 * m4a/m4b
 * aac

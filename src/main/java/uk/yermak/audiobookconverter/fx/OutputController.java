@@ -51,7 +51,7 @@ public class OutputController {
     private RadioButton vbr;
     @FXML
     private Slider vbrQuality;
-    private ObservableList<MediaInfo> media;
+//    private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
@@ -136,7 +136,8 @@ public class OutputController {
         refreshSpeeds();
 
         ConversionContext context = ConverterApplication.getContext();
-        media = context.getMedia();
+        ObservableList<MediaInfo> media = context.getMedia();
+
 
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;

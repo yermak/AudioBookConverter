@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.IOException;

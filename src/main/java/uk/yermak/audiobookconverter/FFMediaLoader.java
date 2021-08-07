@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,7 @@ public class FFMediaLoader {
     private final ConversionGroup conversionGroup;
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(8);
+    private boolean detached;
 
     public FFMediaLoader(List<String> files, ConversionGroup conversionGroup) {
         this.fileNames = files;
@@ -62,6 +64,10 @@ public class FFMediaLoader {
         }
     }
 
+    public void detach() {
+
+    }
+
     private static class MediaInfoCallable implements Callable<MediaInfo> {
 
         private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
@@ -79,7 +85,7 @@ public class FFMediaLoader {
         @Override
         public MediaInfo call() throws Exception {
             try {
-                if (conversionGroup.isOver())
+                if (conversionGroup.isOver() || conversionGroup.isRunning())
                     throw new InterruptedException("Media Info Loading was interrupted");
                 FFmpegProbeResult probeResult = ffprobe.probe(filename);
                 logger.debug("Extracted ffprobe error: {}", probeResult.getError());
@@ -103,9 +109,11 @@ public class FFMediaLoader {
                         streamTags = ffMpegStream.tags;
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
-                        Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup), 1, TimeUnit.SECONDS);
-                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                        mediaInfo.setArtWork(artWork);
+                        if (!conversionGroup.isDetached()) {
+                            Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup), 1, TimeUnit.SECONDS);
+                            ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
+                            mediaInfo.setArtWork(artWork);
+                        }
                     }
                 }
 
@@ -221,7 +229,8 @@ public class FFMediaLoader {
         public ArtWork call() throws Exception {
             Process process = null;
             try {
-                if (conversionGroup.isOver()) throw new InterruptedException("ArtWork loading was interrupted");
+                if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
+                    throw new InterruptedException("ArtWork loading was interrupted");
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
                         "-i", mediaInfo.getFileName(),
@@ -244,8 +253,9 @@ public class FFMediaLoader {
 
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
-                    if (!conversionGroup.isOver())
+                    if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
                         ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                    }
                 });
                 return artWorkBean;
             } finally {

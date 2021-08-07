@@ -26,7 +26,7 @@ public class Book implements Organisable, InvalidationListener {
         this.audioBookInfo = audioBookInfo;
     }
 
-    public void construct(ObservableList<MediaInfo> items) {
+    public void construct(List<MediaInfo> items) {
         try {
             Part part = new Part(this);
             for (MediaInfo item : items) {

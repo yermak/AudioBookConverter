@@ -33,12 +33,12 @@ public class ArtWorkController {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-
     @FXML
     private void initialize() {
         ConversionContext context = ConverterApplication.getContext();
         imageList.setCellFactory(param -> new ArtWorkListCell());
         imageList.setItems(context.getPosters());
+        context.addContextDetachListener(observable -> context.getPosters().clear());
     }
 
     @FXML
@@ -75,7 +75,7 @@ public class ArtWorkController {
         if (selectedIndices.size() == 1) {
             Integer selected = selectedIndices.get(0);
             if (selected > 0) {
-                ConverterApplication.getContext().movePosterLeft(selected);
+                ConverterApplication.getContext().movePosterUp(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
                 logger.debug("Image {} moved left", selected);
             }
@@ -90,7 +90,7 @@ public class ArtWorkController {
             ObservableList<ArtWork> items = imageList.getItems();
             Integer selected = selectedIndices.get(0);
             if (selected < items.size() - 1) {
-                ConverterApplication.getContext().movePosterLeft(selected + 1);
+                ConverterApplication.getContext().movePosterUp(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
                 logger.debug("Image {} moved right", selected);
             }

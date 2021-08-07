@@ -2,6 +2,8 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import uk.yermak.audiobookconverter.fx.util.SmartIntegerProperty;
+import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 
 import java.util.Collections;
 import java.util.Map;

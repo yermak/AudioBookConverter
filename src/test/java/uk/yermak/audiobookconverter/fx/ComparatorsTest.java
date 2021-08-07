@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.util.ArrayList;
 import java.util.Comparator;

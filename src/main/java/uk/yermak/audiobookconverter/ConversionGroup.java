@@ -32,6 +32,7 @@ public class ConversionGroup {
     private List<MediaInfo> media;
     private List<ArtWork> posters;
     private OutputParameters outputParameters;
+    private boolean detached;
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -88,7 +89,18 @@ public class ConversionGroup {
     }
 
     public boolean isRunning() {
+        for (ConversionJob job : jobs) {
+            if (!job.getStatus().isOver()) return false;
+        }
+
         //TODO add running check to prevent images update
+        return false;
+    }
+
+    public boolean isStarted() {
+        for (ConversionJob job : jobs) {
+            if (job.getStatus().isStarted()) return true;
+        }
         return false;
     }
 
@@ -112,20 +124,19 @@ public class ConversionGroup {
         this.outputParameters = outputParameters;
     }
 
-    public void launch(ConversionGroup conversionGroup, ListView<ProgressComponent> progressQueue, ProgressComponent progressComponent, String outputDestination) {
-
-        Book book = conversionGroup.getBook();
+    public void launch(ListView<ProgressComponent> progressQueue, ProgressComponent progressComponent, String outputDestination) {
+        Book book = this.getBook();
         if (book == null) {
-            book = new Book(conversionGroup.getBookInfo());
-            book.construct(conversionGroup.getMedia());
+            book = new Book(this.getBookInfo());
+            book.construct(this.getMedia());
         }
 
         ObservableList<Part> parts = book.getParts();
-        Format format = conversionGroup.getOutputParameters().getFormat();
+        Format format = this.getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
-        conversionGroup.getOutputParameters().setupFormat(format);
+        this.getOutputParameters().setupFormat(format);
 
-        if (conversionGroup.getOutputParameters().isSplitChapters()) {
+        if (this.getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
@@ -137,7 +148,7 @@ public class ConversionGroup {
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
-                ConversionProgress conversionProgress = conversionGroup.start(chapter, finalDesination);
+                ConversionProgress conversionProgress = this.start(chapter, finalDesination);
                 Platform.runLater(() -> {
                     progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
                 });
@@ -154,7 +165,7 @@ public class ConversionGroup {
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
-                ConversionProgress conversionProgress = conversionGroup.start(part, finalDesination);
+                ConversionProgress conversionProgress = this.start(part, finalDesination);
                 Platform.runLater(() -> {
                     progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
                 });
@@ -162,6 +173,14 @@ public class ConversionGroup {
         }
 
         Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+    }
+
+    public void setDetached(boolean detached) {
+        this.detached = detached;
+    }
+
+    public boolean isDetached() {
+        return detached;
     }
 }
 

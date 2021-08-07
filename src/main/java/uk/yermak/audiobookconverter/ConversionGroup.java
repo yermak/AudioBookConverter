@@ -11,10 +11,7 @@ import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -182,6 +179,8 @@ public class ConversionGroup {
     public boolean isDetached() {
         return detached;
     }
+
+
 }
 
 

@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter.fx;
+package uk.yermak.audiobookconverter.fx.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @author Ivan Gerasimov
  */
-class Comparators {
+public class Comparators {
     private Comparators() {
         throw new AssertionError("no instances");
     }

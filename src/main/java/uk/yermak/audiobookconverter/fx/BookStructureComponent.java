@@ -6,6 +6,8 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.util.Pair;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuTreeTableRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +184,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
-        double speed = ConverterApplication.getContext().getSpeed();
+        double speed = ConverterApplication.getContext().getOutputParameters().getSpeed();
         long duration = mediaInfo.getDuration();
 
         if (speed != 1.0) {

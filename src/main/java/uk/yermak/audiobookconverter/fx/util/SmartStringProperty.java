@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.fx.util;
 
 import javafx.beans.property.SimpleStringProperty;
 import org.apache.commons.lang3.StringUtils;

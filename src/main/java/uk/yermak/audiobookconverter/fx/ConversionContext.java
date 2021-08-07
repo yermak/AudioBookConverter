@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,8 +36,10 @@ public class ConversionContext {
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
-//    private boolean detached;
+
     private FFMediaLoader mediaLoader;
+    private Set<ArtWork> removedArtWorks = new HashSet<>();
+
 
     public ConversionContext() {
 //        resetForNewConversion();
@@ -109,9 +109,8 @@ public class ConversionContext {
         book.set(null);
         posters.clear();
         media.clear();
+        removedArtWorks.clear();
         mediaLoader = null;
-
-//        detached = true;
 
         return conversionGroup;
     }
@@ -144,9 +143,10 @@ public class ConversionContext {
     }
 
     public void addPosterIfMissing(ArtWork artWork) {
-//        if (detached) return;
         if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
-            posters.add(artWork);
+            if (removedArtWorks.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
+                posters.add(artWork);
+            }
         }
     }
 
@@ -155,7 +155,10 @@ public class ConversionContext {
     }
 
     public void removePoster(int toRemove) {
-        Platform.runLater(() -> posters.remove(toRemove));
+        Platform.runLater(() -> {
+            ArtWork remove = posters.remove(toRemove);
+            removeArtWork(remove);
+        });
     }
 
     public void addOutputParametersChangeListener(ChangeListener<OutputParameters> changeListener) {
@@ -209,4 +212,9 @@ public class ConversionContext {
     public void setMediaLoader(FFMediaLoader mediaLoader) {
         this.mediaLoader = mediaLoader;
     }
+
+    public void removeArtWork(ArtWork artWork) {
+        removedArtWorks.add(artWork);
+    }
+
 }

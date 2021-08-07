@@ -188,13 +188,14 @@ public class FilesController {
 
 
     private void processFiles(List<String> fileNames) {
-        List<MediaInfo> addedMedia = createMediaLoader(fileNames).loadMediaInfo();
+        FFMediaLoader mediaLoader = createMediaLoader(fileNames);
+        ConverterApplication.getContext().setMediaLoader(mediaLoader);
+        List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
-            Book book = ConverterApplication.getContext().getBook();
-            book.construct(FXCollections.observableArrayList(addedMedia));
+            ConverterApplication.getContext().constructBook(addedMedia);
             bookStructure.updateBookStructure();
         } else {
-            ConverterApplication.getContext().getMedia().addAll(addedMedia);
+            ConverterApplication.getContext().addNewMedia(addedMedia);
         }
     }
 
@@ -288,7 +289,7 @@ public class FilesController {
                 progressQueue.getItems().add(0, placeHolderProgress);
                 filesChapters.getSelectionModel().select(queueTab);
             });
-            conversionGroup.launch(conversionGroup, progressQueue, placeHolderProgress, outputDestination);
+            conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
 
 //            launch(conversionGroup, mediaInfos, placeHolderProgress, outputDestination);
         });

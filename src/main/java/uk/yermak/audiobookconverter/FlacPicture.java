@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-public record FlacPicture(int type, String description, String mime, int width, int height, int depth, byte[]data) {
+public record FlacPicture(int type, String description, String mime, int width, int height, int depth, byte[] data) {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

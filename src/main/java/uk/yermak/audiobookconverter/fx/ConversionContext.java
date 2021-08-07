@@ -13,6 +13,7 @@ import uk.yermak.audiobookconverter.*;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +38,8 @@ public class ConversionContext {
     private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
+//    private boolean detached;
+    private FFMediaLoader mediaLoader;
 
     public ConversionContext() {
 //        resetForNewConversion();
@@ -87,6 +90,8 @@ public class ConversionContext {
     }
 
     public ConversionGroup detach() {
+        mediaLoader.detach();
+
         saveGenres();
 
         ConversionGroup conversionGroup = conversionGroupHolder.get();
@@ -95,6 +100,7 @@ public class ConversionContext {
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
         conversionGroup.setOutputParameters(outputParameters.get());
+        conversionGroup.setDetached(true);
 
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);
@@ -103,6 +109,10 @@ public class ConversionContext {
         book.set(null);
         posters.clear();
         media.clear();
+        mediaLoader = null;
+
+//        detached = true;
+
         return conversionGroup;
     }
 
@@ -134,6 +144,7 @@ public class ConversionContext {
     }
 
     public void addPosterIfMissing(ArtWork artWork) {
+//        if (detached) return;
         if (posters.stream().mapToLong(ArtWork::getCrc32).noneMatch(artWork::matchCrc32)) {
             posters.add(artWork);
         }
@@ -181,5 +192,21 @@ public class ConversionContext {
 
     public ConversionGroup getConversionGroup() {
         return conversionGroupHolder.get();
+    }
+
+    public void addNewMedia(List<MediaInfo> addedMedia) {
+        getMedia().addAll(addedMedia);
+//        detached = false;
+    }
+
+    public Book constructBook(List<MediaInfo> addedMedia) {
+        Book book = getBook();
+        book.construct(FXCollections.observableArrayList(addedMedia));
+//        detached = false;
+        return book;
+    }
+
+    public void setMediaLoader(FFMediaLoader mediaLoader) {
+        this.mediaLoader = mediaLoader;
     }
 }

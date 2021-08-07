@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
@@ -59,35 +60,33 @@ public class BookInfoController {
         });
 
         ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
-        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+//        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
+        media.addListener((ListChangeListener<? super MediaInfo>) change -> updateTags(media, media.isEmpty()));
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
 //        clearTags();
 
-        SimpleObjectProperty<AudioBookInfo> bookInfo = ConverterApplication.getContext().getBookInfo();
-
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> bookInfo.get().title().set(title.getText()));
+        title.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().title().set(title.getText()));
 
-        writer.textProperty().addListener(o -> bookInfo.get().writer().set(writer.getText()));
-        narrator.textProperty().addListener(o -> bookInfo.get().narrator().set(narrator.getText()));
+        writer.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().writer().set(writer.getText()));
+        narrator.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().narrator().set(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> bookInfo.get().genre().set(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> bookInfo.get().genre().set(genre.getEditor().getText()));
+        genre.valueProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
 
-        series.textProperty().addListener(o -> bookInfo.get().series().set(series.getText()));
+        series.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().series().set(series.getText()));
         bookNo.textProperty().addListener(o -> {
             if (StringUtils.isNotBlank(bookNo.getText()))
-                bookInfo.get().bookNumber().set(bookNo.getText());
+                ConverterApplication.getContext().getBookInfo().bookNumber().set(bookNo.getText());
         });
-        year.textProperty().addListener(o -> bookInfo.get().year().set(year.getText()));
-        comment.textProperty().addListener(o -> bookInfo.get().comment().set(comment.getText()));
+        year.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().year().set(year.getText()));
+        comment.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().comment().set(comment.getText()));
 
-        ConverterApplication.getContext().addBookInfoChangeListener((observable, oldValue, newValue) -> Platform.runLater(() -> copyTags(bookInfo.get())));
-
+        ConverterApplication.getContext().addContextDetachListener(observable -> Platform.runLater(() -> clearTags()));
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
@@ -116,6 +115,8 @@ public class BookInfoController {
         series.setText(bookInfo.series().get());
         if (bookInfo.bookNumber().get() != 0) {
             bookNo.setText(bookInfo.bookNumber().toString());
+        } else{
+            bookNo.setText("");
         }
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());

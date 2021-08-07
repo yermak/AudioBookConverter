@@ -4,8 +4,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import uk.yermak.audiobookconverter.ConversionContext;
 import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
+import uk.yermak.audiobookconverter.fx.util.ContextMenuListCell;
 
 import java.util.ArrayList;
 import java.util.List;

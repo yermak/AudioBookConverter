@@ -42,7 +42,7 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     public long getDuration() {
-        return (long) (this.getMediaInfo().getDuration() / ConverterApplication.getContext().getSpeed());
+        return (long) (this.getMediaInfo().getDuration() / ConverterApplication.getContext().getOutputParameters().getSpeed());
     }
 
     @Override

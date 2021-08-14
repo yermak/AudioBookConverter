@@ -56,7 +56,7 @@ jobs:
       displayName: 'Build deb package'
 
     - bash: |
-        wget -q https://download.java.net/java/GA/jdk16.0.1/7147401fd7354114ac51ef3e1328291f/9/GPL/openjdk-16.0.1_osx-x64_bin.tar.gz -O openjdk-16.0.1_osx-x64_bin.tar.gz
+        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_osx-x64_bin.tar.gz -O openjdk-16.0.1_osx-x64_bin.tar.gz
         tar -xzf openjdk-16.0.1_osx-x64_bin.tar.gz
         sudo mv jdk-16.0.1.jdk /Library/Java/JavaVirtualMachines/
         rm openjdk-16.0.1_osx-x64_bin.tar.gz

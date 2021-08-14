@@ -17,7 +17,7 @@ steps:
     displayName: 'Cache Maven local repo'
 
   - script: |
-      choco install openjdk --no-progress
+      choco install openjdk --version 16.0.2 --no-progress
       call refreshenv
       call mvn clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build app without installer'

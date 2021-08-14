@@ -56,11 +56,11 @@ jobs:
       displayName: 'Build deb package'
 
     - bash: |
-        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_osx-x64_bin.tar.gz -O openjdk-16.0.1_osx-x64_bin.tar.gz
-        tar -xzf openjdk-16.0.1_osx-x64_bin.tar.gz
-        sudo mv jdk-16.0.1.jdk /Library/Java/JavaVirtualMachines/
-        rm openjdk-16.0.1_osx-x64_bin.tar.gz
-        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-16.0.1.jdk/Contents/Home
+        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_osx-x64_bin.tar.gz -O openjdk-16.0.2_osx-x64_bin.tar.gz
+        tar -xzf openjdk-16.0.2_osx-x64_bin.tar.gz
+        sudo mv jdk-16.0.2jdk /Library/Java/JavaVirtualMachines/
+        rm openjdk-16.0.2_osx-x64_bin.tar.gz
+        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-16.0.2.jdk/Contents/Home
         brew install ffmpeg
         brew install mp4v2
         wget -q https://gluonhq.com/download/javafx-16-jmods-mac/ -O openjfx-16_osx-x64_bin-jmods.zip
@@ -85,7 +85,7 @@ jobs:
 
     - script: |
         ECHO ON
-        choco install openjdk --no-progress
+        choco install openjdk --version 16.0.2 --no-progress
         choco install 7zip --no-progress
         choco install wget --no-progress
         call refreshenv

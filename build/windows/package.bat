@@ -1,4 +1,4 @@
-REM build\windows\package.bat C:\Users\Yermak\Programs\OpenJDK\jdk-15.0.2 C:\Users\Yermak\Programs\JavaFX\javafx-jmods-15.0.1 1.0.0
+REM build\windows\package.bat C:\Users\Yermak\Programs\OpenJDK\jdk-16.0.2 C:\Users\Yermak\Programs\JavaFX\javafx-jmods-16 1.0.0
 ECHO ON
 SET JAVA_HOME=%~1
 ECHO %JAVA_HOME%

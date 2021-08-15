@@ -19,7 +19,7 @@ steps:
   - script: |
       choco install wget --no-progress
       wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_windows-x64_bin.zip -O openjdk-16.0.2_windows-x64_bin.zip
-      unzip openjdk-16.0.2_windows-x64_bin.zip
+      7z.exe x openjdk-16.0.2_windows-x64_bin.zip
       setx JAVA_HOME jdk-16.0.2
       call refreshenv
       call mvn -X clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)

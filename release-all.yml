@@ -88,15 +88,17 @@ jobs:
 
     - script: |
         ECHO ON
-        choco install openjdk --version 16.0.2 --no-progress
         choco install 7zip --no-progress
         choco install wget --no-progress
+        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_windows-x64_bin.zip -O openjdk-16.0.2_windows-x64_bin.zip
+        unzip openjdk-16.0.2_windows-x64_bin.zip
+        setx JAVA_HOME jdk-16.0.2
         call refreshenv
         wget -q https://gluonhq.com/download/javafx-16-jmods-windows/ -O openjfx-16_windows-x64_bin-jmods.zip
-        unzip openjfx-16_windows-x64_bin-jmods.zip
+        7z.exe x openjfx-16_windows-x64_bin-jmods.zip
         SET JAVAFX_JMODS=javafx-jmods-16
 
-        call mvn clean package --no-transfer-progress
+        call mvn -X clean package --no-transfer-progress
 
         call build/windows/package.bat "%JAVA_HOME%" %JAVAFX_JMODS% $(APP_VERSION)
 

@@ -95,7 +95,7 @@ jobs:
         setx JAVA_HOME jdk-16.0.2
         call refreshenv
         wget -q https://gluonhq.com/download/javafx-16-jmods-windows/ -O openjfx-16_windows-x64_bin-jmods.zip
-        unzip openjfx-16_windows-x64_bin-jmods.zip
+        7z.exe x openjfx-16_windows-x64_bin-jmods.zip
         SET JAVAFX_JMODS=javafx-jmods-16
 
         call mvn -X clean package --no-transfer-progress

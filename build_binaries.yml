@@ -93,7 +93,7 @@ jobs:
         unzip openjfx-16_windows-x64_bin-jmods.zip
         SET JAVAFX_JMODS=javafx-jmods-16
 
-        call mvn clean package --no-transfer-progress
+        call mvn -X clean package --no-transfer-progress
 
         call build/windows/package.bat "%JAVA_HOME%" %JAVAFX_JMODS% $(APP_VERSION)
 

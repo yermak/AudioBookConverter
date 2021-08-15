@@ -88,7 +88,7 @@ jobs:
 
     - script: |
         ECHO ON
-        choco install openjdk --no-progress
+        choco install openjdk --version 16.0.2 --no-progress
         choco install 7zip --no-progress
         choco install wget --no-progress
         call refreshenv

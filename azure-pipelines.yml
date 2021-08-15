@@ -3,7 +3,6 @@ pool:
 
 variables:
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)\.m2\repository
-  JDK_CACHE_FOLDER: $(Pipeline.Workspace)\jdk-16.0.2
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
 
 steps:

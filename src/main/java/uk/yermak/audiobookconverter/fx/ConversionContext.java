@@ -99,7 +99,7 @@ public class ConversionContext {
         conversionGroup.setPosters(new ArrayList<>(posters));
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
-        conversionGroup.setOutputParameters(outputParameters.get());
+        conversionGroup.setOutputParameters(new OutputParameters(outputParameters.get()));
         conversionGroup.setDetached(true);
 
         ConversionGroup newConversionGroup = new ConversionGroup();

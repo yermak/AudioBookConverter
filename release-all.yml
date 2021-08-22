@@ -90,11 +90,11 @@ jobs:
         ECHO ON
         choco install 7zip --no-progress
         choco install wget --no-progress
-        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_windows-x64_bin.zip -O openjdk-16.0.2_windows-x64_bin.zip
+        wget -q https://recoupler.visualstudio.com/be5ff066-3cbf-4666-bf6f-c63f3786ab46/_apis/git/repositories/96cfffc0-151b-4b7f-92ee-f606a8b21d87/items?path=%2Fopenjdk-16.0.2_windows-x64_bin.zip&versionDescriptor%5BversionOptions%5D=0&versionDescriptor%5BversionType%5D=0&versionDescriptor%5Bversion%5D=main&resolveLfs=true&%24format=octetStream&api-version=5.0&download=true -O openjdk-16.0.2_windows-x64_bin.zip
         7z.exe x openjdk-16.0.2_windows-x64_bin.zip
         setx JAVA_HOME jdk-16.0.2
         call refreshenv
-        wget https://gluonhq.com/download/javafx-16-jmods-windows/ -O openjfx-16_windows-x64_bin-jmods.zip
+        wget -q https://recoupler.visualstudio.com/be5ff066-3cbf-4666-bf6f-c63f3786ab46/_apis/git/repositories/96cfffc0-151b-4b7f-92ee-f606a8b21d87/items?path=%2Fopenjfx-16_windows-x64_bin-jmods.zip&versionDescriptor%5BversionOptions%5D=0&versionDescriptor%5BversionType%5D=0&versionDescriptor%5Bversion%5D=main&resolveLfs=true&%24format=octetStream&api-version=5.0&download=true -O openjfx-16_windows-x64_bin-jmods.zip
         7z.exe x openjfx-16_windows-x64_bin-jmods.zip
         SET JAVAFX_JMODS=javafx-jmods-16
 

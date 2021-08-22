@@ -89,7 +89,7 @@ jobs:
         call refreshenv
         SET JAVAFX_JMODS=jmods/windows
 
-        call mvn -X clean package --no-transfer-progress
+        call mvn clean package --no-transfer-progress
 
         call build/windows/package.bat "%JAVA_HOME%" %JAVAFX_JMODS% $(APP_VERSION)
 

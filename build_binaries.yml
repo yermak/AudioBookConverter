@@ -45,9 +45,7 @@ jobs:
         sudo apt-get install ffmpeg
         sudo apt-get install mp4v2-utils
         export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-16-hotspot-amd64
-        wget -q https://gluonhq.com/download/javafx-16-jmods-linux/ -O openjfx-16_linux-x64_bin-jmods.zip
-        unzip openjfx-16_linux-x64_bin-jmods.zip
-        export JAVAFX_JMODS=javafx-jmods-16
+        export JAVAFX_JMODS=jmods/linux
         mvn clean package --no-transfer-progress
 
         build/linux/package.sh $JAVA_HOME $JAVAFX_JMODS $(APP_VERSION)
@@ -63,10 +61,8 @@ jobs:
         export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-16.0.2.jdk/Contents/Home
         brew install ffmpeg
         brew install mp4v2
-        wget -q https://gluonhq.com/download/javafx-16-jmods-mac/ -O openjfx-16_osx-x64_bin-jmods.zip
-        unzip openjfx-16_osx-x64_bin-jmods.zip
-        rm openjfx-16_osx-x64_bin-jmods.zip
-        export JAVAFX_JMODS=javafx-jmods-16
+        export JAVAFX_JMODS=jmods/mac
+
         mvn clean package --no-transfer-progress
 
         $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
@@ -91,11 +87,9 @@ jobs:
         7z.exe x openjdk-16.0.2_windows-x64_bin.zip
         setx JAVA_HOME jdk-16.0.2
         call refreshenv
-        wget -q https://gluonhq.com/download/javafx-16-jmods-windows/ -O openjfx-16_windows-x64_bin-jmods.zip
-        7z.exe x openjfx-16_windows-x64_bin-jmods.zip
-        SET JAVAFX_JMODS=javafx-jmods-16
+        SET JAVAFX_JMODS=jmods/windows
 
-        call mvn -X clean package --no-transfer-progress
+        call mvn clean package --no-transfer-progress
 
         call build/windows/package.bat "%JAVA_HOME%" %JAVAFX_JMODS% $(APP_VERSION)
 

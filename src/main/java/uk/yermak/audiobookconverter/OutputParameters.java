@@ -1,10 +1,8 @@
 package uk.yermak.audiobookconverter;
 
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +29,8 @@ public class OutputParameters {
         this.cbr = parameters.isCbr();
         this.cutoff = parameters.getCutoff();
         this.format = parameters.getFormat();
+        this.splitChapters = parameters.isSplitChapters();
+        this.speed = new SimpleObjectProperty<>(parameters.getSpeed());
     }
 
     OutputParameters() {

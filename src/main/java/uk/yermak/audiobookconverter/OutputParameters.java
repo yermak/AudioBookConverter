@@ -138,5 +138,9 @@ public class OutputParameters {
     public ObservableValue<Double> getSpeedObservable() {
         return speed;
     }
+
+    protected void initSpeed() {
+        speed = new SimpleObjectProperty<>(1.0);
+    }
 }
 

@@ -71,7 +71,9 @@ public class Preset extends OutputParameters {
         String property = AppProperties.getProperty("preset." + presetName);
         if (property != null) {
             Gson gson = new Gson();
-            return gson.fromJson(property, Preset.class);
+            Preset preset = gson.fromJson(property, Preset.class);
+            preset.initSpeed();
+            return preset;
         }
         return new Preset(presetName, Objects.requireNonNullElseGet(defaultValues.get(presetName), OutputParameters::new));
     }

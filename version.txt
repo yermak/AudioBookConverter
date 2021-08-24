@@ -1,1 +1,1 @@
-AudioBookConverter-5.5.25
+AudioBookConverter-5.5.26

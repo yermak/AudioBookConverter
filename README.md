@@ -41,10 +41,16 @@ Main features:
 * Instant playback: listen what you are going to encode
 * Simple and lightweigh user interface: Convert a book with few clicks
 
-Just download the file from link bellow, no QuickTime or iTunes is required.
+
+
+If you looking for safe option to install better tested software from trusted source and get automatic incremental updates use <a href="https://store.steampowered.com/app/1529240/AudioBookConverter/">Steam</a> 
+======
+
+alternatively look at <a href="https://community.chocolatey.org/packages/audiobookconverter">Chocolaty</a>
 ----
-<a href="https://github.com/yermak/AudioBookConverter/releases/latest">Download</a>
-=======
+
+or just download <a href="https://github.com/yermak/AudioBookConverter/releases/latest">latest build</a>, no QuickTime or iTunes is required.
+
 You may want to check <a href="https://github.com/yermak/AudioBookConverter/wiki/Installation">Installation Manual</a>
 ----
 

@@ -10,11 +10,21 @@
         <fileSet>
             <includes>
                 <include>README*</include>
+                <include>*.txt</include>
                 <include>*.ico</include>
             </includes>
             <outputDirectory>app</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>external/x64/choco</directory>
+            <outputDirectory>app</outputDirectory>
+            <includes>
+                <include>path.properties</include>
+            </includes>
+        </fileSet>
     </fileSets>
+
+
     <dependencySets>
         <dependencySet>
             <includes>

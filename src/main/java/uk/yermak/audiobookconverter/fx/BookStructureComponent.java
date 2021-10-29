@@ -115,7 +115,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     void updateBookStructure() {
-        Book book = ConverterApplication.getContext().getBook();
+        Book book = AudiobookConverter.getContext().getBook();
         getRoot().getChildren().clear();
         book.getParts().forEach(p -> {
             TreeItem<Organisable> partItem = new TreeItem<>(p);
@@ -128,7 +128,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         });
         getRoot().getChildren().forEach(t -> t.setExpanded(true));
         refresh();
-        ConverterApplication.getContext().getOutputParameters().updateAuto(book.getMedia());
+        AudiobookConverter.getContext().getOutputParameters().updateAuto(book.getMedia());
     }
 
     void moveChapterDown(ActionEvent event) {
@@ -172,7 +172,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();
 
         if (organisable instanceof MediaInfo) {
-            SubTracksDialog dialog = new SubTracksDialog(ConverterApplication.getEnv().getWindow());
+            SubTracksDialog dialog = new SubTracksDialog(AudiobookConverter.getEnv().getWindow());
 
             Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
             result.ifPresent(r -> {
@@ -184,7 +184,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
-        double speed = ConverterApplication.getContext().getOutputParameters().getSpeed();
+        double speed = AudiobookConverter.getContext().getOutputParameters().getSpeed();
         long duration = mediaInfo.getDuration();
 
         if (speed != 1.0) {

@@ -6,7 +6,6 @@ import javafx.scene.control.ListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
@@ -43,7 +42,7 @@ public class ConversionGroup {
 
         jobs.add(conversionJob);
         Executors.newSingleThreadExecutor().execute(conversionProgress);
-        ConverterApplication.getContext().addJob(conversionJob);
+        AudiobookConverter.getContext().addJob(conversionJob);
         return conversionProgress;
     }
 

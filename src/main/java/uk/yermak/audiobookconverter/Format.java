@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

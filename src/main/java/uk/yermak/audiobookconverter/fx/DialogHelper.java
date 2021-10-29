@@ -11,6 +11,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import uk.yermak.audiobookconverter.AppProperties;
 import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.fx.util.Comparators;
 
@@ -31,7 +32,7 @@ public class DialogHelper {
 
 
     static String selectOutputFile(AudioBookInfo audioBookInfo) {
-        JfxEnv env = ConverterApplication.getEnv();
+        JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
@@ -39,7 +40,7 @@ public class DialogHelper {
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(ConverterApplication.getContext().getOutputParameters().getFormat().toString(), "*." + ConverterApplication.getContext().getOutputParameters().getFormat().toString())
+                new FileChooser.ExtensionFilter(AudiobookConverter.getContext().getOutputParameters().getFormat().toString(), "*." + AudiobookConverter.getContext().getOutputParameters().getFormat().toString())
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
@@ -49,7 +50,7 @@ public class DialogHelper {
     }
 
     public static List<String> selectFilesDialog() {
-        Window window = ConverterApplication.getEnv().getWindow();
+        Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
@@ -74,7 +75,7 @@ public class DialogHelper {
     }
 
     public static List<String> selectFolderDialog() {
-        Window window = ConverterApplication.getEnv().getWindow();
+        Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
         directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));

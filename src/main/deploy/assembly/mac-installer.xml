@@ -15,6 +15,22 @@
             </includes>
             <outputDirectory>app</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>external/x64/mac</directory>
+            <outputDirectory>app/external/</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>external/x64/mac</directory>
+            <outputDirectory>app</outputDirectory>
+            <includes>
+                <include>path.properties</include>
+            </includes>
+        </fileSet>
+
+
     </fileSets>
     <dependencySets>
         <dependencySet>

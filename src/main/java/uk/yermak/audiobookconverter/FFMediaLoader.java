@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -254,7 +253,7 @@ public class FFMediaLoader {
                 ArtWorkBean artWorkBean = new ArtWorkBean(poster);
                 Platform.runLater(() -> {
                     if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
                     }
                 });
                 return artWorkBean;
@@ -274,7 +273,7 @@ public class FFMediaLoader {
 
         List<File> pictures = new ArrayList<>();
 
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         for (File d : searchDirs) {
             pictures.addAll(findPictures(d));
         }

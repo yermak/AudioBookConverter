@@ -57,7 +57,7 @@ public class ConversionJob implements Runnable {
         String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         File fileListFile = null;
-        File metaFile = null;
+//        File metaFile = null;
         try {
 //            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
@@ -91,9 +91,7 @@ public class ConversionJob implements Runnable {
             }
 
             if (status.get().isOver()) return;
-            File destFile = new File(outputDestination);
-            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-            FileUtils.moveFile(new File(tempFile), destFile);
+            new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).moveResultingFile();
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
@@ -105,7 +103,7 @@ public class ConversionJob implements Runnable {
             for (MediaInfo mediaInfo : convertable.getMedia()) {
                 FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
-            FileUtils.deleteQuietly(metaFile);
+//            FileUtils.deleteQuietly(metaFile);
             FileUtils.deleteQuietly(fileListFile);
         }
     }

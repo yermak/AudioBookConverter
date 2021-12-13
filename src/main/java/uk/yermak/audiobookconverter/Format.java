@@ -411,7 +411,7 @@ public enum Format {
                 "-map_metadata", "1",
                 "-f", format,
                 "-c:a", "copy",
-                "-movflags", "+faststart",
+//                "-movflags", "+faststart",
                 "-progress", progressUri,
                 outputFileName};
         return Arrays.asList(strings);

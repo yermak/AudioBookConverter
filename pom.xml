@@ -13,13 +13,13 @@
     <version>#{APP_VERSION}#</version>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>16</javafx.version>
+        <javafx.version>17</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

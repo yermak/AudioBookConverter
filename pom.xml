@@ -7,7 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>5.6.0</version>
+    <version>5.6.1</version>
 <!--    <version>#{APP_VERSION}#</version>-->
 
     <properties>
@@ -161,7 +161,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <mainClass>AudiobookConverter</mainClass>
+                    <mainClass>ConverterApplication</mainClass>
                     <executable>${java.home}\bin\java</executable>
                 </configuration>
             </plugin>

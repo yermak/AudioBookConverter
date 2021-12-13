@@ -9,10 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import uk.yermak.audiobookconverter.AppProperties;
-import uk.yermak.audiobookconverter.AudioBookInfo;
-import uk.yermak.audiobookconverter.AudiobookConverter;
-import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;
@@ -36,7 +33,7 @@ public class DialogHelper {
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(outputFolder));
+        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
@@ -53,7 +50,7 @@ public class DialogHelper {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
+        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
@@ -78,7 +75,7 @@ public class DialogHelper {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        directoryChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
+        directoryChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");
 

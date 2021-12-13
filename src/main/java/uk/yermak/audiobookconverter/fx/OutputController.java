@@ -258,7 +258,7 @@ public class OutputController {
         }
 
         Executors.newSingleThreadExecutor().submit(() -> {
-            OutputParameters params = AudiobookConverter.getContext().getOutputParameters();
+            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
             if (book != null) {
                 params.updateAuto(book.getMedia());
 //                book.addListener(observable -> updateParameters(book.getMedia()));
@@ -266,7 +266,7 @@ public class OutputController {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
-                Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
+                Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
                 frequency.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
                 bitRate.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
                 channels.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));

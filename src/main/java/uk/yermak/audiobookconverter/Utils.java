@@ -3,15 +3,12 @@ package uk.yermak.audiobookconverter;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
 
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
@@ -27,7 +24,6 @@ import java.util.function.Function;
  */
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final Properties PATH = new Properties();
 
     public static String getTmp(long jobId, long fileId, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~ABC_" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
@@ -121,14 +117,6 @@ public class Utils {
         }
     }
 
-    public static File getInitialDirecotory(String sourceFolder) {
-        if (sourceFolder == null) {
-            return new File(System.getProperty("user.home"));
-        }
-        File file = new File(sourceFolder);
-        return file.exists() ? file : getInitialDirecotory(file.getParent());
-    }
-
     public static String formatTime(double millis) {
         return formatTime((long) millis);
     }
@@ -195,60 +183,18 @@ public class Utils {
 
     }
 
-    public static boolean isWindows() {
-        return System.getProperty("os.name").contains("Windows");
-    }
 
-    public static boolean isLinux() {
-        return System.getProperty("os.name").contains("Linux");
-    }
+    public final static String FFMPEG = Environment.getPath("ffmpeg").replaceAll(" ", "\\ ");
 
-    public static boolean isMac() {
-        return System.getProperty("os.name").contains("Mac OS X");
-    }
+    public static final String MP4ART = Environment.getPath("mp4art").replaceAll(" ", "\\ ");
+
+    public static final String MP4INFO = Environment.getPath("mp4info").replaceAll(" ", "\\ ");
+
+    public static final String FFPROBE = Environment.getPath("ffprobe");
 
 
-    public final static String FFMPEG = getPath("ffmpeg").replaceAll(" ", "\\ ");
 
-    public static final String MP4ART = getPath("mp4art").replaceAll(" ", "\\ ");
 
-    public static final String MP4INFO = getPath("mp4info").replaceAll(" ", "\\ ");
-
-    public static final String FFPROBE = getPath("ffprobe");
-
-    private static String getPath(String binary) {
-        String property = loadAppProperties().getProperty(binary);
-        if (property != null) {
-            return getAppPath() + property;
-        }
-        return binary + (isWindows() ? ".exe" : "");
-
-    }
-
-    private static String getAppPath() {
-        if (isMac()) return com.apple.eio.FileManager.getPathToApplicationBundle() + "/";
-        else return "";
-    }
-
-    private static synchronized Properties loadAppProperties() {
-        if (PATH.isEmpty()) {
-            File file = null;
-            if (isMac()) {
-                file = new File(getAppPath(), "Contents/app/path.properties");
-            } else {
-                file = new File((isLinux()) ? "../lib/app/path.properties" : "app/path.properties");
-            }
-
-            if (file.exists()) {
-                try (FileInputStream in = new FileInputStream(file)) {
-                    PATH.load(in);
-                } catch (IOException e) {
-                    logger.error("Error during loading properties", e);
-                }
-            }
-        }
-        return PATH;
-    }
 
 
     private static class DurationRender implements AttributeRenderer<Duration> {

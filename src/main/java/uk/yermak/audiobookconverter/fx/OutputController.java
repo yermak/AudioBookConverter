@@ -2,6 +2,8 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,11 +25,15 @@ import java.util.stream.Collectors;
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
+    public static final String FORCE = "Always";
+
 
     @FXML
     public ComboBox<Format> outputFormatBox;
     @FXML
     public ComboBox<String> presetBox;
+
+    public ComboBox<String> force;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -80,6 +86,12 @@ public class OutputController {
         });
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) return;
+            AudiobookConverter.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
+            ;
+        });
+        force.getSelectionModel().select(0);
+        force.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
             AudiobookConverter.getContext().setSpeed(Double.valueOf(newValue));
         });
@@ -258,7 +270,7 @@ public class OutputController {
         }
 
         Executors.newSingleThreadExecutor().submit(() -> {
-            OutputParameters params = ConverterApplication.getContext().getOutputParameters();
+            OutputParameters params = AudiobookConverter.getContext().getOutputParameters();
             if (book != null) {
                 params.updateAuto(book.getMedia());
 //                book.addListener(observable -> updateParameters(book.getMedia()));
@@ -266,7 +278,7 @@ public class OutputController {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
-                Format format = ConverterApplication.getContext().getOutputParameters().getFormat();
+                Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
                 frequency.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
                 bitRate.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
                 channels.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));

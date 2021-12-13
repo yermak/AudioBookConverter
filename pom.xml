@@ -161,7 +161,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <mainClass>ConverterApplication</mainClass>
+                    <mainClass>AudioBookConverter</mainClass>
                     <executable>${java.home}\bin\java</executable>
                 </configuration>
             </plugin>

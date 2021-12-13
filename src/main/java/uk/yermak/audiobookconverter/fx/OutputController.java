@@ -2,9 +2,12 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
@@ -23,11 +26,13 @@ import java.util.stream.Collectors;
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
+    public static final String FORCE = "Always";
 
     @FXML
     public ComboBox<Format> outputFormatBox;
     @FXML
     public ComboBox<String> presetBox;
+    public ComboBox<String> force;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -81,7 +86,16 @@ public class OutputController {
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
+            ConverterApplication.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
+            ;
+        });
+        force.getSelectionModel().select(0);
+        force.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                if (newValue == null) return;
+                ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
+            }
         });
 
         outputFormatBox.getItems().addAll(Format.values());

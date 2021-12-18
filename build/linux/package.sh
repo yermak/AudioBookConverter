@@ -22,10 +22,10 @@ cd target/image
 tar -czf ../release/AudioBookConverter-static-binaries-$APP_VERSION.tar.gz AudioBookConverter
 cd ../..
 
-$JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file LICENSE --icon AudioBookConverter.png \
--t deb --name AudioBookConverter --vendor Recoupler \
---linux-menu-group AudioBookConverter --linux-shortcut \
---input target/package/audiobookconverter-$APP_VERSION-linux-nodeps-installer/audiobookconverter-$APP_VERSION/app \
---main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
+#$JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file LICENSE --icon AudioBookConverter.png \
+#-t deb --name AudioBookConverter --vendor Recoupler \
+#--linux-menu-group AudioBookConverter --linux-shortcut \
+#--input target/package/audiobookconverter-$APP_VERSION-linux-nodeps-installer/audiobookconverter-$APP_VERSION/app \
+#--main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
 
-mv audiobookconverter_$APP_VERSION-1_amd64.deb target/release/
+#mv audiobookconverter_$APP_VERSION-1_amd64.deb target/release/

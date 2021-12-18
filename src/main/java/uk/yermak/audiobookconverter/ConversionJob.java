@@ -56,7 +56,7 @@ public class ConversionJob implements Runnable {
 
         String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
-//        File metaFile = null;
+        File metaFile = null;
         try {
 //            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
@@ -101,7 +101,7 @@ public class ConversionJob implements Runnable {
                 FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
 */
-//            FileUtils.deleteQuietly(metaFile);
+            FileUtils.deleteQuietly(metaFile);
         }
     }
 

@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -23,21 +26,31 @@ public class FFMpegConcatenator {
     private final String outputFileName;
 
     private final MetadataBuilder metadataBuilder;
-    private final String fileListFileName;
+    private List<MediaInfo> media;
     private final ProgressCallback callback;
     private ProgressParser progressParser;
+    private List<String> tmpFiles = new ArrayList<>();
+    private String fileListFileName;
 
-
-    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, MetadataBuilder metadataBuilder, String fileListFileName, ProgressCallback callback) {
+    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, MetadataBuilder metadataBuilder, List<MediaInfo> media, ProgressCallback callback) {
         this.conversionJob = conversionJob;
         this.outputFileName = outputFileName;
         this.metadataBuilder = metadataBuilder;
-        this.fileListFileName = fileListFileName;
+        this.media = media;
         this.callback = callback;
+    }
+
+    protected static File prepareFiles(long jobId, List<MediaInfo> media, String workfileExtension) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+        List<String> outFiles = media.stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.getFileName().hashCode(), workfileExtension) + "'").collect(Collectors.toList());
+        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
+        return fileListFile;
     }
 
     public void concat() throws IOException, InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
+        fileListFileName = prepareFiles(conversionJob.jobId, media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
+
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
         try {
@@ -83,6 +96,8 @@ public class FFMpegConcatenator {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
+            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.jobId, mediaInfo.getFileName().hashCode(), conversionJob.getConversionGroup().getWorkfileExtension()))));
+//            FileUtils.deleteQuietly(new File(fileListFileName));
         }
     }
 }

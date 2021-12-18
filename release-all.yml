@@ -61,8 +61,6 @@ jobs:
         sudo mv jdk-17.0.1.jdk /Library/Java/JavaVirtualMachines/
         rm openjdk-17.0.1_osx-x64_bin.tar.gz
         export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home
-#        brew install ffmpeg
-#        brew install mp4v2
         export JAVAFX_JMODS=jmods/mac
         mvn clean package --no-transfer-progress
 

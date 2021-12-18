@@ -97,7 +97,7 @@ public class FFMpegConcatenator {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
             media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.jobId, mediaInfo.getFileName().hashCode(), conversionJob.getConversionGroup().getWorkfileExtension()))));
-//            FileUtils.deleteQuietly(new File(fileListFileName));
+            FileUtils.deleteQuietly(new File(fileListFileName));
         }
     }
 }

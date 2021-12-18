@@ -41,10 +41,10 @@ jobs:
     - bash: |
         wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
         sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
-        sudo apt-get install adoptopenjdk-16-hotspot
+        sudo apt-get install adoptopenjdk-17-hotspot
         sudo apt-get install ffmpeg
         sudo apt-get install mp4v2-utils
-        export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-16-hotspot-amd64
+        export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-17-hotspot-amd64
         export JAVAFX_JMODS=jmods/linux
         mvn clean package --no-transfer-progress
 
@@ -54,11 +54,11 @@ jobs:
       displayName: 'Build deb package'
 
     - bash: |
-        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_osx-x64_bin.tar.gz -O openjdk-16.0.2_osx-x64_bin.tar.gz
-        tar -xzf openjdk-16.0.2_osx-x64_bin.tar.gz
-        sudo mv jdk-16.0.2.jdk /Library/Java/JavaVirtualMachines/
-        rm openjdk-16.0.2_osx-x64_bin.tar.gz
-        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-16.0.2.jdk/Contents/Home
+        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_macos-x64_bin.tar.gz -O openjdk-17.0.1_osx-x64_bin.tar.gz
+        tar -xzf openjdk-17.0.1_osx-x64_bin.tar.gz
+        sudo mv jdk-17.0.1.jdk /Library/Java/JavaVirtualMachines/
+        rm openjdk-17.0.1_osx-x64_bin.tar.gz
+        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home
         brew install ffmpeg
         brew install mp4v2
         export JAVAFX_JMODS=jmods/mac
@@ -83,9 +83,9 @@ jobs:
         ECHO ON
         choco install 7zip --no-progress
         choco install wget --no-progress
-        wget -q https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_windows-x64_bin.zip -O openjdk-16.0.2_windows-x64_bin.zip
-        7z.exe x openjdk-16.0.2_windows-x64_bin.zip
-        setx JAVA_HOME jdk-16.0.2
+        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip
+        7z.exe x openjdk-17.0.1_windows-x64_bin.zip
+        setx JAVA_HOME jdk-17.0.1
         call refreshenv
         SET JAVAFX_JMODS=jmods/windows
 

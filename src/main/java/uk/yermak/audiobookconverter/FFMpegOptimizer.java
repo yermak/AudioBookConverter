@@ -34,8 +34,9 @@ public class FFMpegOptimizer {
     public void moveResultingFile() {
         try {
             File destFile = new File(outputFileName);
-            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
             optimize();
+            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+            FileUtils.moveFile(new File(Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())), destFile);
         } catch (IOException | InterruptedException e) {
             logger.error("Failed to optimize resulting file", e);
             throw new RuntimeException(e);
@@ -64,7 +65,7 @@ public class FFMpegOptimizer {
                     "-i", tempFile,
                     "-c", "copy",
                     "-movflags", "+faststart",
-                    outputFileName,
+                    Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())
             } ;
 
             logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
@@ -88,7 +89,7 @@ public class FFMpegOptimizer {
                 throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
-            if (!new File(outputFileName).exists()) {
+            if (!new File(Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())).exists()) {
                 throw new ConversionException("Optimisation failed, no output file:" + out.toString(), new Error(err.toString()));
             }
         } catch (Exception e) {

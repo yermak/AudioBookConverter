@@ -84,7 +84,7 @@ jobs:
         choco install wget --no-progress
         wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip
         7z.exe x openjdk-17.0.1_windows-x64_bin.zip
-        setx JAVA_HOME jdk-11.0.1
+        setx JAVA_HOME jdk-17.0.1
         call refreshenv
         SET JAVAFX_JMODS=jmods/windows
 

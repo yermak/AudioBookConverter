@@ -30,6 +30,7 @@ public class MetadataBuilder {
     public File prepareMp4MetaFile() {
         try {
             File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
+            metaFile.deleteOnExit();
             List<String> metaData = new ArrayList<>();
             metaData.add(";FFMETADATA1");
             metaData.add("major_brand=M4A");

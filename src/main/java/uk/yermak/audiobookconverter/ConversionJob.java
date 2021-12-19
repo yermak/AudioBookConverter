@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -32,6 +31,7 @@ public class ConversionJob implements Runnable {
     private final Map<String, ProgressCallback> progressCallbacks;
     private final String outputDestination;
     private final SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
+    long jobId;
 
 
     public ConversionJob(ConversionGroup conversionGroup, Convertable convertable, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
@@ -39,6 +39,7 @@ public class ConversionJob implements Runnable {
         this.convertable = convertable;
         this.progressCallbacks = progressCallbacks;
         this.outputDestination = outputDestination;
+        jobId = outputDestination.hashCode() + System.currentTimeMillis();
 
         addStatusChangeListener((observable, oldValue, newValue) -> {
             if (FINISHED.equals(newValue)) {
@@ -52,22 +53,17 @@ public class ConversionJob implements Runnable {
         status.set(IN_PROGRESS);
 
         List<Future<String>> futures = new ArrayList<>();
-        long jobId = outputDestination.hashCode() + System.currentTimeMillis();
 
         String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
-        File fileListFile = null;
-//        File metaFile = null;
+        File metaFile = null;
         try {
 //            conversion.getOutputParameters().updateAuto(conversion.getMedia());
-
-            fileListFile = prepareFiles(jobId);
-
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(jobId, mediaInfo.getFileName().hashCode(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -80,7 +76,7 @@ public class ConversionJob implements Runnable {
             }
             if (status.get().isOver()) return;
 
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(jobId, conversionGroup, convertable), fileListFile.getAbsolutePath(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(jobId, conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;
@@ -100,24 +96,17 @@ public class ConversionJob implements Runnable {
             e.printStackTrace(new PrintWriter(sw));
             error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
+/*
             for (MediaInfo mediaInfo : convertable.getMedia()) {
                 FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
             }
-//            FileUtils.deleteQuietly(metaFile);
-            FileUtils.deleteQuietly(fileListFile);
+*/
+            FileUtils.deleteQuietly(metaFile);
         }
     }
 
     private List<MediaInfo> prioritiseMedia() {
         return convertable.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
-    }
-
-
-    protected File prepareFiles(long jobId) throws IOException {
-        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = convertable.getMedia().stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension()) + "'").collect(Collectors.toList());
-        FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
-        return fileListFile;
     }
 
 

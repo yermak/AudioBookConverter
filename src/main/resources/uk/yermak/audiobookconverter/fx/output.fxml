@@ -74,6 +74,17 @@
                GridPane.halignment="LEFT"/>
         <ComboBox fx:id="cutoff" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
 
+        <Label text="Force re-encoding" GridPane.columnIndex="3" GridPane.rowIndex="3"
+               GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="force" GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Auto"/>
+                    <String fx:value="Always"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
         <Pane prefWidth="50" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
 
 

@@ -46,8 +46,8 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             while (!conversionGroup.isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            FFMediaLoader.logger.debug("ArtWork Out: {}", out.toString());
-            FFMediaLoader.logger.error("ArtWork Error: {}", err.toString());
+            FFMediaLoader.logger.debug("ArtWork Out: {}", out);
+            FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
             ArtWorkBean artWorkBean = new ArtWorkBean(poster);
             Platform.runLater(() -> {

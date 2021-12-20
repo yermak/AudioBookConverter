@@ -162,9 +162,7 @@ public class Utils {
         ST partTemplate = new ST(g, partFormat);
 
 
-        context.forEach((key, value) -> {
-            partTemplate.add(key, value.apply(part));
-        });
+        context.forEach((key, value) -> partTemplate.add(key, value.apply(part)));
 
         String result = partTemplate.render();
         char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};

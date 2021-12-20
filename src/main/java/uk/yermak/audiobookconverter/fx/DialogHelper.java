@@ -55,7 +55,7 @@ public class DialogHelper {
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
 
-        fileChooser.setTitle("Select " + filetypes.toString() + " files for conversion");
+        fileChooser.setTitle("Select " + filetypes + " files for conversion");
 
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio", Arrays.asList(toSuffixes("*.", FILE_EXTENSIONS))));
 
@@ -67,8 +67,7 @@ public class DialogHelper {
             File parentFile = firstFile.getParentFile();
             AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
         }
-        List<String> fileNames = collectFiles(files);
-        return fileNames;
+        return collectFiles(files);
     }
 
     public static List<String> selectFolderDialog() {
@@ -81,14 +80,13 @@ public class DialogHelper {
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
 
-        directoryChooser.setTitle("Select folder with " + filetypes.toString() + " files for conversion");
+        directoryChooser.setTitle("Select folder with " + filetypes + " files for conversion");
         File selectedDirectory = directoryChooser.showDialog(window);
 
         if (selectedDirectory == null) return null;
         AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
 
-        List<String> fileNames = collectFiles(Collections.singleton(selectedDirectory));
-        return fileNames;
+        return collectFiles(Collections.singleton(selectedDirectory));
     }
 
     static List<String> collectFiles(Collection<File> files) {

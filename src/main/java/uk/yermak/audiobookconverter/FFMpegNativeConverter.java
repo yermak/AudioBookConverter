@@ -69,8 +69,8 @@ public class FFMpegNativeConverter implements Callable<String> {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("ffmpeg out: {}", out.toString());
-            logger.warn("ffmpeg err: {}", err.toString());
+            logger.debug("ffmpeg out: {}", out);
+            logger.warn("ffmpeg err: {}", err);
 
             DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
             return outputFileName;

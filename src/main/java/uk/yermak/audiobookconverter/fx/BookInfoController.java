@@ -85,7 +85,7 @@ public class BookInfoController {
         year.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().year().set(year.getText()));
         comment.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().comment().set(comment.getText()));
 
-        AudiobookConverter.getContext().addContextDetachListener(observable -> Platform.runLater(() -> clearTags()));
+        AudiobookConverter.getContext().addContextDetachListener(observable -> Platform.runLater(this::clearTags));
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {

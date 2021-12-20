@@ -4,13 +4,11 @@ import com.google.common.collect.ImmutableSet;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
@@ -47,7 +45,7 @@ public class DurationVerifier {
     public static void mp4v2UpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         Process process = null;
         try {
-            ProcessBuilder infoProcessBuilder = new ProcessBuilder(Utils.MP4INFO, outputFileName);
+            ProcessBuilder infoProcessBuilder = new ProcessBuilder(Environment.MP4INFO, outputFileName);
             process = infoProcessBuilder.start();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);
@@ -69,7 +67,7 @@ public class DurationVerifier {
 
     public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
-        FFprobe ffprobe = new FFprobe(Utils.FFPROBE);
+        FFprobe ffprobe = new FFprobe(Environment.FFPROBE);
         FFmpegProbeResult probe = ffprobe.probe(outputFileName);
         List<FFmpegStream> streams = probe.getStreams();
         for (FFmpegStream stream : streams) {

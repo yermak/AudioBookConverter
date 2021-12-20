@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -182,19 +181,6 @@ public class Utils {
         return mp3Filename;
 
     }
-
-
-    public final static String FFMPEG = Environment.getPath("ffmpeg").replaceAll(" ", "\\ ");
-
-    public static final String MP4ART = Environment.getPath("mp4art").replaceAll(" ", "\\ ");
-
-    public static final String MP4INFO = Environment.getPath("mp4info").replaceAll(" ", "\\ ");
-
-    public static final String FFPROBE = Environment.getPath("ffprobe");
-
-
-
-
 
 
     private static class DurationRender implements AttributeRenderer<Duration> {

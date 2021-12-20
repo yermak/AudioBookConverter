@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.application.Platform;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,7 +53,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             ArtWorkBean artWorkBean = new ArtWorkBean(poster);
             Platform.runLater(() -> {
                 if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                    ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                    AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 }
             });
             return artWorkBean;

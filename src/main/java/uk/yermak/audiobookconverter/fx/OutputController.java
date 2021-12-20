@@ -86,15 +86,14 @@ public class OutputController {
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            ConverterApplication.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
-            ;
+            ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
         });
         force.getSelectionModel().select(0);
         force.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
                 if (newValue == null) return;
-                ConverterApplication.getContext().setSpeed(Double.valueOf(newValue));
+                ConverterApplication.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
             }
         });
 

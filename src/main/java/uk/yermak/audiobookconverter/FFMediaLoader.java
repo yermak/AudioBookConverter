@@ -232,6 +232,7 @@ public class FFMediaLoader {
                 if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                     throw new InterruptedException("ArtWork loading was interrupted");
                 String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
+                //TODO consider replacing with m4art extract for m4b files
                 ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
                         "-i", mediaInfo.getFileName(),
                         "-y",

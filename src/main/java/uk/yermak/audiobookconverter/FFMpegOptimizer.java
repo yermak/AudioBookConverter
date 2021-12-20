@@ -63,6 +63,8 @@ public class FFMpegOptimizer {
             String[] optimize = {
                     Utils.FFMPEG,
                     "-i", tempFile,
+                    "-map", "0:v",
+                    "-map", "0:a",
                     "-c", "copy",
                     "-movflags", "+faststart",
                     Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())

@@ -21,7 +21,7 @@ public class AppProperties {
         loadAppProperties();
     }
 
-    private static synchronized Properties loadAppProperties() {
+    static synchronized Properties loadAppProperties() {
         if (PROP_FILE.exists()) {
             try (FileInputStream in = new FileInputStream(PROP_FILE)) {
                 applicationProps.load(in);

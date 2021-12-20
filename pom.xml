@@ -7,9 +7,8 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-<!--
-    <version>5.5.10</version>
--->
+<!--    <version>5.6.3</version>-->
+
     <version>#{APP_VERSION}#</version>
 
     <properties>
@@ -128,6 +127,23 @@
             <version>4.3.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.apple/AppleJavaExtensions -->
+        <dependency>
+            <groupId>com.apple</groupId>
+            <artifactId>AppleJavaExtensions</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+
+<!--
+        <dependency>
+            <groupId>com.apple</groupId>
+            <artifactId>javaextensions</artifactId>
+            <scope>>system</scope>
+            <systemPath>/Users/Yarick_Yermak/Projects/AudioBookConverter/lib/applejavaextensions-1.4.jar</systemPath>
+        </dependency>
+-->
+
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -144,7 +160,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <mainClass>ConverterApplication</mainClass>
+                    <mainClass>AudioBookConverter</mainClass>
                     <executable>${java.home}\bin\java</executable>
                 </configuration>
             </plugin>
@@ -181,7 +197,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>uk.yermak.audiobookconverter.fx.ConverterApplication</mainClass>
+                            <mainClass>uk.yermak.audiobookconverter.AudiobookConverter</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

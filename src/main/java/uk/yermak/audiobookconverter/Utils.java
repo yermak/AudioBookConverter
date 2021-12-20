@@ -9,14 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -25,7 +23,6 @@ import java.util.function.Function;
  */
 public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final Properties PATH = new Properties();
 
     public static String getTmp(long jobId, long fileId, String extension) {
         return new File(System.getProperty("java.io.tmpdir"), "~" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
@@ -119,14 +116,6 @@ public class Utils {
         }
     }
 
-    public static File getInitialDirecotory(String sourceFolder) {
-        if (sourceFolder == null) {
-            return new File(System.getProperty("user.home"));
-        }
-        File file = new File(sourceFolder);
-        return file.exists() ? file : getInitialDirecotory(file.getParent());
-    }
-
     public static String formatTime(double millis) {
         return formatTime((long) millis);
     }
@@ -191,46 +180,6 @@ public class Utils {
         }
         return mp3Filename;
 
-    }
-
-    public static boolean isWindows() {
-        return System.getProperty("os.name").contains("Windows");
-    }
-
-    public static boolean isLinux() {
-        return System.getProperty("os.name").contains("Linux");
-    }
-
-    public final static String FFMPEG = getPath("ffmpeg");
-
-    public static final String MP4ART = getPath("mp4art");
-
-    public static final String MP4INFO = getPath("mp4info");
-
-    public static final String FFPROBE = getPath("ffprobe");
-
-    private static String getPath(String binary) {
-        String property = loadAppProperties().getProperty(binary);
-        if (property != null) {
-            return property;
-        }
-        return binary + (isWindows() ? ".exe" : "");
-
-    }
-
-    public static synchronized Properties loadAppProperties() {
-        if (PATH.isEmpty()) {
-            File file = new File((isLinux()) ? "../lib/app/path.properties" : "app/path.properties");
-
-            if (file.exists()) {
-                try (FileInputStream in = new FileInputStream(file)) {
-                    PATH.load(in);
-                } catch (IOException e) {
-                    logger.error("Error during loading properties", e);
-                }
-            }
-        }
-        return PATH;
     }
 
 

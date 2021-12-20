@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.application.Platform;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,7 +29,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
                 throw new InterruptedException("ArtWork loading was interrupted");
             String poster = Utils.getTmp(mediaInfo.hashCode(), stream, format);
             //TODO consider replacing with m4art extract for m4b files
-            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
+            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Environment.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,
                     "-y",
@@ -54,7 +53,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             ArtWorkBean artWorkBean = new ArtWorkBean(poster);
             Platform.runLater(() -> {
                 if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                    ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                    AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 }
             });
             return artWorkBean;

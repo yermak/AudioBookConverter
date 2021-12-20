@@ -1,2 +1,0 @@
-VM Options=--module-path "C:\Users\Yermak\Programs\JavaFX\javafx-sdk-15.0.1\lib" --add-modules javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics
-Enviromnent var=FFMPEG=external/x64/windows

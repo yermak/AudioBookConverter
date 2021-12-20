@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +42,7 @@ public class FFMediaLoader {
     public List<MediaInfo> loadMediaInfo() {
         logger.info("Loading media info");
         try {
-            FFprobe ffprobe = new FFprobe(Utils.FFPROBE);
+            FFprobe ffprobe = new FFprobe(Environment.FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversionGroup));
@@ -223,7 +222,7 @@ public class FFMediaLoader {
 
         List<File> pictures = new ArrayList<>();
 
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         for (File d : searchDirs) {
             pictures.addAll(findPictures(d));
         }

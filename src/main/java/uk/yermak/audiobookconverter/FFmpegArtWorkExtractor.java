@@ -28,7 +28,6 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
             String poster = Utils.getTmp(mediaInfo.hashCode(), stream, format);
-            //TODO consider replacing with m4art extract for m4b files
             ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Environment.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,
@@ -47,8 +46,8 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             while (!conversionGroup.isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            FFMediaLoader.logger.debug("ArtWork Out: {}", out.toString());
-            FFMediaLoader.logger.error("ArtWork Error: {}", err.toString());
+            FFMediaLoader.logger.debug("ArtWork Out: {}", out);
+            FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
             ArtWorkBean artWorkBean = new ArtWorkBean(poster);
             Platform.runLater(() -> {

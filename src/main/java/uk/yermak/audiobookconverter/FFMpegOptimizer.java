@@ -18,7 +18,6 @@ public class FFMpegOptimizer {
     private String tempFile;
     private final String outputFileName;
 
-    private final ProgressCallback callback;
     private ProgressParser progressParser;
 
 
@@ -26,7 +25,6 @@ public class FFMpegOptimizer {
         this.conversionJob = conversionJob;
         this.tempFile = tempFile;
         this.outputFileName = outputFileName;
-        this.callback = callback;
     }
 
 
@@ -45,7 +43,7 @@ public class FFMpegOptimizer {
         }
     }
 
-    private  void optimize() throws IOException, InterruptedException {
+    private  void optimize() throws InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
 //        callback.reset();
@@ -88,15 +86,15 @@ public class FFMpegOptimizer {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("Optimize Out: {}", out.toString());
-            logger.error("Optimize Error: {}", err.toString());
+            logger.debug("Optimize Out: {}", out);
+            logger.error("Optimize Error: {}", err);
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
             if (!new File(Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())).exists()) {
-                throw new ConversionException("Optimisation failed, no output file:" + out.toString(), new Error(err.toString()));
+                throw new ConversionException("Optimisation failed, no output file:" + out, new Error(err.toString()));
             }
         } catch (Exception e) {
             logger.error("Error during optimisation of resulting file:", e);

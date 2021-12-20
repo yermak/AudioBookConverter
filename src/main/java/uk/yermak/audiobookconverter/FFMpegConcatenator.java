@@ -30,7 +30,6 @@ public class FFMpegConcatenator {
     private final ProgressCallback callback;
     private ProgressParser progressParser;
     private List<String> tmpFiles = new ArrayList<>();
-    private String fileListFileName;
 
     public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, MetadataBuilder metadataBuilder, List<MediaInfo> media, ProgressCallback callback) {
         this.conversionJob = conversionJob;
@@ -49,14 +48,12 @@ public class FFMpegConcatenator {
 
     public void concat() throws IOException, InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
-        fileListFileName = prepareFiles(conversionJob.jobId, media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
+        String fileListFileName = prepareFiles(conversionJob.jobId, media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
 
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
         try {
-            progressParser = new TcpProgressParser(progress -> {
-                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-            });
+            progressParser = new TcpProgressParser(progress -> callback.converted(progress.out_time_ns / 1000000, progress.total_size));
             progressParser.start();
         } catch (URISyntaxException e) {
         }
@@ -83,15 +80,15 @@ public class FFMpegConcatenator {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("Concat Out: {}", out.toString());
-            logger.error("Concat Error: {}", err.toString());
+            logger.debug("Concat Out: {}", out);
+            logger.error("Concat Error: {}", err);
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("Concatenation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
             if (!new File(outputFileName).exists()) {
-                throw new ConversionException("Concatenation failed, no output file:" + out.toString(), new Error(err.toString()));
+                throw new ConversionException("Concatenation failed, no output file:" + out, new Error(err.toString()));
             }
         } catch (Exception e) {
             logger.error("Error during concatination of files:", e);

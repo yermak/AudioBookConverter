@@ -203,8 +203,7 @@ public class FFMediaLoader {
     private static long parseCueTime(String substring) {
         String cleanText = cleanText(substring);
         String[] split = cleanText.split(":");
-        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 1000 / 75;
-        return time;
+        return 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 1000 / 75;
     }
 
     private static String cleanText(String text) {

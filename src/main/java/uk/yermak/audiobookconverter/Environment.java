@@ -20,14 +20,14 @@ public enum Environment {
         }
 
         @Override
-        protected File getConfigFilePath(File file) {
+        protected File getConfigFilePath() {
             return new File(getAppPath(), "Contents/app/path.properties");
         }
     },
 
     LINUX {
         @Override
-        protected File getConfigFilePath(File file) {
+        protected File getConfigFilePath() {
             return new File("../lib/app/path.properties");
 
         }
@@ -83,14 +83,13 @@ public enum Environment {
         return "";
     }
 
-    protected File getConfigFilePath(File file) {
+    protected File getConfigFilePath() {
         return new File("app/path.properties");
     }
 
     synchronized Properties loadAppProperties() {
         if (properties.isEmpty()) {
-            File file = null;
-            file = getConfigFilePath(file);
+            File file = getConfigFilePath();
 
             if (file.exists()) {
                 try (FileInputStream in = new FileInputStream(file)) {

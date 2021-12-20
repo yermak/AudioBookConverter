@@ -87,7 +87,7 @@ public enum Environment {
         return new File("app/path.properties");
     }
 
-    private synchronized Properties loadAppProperties() {
+    synchronized Properties loadAppProperties() {
         if (properties.isEmpty()) {
             File file = null;
             file = getConfigFilePath(file);

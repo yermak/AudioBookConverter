@@ -140,7 +140,7 @@ public class AudiobookConverter extends Application {
         @Override
         public void run() {
             try {
-                String platform = AppProperties.loadAppProperties().getProperty("platform");
+                String platform = Environment.current.loadAppProperties().getProperty("platform");
                 if (platform == null) platform = "version";
                 if ("steam".equals(platform)) return;
                 String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/" + platform + ".txt");

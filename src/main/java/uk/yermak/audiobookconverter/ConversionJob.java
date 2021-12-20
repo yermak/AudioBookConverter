@@ -63,7 +63,7 @@ public class ConversionJob implements Runnable {
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(jobId, mediaInfo.getFileName().hashCode(), conversionGroup.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(jobId, mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -96,11 +96,6 @@ public class ConversionJob implements Runnable {
             e.printStackTrace(new PrintWriter(sw));
             error(e.getMessage() + "; " + sw.getBuffer().toString());
         } finally {
-/*
-            for (MediaInfo mediaInfo : convertable.getMedia()) {
-                FileUtils.deleteQuietly(new File(Utils.getTmp(jobId, mediaInfo.hashCode() + mediaInfo.getDuration(), conversionGroup.getWorkfileExtension())));
-            }
-*/
             FileUtils.deleteQuietly(metaFile);
         }
     }

@@ -237,6 +237,7 @@ public class FFMediaLoader {
                         "-y",
                         poster);
                 process = pictureProcessBuilder.start();
+                new File(poster).deleteOnExit();
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 StreamCopier.copy(process.getInputStream(), out);

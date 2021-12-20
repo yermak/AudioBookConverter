@@ -1,7 +1,7 @@
 JAVA_HOME=/Users/Yarick_Yermak/Library/Java/JavaVirtualMachines/temurin-17/Contents/Home
-#JAVA_HOME=$1
+JAVA_HOME=$1
 JAVAFX_JMODS=jmods/mac
-APP_VERSION=5.6.3
+#APP_VERSION=5.6.3
 
 rm -rf target/release
 mkdir target/release
@@ -18,9 +18,11 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --icon AudioBookConverter.ic
 --runtime-image target/fx-jre \
 --java-options "--add-exports java.desktop/com.apple.eio=ALL-UNNAMED" \
 --dest target/release \
+--vendor "Recoupler Limited" \
+--app-version $APP_VERSION \
 --mac-package-identifier com.recoupler.audiobookconverter \
---mac-package-name AudioBookConverter \
---mac-signing-key-user-name "YAROSLAV YERMAK" \
+--mac-package-name AudiobookConverter \
+--mac-signing-key-user-name "Developer ID Application: Recoupler Limited" \
 --mac-sign
 
 

@@ -19,7 +19,7 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>17</javafx.version>
+        <javafx.version>17.0.1</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -29,7 +29,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
                 throw new InterruptedException("ArtWork loading was interrupted");
             String poster = Utils.getTmp(mediaInfo.hashCode(), stream, format);
             //TODO consider replacing with m4art extract for m4b files
-            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
+            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Environment.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,
                     "-y",

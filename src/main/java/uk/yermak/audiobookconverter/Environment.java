@@ -11,72 +11,90 @@ import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public enum Environment {
-    DEV, MAC, LINUX, WINDOWS;
+    DEV {
+    },
 
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final Properties PATH = new Properties();
+    MAC {
+        protected String getAppPath() {
+            return com.apple.eio.FileManager.getPathToApplicationBundle() + "/";
+        }
 
-    private static Environment target;
+        @Override
+        protected File getConfigFilePath(File file) {
+            return new File(getAppPath(), "Contents/app/path.properties");
+        }
+    },
+
+    LINUX {
+        @Override
+        protected File getConfigFilePath(File file) {
+            return new File("../lib/app/path.properties");
+
+        }
+    },
+
+    WINDOWS {
+    };
+    static Environment current;
+    private static Properties properties = new Properties();
 
     static {
-        if (isDebug()) target = DEV;
-        if (isLinux()) target = LINUX;
-        if (isMac()) target = MAC;
-        if (isWindows()) target = WINDOWS;
-
+        if (LINUX.isLinux()) current = LINUX;
+        if (MAC.isMac()) current = MAC;
+        if (WINDOWS.isWindows()) current = WINDOWS;
+        if (DEV.isDebug()) current = DEV;
+        properties = current.loadAppProperties();
     }
 
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static boolean isDebug() {
+
+
+    public static final String FFPROBE = current.getPath("ffprobe");
+    public static final String MP4INFO = current.getPath("mp4info").replaceAll(" ", "\\ ");
+    public static final String MP4ART = current.getPath("mp4art").replaceAll(" ", "\\ ");
+    public final static String FFMPEG = current.getPath("ffmpeg").replaceAll(" ", "\\ ");
+
+
+
+    private boolean isDebug() {
         String debug = System.getenv("DEBUG");
         return (StringUtils.isNotEmpty(debug)) && Boolean.parseBoolean(debug);
     }
-    public static boolean isWindows() {
+
+    public boolean isWindows() {
         return System.getProperty("os.name").contains("Windows");
     }
 
-    public static boolean isLinux() {
+    public boolean isLinux() {
         return System.getProperty("os.name").contains("Linux");
     }
 
-    public static boolean isMac() {
+    public boolean isMac() {
         return System.getProperty("os.name").contains("Mac OS X");
     }
 
 
-
-    static String getPath(String command) {
-        String property = loadAppProperties().getProperty(command);
-        if (property != null && !isDebug()) {
-            return getAppPath() + property;
-        }
-        return command + (isWindows() ? ".exe" : "");
-
+    String getPath(String command) {
+        return getAppPath() + properties.getProperty(command);
     }
 
-    private static String getAppPath() {
-        if (isMac()) return com.apple.eio.FileManager.getPathToApplicationBundle() + "/";
-        else return "";
+    protected String getAppPath() {
+        return "";
     }
 
-    private static synchronized Properties loadAppProperties() {
-        if (PATH.isEmpty()) {
+    protected File getConfigFilePath(File file) {
+        return new File("app/path.properties");
+    }
+
+    private synchronized Properties loadAppProperties() {
+        if (properties.isEmpty()) {
             File file = null;
-            if (isDebug()){
-                file = new File( "app/path.properties");
-            }else if (isMac()) {
-                file = new File(getAppPath(), "Contents/app/path.properties");
-            } else if (isLinux()) {
-                file = new File("../lib/app/path.properties");
-            } else if (isWindows()){
-                file = new File( "app/path.properties");
-            } else {
-                logger.error("Unknown OS: can't find path name");
-            }
+            file = getConfigFilePath(file);
 
             if (file.exists()) {
                 try (FileInputStream in = new FileInputStream(file)) {
-                    PATH.load(in);
+                    properties.load(in);
                 } catch (IOException e) {
                     logger.error("Error during loading properties", e);
                 }
@@ -84,7 +102,7 @@ public enum Environment {
                 logger.error("Path properties is not found at: ", file.getPath());
             }
         }
-        return PATH;
+        return properties;
     }
 
 

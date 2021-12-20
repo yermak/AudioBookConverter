@@ -73,7 +73,11 @@ public class FFMpegOptimizer {
             logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
 
             //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
-            process = Runtime.getRuntime().exec( String.join(" ", optimize));
+
+            ProcessBuilder pb = new ProcessBuilder (optimize);
+            process = pb.start();
+
+//            process = Runtime.getRuntime().exec( String.join(" ", optimize));
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);

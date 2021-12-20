@@ -139,15 +139,13 @@ public class ConversionGroup {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
                 ConversionProgress conversionProgress = this.start(chapter, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
+                Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
 
             }
         } else {
@@ -156,15 +154,13 @@ public class ConversionGroup {
                 Part part = parts.get(i);
                 String finalDesination = outputDestination;
                 if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
                 ConversionProgress conversionProgress = this.start(part, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
+                Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
             }
         }
 

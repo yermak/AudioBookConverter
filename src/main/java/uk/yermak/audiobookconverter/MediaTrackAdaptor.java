@@ -82,13 +82,13 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     }
 
     @Override
-    public long getOffset() {
-        return track.getStart();
+    public int getUID() {
+        return Objects.hash(mediaInfo.getFileName(), track.getTrackNo());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getFileName(), track.getTrackNo(), getDuration());
+    public long getOffset() {
+        return track.getStart();
     }
 
     @Override

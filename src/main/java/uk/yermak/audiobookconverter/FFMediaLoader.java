@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import javafx.application.Platform;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegChapter;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -35,7 +33,6 @@ public class FFMediaLoader {
     private final ConversionGroup conversionGroup;
     private static final ExecutorService mediaExecutor = Executors.newSingleThreadExecutor();
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(8);
-    private boolean detached;
 
     public FFMediaLoader(List<String> files, ConversionGroup conversionGroup) {
         this.fileNames = files;
@@ -97,7 +94,8 @@ public class FFMediaLoader {
 
                 Map<String, String> streamTags = null;
 
-                for (FFmpegStream ffMpegStream : streams) {
+                for (int i = 0; i < streams.size(); i++) {
+                    FFmpegStream ffMpegStream = streams.get(i);
                     if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
                         logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                         mediaInfo.setCodec(ffMpegStream.codec_name);
@@ -108,8 +106,10 @@ public class FFMediaLoader {
                         streamTags = ffMpegStream.tags;
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
+
+
                         if (!conversionGroup.isDetached()) {
-                            Future<ArtWork> futureLoad = artExecutor.schedule(new ArtWorkCallable(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup), 1, TimeUnit.SECONDS);
+                            Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 1, TimeUnit.SECONDS);
                             ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                             mediaInfo.setArtWork(artWork);
                         }
@@ -211,57 +211,6 @@ public class FFMediaLoader {
         return StringUtils.remove(StringUtils.trim(text), '"');
     }
 
-
-    private static class ArtWorkCallable implements Callable<ArtWork> {
-
-        private final MediaInfoBean mediaInfo;
-        private final String format;
-        private final ConversionGroup conversionGroup;
-
-        public ArtWorkCallable(MediaInfoBean mediaInfo, String format, ConversionGroup conversionGroup) {
-            this.mediaInfo = mediaInfo;
-            this.format = format;
-            this.conversionGroup = conversionGroup;
-        }
-
-        @Override
-        public ArtWork call() throws Exception {
-            Process process = null;
-            try {
-                if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
-                    throw new InterruptedException("ArtWork loading was interrupted");
-                String poster = Utils.getTmp(mediaInfo.hashCode(), mediaInfo.hashCode(), format);
-                ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
-                        "-i", mediaInfo.getFileName(),
-                        "-y",
-                        poster);
-                process = pictureProcessBuilder.start();
-
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                StreamCopier.copy(process.getInputStream(), out);
-                // not using redirectErrorStream() as sometimes error stream is not closed by process which cause feature to hang indefinitely
-                ByteArrayOutputStream err = new ByteArrayOutputStream();
-                StreamCopier.copy(process.getErrorStream(), err);
-
-                boolean finished = false;
-                while (!conversionGroup.isOver() && !finished) {
-                    finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-                }
-                logger.debug("ArtWork Out: {}", out.toString());
-                logger.error("ArtWork Error: {}", err.toString());
-
-                ArtWorkBean artWorkBean = new ArtWorkBean(poster);
-                Platform.runLater(() -> {
-                    if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
-                    }
-                });
-                return artWorkBean;
-            } finally {
-                Utils.closeSilently(process);
-            }
-        }
-    }
 
     static Collection<File> findPictures(File dir) {
         return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);

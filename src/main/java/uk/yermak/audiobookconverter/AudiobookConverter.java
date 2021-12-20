@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AppProperties;
+import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.Version;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.JfxEnv;
 
@@ -103,7 +106,7 @@ public class AudiobookConverter extends Application {
                 System.exit(0);
             });
 
-//            checkNewVersion();
+            checkNewVersion();
 
         } catch (IOException e) {
             logger.error("Error initiating application", e);
@@ -137,7 +140,10 @@ public class AudiobookConverter extends Application {
         @Override
         public void run() {
             try {
-                String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/version.txt");
+                String platform = Utils.loadAppProperties().getProperty("platform");
+                if (platform == null) platform = "version";
+                if ("steam".equals(platform)) return;
+                String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/" + platform + ".txt");
                 if (!Version.getVersionString().equals(StringUtils.trim(version))) {
                     logger.info("New version found: {}", version);
                     Platform.runLater(() -> {
@@ -148,7 +154,7 @@ public class AudiobookConverter extends Application {
                         alert.setContentText("Would you like to download new version?");
                         Optional<ButtonType> result = alert.showAndWait();
                         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-                            AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/releases/latest");
+                            AudiobookConverter.getEnv().showDocument("https://store.steampowered.com/app/1529240/AudioBookConverter/");
                         }
                     });
                 }

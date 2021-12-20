@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +32,7 @@ public enum Format {
         @Override
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Environment.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -105,7 +103,7 @@ public enum Format {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Environment.FFMPEG);
             options.add("-protocol_whitelist");
             options.add("file,pipe,concat");
             options.add("-f");
@@ -180,7 +178,7 @@ public enum Format {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Environment.FFMPEG);
             options.add("-protocol_whitelist");
             options.add("file,pipe,concat");
             options.add("-f");
@@ -209,7 +207,7 @@ public enum Format {
         @Override
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Environment.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -331,7 +329,7 @@ public enum Format {
 
     public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
         List<String> options = new ArrayList<>();
-        options.add(Utils.FFMPEG);
+        options.add(Environment.FFMPEG);
         if (mediaInfo.getOffset() != -1) {
             options.add("-ss");
             options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -376,7 +374,7 @@ public enum Format {
 
     public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
         List<String> options = new ArrayList<>();
-        options.add(Utils.FFMPEG);
+        options.add(Environment.FFMPEG);
         if (mediaInfo.getOffset() != -1) {
             options.add("-ss");
             options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -403,7 +401,7 @@ public enum Format {
     }
 
     public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
-        String[] strings = {Utils.FFMPEG,
+        String[] strings = {Environment.FFMPEG,
                 "-protocol_whitelist", "file,pipe,concat",
                 "-vn",
                 "-f", "concat",

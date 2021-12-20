@@ -4,7 +4,6 @@ import javafx.collections.ObservableList;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +18,7 @@ public class FFMediaLoaderTest {
 
     @org.testng.annotations.Test
     public void testAddPosterIfMissing() {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<ArtWork> posters = context.getPosters();
 
         ArtWorkBean art1 = new ArtWorkBean("", 1);

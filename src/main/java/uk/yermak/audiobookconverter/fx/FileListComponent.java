@@ -4,6 +4,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
 import uk.yermak.audiobookconverter.fx.util.ContextMenuListCell;
@@ -17,12 +18,12 @@ public class FileListComponent extends ListView<MediaInfo> {
         setCellFactory(ContextMenuListCell.forListView(filesContextMenuBuilder()));
 
         getSelectionModel().getSelectedItems().addListener((ListChangeListener<MediaInfo>) c -> {
-            ConverterApplication.getContext().getSelectedMedia().clear();
-            ConverterApplication.getContext().getSelectedMedia().addAll(c.getList());
+            AudiobookConverter.getContext().getSelectedMedia().clear();
+            AudiobookConverter.getContext().getSelectedMedia().addAll(c.getList());
         });
 
 
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> media = context.getMedia();
         setItems(media);
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -101,7 +102,7 @@ public class FileListComponent extends ListView<MediaInfo> {
     }
 
     public void reselect() {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
         ObservableList<MediaInfo> media = context.getMedia();
         List<MediaInfo> change = new ArrayList<>(selectedMedia);

@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -43,7 +42,7 @@ public class ConversionJob implements Runnable {
 
         addStatusChangeListener((observable, oldValue, newValue) -> {
             if (FINISHED.equals(newValue)) {
-                Platform.runLater(() -> ConverterApplication.showNotification(outputDestination));
+                Platform.runLater(() -> AudiobookConverter.showNotification(outputDestination));
             }
         });
 

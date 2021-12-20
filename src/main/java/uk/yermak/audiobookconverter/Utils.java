@@ -26,7 +26,7 @@ public class Utils {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static String getTmp(long jobId, long fileId, String extension) {
-        return new File(System.getProperty("java.io.tmpdir"), "~ABC_" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
+        return new File(System.getProperty("java.io.tmpdir"), "~" + Version.getVersionString() + "_" + jobId + "_" + fileId + "." + extension).getAbsolutePath();
     }
 
     public static void closeSilently(ProgressParser progressParser) {

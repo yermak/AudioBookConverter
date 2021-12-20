@@ -101,6 +101,11 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
+    public int getUID() {
+        return this.getMediaInfo().getUID();
+    }
+
+    @Override
     public long getOffset() {
         return this.getMediaInfo().getOffset();
     }
@@ -112,19 +117,6 @@ public class MediaInfoProxy implements MediaInfo {
     MediaInfoProxy(final String filename, final Future<MediaInfo> futureLoad) {
         this.filename = filename;
         this.futureLoad = futureLoad;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MediaInfo)) return false;
-        MediaInfo that = (MediaInfo) o;
-        return getFileName().equals(that.getFileName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getFileName(), getDuration());
     }
 
     @Override

@@ -24,6 +24,7 @@ public interface MediaInfo extends Organisable {
 
     public Chapter getChapter();
 
+    public int getUID();
 }
 
         

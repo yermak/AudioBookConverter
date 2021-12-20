@@ -32,6 +32,7 @@ public class OutputParameters {
         this.format = parameters.getFormat();
         this.splitChapters = parameters.isSplitChapters();
         this.speed = new SimpleObjectProperty<>(parameters.getSpeed());
+        this.force = parameters.force;
     }
 
     OutputParameters() {

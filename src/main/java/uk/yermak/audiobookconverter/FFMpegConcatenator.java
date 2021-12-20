@@ -42,7 +42,7 @@ public class FFMpegConcatenator {
 
     protected static File prepareFiles(long jobId, List<MediaInfo> media, String workfileExtension) throws IOException {
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
-        List<String> outFiles = media.stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.getFileName().hashCode(), workfileExtension) + "'").collect(Collectors.toList());
+        List<String> outFiles = media.stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.getUID(), workfileExtension) + "'").collect(Collectors.toList());
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
     }
@@ -96,7 +96,7 @@ public class FFMpegConcatenator {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
-            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.jobId, mediaInfo.getFileName().hashCode(), conversionJob.getConversionGroup().getWorkfileExtension()))));
+            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.jobId, mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
             FileUtils.deleteQuietly(new File(fileListFileName));
         }
     }

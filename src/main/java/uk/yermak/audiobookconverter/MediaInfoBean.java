@@ -30,6 +30,11 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.duration = duration;
     }
 
+    @Override
+    public int getUID() {
+        return Objects.hash(fileName);
+    }
+
     public int getChannels() {
         return this.channels;
     }
@@ -89,12 +94,10 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.codec = codec;
     }
 
-
     @Override
     public long getOffset() {
         return -1;
     }
-
 
     public MediaInfoBean(final String fileName) {
         this.fileName = fileName;
@@ -104,19 +107,5 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         this.duration = 0L;
         this.codec = "";
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MediaInfo)) return false;
-        MediaInfo that = (MediaInfo) o;
-        return getFileName().equals(that.getFileName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getFileName(), getDuration());
-    }
-
 }
 

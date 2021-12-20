@@ -16,8 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.AppProperties;
-import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.Version;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.JfxEnv;

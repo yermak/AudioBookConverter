@@ -19,9 +19,7 @@ public class ContextMenuTreeTableRow<T> extends TreeTableRow<T> {
                     row.setContextMenu(contextMenuBuilder.menu(row.getTreeItem().getValue()));
                 }
             });
-            row.selectedProperty().addListener((observableValue, prev, current) -> {
-                row.setContextMenu(contextMenuBuilder.menu(row.getTreeItem().getValue()));
-            });
+            row.selectedProperty().addListener((observableValue, prev, current) -> row.setContextMenu(contextMenuBuilder.menu(row.getTreeItem().getValue())));
             return row;
         };
     }

@@ -33,7 +33,7 @@ public class Mp4v2ArtBuilder {
         }
     }
 
-    public void updateSinglePoster(ArtWork poster, int index, String outputFileName) throws IOException, InterruptedException {
+    public void updateSinglePoster(ArtWork poster, int index, String outputFileName) {
         Process process = null;
         try {
             ProcessBuilder artProcessBuilder = new ProcessBuilder(Environment.MP4ART,
@@ -53,15 +53,15 @@ public class Mp4v2ArtBuilder {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("mp4art out: {}", out.toString());
-            logger.warn("mp4art err: {}", err.toString());
+            logger.debug("mp4art out: {}", out);
+            logger.warn("mp4art err: {}", err);
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("ArtWork failed with code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
             if (!new File(outputFileName).exists()) {
-                throw new ConversionException("ArtWork failed, no output file:" + out.toString(), new Error(err.toString()));
+                throw new ConversionException("ArtWork failed, no output file:" + out, new Error(err.toString()));
             }
         } catch (Exception e) {
             logger.error("Failed to apply art work", e);

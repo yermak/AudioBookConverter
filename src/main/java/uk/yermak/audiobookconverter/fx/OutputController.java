@@ -90,12 +90,9 @@ public class OutputController {
             AudiobookConverter.getContext().setSpeed(Double.valueOf(newValue));
         });
         force.getSelectionModel().select(0);
-        force.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                if (newValue == null) return;
-                AudiobookConverter.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
-            }
+        force.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) return;
+            AudiobookConverter.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
         });
 
         outputFormatBox.getItems().addAll(Format.values());

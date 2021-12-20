@@ -137,9 +137,7 @@ public class ConversionContext {
     }
 
     public void addPosterIfMissingWithDelay(ArtWork artWork) {
-        Platform.runLater(() -> {
-            addPosterIfMissing(artWork);
-        });
+        Platform.runLater(() -> addPosterIfMissing(artWork));
     }
 
     public void addPosterIfMissing(ArtWork artWork) {

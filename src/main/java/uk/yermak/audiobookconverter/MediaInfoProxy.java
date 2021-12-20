@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class MediaInfoProxy implements MediaInfo {

@@ -30,7 +30,6 @@ public class ConversionJob implements Runnable {
     private final Map<String, ProgressCallback> progressCallbacks;
     private final String outputDestination;
     private final SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
-    long jobId;
 
 
     public ConversionJob(ConversionGroup conversionGroup, Convertable convertable, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
@@ -38,7 +37,6 @@ public class ConversionJob implements Runnable {
         this.convertable = convertable;
         this.progressCallbacks = progressCallbacks;
         this.outputDestination = outputDestination;
-        jobId = outputDestination.hashCode() + System.currentTimeMillis();
 
         addStatusChangeListener((observable, oldValue, newValue) -> {
             if (FINISHED.equals(newValue)) {
@@ -53,7 +51,7 @@ public class ConversionJob implements Runnable {
 
         List<Future<String>> futures = new ArrayList<>();
 
-        String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
+        String tempFile = Utils.getTmp(conversionGroup.getJobId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         try {
 //            conversion.getOutputParameters().updateAuto(conversion.getMedia());
@@ -61,7 +59,7 @@ public class ConversionJob implements Runnable {
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(jobId, mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(conversionGroup.getJobId(), mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -74,7 +72,7 @@ public class ConversionJob implements Runnable {
             }
             if (status.get().isOver()) return;
 
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(jobId, conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(conversionGroup.getJobId(), conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;

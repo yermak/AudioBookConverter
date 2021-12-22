@@ -30,7 +30,8 @@ public class ArtWorkImage implements ArtWork {
         }
 
         BufferedImage bImage = SwingFXUtils.fromFXImage(this.image(), null);
-        String poster = Utils.getTmp(this.image().hashCode(), this.image().hashCode(), "png");
+
+        String poster = Utils.getTmp(AudiobookConverter.getContext().getConversionGroup().getJobId(), this.image().hashCode(), "png");
 
         try {
             File posterFile = new File(poster);

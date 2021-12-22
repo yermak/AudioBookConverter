@@ -29,6 +29,7 @@ public class ConversionGroup {
     private List<ArtWork> posters;
     private OutputParameters outputParameters;
     private boolean detached;
+    private long jobId = System.currentTimeMillis();
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -176,6 +177,9 @@ public class ConversionGroup {
     }
 
 
+    public long getJobId() {
+        return jobId;
+    }
 }
 
 

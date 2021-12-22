@@ -27,7 +27,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
         try {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
-            String poster = Utils.getTmp(mediaInfo.hashCode(), stream, format);
+            String poster = Utils.getTmp(mediaInfo.getUID(), stream, format);
             ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Environment.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,

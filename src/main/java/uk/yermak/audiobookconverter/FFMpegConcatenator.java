@@ -48,7 +48,7 @@ public class FFMpegConcatenator {
 
     public void concat() throws IOException, InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
-        String fileListFileName = prepareFiles(conversionJob.jobId, media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
+        String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getJobId(), media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
 
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
@@ -96,7 +96,7 @@ public class FFMpegConcatenator {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
-            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.jobId, mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
+            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.getConversionGroup().getJobId(), mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
             FileUtils.deleteQuietly(new File(fileListFileName));
         }
     }

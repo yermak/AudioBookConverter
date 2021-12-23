@@ -87,6 +87,11 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     }
 
     @Override
+    public String getReference() {
+        return getFileName() + "-" + track.getTrackNo();
+    }
+
+    @Override
     public long getOffset() {
         return track.getStart();
     }
@@ -94,5 +99,13 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     @Override
     public int getTotalNumbers() {
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MediaInfo)) return false;
+        MediaInfo that = (MediaInfo) o;
+        return getReference().equals(that.getReference());
     }
 }

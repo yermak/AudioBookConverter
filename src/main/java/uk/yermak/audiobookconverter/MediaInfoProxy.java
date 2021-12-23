@@ -103,6 +103,11 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
+    public String getReference() {
+        return this.getMediaInfo().getReference();
+    }
+
+    @Override
     public long getOffset() {
         return this.getMediaInfo().getOffset();
     }
@@ -124,6 +129,11 @@ public class MediaInfoProxy implements MediaInfo {
     @Override
     public int getTotalNumbers() {
         return this.getMediaInfo().getTotalNumbers();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.getMediaInfo().equals(obj);
     }
 }
 

@@ -50,22 +50,6 @@ public class Part implements Organisable, Convertable {
         return String.valueOf(getBook().getBookInfo().bookNumber());
     }
 
-/*
-    private String getNumberString() {
-        if (getBook().getParts().size() > 1) {
-            return StringUtils.leftPad(String.valueOf(getNumber()), 2, '0');
-        } else {
-            return null;
-        }
-    }
-*/
-
-/*
-    private String getDurationString() {
-        return Utils.formatTimeForFilename(getDuration());
-    }
-*/
-
     public String getTitle() {
         return "Part " + getNumber();
     }

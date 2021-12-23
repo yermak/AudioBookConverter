@@ -59,7 +59,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                     contextMenu.getItems().add(split);
                 }
 
-                if (item instanceof Chapter && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() > 1 /*&& getSelectionModel().getSelectedItems().contains(item)*/) {
+                if ((item instanceof Chapter || item instanceof Part)  && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() > 1 /*&& getSelectionModel().getSelectedItems().contains(item)*/) {
                     MenuItem combine = new MenuItem("Combine");
                     combine.setOnAction(BookStructureComponent.this::combineChapters);
                     contextMenu.getItems().add(combine);

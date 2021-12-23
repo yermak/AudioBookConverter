@@ -212,7 +212,12 @@ public class FFMediaLoader {
 
 
     static Collection<File> findPictures(File dir) {
-        return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
+        try {
+            return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
+        } catch (Exception e) {
+            logger.error("Failed to search for images in dir:" + dir, e);
+            return Collections.emptyList();
+        }
     }
 
     static void searchForPosters(List<MediaInfo> media) {

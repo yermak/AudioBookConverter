@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import jetbrains.exodus.ByteIterable;
 import jetbrains.exodus.bindings.StringBinding;
 import jetbrains.exodus.entitystore.Entity;
 import jetbrains.exodus.entitystore.EntityIterable;
@@ -37,13 +38,14 @@ public class AppProperties {
 
 
     public static String getProperty(String key) {
+        String result;
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
-            env.computeInReadonlyTransaction(txn -> {
+            result = env.computeInReadonlyTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
-                return store.get(txn, StringBinding.stringToEntry(key));
+                return StringBinding.entryToString(store.get(txn, StringBinding.stringToEntry(key)));
             });
         }
-        return null;
+        return result;
     }
 
     public static synchronized void setProperty(String key, String value) {
@@ -68,10 +70,12 @@ public class AppProperties {
     }
 
     public static ObservableList<String> loadGenres() {
-        ObservableList<String> genres = FXCollections.observableArrayList();
+        ObservableList<String> genres;
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
-            entityStore.executeInReadonlyTransaction(txn -> {
-                StreamSupport.stream(txn.sort(GENRE_ENTITY, GENRE_TITLE, true).spliterator(), false).forEach(g -> genres.add((String) g.getProperty(GENRE_TITLE)));
+            genres = entityStore.computeInReadonlyTransaction(txn -> {
+                ObservableList<String> list = FXCollections.observableArrayList();
+                StreamSupport.stream(txn.sort(GENRE_ENTITY, GENRE_TITLE, true).spliterator(), false).forEach(g -> list.add((String) g.getProperty(GENRE_TITLE)));
+                return list;
             });
         }
         return genres;
@@ -89,14 +93,16 @@ public class AppProperties {
     }
 
     public static List<Preset> loadPresets() {
-        ArrayList<Preset> presets = new ArrayList<>();
+        List<Preset> presets;
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
-            entityStore.executeInReadonlyTransaction(txn -> {
+            presets = entityStore.computeInReadonlyTransaction(txn -> {
+                List<Preset> list = new ArrayList<>();
                 EntityIterable all = txn.getAll(PRESET_ENTITY);
                 for (Entity entity : all) {
                     Preset preset = bindPreset(entity);
-                    presets.add(preset);
+                    list.add(preset);
                 }
+                return list;
             });
         }
         return presets;
@@ -119,7 +125,13 @@ public class AppProperties {
     public static void savePreset(Preset preset) {
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             entityStore.executeInTransaction(txn -> {
-                final Entity entity = txn.newEntity(PRESET_ENTITY);
+                Entity entity;
+                EntityIterable entities = txn.find(PRESET_ENTITY, PRESET_NAME, preset.getName());
+                if (entities.isEmpty()) {
+                    entity = txn.newEntity(PRESET_ENTITY);
+                } else {
+                    entity = entities.getFirst();
+                }
                 entity.setProperty(PRESET_NAME, preset.getName());
                 entity.setProperty(PRESET_FORMAT, preset.getFormat().format);
                 entity.setProperty(PRESET_BITRATE, preset.getBitRate());
@@ -133,13 +145,14 @@ public class AppProperties {
     }
 
     public static Preset loadPreset(String presetName) {
+        Preset preset;
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
-            entityStore.computeInReadonlyTransaction(txn -> {
+            preset = entityStore.computeInReadonlyTransaction(txn -> {
                 EntityIterable entities = txn.find(PRESET_ENTITY, PRESET_NAME, presetName);
                 if (entities.isEmpty()) return null;
                 return bindPreset(entities.getFirst());
             });
         }
-        return null;
+        return preset;
     }
 }

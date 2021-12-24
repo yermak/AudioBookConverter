@@ -93,7 +93,7 @@ public class ConversionContext {
         conversionGroup.setBookInfo(bookInfo.get());
         conversionGroup.setOutputParameters(new OutputParameters(outputParameters.get()));
         conversionGroup.setDetached(true);
-        AppProperties.saveGenres(bookInfo.get().genre().get());
+        AppSetting.saveGenres(bookInfo.get().genre().get());
 
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);

@@ -2,8 +2,6 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -119,11 +117,11 @@ public class OutputController {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
-                AppProperties.savePreset(preset);
+                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             } else {
                 Preset preset = Preset.instance(newValue);
-                AppProperties.savePreset(preset);
+                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             }
         });

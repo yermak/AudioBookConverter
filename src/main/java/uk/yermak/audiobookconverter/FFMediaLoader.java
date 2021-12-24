@@ -42,7 +42,7 @@ public class FFMediaLoader {
     public List<MediaInfo> loadMediaInfo() {
         logger.info("Loading media info");
         try {
-            FFprobe ffprobe = new FFprobe(Environment.FFPROBE);
+            FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversionGroup));

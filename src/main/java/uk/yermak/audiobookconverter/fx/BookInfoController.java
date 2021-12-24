@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +13,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.AppProperties;
 import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
@@ -44,11 +47,15 @@ public class BookInfoController {
     private void initialize() {
 
         MenuItem menuItem = new MenuItem("Remove");
-        genre.setItems(AudiobookConverter.getContext().loadGenres());
+
+        genre.setItems(AppProperties.loadGenres());
         menuItem.setOnAction(event -> {
-            genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
-            AudiobookConverter.getContext().saveGenres();
+            String remove = genre.getItems().get(genre.getSelectionModel().getSelectedIndex());
+            AppProperties.removeGenre(remove);
+            genre.setItems(AppProperties.loadGenres());
         });
+        AudiobookConverter.getContext().addContextDetachListener(observable -> genre.setItems(AppProperties.loadGenres()));
+
         ContextMenu contextMenu = new ContextMenu(menuItem);
 
         genre.setOnContextMenuRequested(event -> {

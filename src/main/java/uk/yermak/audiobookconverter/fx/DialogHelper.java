@@ -33,7 +33,7 @@ public class DialogHelper {
 
         final FileChooser fileChooser = new FileChooser();
         String outputFolder = AppProperties.getProperty("output.folder");
-        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(outputFolder));
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
@@ -50,7 +50,7 @@ public class DialogHelper {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
@@ -74,7 +74,7 @@ public class DialogHelper {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         String sourceFolder = AppProperties.getProperty("source.folder");
-        directoryChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
+        directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");
 

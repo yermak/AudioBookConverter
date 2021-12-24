@@ -1,15 +1,24 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import jetbrains.exodus.bindings.StringBinding;
+import jetbrains.exodus.entitystore.Entity;
+import jetbrains.exodus.entitystore.EntityIterable;
+import jetbrains.exodus.entitystore.PersistentEntityStore;
+import jetbrains.exodus.entitystore.PersistentEntityStores;
+import jetbrains.exodus.env.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.stream.StreamSupport;
 
 public class AppProperties {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -18,7 +27,7 @@ public class AppProperties {
     private static final Properties applicationProps = new Properties();
 
     static {
-        loadAppProperties();
+//        loadAppProperties();
     }
 
     static synchronized Properties loadAppProperties() {
@@ -33,7 +42,13 @@ public class AppProperties {
     }
 
     public static String getProperty(String key) {
-        return applicationProps.getProperty(key);
+        try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
+            env.computeInReadonlyTransaction(txn -> {
+                final Store store = env.openStore("Settings", StoreConfig.WITHOUT_DUPLICATES, txn);
+                return store.get(txn, StringBinding.stringToEntry(key));
+            });
+        }
+        return null;
     }
 
     public static Properties getProperties(String group) {
@@ -50,14 +65,44 @@ public class AppProperties {
     }
 
     public static synchronized void setProperty(String key, String value) {
-        applicationProps.put(key, value);
-        File appDir = APP_DIR;
-        if (appDir.exists() || appDir.mkdir()) {
-            try (FileOutputStream out = new FileOutputStream(PROP_FILE)) {
-                applicationProps.store(out, "");
-            } catch (Exception e) {
-                logger.error("Error during saving properties", e);
+        try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
+            env.executeInTransaction(txn -> {
+                final Store store = env.openStore("Settings", StoreConfig.WITHOUT_DUPLICATES, txn);
+                store.put(txn, StringBinding.stringToEntry(key), StringBinding.stringToEntry(value));
+            });
+        }
+    }
+
+    public static void saveGenres(String genre) {
+        if (StringUtils.isNotEmpty(genre) & loadGenres().stream().noneMatch(s -> s.equals(genre))) {
+            try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+                entityStore.executeInTransaction(txn -> {
+                    final Entity genreEntity = txn.newEntity("Genre");
+                    genreEntity.setProperty("title", genre);
+                    genreEntity.setProperty("created", System.currentTimeMillis());
+                });
             }
+        }
+    }
+
+    public static ObservableList<String> loadGenres() {
+        ObservableList<String> genres = FXCollections.observableArrayList();
+        try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+            entityStore.executeInReadonlyTransaction(txn -> {
+                StreamSupport.stream(txn.sort("Genre", "title", true).spliterator(), false).forEach(g -> genres.add((String) g.getProperty("title")));
+            });
+        }
+        return genres;
+    }
+
+    public static void removeGenre(String genre) {
+        try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+            entityStore.executeInTransaction(txn -> {
+                EntityIterable entities = txn.find("Genre", "title", genre);
+                for (Entity entity : entities) {
+                    entity.delete();
+                }
+            });
         }
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
-public enum Environment {
+public enum Platform {
     DEV {
     },
 
@@ -35,7 +35,7 @@ public enum Environment {
 
     WINDOWS {
     };
-    static Environment current;
+    static Platform current;
     private static Properties properties = new Properties();
 
     static {

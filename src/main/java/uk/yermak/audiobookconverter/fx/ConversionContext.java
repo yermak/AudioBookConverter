@@ -27,7 +27,8 @@ public class ConversionContext {
     private boolean paused;
 
     private final ObservableList<MediaInfo> selectedMedia = FXCollections.observableArrayList();
-    private final GenresManager genresManager = new GenresManager();
+    private final ObservableList<String> genres = FXCollections.observableArrayList();
+
 
     private final SimpleObjectProperty<AudioBookInfo> bookInfo = new SimpleObjectProperty<>(AudioBookInfo.instance());
     private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
@@ -43,15 +44,6 @@ public class ConversionContext {
 
     public ConversionContext() {
 //        resetForNewConversion();
-    }
-
-
-    public void saveGenres() {
-        genresManager.saveGenres(conversionGroupHolder.get().getBookInfo());
-    }
-
-    public ObservableList<String> loadGenres() {
-        return genresManager.loadGenres();
     }
 
     public void stopConversions() {
@@ -92,7 +84,7 @@ public class ConversionContext {
     public ConversionGroup detach() {
         mediaLoader.detach();
 
-        saveGenres();
+
 
         ConversionGroup conversionGroup = conversionGroupHolder.get();
         conversionGroup.setMedia(new ArrayList<>(media));
@@ -101,6 +93,7 @@ public class ConversionContext {
         conversionGroup.setBookInfo(bookInfo.get());
         conversionGroup.setOutputParameters(new OutputParameters(outputParameters.get()));
         conversionGroup.setDetached(true);
+        AppProperties.saveGenres(bookInfo.get().genre().get());
 
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);

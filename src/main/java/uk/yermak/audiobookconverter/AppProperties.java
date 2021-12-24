@@ -9,65 +9,47 @@ import jetbrains.exodus.entitystore.PersistentEntityStore;
 import jetbrains.exodus.entitystore.PersistentEntityStores;
 import jetbrains.exodus.env.*;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Enumeration;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class AppProperties {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final File APP_DIR = new File(System.getProperty("APP_HOME"));
-    public static final File PROP_FILE = new File(APP_DIR, Version.getVersionString() + ".properties");
-    private static final Properties applicationProps = new Properties();
+    public static final String PRESET_ENTITY = "Preset";
+    public static final String PRESET_NAME = "name";
+    public static final String PRESET_FORMAT = "format";
+    public static final String PRESET_BITRATE = "bitrate";
+    public static final String PRESET_FREQUENCY = "frequency";
+    public static final String PRESET_CHANNELS = "channels";
+    public static final String PRESET_CUTOFF = "cutoff";
+    public static final String PRESET_CBR = "cbr";
+    public static final String PRESET_QUALITY = "quality";
+    public static final String GENRE_ENTITY = "Genre";
+    public static final String GENRE_TITLE = "title";
+    public static final String GENRE_CREATED = "created";
+    public static final String SETTINGS = "Settings";
 
-    static {
-//        loadAppProperties();
-    }
-
-    static synchronized Properties loadAppProperties() {
-        if (PROP_FILE.exists()) {
-            try (FileInputStream in = new FileInputStream(PROP_FILE)) {
-                applicationProps.load(in);
-            } catch (IOException e) {
-                logger.error("Error during loading properties", e);
-            }
-        }
-        return applicationProps;
-    }
 
     public static String getProperty(String key) {
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             env.computeInReadonlyTransaction(txn -> {
-                final Store store = env.openStore("Settings", StoreConfig.WITHOUT_DUPLICATES, txn);
+                final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
                 return store.get(txn, StringBinding.stringToEntry(key));
             });
         }
         return null;
     }
 
-    public static Properties getProperties(String group) {
-        Properties properties = new Properties();
-        Enumeration<Object> keys = applicationProps.keys();
-        while (keys.hasMoreElements()) {
-            String propName = (String) keys.nextElement();
-            if (propName.startsWith(group + ".")) {
-                String nameWithoutGroup = propName.substring(group.length() + 1);
-                properties.setProperty(nameWithoutGroup, applicationProps.getProperty(propName));
-            }
-        }
-        return properties;
-    }
-
     public static synchronized void setProperty(String key, String value) {
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             env.executeInTransaction(txn -> {
-                final Store store = env.openStore("Settings", StoreConfig.WITHOUT_DUPLICATES, txn);
+                final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
                 store.put(txn, StringBinding.stringToEntry(key), StringBinding.stringToEntry(value));
             });
         }
@@ -77,9 +59,9 @@ public class AppProperties {
         if (StringUtils.isNotEmpty(genre) & loadGenres().stream().noneMatch(s -> s.equals(genre))) {
             try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
                 entityStore.executeInTransaction(txn -> {
-                    final Entity genreEntity = txn.newEntity("Genre");
-                    genreEntity.setProperty("title", genre);
-                    genreEntity.setProperty("created", System.currentTimeMillis());
+                    final Entity genreEntity = txn.newEntity(GENRE_ENTITY);
+                    genreEntity.setProperty(GENRE_TITLE, genre);
+                    genreEntity.setProperty(GENRE_CREATED, System.currentTimeMillis());
                 });
             }
         }
@@ -89,7 +71,7 @@ public class AppProperties {
         ObservableList<String> genres = FXCollections.observableArrayList();
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             entityStore.executeInReadonlyTransaction(txn -> {
-                StreamSupport.stream(txn.sort("Genre", "title", true).spliterator(), false).forEach(g -> genres.add((String) g.getProperty("title")));
+                StreamSupport.stream(txn.sort(GENRE_ENTITY, GENRE_TITLE, true).spliterator(), false).forEach(g -> genres.add((String) g.getProperty(GENRE_TITLE)));
             });
         }
         return genres;
@@ -98,11 +80,66 @@ public class AppProperties {
     public static void removeGenre(String genre) {
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             entityStore.executeInTransaction(txn -> {
-                EntityIterable entities = txn.find("Genre", "title", genre);
+                EntityIterable entities = txn.find(GENRE_ENTITY, GENRE_TITLE, genre);
                 for (Entity entity : entities) {
                     entity.delete();
                 }
             });
         }
+    }
+
+    public static List<Preset> loadPresets() {
+        ArrayList<Preset> presets = new ArrayList<>();
+        try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+            entityStore.executeInReadonlyTransaction(txn -> {
+                EntityIterable all = txn.getAll(PRESET_ENTITY);
+                for (Entity entity : all) {
+                    Preset preset = bindPreset(entity);
+                    presets.add(preset);
+                }
+            });
+        }
+        return presets;
+    }
+
+    @NotNull
+    private static Preset bindPreset(Entity entity) {
+        String name = (String) entity.getProperty(PRESET_NAME);
+        String format = (String) entity.getProperty(PRESET_FORMAT);
+        Integer bitrate = (Integer) entity.getProperty(PRESET_BITRATE);
+        Integer frequency = (Integer) entity.getProperty(PRESET_FREQUENCY);
+        Integer channels = (Integer) entity.getProperty(PRESET_CHANNELS);
+        Integer cutoff = (Integer) entity.getProperty(PRESET_CUTOFF);
+        Boolean cbr = (Boolean) entity.getProperty(PRESET_CBR);
+        Integer quality = (Integer) entity.getProperty(PRESET_QUALITY);
+        Preset preset = new Preset(name, new OutputParameters(Format.instance(format), bitrate, frequency, channels, cutoff, cbr, quality));
+        return preset;
+    }
+
+    public static void savePreset(Preset preset) {
+        try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+            entityStore.executeInTransaction(txn -> {
+                final Entity entity = txn.newEntity(PRESET_ENTITY);
+                entity.setProperty(PRESET_NAME, preset.getName());
+                entity.setProperty(PRESET_FORMAT, preset.getFormat().format);
+                entity.setProperty(PRESET_BITRATE, preset.getBitRate());
+                entity.setProperty(PRESET_FREQUENCY, preset.getFrequency());
+                entity.setProperty(PRESET_CHANNELS, preset.getChannels());
+                entity.setProperty(PRESET_CUTOFF, preset.getCutoff());
+                entity.setProperty(PRESET_CBR, preset.isCbr());
+                entity.setProperty(PRESET_QUALITY, preset.getVbrQuality());
+            });
+        }
+    }
+
+    public static Preset loadPreset(String presetName) {
+        try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
+            entityStore.computeInReadonlyTransaction(txn -> {
+                EntityIterable entities = txn.find(PRESET_ENTITY, PRESET_NAME, presetName);
+                if (entities.isEmpty()) return null;
+                return bindPreset(entities.getFirst());
+            });
+        }
+        return null;
     }
 }

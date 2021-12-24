@@ -112,16 +112,18 @@ public class OutputController {
 //        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
 //        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
 
-        presetBox.getItems().addAll(presets.stream().map(Preset::getName).collect(Collectors.toList()));
+        presetBox.getItems().addAll(presets.stream().map(Preset::getName).toList());
 
         presetBox.getSelectionModel().select(Preset.DEFAULT);
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
+                AppProperties.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             } else {
                 Preset preset = Preset.instance(newValue);
+                AppProperties.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             }
         });

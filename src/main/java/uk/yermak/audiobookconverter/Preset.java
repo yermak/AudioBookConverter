@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.google.gson.Gson;
-
 import java.util.*;
 
 public class Preset extends OutputParameters {
@@ -29,13 +27,13 @@ public class Preset extends OutputParameters {
 
 
     public static List<Preset> loadPresets() {
-        List<Preset> presets = AppProperties.loadPresets();
+        List<Preset> presets = AppSetting.loadPresets();
         ArrayList<Preset> toStore = new ArrayList<>(defaultValues);
         toStore.removeAll(presets);
         for (Preset preset : toStore) {
-            AppProperties.savePreset(preset);
+            AppSetting.savePreset(preset);
         }
-        return AppProperties.loadPresets();
+        return AppSetting.loadPresets();
 
     }
 
@@ -63,14 +61,14 @@ public class Preset extends OutputParameters {
     }
 
     public static Preset instance(String presetName) {
-        Preset preset = AppProperties.loadPreset(presetName);
+        Preset preset = AppSetting.loadPreset(presetName);
         if (preset != null) return preset;
 
         return new Preset(presetName, new OutputParameters());
     }
 
     private void savePreset() {
-        AppProperties.savePreset(this);
+        AppSetting.savePreset(this);
     }
 
 

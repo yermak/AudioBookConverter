@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import jetbrains.exodus.ByteIterable;
 import jetbrains.exodus.bindings.StringBinding;
 import jetbrains.exodus.entitystore.Entity;
 import jetbrains.exodus.entitystore.EntityIterable;
@@ -19,7 +18,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-public class AppProperties {
+public class AppSetting {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final File APP_DIR = new File(System.getProperty("APP_HOME"));
     public static final String PRESET_ENTITY = "Preset";

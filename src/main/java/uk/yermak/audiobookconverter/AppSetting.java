@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import jetbrains.exodus.ByteIterable;
 import jetbrains.exodus.bindings.StringBinding;
 import jetbrains.exodus.entitystore.Entity;
 import jetbrains.exodus.entitystore.EntityIterable;
@@ -41,7 +42,12 @@ public class AppSetting {
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             result = env.computeInReadonlyTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
-                return StringBinding.entryToString(store.get(txn, StringBinding.stringToEntry(key)));
+                ByteIterable entry = store.get(txn, StringBinding.stringToEntry(key));
+                if (entry!=null) {
+                    return StringBinding.entryToString(entry);
+                } else {
+                    return null;
+                }
             });
         }
         return result;

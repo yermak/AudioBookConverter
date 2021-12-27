@@ -81,6 +81,7 @@
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="Auto"/>
                     <String fx:value="Always"/>
+                    <String fx:value="Avoid"/>
                 </FXCollections>
             </items>
         </ComboBox>

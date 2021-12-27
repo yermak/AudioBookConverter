@@ -17,7 +17,10 @@ public class OutputParameters {
     protected boolean cbr = format.defaultCBR();
     protected Integer cutoff = format.defaultCutoff();
     protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
-    protected boolean force = false;
+
+    public enum Force {Auto, Always, Avoid} ;
+
+    protected Force force;
 
     private boolean splitChapters = false;
 
@@ -50,7 +53,9 @@ public class OutputParameters {
 
 
     public boolean needReencode(String codec) {
-        return format.needsReencode(codec) || force;
+        return Force.Always.equals(force) ||
+                (Force.Auto.equals(force) && format.needsReencode(codec)) ||
+                !(Force.Avoid.equals(force) && format.skipReedncode(codec));
     }
 
     public void setupFormat(Format format) {
@@ -145,12 +150,8 @@ public class OutputParameters {
         speed = new SimpleObjectProperty<>(1.0);
     }
 
-    public void setForce(boolean force) {
+    public void setForce(Force force) {
         this.force = force;
-    }
-
-    public boolean isForce() {
-        return force;
     }
 }
 

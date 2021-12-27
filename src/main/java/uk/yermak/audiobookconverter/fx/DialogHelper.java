@@ -32,8 +32,8 @@ public class DialogHelper {
         JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
-        String outputFolder = AppProperties.getProperty("output.folder");
-        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(outputFolder));
+        String outputFolder = AppSetting.getProperty("output.folder");
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         fileChooser.getExtensionFilters().addAll(
@@ -42,15 +42,15 @@ public class DialogHelper {
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
         File parentFolder = file.getParentFile();
-        AppProperties.setProperty("output.folder", parentFolder.getAbsolutePath());
+        AppSetting.setProperty("output.folder", parentFolder.getAbsolutePath());
         return file.getPath();
     }
 
     public static List<String> selectFilesDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
+        String sourceFolder = AppSetting.getProperty("source.folder");
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
@@ -65,7 +65,7 @@ public class DialogHelper {
         if (!files.isEmpty()) {
             File firstFile = files.get(0);
             File parentFile = firstFile.getParentFile();
-            AppProperties.setProperty("source.folder", parentFile.getAbsolutePath());
+            AppSetting.setProperty("source.folder", parentFile.getAbsolutePath());
         }
         return collectFiles(files);
     }
@@ -73,8 +73,8 @@ public class DialogHelper {
     public static List<String> selectFolderDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        directoryChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
+        String sourceFolder = AppSetting.getProperty("source.folder");
+        directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");
 
@@ -84,7 +84,7 @@ public class DialogHelper {
         File selectedDirectory = directoryChooser.showDialog(window);
 
         if (selectedDirectory == null) return null;
-        AppProperties.setProperty("source.folder", selectedDirectory.getAbsolutePath());
+        AppSetting.setProperty("source.folder", selectedDirectory.getAbsolutePath());
 
         return collectFiles(Collections.singleton(selectedDirectory));
     }

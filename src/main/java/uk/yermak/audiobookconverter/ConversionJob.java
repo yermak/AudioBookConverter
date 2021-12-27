@@ -83,7 +83,20 @@ public class ConversionJob implements Runnable {
             }
 
             if (status.get().isOver()) return;
-            new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).moveResultingFile();
+
+            File destFile = new File(outputDestination);
+
+            if (getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
+                try {
+                    String optimisedOutput = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).optimize();
+                    if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+                    FileUtils.moveFile(new File(optimisedOutput), destFile);
+                } finally {
+                    FileUtils.deleteQuietly(new File(tempFile));
+                }
+            } else {
+                FileUtils.moveFile(new File(tempFile), destFile);
+            }
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);

@@ -28,23 +28,7 @@ public class FFMpegOptimizer {
     }
 
 
-
-    public void moveResultingFile() {
-        try {
-            File destFile = new File(outputFileName);
-            optimize();
-            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-            FileUtils.moveFile(new File(Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())), destFile);
-        } catch (IOException | InterruptedException e) {
-            logger.error("Failed to optimize resulting file", e);
-            throw new RuntimeException(e);
-        } finally {
-            FileUtils.deleteQuietly(new File(tempFile));
-        }
-    }
-
-    private  void optimize() throws InterruptedException {
-        if (conversionJob.getStatus().isOver()) return;
+    String optimize() throws InterruptedException {
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
 //        callback.reset();
 //        try {
@@ -58,21 +42,31 @@ public class FFMpegOptimizer {
         Process process = null;
         try {
 
-            String[] optimize = {
-                    Platform.FFMPEG,
-                    "-i", tempFile,
-                    "-map", "0:v",
-                    "-map", "0:a",
-                    "-c", "copy",
-                    "-movflags", "+faststart",
-                    Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())
-            } ;
+            String tmp = Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
+            String[] optimize;
+            if (conversionJob.getConversionGroup().getPosters().isEmpty()) {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-c", "copy",
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            } else {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-map", "0:v",
+                        "-map", "0:a",
+                        "-c", "copy",
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            }
 
             logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
 
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
-
-            ProcessBuilder pb = new ProcessBuilder (optimize);
+            ProcessBuilder pb = new ProcessBuilder(optimize);
             process = pb.start();
 
 //            process = Runtime.getRuntime().exec( String.join(" ", optimize));
@@ -93,9 +87,10 @@ public class FFMpegOptimizer {
                 throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
-            if (!new File(Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())).exists()) {
+            if (!new File(tmp).exists()) {
                 throw new ConversionException("Optimisation failed, no output file:" + out, new Error(err.toString()));
             }
+            return tmp;
         } catch (Exception e) {
             logger.error("Error during optimisation of resulting file:", e);
             throw new RuntimeException(e);
@@ -103,12 +98,5 @@ public class FFMpegOptimizer {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
-
-
-
     }
-
-
-
-
 }

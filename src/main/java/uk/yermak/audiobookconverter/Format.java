@@ -1,11 +1,11 @@
 package uk.yermak.audiobookconverter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.*;
 
 public enum Format {
-    M4B("ipod", "aac", "m4b") {
+    M4B("ipod", "aac", "m4b", "alac") {
         @Override
         public boolean mp4Compatible() {
             return true;
@@ -15,8 +15,9 @@ public enum Format {
         public boolean ffmpegCompatible() {
             return false;
         }
+
     },
-    M4A("ipod", "aac", "m4a") {
+    M4A("ipod", "aac", "m4a", "alac") {
         @Override
         public boolean mp4Compatible() {
             return true;
@@ -44,7 +45,7 @@ public enum Format {
             options.add(codec);
 
             options.add("-map_metadata");
-            options.add( "-1");
+            options.add("-1");
 
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
@@ -139,7 +140,7 @@ public enum Format {
             return options;
         }
     },
-    OGG("ogg", "libopus", "ogg") {
+    OGG("ogg", "libopus", "ogg", "vorbis") {
         @Override
         public List<Integer> cutoffs() {
             return List.of(4000, 6000, 8000, 12000, 20000);
@@ -219,7 +220,7 @@ public enum Format {
             options.add(codec);
 
             options.add("-map_metadata");
-            options.add( "-1");
+            options.add("-1");
 
             if (outputParameters.cbr) {
                 options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
@@ -252,11 +253,13 @@ public enum Format {
     protected String format;
     protected String codec;
     protected String extension;
+    private String[] compatibleCodecs;
 
-    Format(String format, String codec, String extension) {
+    Format(String format, String codec, String extension, String... compatibleCodecs) {
         this.format = format;
         this.codec = codec;
         this.extension = extension;
+        this.compatibleCodecs = compatibleCodecs;
     }
 
     public List<Integer> channels() {
@@ -341,7 +344,7 @@ public enum Format {
         options.add(codec);
 
         options.add("-map_metadata");
-        options.add( "-1");
+        options.add("-1");
 
         options.addAll(outputParameters.cbr
                 ? List.of("-b:a", outputParameters.getBitRate() + "k")
@@ -434,4 +437,10 @@ public enum Format {
     public boolean ffmpegCompatible() {
         return true;
     }
+
+    public boolean skipReedncode(String codec) {
+        if (compatibleCodecs == null) return false;
+        return ArrayUtils.contains(compatibleCodecs, codec);
+    }
+
 }

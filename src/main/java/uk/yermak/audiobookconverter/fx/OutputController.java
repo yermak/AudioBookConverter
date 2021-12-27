@@ -17,13 +17,16 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+
+
 /**
  * Created by yermak on 08/09/2018.
  */
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
-    public static final String FORCE = "Always";
+//    public static final String FORCE = "Always";
+
 
 
     @FXML
@@ -90,7 +93,8 @@ public class OutputController {
         force.getSelectionModel().select(0);
         force.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            AudiobookConverter.getContext().getOutputParameters().setForce(FORCE.equals(newValue));
+            AudiobookConverter.getContext().getOutputParameters().setForce(OutputParameters.Force.valueOf(newValue));
+//            AudiobookConverter.getContext().getOutputParameters()
         });
 
         outputFormatBox.getItems().addAll(Format.values());
@@ -223,28 +227,28 @@ public class OutputController {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
         cutoff.getItems().clear();
         cutoff.getItems().add(DISABLED);
-        cutoff.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).collect(Collectors.toList()));
+        cutoff.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).toList());
         cutoff.getSelectionModel().select(String.valueOf(format.defaultCutoff()));
     }
 
     private void refreshChannels() {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
         channels.getItems().clear();
-        channels.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).collect(Collectors.toList()));
+        channels.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).toList());
         channels.getSelectionModel().select(String.valueOf(format.defaultChannel()));
     }
 
     private void refreshBitrates() {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
         bitRate.getItems().clear();
-        bitRate.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).collect(Collectors.toList()));
+        bitRate.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).toList());
         bitRate.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
     }
 
     private void refreshSpeeds() {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
         speedBox.getItems().clear();
-        speedBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).collect(Collectors.toList()));
+        speedBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).toList());
         speedBox.getSelectionModel().select(String.valueOf(format.defaultSpeed()));
     }
 
@@ -252,7 +256,7 @@ public class OutputController {
         OutputParameters outputParameters = AudiobookConverter.getContext().getOutputParameters();
         Format format = outputParameters.getFormat();
         frequency.getItems().clear();
-        frequency.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).collect(Collectors.toList()));
+        frequency.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).toList());
         frequency.getSelectionModel().select(String.valueOf(format.defaultFrequency()));
     }
 

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 public class AppSetting {
@@ -35,25 +36,29 @@ public class AppSetting {
     public static final String GENRE_TITLE = "title";
     public static final String GENRE_CREATED = "created";
     public static final String SETTINGS = "Settings";
+    private static Map<String, String> cache = new ConcurrentHashMap<>();
 
 
-    public static String getProperty(String key) {
-        String result;
+    public static synchronized String getProperty(String key) {
+        String result = cache.get(key);
+        if (result != null) return result;
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             result = env.computeInReadonlyTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
                 ByteIterable entry = store.get(txn, StringBinding.stringToEntry(key));
-                if (entry!=null) {
+                if (entry != null) {
                     return StringBinding.entryToString(entry);
                 } else {
                     return null;
                 }
             });
+            cache.put(key, result);
         }
         return result;
     }
 
     public static synchronized void setProperty(String key, String value) {
+        cache.put(key, value);
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             env.executeInTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
@@ -62,7 +67,7 @@ public class AppSetting {
         }
     }
 
-    public static void saveGenres(String genre) {
+    public static synchronized void saveGenres(String genre) {
         if (StringUtils.isNotEmpty(genre) & loadGenres().stream().noneMatch(s -> s.equals(genre))) {
             try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
                 entityStore.executeInTransaction(txn -> {
@@ -74,7 +79,7 @@ public class AppSetting {
         }
     }
 
-    public static ObservableList<String> loadGenres() {
+    public static synchronized ObservableList<String> loadGenres() {
         ObservableList<String> genres;
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             genres = entityStore.computeInReadonlyTransaction(txn -> {
@@ -86,7 +91,7 @@ public class AppSetting {
         return genres;
     }
 
-    public static void removeGenre(String genre) {
+    public static synchronized void removeGenre(String genre) {
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             entityStore.executeInTransaction(txn -> {
                 EntityIterable entities = txn.find(GENRE_ENTITY, GENRE_TITLE, genre);
@@ -97,7 +102,7 @@ public class AppSetting {
         }
     }
 
-    public static List<Preset> loadPresets() {
+    public static synchronized List<Preset> loadPresets() {
         List<Preset> presets;
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             presets = entityStore.computeInReadonlyTransaction(txn -> {
@@ -127,7 +132,7 @@ public class AppSetting {
         return preset;
     }
 
-    public static void savePreset(Preset preset) {
+    public static synchronized void savePreset(Preset preset) {
         try (PersistentEntityStore entityStore = PersistentEntityStores.newInstance(APP_DIR.getPath())) {
             entityStore.executeInTransaction(txn -> {
                 Entity entity;

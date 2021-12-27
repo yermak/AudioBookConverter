@@ -4,7 +4,6 @@ package uk.yermak.audiobookconverter;/**
 
 import com.apple.eio.FileManager;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.Version;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.JfxEnv;
 
@@ -138,13 +136,13 @@ public class AudiobookConverter extends Application {
         @Override
         public void run() {
             try {
-                String platform = Environment.current.loadAppProperties().getProperty("platform");
+                String platform = Platform.current.loadAppProperties().getProperty("platform");
                 if (platform == null) platform = "version";
                 if ("steam".equals(platform)) return;
                 String version = readStringFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/" + platform + ".txt");
                 if (!Version.getVersionString().equals(StringUtils.trim(version))) {
                     logger.info("New version found: {}", version);
-                    Platform.runLater(() -> {
+                    javafx.application.Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("New Version Available!");
                         String path = FileManager.getPathToApplicationBundle();

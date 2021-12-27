@@ -45,7 +45,7 @@ public class DurationVerifier {
     public static void mp4v2UpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         Process process = null;
         try {
-            ProcessBuilder infoProcessBuilder = new ProcessBuilder(Environment.MP4INFO, outputFileName);
+            ProcessBuilder infoProcessBuilder = new ProcessBuilder(Platform.MP4INFO, outputFileName);
             process = infoProcessBuilder.start();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);
@@ -67,7 +67,7 @@ public class DurationVerifier {
 
     public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
-        FFprobe ffprobe = new FFprobe(Environment.FFPROBE);
+        FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
         FFmpegProbeResult probe = ffprobe.probe(outputFileName);
         List<FFmpegStream> streams = probe.getStreams();
         for (FFmpegStream stream : streams) {

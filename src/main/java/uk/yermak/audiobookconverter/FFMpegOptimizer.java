@@ -59,7 +59,7 @@ public class FFMpegOptimizer {
         try {
 
             String[] optimize = {
-                    Environment.FFMPEG,
+                    Platform.FFMPEG,
                     "-i", tempFile,
                     "-map", "0:v",
                     "-map", "0:a",

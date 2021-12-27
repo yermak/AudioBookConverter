@@ -36,7 +36,7 @@ public class Mp4v2ArtBuilder {
     public void updateSinglePoster(ArtWork poster, int index, String outputFileName) {
         Process process = null;
         try {
-            ProcessBuilder artProcessBuilder = new ProcessBuilder(Environment.MP4ART,
+            ProcessBuilder artProcessBuilder = new ProcessBuilder(Platform.MP4ART,
                     "--art-index", String.valueOf(index),
                     "--add", poster.getFileName(),
                     outputFileName);

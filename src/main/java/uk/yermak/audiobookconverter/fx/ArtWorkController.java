@@ -44,8 +44,8 @@ public class ArtWorkController {
     @FXML
     private void addImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Environment.getInitialDirecotory(sourceFolder));
+        String sourceFolder = AppSetting.getProperty("source.folder");
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         fileChooser.setTitle("Select JPG or PNG file");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),

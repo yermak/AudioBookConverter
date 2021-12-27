@@ -45,7 +45,7 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        String chapterFormat = AppProperties.getProperty("chapter_format");
+        String chapterFormat = AppSetting.getProperty("chapter_format");
         if (chapterFormat == null) {
             chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
                     "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
@@ -54,7 +54,7 @@ public class Utils {
                     "<if(TAG)><TAG> <endif>" +
                     "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
                     "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
-            AppProperties.setProperty("chapter_format", chapterFormat);
+            AppSetting.setProperty("chapter_format", chapterFormat);
         }
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
@@ -73,10 +73,10 @@ public class Utils {
 
 
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        String filenameFormat = AppProperties.getProperty("filename_format");
+        String filenameFormat = AppSetting.getProperty("filename_format");
         if (filenameFormat == null) {
             filenameFormat = "<WRITER> <if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>] <endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
-            AppProperties.setProperty("filename_format", filenameFormat);
+            AppSetting.setProperty("filename_format", filenameFormat);
         }
 
         STGroup g = new STGroupString("");
@@ -146,7 +146,7 @@ public class Utils {
     }
 
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
-        String partFormat = AppProperties.getProperty("part_format");
+        String partFormat = AppSetting.getProperty("part_format");
         if (partFormat == null) {
             partFormat = "<if(WRITER)><WRITER> <endif>" +
                     "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +
@@ -154,7 +154,7 @@ public class Utils {
                     "<if(NARRATOR)> (<NARRATOR>)<endif>" +
                     "<if(YEAR)>-<YEAR><endif>" +
                     "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
-            AppProperties.setProperty("part_format", partFormat);
+            AppSetting.setProperty("part_format", partFormat);
         }
 
         STGroup g = new STGroupString("");

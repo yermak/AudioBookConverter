@@ -140,7 +140,7 @@ public enum Format {
             return options;
         }
     },
-    OGG("ogg", "libopus", "ogg", "libvorbis") {
+    OGG("ogg", "libopus", "ogg", "vorbis") {
         @Override
         public List<Integer> cutoffs() {
             return List.of(4000, 6000, 8000, 12000, 20000);

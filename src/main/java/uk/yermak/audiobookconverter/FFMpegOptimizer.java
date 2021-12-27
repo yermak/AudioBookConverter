@@ -43,19 +43,28 @@ public class FFMpegOptimizer {
         try {
 
             String tmp = Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
-            String[] optimize = {
-                    Platform.FFMPEG,
-                    "-i", tempFile,
-                    "-map", "0:v",
-                    "-map", "0:a",
-                    "-c", "copy",
-                    "-movflags", "+faststart",
-                    tmp
-            };
+            String[] optimize;
+            if (conversionJob.getConversionGroup().getPosters().isEmpty()) {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-c", "copy",
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            } else {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-map", "0:v",
+                        "-map", "0:a",
+                        "-c", "copy",
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            }
 
             logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
-
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
 
             ProcessBuilder pb = new ProcessBuilder(optimize);
             process = pb.start();
@@ -89,9 +98,5 @@ public class FFMpegOptimizer {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
-
-
     }
-
-
 }

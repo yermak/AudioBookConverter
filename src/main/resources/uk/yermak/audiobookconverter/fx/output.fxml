@@ -61,7 +61,7 @@
         <ComboBox fx:id="speedBox" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
 
-        <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
+        <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
         <Label text="Sampling frequency, Hz" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
         <ComboBox fx:id="frequency" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
@@ -76,7 +76,7 @@
 
         <Label text="Force re-encoding" GridPane.columnIndex="3" GridPane.rowIndex="3"
                GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="force" GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
+        <ComboBox fx:id="forceBox" GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
             <items>
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="Auto"/>
@@ -86,21 +86,7 @@
             </items>
         </ComboBox>
 
-        <Pane prefWidth="50" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.rowSpan="3"/>
-
-
-        <!--
-                <RadioButton fx:id="vbr" text="Variable bitrate, Quality" GridPane.columnSpan="2"
-                             GridPane.columnIndex="6" GridPane.rowIndex="1"
-                             toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT"/>
-
-                <Slider fx:id="vbrQuality" GridPane.columnIndex="6" GridPane.rowIndex="2" min="1" max="5" GridPane.columnSpan="2"
-                        value="4"
-                        showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"
-                        disable="true"/>
-
-        -->
-
+        <Pane prefWidth="50" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
         <RadioButton fx:id="cbr" text="Constant bitrate, kb/s"
                      GridPane.columnIndex="6" GridPane.rowIndex="0"
@@ -119,6 +105,7 @@
                 value="4"
                 showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"
                 disable="true"/>
+        <Button text="Save Preset" onAction="#savePreset" GridPane.columnIndex="7" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
 
     </children>

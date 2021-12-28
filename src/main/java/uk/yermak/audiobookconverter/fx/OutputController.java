@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import org.checkerframework.checker.optional.qual.Present;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
@@ -15,8 +16,6 @@ import uk.yermak.audiobookconverter.*;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 
 
 /**
@@ -28,13 +27,12 @@ public class OutputController {
 //    public static final String FORCE = "Always";
 
 
-
     @FXML
     public ComboBox<Format> outputFormatBox;
     @FXML
     public ComboBox<String> presetBox;
 
-    public ComboBox<String> force;
+    public ComboBox<String> forceBox;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -58,7 +56,6 @@ public class OutputController {
     private RadioButton vbr;
     @FXML
     private Slider vbrQuality;
-//    private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
         bitRate.setDisable(false);
@@ -88,13 +85,12 @@ public class OutputController {
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            AudiobookConverter.getContext().setSpeed(Double.valueOf(newValue));
+            AudiobookConverter.getContext().getOutputParameters().setSpeed(Double.parseDouble(newValue));
         });
-        force.getSelectionModel().select(0);
-        force.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+        forceBox.getSelectionModel().select(0);
+        forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
             AudiobookConverter.getContext().getOutputParameters().setForce(OutputParameters.Force.valueOf(newValue));
-//            AudiobookConverter.getContext().getOutputParameters()
         });
 
         outputFormatBox.getItems().addAll(Format.values());
@@ -107,12 +103,9 @@ public class OutputController {
             refreshCutoffs();
             refreshVbrQuality();
             refreshCBR();
-
         });
 
         List<Preset> presets = Preset.loadPresets();
-//        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
-//        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
 
         presetBox.getItems().addAll(presets.stream().map(Preset::getName).toList());
 
@@ -121,11 +114,9 @@ public class OutputController {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
-                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             } else {
                 Preset preset = Preset.instance(newValue);
-                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             }
         });
@@ -139,6 +130,8 @@ public class OutputController {
                 refreshCutoffs();
                 refreshVbrQuality();
                 refreshCBR();
+                refreshSpeeds();
+
             }
         });
 
@@ -155,20 +148,24 @@ public class OutputController {
 
 
         bitRate.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+            if (newValue != null) {
+                context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+            }
         });
         frequency.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+            if (newValue != null) {
+                context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+            }
         });
         channels.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+            if (newValue != null) {
+                context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+            }
         });
         vbrQuality.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            if (newValue != null) {
+                context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            }
         });
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
@@ -190,6 +187,9 @@ public class OutputController {
             } else {
                 vbr.fire();
             }
+            speedBox.valueProperty().set(Double.toString(newValue.getSpeed()));
+            forceBox.getSelectionModel().select(newValue.getForce().toString());
+            splitFileBox.getSelectionModel().select(newValue.isSplitChapters() ? "chapters" : "parts");
         });
 
         media.addListener((InvalidationListener) observable -> updateParameters(media));
@@ -299,6 +299,11 @@ public class OutputController {
                 return integer;
         }
         return defaultValue;
+    }
+
+    public void savePreset(ActionEvent actionEvent) {
+        Preset preset = new Preset(presetBox.getSelectionModel().getSelectedItem(), AudiobookConverter.getContext().getOutputParameters());
+        AppSetting.savePreset(preset);
     }
 }
 

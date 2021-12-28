@@ -36,13 +36,16 @@ public class AppSetting {
     public static final String GENRE_TITLE = "title";
     public static final String GENRE_CREATED = "created";
     public static final String SETTINGS = "Settings";
+    public static final String PRESET_SPEED = "speed";
+    public static final String PRESET_FORCE = "force";
+    public static final String PRESET_SPLIT_CHAPTERS = "split_chapters";
     private static Map<String, String> cache = new ConcurrentHashMap<>();
 
 
     public static synchronized String getProperty(String key) {
         String result = cache.get(key);
         if (result != null) return result;
-        logger.debug("Settings cache is missed for property: "+ key);
+        logger.debug("Settings cache is missed for property: " + key);
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             result = env.computeInReadonlyTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
@@ -60,7 +63,7 @@ public class AppSetting {
 
     public static synchronized void setProperty(String key, String value) {
         cache.put(key, value);
-        logger.debug("Updating settings cache and database with key: ["+ key+"] and value: ["+value+"]");
+        logger.debug("Updating settings cache and database with key: [" + key + "] and value: [" + value + "]");
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             env.executeInTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
@@ -130,7 +133,10 @@ public class AppSetting {
         Integer cutoff = (Integer) entity.getProperty(PRESET_CUTOFF);
         Boolean cbr = (Boolean) entity.getProperty(PRESET_CBR);
         Integer quality = (Integer) entity.getProperty(PRESET_QUALITY);
-        Preset preset = new Preset(name, new OutputParameters(Format.instance(format), bitrate, frequency, channels, cutoff, cbr, quality));
+        Double speed = (Double) entity.getProperty(PRESET_SPEED);
+        OutputParameters.Force force = OutputParameters.Force.valueOf((String) entity.getProperty(PRESET_FORCE));
+        Boolean splitChapters = (Boolean) entity.getProperty(PRESET_SPLIT_CHAPTERS);
+        Preset preset = new Preset(name, new OutputParameters(Format.instance(format), bitrate, frequency, channels, cutoff, cbr, quality, speed, force, splitChapters));
         return preset;
     }
 
@@ -152,6 +158,9 @@ public class AppSetting {
                 entity.setProperty(PRESET_CUTOFF, preset.getCutoff());
                 entity.setProperty(PRESET_CBR, preset.isCbr());
                 entity.setProperty(PRESET_QUALITY, preset.getVbrQuality());
+                entity.setProperty(PRESET_SPEED, preset.getSpeed());
+                entity.setProperty(PRESET_FORCE, preset.getForce().toString());
+                entity.setProperty(PRESET_SPLIT_CHAPTERS, preset.isSplitChapters());
             });
         }
     }

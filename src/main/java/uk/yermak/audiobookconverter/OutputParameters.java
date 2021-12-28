@@ -20,8 +20,6 @@ public class OutputParameters {
 
     public enum Force {Auto, Always, Avoid}
 
-    ;
-
     protected Force force = Force.Auto;
 
     private boolean splitChapters = false;
@@ -43,7 +41,7 @@ public class OutputParameters {
     OutputParameters() {
     }
 
-    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality) {
+    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality, double speed, Force force, boolean splitChapters) {
         this.format = format;
         this.bitRate = bitRate;
         this.frequency = frequency;
@@ -51,6 +49,9 @@ public class OutputParameters {
         this.vbrQuality = quality;
         this.cbr = cbr;
         this.cutoff = cutoff;
+        this.speed.set(speed);
+        this.force = force;
+        this.splitChapters = splitChapters;
     }
 
 
@@ -156,6 +157,10 @@ public class OutputParameters {
 
     public void setForce(Force force) {
         this.force = force;
+    }
+
+    public Force getForce() {
+        return force;
     }
 }
 

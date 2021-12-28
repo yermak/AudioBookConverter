@@ -114,7 +114,7 @@ public class Preset extends OutputParameters {
     public void updateAuto(List<MediaInfo> media) {
         if (!defaultValues.contains(this)) {
             super.updateAuto(media);
-            savePreset();
+//            savePreset();
         } else {
             //Ignoring auto-update and save for all other preset
         }

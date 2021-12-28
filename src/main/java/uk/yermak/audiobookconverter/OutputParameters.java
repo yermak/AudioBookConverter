@@ -16,34 +16,19 @@ public class OutputParameters {
     protected Integer vbrQuality = format.defaultVbrQuality();
     protected boolean cbr = format.defaultCBR();
     protected Integer cutoff = format.defaultCutoff();
-    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
+    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(format.defaultSpeed());
 
     public enum Force {Auto, Always, Avoid}
-
-    ;
 
     protected Force force = Force.Auto;
 
     private boolean splitChapters = false;
 
 
-    public OutputParameters(OutputParameters parameters) {
-        this.bitRate = parameters.getBitRate();
-        this.frequency = parameters.getFrequency();
-        this.channels = parameters.getChannels();
-        this.vbrQuality = parameters.getVbrQuality();
-        this.cbr = parameters.isCbr();
-        this.cutoff = parameters.getCutoff();
-        this.format = parameters.getFormat();
-        this.splitChapters = parameters.isSplitChapters();
-        this.speed = new SimpleObjectProperty<>(parameters.getSpeed());
-        this.force = parameters.force;
-    }
-
     OutputParameters() {
     }
 
-    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality) {
+    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality, double speed, Force force, boolean splitChapters) {
         this.format = format;
         this.bitRate = bitRate;
         this.frequency = frequency;
@@ -51,6 +36,22 @@ public class OutputParameters {
         this.vbrQuality = quality;
         this.cbr = cbr;
         this.cutoff = cutoff;
+        this.speed.set(speed);
+        this.force = force;
+        this.splitChapters = splitChapters;
+    }
+
+    public OutputParameters(OutputParameters parameters) {
+        this(parameters. getFormat(),
+                parameters.getBitRate(),
+                parameters.getFrequency(),
+                parameters.getChannels(),
+                parameters.getCutoff(), parameters.isCbr(),
+                parameters.getVbrQuality(),
+                parameters.getSpeed(),
+                parameters.getForce(),
+                parameters.isSplitChapters()
+        );
     }
 
 
@@ -156,6 +157,10 @@ public class OutputParameters {
 
     public void setForce(Force force) {
         this.force = force;
+    }
+
+    public Force getForce() {
+        return force;
     }
 }
 

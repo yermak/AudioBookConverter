@@ -133,8 +133,9 @@ public class ConversionGroup {
 //        String extension = FilenameUtils.getExtension(outputDestination);
         this.getOutputParameters().setupFormat(format);
 
+
         if (this.getOutputParameters().isSplitChapters()) {
-            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).toList();
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);

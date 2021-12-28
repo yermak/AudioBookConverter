@@ -160,10 +160,6 @@ public class ConversionContext {
         outputParameters.get().getSpeedObservable().addListener(changeListener);
     }
 
-    public void setSpeed(Double speed) {
-        this.outputParameters.get().setSpeed(speed);
-    }
-
     public void setBook(Book book) {
         this.book.set(book);
     }

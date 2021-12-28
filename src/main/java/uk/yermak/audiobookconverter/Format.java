@@ -58,7 +58,7 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            if (outputParameters.getCutoff() != null) {
+            if (outputParameters.getCutoff() != 0) {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }
@@ -236,7 +236,7 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            if (outputParameters.getCutoff() != null) {
+            if (outputParameters.getCutoff() != 0) {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }

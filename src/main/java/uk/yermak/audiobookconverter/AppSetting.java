@@ -145,7 +145,7 @@ public class AppSetting {
                     entity = entities.getFirst();
                 }
                 entity.setProperty(PRESET_NAME, preset.getName());
-                entity.setProperty(PRESET_FORMAT, preset.getFormat().format);
+                entity.setProperty(PRESET_FORMAT, preset.getFormat().extension);
                 entity.setProperty(PRESET_BITRATE, preset.getBitRate());
                 entity.setProperty(PRESET_FREQUENCY, preset.getFrequency());
                 entity.setProperty(PRESET_CHANNELS, preset.getChannels());

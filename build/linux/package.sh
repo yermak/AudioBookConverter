@@ -7,7 +7,7 @@ mkdir target/release
 
 rm -rf target/fx-jre
 $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
---add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics \
+--add-modules java.base,java.sql,java.management,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics \
 --strip-native-commands --strip-debug --no-man-pages --no-header-files --exclude-files=**.md \
 --output target/fx-jre
 

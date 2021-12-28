@@ -15,8 +15,6 @@ import uk.yermak.audiobookconverter.*;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 
 
 /**
@@ -28,13 +26,12 @@ public class OutputController {
 //    public static final String FORCE = "Always";
 
 
-
     @FXML
     public ComboBox<Format> outputFormatBox;
     @FXML
     public ComboBox<String> presetBox;
 
-    public ComboBox<String> force;
+    public ComboBox<String> forceBox;
 
     @FXML
     private ComboBox<String> splitFileBox;
@@ -47,21 +44,20 @@ public class OutputController {
     public ComboBox<String> cutoff;
 
     @FXML
-    private ComboBox<String> frequency;
+    private ComboBox<String> frequencyBox;
     @FXML
-    private ComboBox<String> channels;
+    private ComboBox<String> channelsBox;
     @FXML
     private RadioButton cbr;
     @FXML
-    private ComboBox<String> bitRate;
+    private ComboBox<String> bitRateBox;
     @FXML
     private RadioButton vbr;
     @FXML
     private Slider vbrQuality;
-//    private ObservableList<MediaInfo> media;
 
     public void cbr(ActionEvent actionEvent) {
-        bitRate.setDisable(false);
+        bitRateBox.setDisable(false);
         vbrQuality.setDisable(true);
         refreshBitrates();
         AudiobookConverter.getContext().getOutputParameters().setCbr(true);
@@ -69,7 +65,7 @@ public class OutputController {
     }
 
     public void vbr(ActionEvent actionEvent) {
-        bitRate.setDisable(true);
+        bitRateBox.setDisable(true);
         vbrQuality.setDisable(false);
         refreshVbrQuality();
         AudiobookConverter.getContext().getOutputParameters().setCbr(false);
@@ -77,7 +73,6 @@ public class OutputController {
 
     @FXML
     private void initialize() {
-
         splitFileBox.getSelectionModel().select(0);
         splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             switch (newValue) {
@@ -88,13 +83,12 @@ public class OutputController {
 
         speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
-            AudiobookConverter.getContext().setSpeed(Double.valueOf(newValue));
+            AudiobookConverter.getContext().getOutputParameters().setSpeed(Double.parseDouble(newValue));
         });
-        force.getSelectionModel().select(0);
-        force.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+        forceBox.getSelectionModel().select(0);
+        forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
             AudiobookConverter.getContext().getOutputParameters().setForce(OutputParameters.Force.valueOf(newValue));
-//            AudiobookConverter.getContext().getOutputParameters()
         });
 
         outputFormatBox.getItems().addAll(Format.values());
@@ -107,13 +101,11 @@ public class OutputController {
             refreshCutoffs();
             refreshVbrQuality();
             refreshCBR();
-
         });
 
         List<Preset> presets = Preset.loadPresets();
-//        String savedPreset = Objects.requireNonNullElse(AppProperties.getProperty("last.preset"), "custom");
-//        Preset lastPreset = presets.stream().filter(preset -> preset.getPresetName().equals(Preset.LAST_USED)).findFirst().get();
 
+        presetBox.getItems().add(Preset.DEFAULT);
         presetBox.getItems().addAll(presets.stream().map(Preset::getName).toList());
 
         presetBox.getSelectionModel().select(Preset.DEFAULT);
@@ -121,16 +113,14 @@ public class OutputController {
             if (!presetBox.getItems().contains(newValue)) {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
-                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             } else {
                 Preset preset = Preset.instance(newValue);
-                AppSetting.savePreset(preset);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             }
         });
 
-        AudiobookConverter.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
+      /*  AudiobookConverter.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
             outputFormatBox.setValue(newParams.getFormat());
             if (!oldParams.getFormat().equals(newParams.getFormat())) {
                 refreshFrequencies();
@@ -140,7 +130,7 @@ public class OutputController {
                 refreshVbrQuality();
                 refreshCBR();
             }
-        });
+        });*/
 
         refreshFrequencies();
         refreshBitrates();
@@ -154,35 +144,40 @@ public class OutputController {
         ObservableList<MediaInfo> media = context.getMedia();
 
 
-        bitRate.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+        bitRateBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+            }
         });
-        frequency.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+        frequencyBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+            }
         });
-        channels.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+        channelsBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+            }
         });
         vbrQuality.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            if (newValue != null) {
+                context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+            }
         });
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
             if (DISABLED.equals(newValue)) {
-                context.getOutputParameters().setCutoff(null);
+                context.getOutputParameters().setCutoff(0);
             } else {
                 context.getOutputParameters().setCutoff(Integer.valueOf(newValue));
             }
         });
 
         context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
-            bitRate.valueProperty().set(String.valueOf(newValue.getBitRate()));
-            frequency.valueProperty().set(String.valueOf(newValue.getFrequency()));
-            channels.valueProperty().set(String.valueOf(newValue.getChannels()));
+            outputFormatBox.valueProperty().set(newValue.getFormat());
+            bitRateBox.valueProperty().set(String.valueOf(newValue.getBitRate()));
+            frequencyBox.valueProperty().set(String.valueOf(newValue.getFrequency()));
+            channelsBox.valueProperty().set(String.valueOf(newValue.getChannels()));
             vbrQuality.valueProperty().set(newValue.getVbrQuality());
             cutoff.valueProperty().set(String.valueOf(newValue.getCutoff()));
             if (newValue.isCbr()) {
@@ -190,6 +185,9 @@ public class OutputController {
             } else {
                 vbr.fire();
             }
+            speedBox.valueProperty().set(Double.toString(newValue.getSpeed()));
+            forceBox.getSelectionModel().select(newValue.getForce().toString());
+            splitFileBox.getSelectionModel().select(newValue.isSplitChapters() ? "chapters" : "parts");
         });
 
         media.addListener((InvalidationListener) observable -> updateParameters(media));
@@ -199,14 +197,16 @@ public class OutputController {
             }
         });
 
+/*
         AudiobookConverter.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
             Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-            bitRate.setValue(String.valueOf(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate())));
-            frequency.setValue(String.valueOf(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency())));
-            channels.setValue(String.valueOf(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel())));
+            bitRateBox.setValue(String.valueOf(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate())));
+            frequencyBox.setValue(String.valueOf(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency())));
+            channelsBox.setValue(String.valueOf(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel())));
             vbrQuality.setValue(findNearestMatch(newParams.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
             cutoff.setValue(String.valueOf(findNearestMatch(newParams.getCutoff(), format.cutoffs(), format.defaultCutoff())));
         });
+*/
     }
 
     private void refreshCBR() {
@@ -233,16 +233,16 @@ public class OutputController {
 
     private void refreshChannels() {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-        channels.getItems().clear();
-        channels.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).toList());
-        channels.getSelectionModel().select(String.valueOf(format.defaultChannel()));
+        channelsBox.getItems().clear();
+        channelsBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).toList());
+        channelsBox.getSelectionModel().select(String.valueOf(format.defaultChannel()));
     }
 
     private void refreshBitrates() {
         Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-        bitRate.getItems().clear();
-        bitRate.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).toList());
-        bitRate.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
+        bitRateBox.getItems().clear();
+        bitRateBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).toList());
+        bitRateBox.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
     }
 
     private void refreshSpeeds() {
@@ -255,9 +255,9 @@ public class OutputController {
     private void refreshFrequencies() {
         OutputParameters outputParameters = AudiobookConverter.getContext().getOutputParameters();
         Format format = outputParameters.getFormat();
-        frequency.getItems().clear();
-        frequency.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).toList());
-        frequency.getSelectionModel().select(String.valueOf(format.defaultFrequency()));
+        frequencyBox.getItems().clear();
+        frequencyBox.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).toList());
+        frequencyBox.getSelectionModel().select(String.valueOf(format.defaultFrequency()));
     }
 
     private void updateParameters(List<MediaInfo> media) {
@@ -265,9 +265,9 @@ public class OutputController {
 
         if (media.isEmpty() && book == null) {
             Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-            frequency.setValue(String.valueOf(format.defaultFrequency()));
-            bitRate.setValue(String.valueOf(format.defaultBitrate()));
-            channels.setValue(String.valueOf(format.defaultChannel()));
+            frequencyBox.setValue(String.valueOf(format.defaultFrequency()));
+            bitRateBox.setValue(String.valueOf(format.defaultBitrate()));
+            channelsBox.setValue(String.valueOf(format.defaultChannel()));
             vbrQuality.setValue(format.defaultVbrQuality());
             return;
         }
@@ -282,9 +282,9 @@ public class OutputController {
             }
             Platform.runLater(() -> {
                 Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-                frequency.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
-                bitRate.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
-                channels.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));
+                frequencyBox.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
+                bitRateBox.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
+                channelsBox.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));
                 vbrQuality.setValue(findNearestMatch(params.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
             });
 
@@ -299,6 +299,11 @@ public class OutputController {
                 return integer;
         }
         return defaultValue;
+    }
+
+    public void savePreset(ActionEvent actionEvent) {
+        Preset preset = new Preset(presetBox.getSelectionModel().getSelectedItem(), AudiobookConverter.getContext().getOutputParameters());
+        AppSetting.savePreset(preset);
     }
 }
 

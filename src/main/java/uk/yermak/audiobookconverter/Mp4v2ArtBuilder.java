@@ -17,19 +17,25 @@ public class Mp4v2ArtBuilder {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ConversionJob conversionJob;
+    private ProgressCallback progressCallback;
 
-    public Mp4v2ArtBuilder(ConversionJob conversionJob) {
+    public Mp4v2ArtBuilder(ConversionJob conversionJob, ProgressCallback progressCallback) {
         this.conversionJob = conversionJob;
+        this.progressCallback = progressCallback;
     }
 
 
-    public void coverArt(String outputFileName) throws IOException, InterruptedException {
+    public void coverArt(String outputFileName) {
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
-
-        int i = 0;
-        for (ArtWork poster : posters) {
+        progressCallback.reset();
+        progressCallback.setState("Adding artwork...");
+        long duration = conversionJob.getConvertable().getDuration();
+        long step = duration / posters.size();
+        for (int i = 0; i < posters.size(); i++) {
+            ArtWork poster = posters.get(i);
             if (conversionJob.getStatus().isOver()) break;
-            updateSinglePoster(poster, i++, outputFileName);
+            updateSinglePoster(poster, i, outputFileName);
+            progressCallback.converted((i+1)*step, posters.size()*step);
         }
     }
 

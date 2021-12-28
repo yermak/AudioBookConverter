@@ -78,7 +78,7 @@ public class ConversionJob implements Runnable {
             if (status.get().isOver()) return;
 
             if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
-                Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
+                Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this, progressCallbacks.get("output"));
                 artBuilder.coverArt(tempFile);
             }
 

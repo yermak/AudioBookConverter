@@ -41,6 +41,17 @@ public class AppSetting {
     public static final String PRESET_SPLIT_CHAPTERS = "split_chapters";
     private static Map<String, String> cache = new ConcurrentHashMap<>();
 
+    public static final String VERSION = "version";
+
+    static {
+        try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
+            env.executeInTransaction(txn -> {
+                final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
+                store.put(txn, StringBinding.stringToEntry(VERSION), StringBinding.stringToEntry(Version.getVersionString()));
+            });
+        }
+
+    }
 
     public static synchronized String getProperty(String key) {
         String result = cache.get(key);
@@ -56,7 +67,9 @@ public class AppSetting {
                     return null;
                 }
             });
-            cache.put(key, result);
+            if (result != null) {
+                cache.put(key, result);
+            }
         }
         return result;
     }

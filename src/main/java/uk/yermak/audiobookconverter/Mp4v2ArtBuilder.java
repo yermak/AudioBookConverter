@@ -27,6 +27,7 @@ public class Mp4v2ArtBuilder {
 
     public void coverArt(String outputFileName) {
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
+        if (posters.isEmpty()) return;
         progressCallback.reset();
         progressCallback.setState("Adding artwork...");
         long duration = conversionJob.getConvertable().getDuration();

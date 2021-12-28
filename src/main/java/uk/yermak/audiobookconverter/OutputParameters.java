@@ -16,7 +16,7 @@ public class OutputParameters {
     protected Integer vbrQuality = format.defaultVbrQuality();
     protected boolean cbr = format.defaultCBR();
     protected Integer cutoff = format.defaultCutoff();
-    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
+    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(format.defaultSpeed());
 
     public enum Force {Auto, Always, Avoid}
 
@@ -24,19 +24,6 @@ public class OutputParameters {
 
     private boolean splitChapters = false;
 
-
-    public OutputParameters(OutputParameters parameters) {
-        this.bitRate = parameters.getBitRate();
-        this.frequency = parameters.getFrequency();
-        this.channels = parameters.getChannels();
-        this.vbrQuality = parameters.getVbrQuality();
-        this.cbr = parameters.isCbr();
-        this.cutoff = parameters.getCutoff();
-        this.format = parameters.getFormat();
-        this.splitChapters = parameters.isSplitChapters();
-        this.speed = new SimpleObjectProperty<>(parameters.getSpeed());
-        this.force = parameters.force;
-    }
 
     OutputParameters() {
     }
@@ -52,6 +39,19 @@ public class OutputParameters {
         this.speed.set(speed);
         this.force = force;
         this.splitChapters = splitChapters;
+    }
+
+    public OutputParameters(OutputParameters parameters) {
+        this(parameters. getFormat(),
+                parameters.getBitRate(),
+                parameters.getFrequency(),
+                parameters.getChannels(),
+                parameters.getCutoff(), parameters.isCbr(),
+                parameters.getVbrQuality(),
+                parameters.getSpeed(),
+                parameters.getForce(),
+                parameters.isSplitChapters()
+        );
     }
 
 

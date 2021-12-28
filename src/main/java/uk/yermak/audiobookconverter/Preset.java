@@ -37,18 +37,10 @@ public class Preset extends OutputParameters {
 
     }
 
-//    private final OutputParameters save;
-
     public Preset(String name, OutputParameters preset) {
+        super(preset.getFormat(), preset.getBitRate(), preset.getFrequency(), preset.getChannels(), preset.getCutoff(), preset.isCbr(), preset.getVbrQuality(),
+                preset.getSpeed(), preset.getForce(), preset.isSplitChapters());
         this.name = name;
-        this.bitRate = preset.getBitRate();
-        this.frequency = preset.getFrequency();
-        this.channels = preset.getChannels();
-        this.vbrQuality = preset.getVbrQuality();
-        this.cbr = preset.isCbr();
-        this.cutoff = preset.getCutoff();
-        this.format = preset.getFormat();
-//        savePreset();
     }
 
 
@@ -71,7 +63,6 @@ public class Preset extends OutputParameters {
     public void updateAuto(List<MediaInfo> media) {
         if (!defaultValues.contains(this)) {
             super.updateAuto(media);
-//            savePreset();
         } else {
             //Ignoring auto-update and save for all other preset
         }

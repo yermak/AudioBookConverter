@@ -64,10 +64,10 @@
         <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
         <Label text="Sampling frequency, Hz" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="frequency" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="frequencyBox" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
 
         <Label text="Channels" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="channels" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
 
 
         <Label text="Cut-off frequencies higher then" GridPane.columnIndex="3" GridPane.rowIndex="2"
@@ -92,7 +92,7 @@
                      GridPane.columnIndex="6" GridPane.rowIndex="0"
                      toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT"/>
 
-        <ComboBox fx:id="bitRate" GridPane.columnIndex="7" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <ComboBox fx:id="bitRateBox" GridPane.columnIndex="7" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
 
 

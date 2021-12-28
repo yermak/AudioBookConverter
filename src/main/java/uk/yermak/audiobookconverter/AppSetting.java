@@ -42,6 +42,7 @@ public class AppSetting {
     public static synchronized String getProperty(String key) {
         String result = cache.get(key);
         if (result != null) return result;
+        logger.debug("Settings cache is missed for property: "+ key);
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             result = env.computeInReadonlyTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
@@ -59,6 +60,7 @@ public class AppSetting {
 
     public static synchronized void setProperty(String key, String value) {
         cache.put(key, value);
+        logger.debug("Updating settings cache and database with key: ["+ key+"] and value: ["+value+"]");
         try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
             env.executeInTransaction(txn -> {
                 final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);

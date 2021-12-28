@@ -173,7 +173,7 @@ public class OutputController {
         cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
             if (DISABLED.equals(newValue)) {
-                context.getOutputParameters().setCutoff(null);
+                context.getOutputParameters().setCutoff(0);
             } else {
                 context.getOutputParameters().setCutoff(Integer.valueOf(newValue));
             }

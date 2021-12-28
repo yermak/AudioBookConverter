@@ -1,7 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
-import org.apache.commons.io.FileUtils;
+import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 public class FFMpegOptimizer {
@@ -17,6 +18,7 @@ public class FFMpegOptimizer {
 
     private String tempFile;
     private final String outputFileName;
+    private ProgressCallback callback;
 
     private ProgressParser progressParser;
 
@@ -25,19 +27,21 @@ public class FFMpegOptimizer {
         this.conversionJob = conversionJob;
         this.tempFile = tempFile;
         this.outputFileName = outputFileName;
+        this.callback = callback;
     }
 
 
-    String optimize() throws InterruptedException {
+    String optimize() throws InterruptedException, IOException {
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
-//        callback.reset();
-//        try {
-//            progressParser = new TcpProgressParser(progress -> {
-//                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-//            });
-//            progressParser.start();
-//        } catch (URISyntaxException e) {
-//        }
+        callback.reset();
+        callback.setState("Optimising...");
+        try {
+            progressParser = new TcpProgressParser(progress -> {
+                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+            });
+            progressParser.start();
+        } catch (URISyntaxException e) {
+        }
 
         Process process = null;
         try {
@@ -49,6 +53,7 @@ public class FFMpegOptimizer {
                         Platform.FFMPEG,
                         "-i", tempFile,
                         "-c", "copy",
+                        "-progress", progressParser.getUri().toString(),
                         "-movflags", "+faststart",
                         tmp
                 };
@@ -59,6 +64,7 @@ public class FFMpegOptimizer {
                         "-map", "0:v",
                         "-map", "0:a",
                         "-c", "copy",
+                        "-progress", progressParser.getUri().toString(),
                         "-movflags", "+faststart",
                         tmp
                 };

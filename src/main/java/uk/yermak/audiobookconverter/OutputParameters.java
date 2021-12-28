@@ -18,9 +18,11 @@ public class OutputParameters {
     protected Integer cutoff = format.defaultCutoff();
     protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty(1.0);
 
-    public enum Force {Auto, Always, Avoid} ;
+    public enum Force {Auto, Always, Avoid}
 
-    protected Force force;
+    ;
+
+    protected Force force = Force.Auto;
 
     private boolean splitChapters = false;
 
@@ -53,9 +55,11 @@ public class OutputParameters {
 
 
     public boolean needReencode(String codec) {
-        return Force.Always.equals(force) ||
-                (Force.Auto.equals(force) && format.needsReencode(codec)) ||
-                !(Force.Avoid.equals(force) && format.skipReedncode(codec));
+        return switch (force) {
+            case Auto -> format.needsReencode(codec);
+            case Always -> true;
+            case Avoid -> !format.skipReedncode(codec);
+        };
     }
 
     public void setupFormat(Format format) {

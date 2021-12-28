@@ -36,8 +36,9 @@ public class Part implements Organisable, Convertable {
         List<Chapter> chapters = tracks.stream().map(t -> t.toChapter(this, mediaInfo)).collect(Collectors.toList());
         Chapter chapter = mediaInfo.getChapter();
         int position = this.getChapters().indexOf(chapter);
-        mediaInfo.remove();
+        //ORDER of next 2 lines is important see issue 269, if only one file is added, chapter and parts are removed and there is no place to add sub-tracks. So, sub-tracks should be added first.
         this.getChapters().addAll(position, chapters);
+        mediaInfo.remove();
     }
 
     public void construct(ObservableList<Chapter> chapters) {

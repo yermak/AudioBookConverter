@@ -95,7 +95,7 @@ public class FilesController {
 
         initFileOpenMenu();
 
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
         selectedMedia.addListener((InvalidationListener) observable -> {
@@ -109,7 +109,7 @@ public class FilesController {
 
         bookStructure.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         bookStructure.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<Organisable>>) c -> {
-            List<MediaInfo> list = ConverterApplication.getContext().getSelectedMedia();
+            List<MediaInfo> list = AudiobookConverter.getContext().getSelectedMedia();
             list.clear();
             List<MediaInfo> newList = c.getList().stream().flatMap(item -> item.getValue().getMedia().stream()).collect(Collectors.toList());
             list.addAll(newList);
@@ -189,19 +189,19 @@ public class FilesController {
 
     private void processFiles(List<String> fileNames) {
         FFMediaLoader mediaLoader = createMediaLoader(fileNames);
-        ConverterApplication.getContext().setMediaLoader(mediaLoader);
+        AudiobookConverter.getContext().setMediaLoader(mediaLoader);
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
-            ConverterApplication.getContext().constructBook(addedMedia);
+            AudiobookConverter.getContext().constructBook(addedMedia);
             bookStructure.updateBookStructure();
         } else {
-            ConverterApplication.getContext().addNewMedia(addedMedia);
+            AudiobookConverter.getContext().addNewMedia(addedMedia);
         }
     }
 
 
     private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, ConverterApplication.getContext().getConversionGroup());
+        return new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
     }
 
     public void selectFiles() {
@@ -228,8 +228,8 @@ public class FilesController {
 
     public void clear(ActionEvent event) {
         fileList.getItems().clear();
-        ConverterApplication.getContext().getConversionGroup().cancel();
-        ConverterApplication.getContext().detach();
+        AudiobookConverter.getContext().getConversionGroup().cancel();
+        AudiobookConverter.getContext().detach();
         bookStructure.setRoot(null);
         filesChapters.getTabs().remove(filesTab);
         filesChapters.getTabs().remove(chaptersTab);
@@ -261,10 +261,10 @@ public class FilesController {
 
 
     public void start(ActionEvent actionEvent) {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
-        String outputDestination = DialogHelper.selectOutputFile(ConverterApplication.getContext().getBookInfo());
+        String outputDestination = DialogHelper.selectOutputFile(AudiobookConverter.getContext().getBookInfo());
 
         if (outputDestination == null) {
             return;
@@ -273,7 +273,7 @@ public class FilesController {
 //        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
 
-        ConversionGroup conversionGroup = ConverterApplication.getContext().detach();
+        ConversionGroup conversionGroup = AudiobookConverter.getContext().detach();
 
 /* TODO!!!!
         conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
@@ -318,11 +318,11 @@ public class FilesController {
 
         ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
 
-        Book book = new Book(ConverterApplication.getContext().getBookInfo());
+        Book book = new Book(AudiobookConverter.getContext().getBookInfo());
 
         TreeItem<Organisable> bookItem = new TreeItem<>(book);
         bookStructure.setRoot(bookItem);
-        ConverterApplication.getContext().setBook(book);
+        AudiobookConverter.getContext().setBook(book);
 
         bookStructure.updateBookStructure();
 
@@ -364,7 +364,7 @@ public class FilesController {
 
     @FXML
     public void pause(ActionEvent actionEvent) {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         if (context.isPaused()) {
             context.resumeConversions();
             pauseButton.setText("Pause all");
@@ -375,42 +375,42 @@ public class FilesController {
     }
 
     public void stop(ActionEvent actionEvent) {
-        ConverterApplication.getContext().stopConversions();
+        AudiobookConverter.getContext().stopConversions();
     }
 
     @FXML
     protected void openLink(ActionEvent event) {
         Hyperlink source = (Hyperlink) event.getSource();
-        ConverterApplication.getEnv().showDocument(source.getUserData().toString());
+        AudiobookConverter.getEnv().showDocument(source.getUserData().toString());
     }
 
     public void openWebSite(ActionEvent actionEvent) {
-        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter");
+        AudiobookConverter.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter");
     }
 
     public void openAboutPage(ActionEvent actionEvent) {
-        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/about");
+        AudiobookConverter.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/about");
     }
 
     public void openFAQ(ActionEvent actionEvent) {
-        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/faq");
+        AudiobookConverter.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/faq");
     }
 
     public void openDiscussions(ActionEvent actionEvent) {
-        ConverterApplication.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/discussions");
+        AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/discussions");
     }
 
     public void openDonate() {
-        ConverterApplication.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/donate");
+        AudiobookConverter.getEnv().showDocument("https://www.recoupler.com/products/audiobookconverter/donate");
     }
 
     public void checkVersion(ActionEvent actionEvent) {
-        ConverterApplication.checkNewVersion();
+        AudiobookConverter.checkNewVersion();
     }
 
     public void exit(ActionEvent actionEvent) {
         logger.info("Closing application");
-        ConverterApplication.getContext().stopConversions();
+        AudiobookConverter.getContext().stopConversions();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {

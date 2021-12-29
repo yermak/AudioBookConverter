@@ -18,9 +18,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -35,7 +33,7 @@ public class ArtWorkController {
 
     @FXML
     private void initialize() {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         imageList.setCellFactory(param -> new ArtWorkListCell());
         imageList.setItems(context.getPosters());
         context.addContextDetachListener(observable -> context.getPosters().clear());
@@ -43,20 +41,25 @@ public class ArtWorkController {
 
     @FXML
     private void addImage(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppProperties.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Utils.getInitialDirecotory(sourceFolder));
-        fileChooser.setTitle("Select JPG or PNG file");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
-                new FileChooser.ExtensionFilter("png", "*.png"),
-                new FileChooser.ExtensionFilter("bmp", "*.bmp"));
+        try {
+            FileChooser fileChooser = new FileChooser();
+            String sourceFolder = AppSetting.getProperty("source.folder");
+            fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
+            fileChooser.setTitle("Select JPG or PNG file");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
+                    new FileChooser.ExtensionFilter("png", "*.png"),
+                    new FileChooser.ExtensionFilter("bmp", "*.bmp"));
 
-        File file = fileChooser.showOpenDialog(ConverterApplication.getEnv().getWindow());
-        logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
-        if (file != null) {
-            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
-            logger.info("Added art work from file: {}", file);
+            File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
+            logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
+            if (file != null) {
+                imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(file.getAbsolutePath()))));
+//            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
+                logger.info("Added art work from file: {}", file);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -64,7 +67,7 @@ public class ArtWorkController {
     private void removeImage(ActionEvent actionEvent) {
         int toRemove = imageList.getSelectionModel().getSelectedIndex();
         if (toRemove == -1) return;
-        ConverterApplication.getContext().removePoster(toRemove);
+        AudiobookConverter.getContext().removePoster(toRemove);
 //        imageList.getItems().remove(toRemove);
         logger.info("Removed art work #{}", toRemove);
     }
@@ -75,7 +78,7 @@ public class ArtWorkController {
         if (selectedIndices.size() == 1) {
             Integer selected = selectedIndices.get(0);
             if (selected > 0) {
-                ConverterApplication.getContext().movePosterUp(selected);
+                AudiobookConverter.getContext().movePosterUp(selected);
                 imageList.getSelectionModel().clearAndSelect(selected - 1);
                 logger.debug("Image {} moved left", selected);
             }
@@ -90,7 +93,7 @@ public class ArtWorkController {
             ObservableList<ArtWork> items = imageList.getItems();
             Integer selected = selectedIndices.get(0);
             if (selected < items.size() - 1) {
-                ConverterApplication.getContext().movePosterUp(selected + 1);
+                AudiobookConverter.getContext().movePosterUp(selected + 1);
                 imageList.getSelectionModel().clearAndSelect(selected + 1);
                 logger.debug("Image {} moved right", selected);
             }
@@ -105,12 +108,17 @@ public class ArtWorkController {
                 if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     java.awt.Image image = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
                     Image fimage = awtImageToFX(image);
-                    ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
+                    AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        ConverterApplication.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+//                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+                        try {
+                            AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(f))));
+                        } catch (FileNotFoundException e) {
+                            logger.error("failed to paste image", e);
+                        }
                     });
                 }
             }

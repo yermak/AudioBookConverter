@@ -1,10 +1,10 @@
 package uk.yermak.audiobookconverter;
 
-import javafx.application.Platform;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
+import javafx.scene.image.Image;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -28,9 +28,8 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
         try {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
-            String poster = Utils.getTmp(mediaInfo.hashCode(), stream, format);
-            //TODO consider replacing with m4art extract for m4b files
-            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Utils.FFMPEG,
+            String poster = Utils.getTmp(mediaInfo.getUID(), stream, format);
+            ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Platform.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,
                     "-y",
@@ -48,13 +47,13 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             while (!conversionGroup.isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            FFMediaLoader.logger.debug("ArtWork Out: {}", out.toString());
-            FFMediaLoader.logger.error("ArtWork Error: {}", err.toString());
+            FFMediaLoader.logger.debug("ArtWork Out: {}", out);
+            FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
-            ArtWorkBean artWorkBean = new ArtWorkBean(poster);
-            Platform.runLater(() -> {
+            ArtWork artWorkBean = new ArtWorkImage(new Image(new FileInputStream(poster)));
+            javafx.application.Platform.runLater(() -> {
                 if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                    ConverterApplication.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                    AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 }
             });
             return artWorkBean;

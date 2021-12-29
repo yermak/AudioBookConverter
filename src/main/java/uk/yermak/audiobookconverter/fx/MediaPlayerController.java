@@ -12,6 +12,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
 
@@ -59,7 +60,7 @@ public class MediaPlayerController  {
     }
 
     public void play(ActionEvent event) {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
 
         List<MediaInfo> selectedMedia = context.getSelectedMedia();
         if (selectedMedia.size() == 1) {
@@ -99,7 +100,7 @@ public class MediaPlayerController  {
 
     private void playMedias(MediaInfo selected) {
         playingTrack = selected;
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> media = context.getMedia();
 
         if (media.indexOf(selected) > media.size() - 1) return;
@@ -149,7 +150,7 @@ public class MediaPlayerController  {
     }
 
     private MediaInfo findNext(MediaInfo selected) {
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> media = context.getMedia();
 
         int i = media.indexOf(selected);

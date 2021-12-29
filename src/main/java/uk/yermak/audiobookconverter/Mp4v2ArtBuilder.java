@@ -17,26 +17,33 @@ public class Mp4v2ArtBuilder {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ConversionJob conversionJob;
+    private ProgressCallback progressCallback;
 
-    public Mp4v2ArtBuilder(ConversionJob conversionJob) {
+    public Mp4v2ArtBuilder(ConversionJob conversionJob, ProgressCallback progressCallback) {
         this.conversionJob = conversionJob;
+        this.progressCallback = progressCallback;
     }
 
 
-    public void coverArt(String outputFileName) throws IOException, InterruptedException {
+    public void coverArt(String outputFileName) {
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
-
-        int i = 0;
-        for (ArtWork poster : posters) {
+        if (posters.isEmpty()) return;
+        progressCallback.reset();
+        progressCallback.setState("Adding artwork...");
+        long duration = conversionJob.getConvertable().getDuration();
+        long step = duration / posters.size();
+        for (int i = 0; i < posters.size(); i++) {
+            ArtWork poster = posters.get(i);
             if (conversionJob.getStatus().isOver()) break;
-            updateSinglePoster(poster, i++, outputFileName);
+            updateSinglePoster(poster, i, outputFileName);
+            progressCallback.converted((i+1)*step, posters.size()*step);
         }
     }
 
-    public void updateSinglePoster(ArtWork poster, int index, String outputFileName) throws IOException, InterruptedException {
+    public void updateSinglePoster(ArtWork poster, int index, String outputFileName) {
         Process process = null;
         try {
-            ProcessBuilder artProcessBuilder = new ProcessBuilder(Utils.MP4ART,
+            ProcessBuilder artProcessBuilder = new ProcessBuilder(Platform.MP4ART,
                     "--art-index", String.valueOf(index),
                     "--add", poster.getFileName(),
                     outputFileName);
@@ -53,15 +60,15 @@ public class Mp4v2ArtBuilder {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("mp4art out: {}", out.toString());
-            logger.warn("mp4art err: {}", err.toString());
+            logger.debug("mp4art out: {}", out);
+            logger.warn("mp4art err: {}", err);
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("ArtWork failed with code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
             if (!new File(outputFileName).exists()) {
-                throw new ConversionException("ArtWork failed, no output file:" + out.toString(), new Error(err.toString()));
+                throw new ConversionException("ArtWork failed, no output file:" + out, new Error(err.toString()));
             }
         } catch (Exception e) {
             logger.error("Failed to apply art work", e);

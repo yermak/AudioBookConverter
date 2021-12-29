@@ -1,13 +1,11 @@
 package uk.yermak.audiobookconverter;
 
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public enum Format {
-    M4B("ipod", "aac", "m4b") {
+    M4B("ipod", "aac", "m4b", "alac") {
         @Override
         public boolean mp4Compatible() {
             return true;
@@ -17,8 +15,9 @@ public enum Format {
         public boolean ffmpegCompatible() {
             return false;
         }
+
     },
-    M4A("ipod", "aac", "m4a") {
+    M4A("ipod", "aac", "m4a", "alac") {
         @Override
         public boolean mp4Compatible() {
             return true;
@@ -34,7 +33,7 @@ public enum Format {
         @Override
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Platform.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -46,7 +45,7 @@ public enum Format {
             options.add(codec);
 
             options.add("-map_metadata");
-            options.add( "-1");
+            options.add("-1");
 
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
@@ -59,7 +58,7 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            if (outputParameters.getCutoff() != null) {
+            if (outputParameters.getCutoff() != 0) {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }
@@ -105,7 +104,7 @@ public enum Format {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Platform.FFMPEG);
             options.add("-protocol_whitelist");
             options.add("file,pipe,concat");
             options.add("-f");
@@ -141,7 +140,7 @@ public enum Format {
             return options;
         }
     },
-    OGG("ogg", "libopus", "ogg") {
+    OGG("ogg", "libopus", "ogg", "vorbis") {
         @Override
         public List<Integer> cutoffs() {
             return List.of(4000, 6000, 8000, 12000, 20000);
@@ -180,7 +179,7 @@ public enum Format {
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Platform.FFMPEG);
             options.add("-protocol_whitelist");
             options.add("file,pipe,concat");
             options.add("-f");
@@ -209,7 +208,7 @@ public enum Format {
         @Override
         public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
             List<String> options = new ArrayList<>();
-            options.add(Utils.FFMPEG);
+            options.add(Platform.FFMPEG);
             if (mediaInfo.getOffset() != -1) {
                 options.add("-ss");
                 options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -221,7 +220,7 @@ public enum Format {
             options.add(codec);
 
             options.add("-map_metadata");
-            options.add( "-1");
+            options.add("-1");
 
             if (outputParameters.cbr) {
                 options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
@@ -237,7 +236,7 @@ public enum Format {
                 options.add("-t");
                 options.add(toFFMpegTime(mediaInfo.getDuration()));
             }
-            if (outputParameters.getCutoff() != null) {
+            if (outputParameters.getCutoff() != 0) {
                 options.add("-cutoff");
                 options.add(Integer.toString(outputParameters.getCutoff()));
             }
@@ -254,11 +253,13 @@ public enum Format {
     protected String format;
     protected String codec;
     protected String extension;
+    private String[] compatibleCodecs;
 
-    Format(String format, String codec, String extension) {
+    Format(String format, String codec, String extension, String... compatibleCodecs) {
         this.format = format;
         this.codec = codec;
         this.extension = extension;
+        this.compatibleCodecs = compatibleCodecs;
     }
 
     public List<Integer> channels() {
@@ -331,7 +332,7 @@ public enum Format {
 
     public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
         List<String> options = new ArrayList<>();
-        options.add(Utils.FFMPEG);
+        options.add(Platform.FFMPEG);
         if (mediaInfo.getOffset() != -1) {
             options.add("-ss");
             options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -343,7 +344,7 @@ public enum Format {
         options.add(codec);
 
         options.add("-map_metadata");
-        options.add( "-1");
+        options.add("-1");
 
         options.addAll(outputParameters.cbr
                 ? List.of("-b:a", outputParameters.getBitRate() + "k")
@@ -376,7 +377,7 @@ public enum Format {
 
     public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
         List<String> options = new ArrayList<>();
-        options.add(Utils.FFMPEG);
+        options.add(Platform.FFMPEG);
         if (mediaInfo.getOffset() != -1) {
             options.add("-ss");
             options.add(toFFMpegTime(mediaInfo.getOffset()));
@@ -403,7 +404,7 @@ public enum Format {
     }
 
     public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
-        String[] strings = {Utils.FFMPEG,
+        String[] strings = {Platform.FFMPEG,
                 "-protocol_whitelist", "file,pipe,concat",
                 "-vn",
                 "-f", "concat",
@@ -436,4 +437,10 @@ public enum Format {
     public boolean ffmpegCompatible() {
         return true;
     }
+
+    public boolean skipReedncode(String codec) {
+        if (compatibleCodecs == null) return false;
+        return ArrayUtils.contains(compatibleCodecs, codec);
+    }
+
 }

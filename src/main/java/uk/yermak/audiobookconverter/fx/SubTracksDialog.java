@@ -7,13 +7,11 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 

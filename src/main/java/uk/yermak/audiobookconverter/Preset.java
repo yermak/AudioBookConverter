@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter;
 
-import com.google.gson.Gson;
-
 import java.util.*;
 
 public class Preset extends OutputParameters {
@@ -16,46 +14,33 @@ public class Preset extends OutputParameters {
     }
 
 
-    static Map<String, OutputParameters> defaultValues = Map.of(
-            "ipod nano", new Preset("ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2)),
-            "ipod classic", new Preset("ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3)),
-            "iphone", new Preset("iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4)),
-            "android 5+", new Preset("android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, false, 3)),
-            "android old", new Preset("android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3)),
-            "legacy", new Preset("legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3))
+    static List<Preset> defaultValues = List.of(
+            new Preset("ipod nano", new OutputParameters(Format.M4B, 64, 44100, 1, 10000, false, 2, 1.0, Force.Auto, false)),
+            new Preset("ipod classic", new OutputParameters(Format.M4B, 96, 44100, 2, 12000, true, 3, 1.0, Force.Auto, false)),
+            new Preset("iphone", new OutputParameters(Format.M4B, 128, 44100, 2, 12000, true, 4, 1.0, Force.Auto, false)),
+            new Preset("android 5+", new OutputParameters(Format.OGG, 64, 44100, 2, 12000, false, 3, 1.0, Force.Auto, false)),
+            new Preset("android old", new OutputParameters(Format.M4B, 96, 44100, 2, 10000, true, 3, 1.0, Force.Auto, false)),
+            new Preset("legacy", new OutputParameters(Format.MP3, 128, 44100, 2, 12000, true, 3, 1.0, Force.Auto, true))
     );
 
     public static final Preset DEFAULT_OUTPUT_PARAMETERS = new Preset(Preset.DEFAULT);
 
 
     public static List<Preset> loadPresets() {
-        List<Preset> list = new ArrayList<>();
-        Properties savedPresets = AppProperties.getProperties("preset");
-        savedPresets.keySet().forEach(p -> list.add(new Preset((String) p)));
-        Set<String> presetNames = defaultValues.keySet();
-        for (String presetName : presetNames) {
-            if (!savedPresets.containsKey(presetName)) {
-                Gson gson = new Gson();
-                String gsonString = gson.toJson(defaultValues.get(presetName));
-                AppProperties.setProperty("preset." + presetName, gsonString);
-                list.add(new Preset(presetName));
-            }
+        List<Preset> presets = AppSetting.loadPresets();
+        ArrayList<Preset> toStore = new ArrayList<>(defaultValues);
+        toStore.removeAll(presets);
+        for (Preset preset : toStore) {
+            AppSetting.savePreset(preset);
         }
-        return list;
+        return AppSetting.loadPresets();
+
     }
 
-//    private final OutputParameters save;
-
-    private Preset(String name, OutputParameters preset) {
+    public Preset(String name, OutputParameters preset) {
+        super(preset.getFormat(), preset.getBitRate(), preset.getFrequency(), preset.getChannels(), preset.getCutoff(), preset.isCbr(), preset.getVbrQuality(),
+                preset.getSpeed(), preset.getForce(), preset.isSplitChapters());
         this.name = name;
-        this.bitRate = preset.getBitRate();
-        this.frequency = preset.getFrequency();
-        this.channels = preset.getChannels();
-        this.vbrQuality = preset.getVbrQuality();
-        this.cbr = preset.isCbr();
-        this.cutoff = preset.getCutoff();
-        this.format = preset.getFormat();
-        saveProperty();
     }
 
 
@@ -68,78 +53,35 @@ public class Preset extends OutputParameters {
     }
 
     public static Preset instance(String presetName) {
-        String property = AppProperties.getProperty("preset." + presetName);
-        if (property != null) {
-            Gson gson = new Gson();
-            Preset preset = gson.fromJson(property, Preset.class);
-            preset.initSpeed();
-            return preset;
-        }
-        return new Preset(presetName, Objects.requireNonNullElseGet(defaultValues.get(presetName), OutputParameters::new));
-    }
+        Preset preset = AppSetting.loadPreset(presetName);
+        if (preset != null) return preset;
 
-    private void saveProperty() {
-        Gson gson = new Gson();
-        String gsonString = gson.toJson(this);
-        AppProperties.setProperty("preset." + name, gsonString);
-    }
-
-
-    @Override
-    public void setupFormat(Format format) {
-        super.setupFormat(format);
-        saveProperty();
-    }
-
-
-    @Override
-    public void setBitRate(Integer bitRate) {
-        super.setBitRate(bitRate);
-        saveProperty();
-    }
-
-    @Override
-    public void setFrequency(Integer frequency) {
-        super.setFrequency(frequency);
-        saveProperty();
-    }
-
-
-    @Override
-    public void setChannels(Integer channels) {
-        super.setChannels(channels);
-        saveProperty();
-    }
-
-    @Override
-    public void setVbrQuality(Integer vbrQuality) {
-        super.setVbrQuality(vbrQuality);
-        saveProperty();
-    }
-
-    @Override
-    public void setCbr(Boolean cbr) {
-        super.setCbr(cbr);
-        saveProperty();
+        return new Preset(presetName, new OutputParameters());
     }
 
     @Override
     public void updateAuto(List<MediaInfo> media) {
-        if (!defaultValues.containsKey(name)) {
+        if (!defaultValues.contains(this)) {
             super.updateAuto(media);
-            saveProperty();
         } else {
             //Ignoring auto-update and save for all other preset
         }
     }
 
-    @Override
-    public void setCutoff(Integer cutoff) {
-        super.setCutoff(cutoff);
-        saveProperty();
-    }
-
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Preset preset = (Preset) o;
+        return Objects.equals(name, preset.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

@@ -253,6 +253,12 @@ public class FilesController {
         }
     }
 
+    public void subTracks(ActionEvent event) {
+        if (chaptersMode.get()) {
+            bookStructure.subTracks(event);
+        }
+    }
+
     public void editChapter(ActionEvent event){
         if (chaptersMode.get()) {
             bookStructure.editChapter(event);
@@ -421,15 +427,7 @@ public class FilesController {
 
 
     public void clearQueue(ActionEvent actionEvent) {
-        ObservableList<ProgressComponent> items = progressQueue.getItems();
-        List<ProgressComponent> dones = new ArrayList<>();
-        for (ProgressComponent item : items) {
-            if (item.isOver()) dones.add(item);
-        }
-        Platform.runLater(() -> {
-            for (ProgressComponent done : dones) {
-                progressQueue.getItems().remove(done);
-            }
-        });
+        List<ProgressComponent> dones = progressQueue.getItems().stream().filter(ProgressComponent::isOver).toList();
+        Platform.runLater(() -> progressQueue.getItems().removeAll(dones));
     }
 }

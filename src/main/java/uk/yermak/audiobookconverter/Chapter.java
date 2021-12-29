@@ -63,12 +63,6 @@ public class Chapter implements Organisable, Convertable {
         return media.stream().mapToLong(MediaInfo::getDuration).sum();
     }
 
-/*
-    public String getDurationString() {
-        return Utils.formatTime(getDuration());
-    }
-*/
-
     @Override
     public boolean split() {
         if (part.getChapters().size() == 1) {

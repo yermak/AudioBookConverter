@@ -1,7 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
-import org.apache.commons.io.FileUtils;
+import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 public class FFMpegOptimizer {
@@ -17,8 +18,8 @@ public class FFMpegOptimizer {
 
     private String tempFile;
     private final String outputFileName;
+    private ProgressCallback callback;
 
-    private final ProgressCallback callback;
     private ProgressParser progressParser;
 
 
@@ -30,50 +31,51 @@ public class FFMpegOptimizer {
     }
 
 
-
-    public void moveResultingFile() {
-        try {
-            File destFile = new File(outputFileName);
-            optimize();
-            if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-            FileUtils.moveFile(new File(Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())), destFile);
-        } catch (IOException | InterruptedException e) {
-            logger.error("Failed to optimize resulting file", e);
-            throw new RuntimeException(e);
-        } finally {
-            FileUtils.deleteQuietly(new File(tempFile));
-        }
-    }
-
-    private  void optimize() throws IOException, InterruptedException {
-        if (conversionJob.getStatus().isOver()) return;
+    String optimize() throws InterruptedException, IOException {
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
-//        callback.reset();
-//        try {
-//            progressParser = new TcpProgressParser(progress -> {
-//                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-//            });
-//            progressParser.start();
-//        } catch (URISyntaxException e) {
-//        }
+        callback.reset();
+        callback.setState("Optimising...");
+        try {
+            progressParser = new TcpProgressParser(progress -> {
+                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+            });
+            progressParser.start();
+        } catch (URISyntaxException e) {
+        }
 
         Process process = null;
         try {
 
-            String[] optimize = {
-                    Utils.FFMPEG,
-                    "-i", tempFile,
-                    "-map", "0:v",
-                    "-map", "0:a",
-                    "-c", "copy",
-                    "-movflags", "+faststart",
-                    Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())
-            } ;
+            String tmp = Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
+            String[] optimize;
+            if (conversionJob.getConversionGroup().getPosters().isEmpty()) {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-c", "copy",
+                        "-progress", progressParser.getUri().toString(),
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            } else {
+                optimize = new String[]{
+                        Platform.FFMPEG,
+                        "-i", tempFile,
+                        "-map", "0:v?",
+                        "-map", "0:a",
+                        "-c", "copy",
+                        "-progress", progressParser.getUri().toString(),
+                        "-movflags", "+faststart",
+                        tmp
+                };
+            }
 
             logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
 
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
-            process = Runtime.getRuntime().exec( String.join(" ", optimize));
+            ProcessBuilder pb = new ProcessBuilder(optimize);
+            process = pb.start();
+
+//            process = Runtime.getRuntime().exec( String.join(" ", optimize));
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);
@@ -84,16 +86,17 @@ public class FFMpegOptimizer {
             while (!conversionJob.getStatus().isOver() && !finished) {
                 finished = process.waitFor(500, TimeUnit.MILLISECONDS);
             }
-            logger.debug("Optimize Out: {}", out.toString());
-            logger.error("Optimize Error: {}", err.toString());
+            logger.debug("Optimize Out: {}", out);
+            logger.error("Optimize Error: {}", err);
 
             if (process.exitValue() != 0) {
                 throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
             }
 
-            if (!new File(Utils.getTmp(conversionJob.jobId, outputFileName.hashCode()+1, conversionJob.getConversionGroup().getWorkfileExtension())).exists()) {
-                throw new ConversionException("Optimisation failed, no output file:" + out.toString(), new Error(err.toString()));
+            if (!new File(tmp).exists()) {
+                throw new ConversionException("Optimisation failed, no output file:" + out, new Error(err.toString()));
             }
+            return tmp;
         } catch (Exception e) {
             logger.error("Error during optimisation of resulting file:", e);
             throw new RuntimeException(e);
@@ -101,12 +104,5 @@ public class FFMpegOptimizer {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
         }
-
-
-
     }
-
-
-
-
 }

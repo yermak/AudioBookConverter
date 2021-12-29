@@ -165,4 +165,8 @@ public class ConversionProgress implements Runnable {
     public ConversionJob getConversionJob() {
         return conversionJob;
     }
+
+    public void setState(String message) {
+        state.set(message);
+    }
 }

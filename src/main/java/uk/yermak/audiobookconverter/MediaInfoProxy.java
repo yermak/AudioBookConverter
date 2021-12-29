@@ -1,9 +1,6 @@
 package uk.yermak.audiobookconverter;
 
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
-
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class MediaInfoProxy implements MediaInfo {
@@ -42,7 +39,7 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     public long getDuration() {
-        return (long) (this.getMediaInfo().getDuration() / ConverterApplication.getContext().getOutputParameters().getSpeed());
+        return (long) (this.getMediaInfo().getDuration() / AudiobookConverter.getContext().getOutputParameters().getSpeed());
     }
 
     @Override
@@ -106,6 +103,11 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     @Override
+    public String getReference() {
+        return this.getMediaInfo().getReference();
+    }
+
+    @Override
     public long getOffset() {
         return this.getMediaInfo().getOffset();
     }
@@ -127,6 +129,11 @@ public class MediaInfoProxy implements MediaInfo {
     @Override
     public int getTotalNumbers() {
         return this.getMediaInfo().getTotalNumbers();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.getMediaInfo().equals(obj);
     }
 }
 

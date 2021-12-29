@@ -1,8 +1,6 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +11,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.AppSetting;
 import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
@@ -45,11 +45,15 @@ public class BookInfoController {
     private void initialize() {
 
         MenuItem menuItem = new MenuItem("Remove");
-        genre.setItems(ConverterApplication.getContext().loadGenres());
+
+        genre.setItems(AppSetting.loadGenres());
         menuItem.setOnAction(event -> {
-            genre.getItems().remove(genre.getSelectionModel().getSelectedIndex());
-            ConverterApplication.getContext().saveGenres();
+            String remove = genre.getItems().get(genre.getSelectionModel().getSelectedIndex());
+            AppSetting.removeGenre(remove);
+            genre.setItems(AppSetting.loadGenres());
         });
+        AudiobookConverter.getContext().addContextDetachListener(observable -> genre.setItems(AppSetting.loadGenres()));
+
         ContextMenu contextMenu = new ContextMenu(menuItem);
 
         genre.setOnContextMenuRequested(event -> {
@@ -59,7 +63,7 @@ public class BookInfoController {
             genre.hide();
         });
 
-        ObservableList<MediaInfo> media = ConverterApplication.getContext().getMedia();
+        ObservableList<MediaInfo> media = AudiobookConverter.getContext().getMedia();
 //        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
         media.addListener((ListChangeListener<? super MediaInfo>) change -> updateTags(media, media.isEmpty()));
 
@@ -70,27 +74,27 @@ public class BookInfoController {
         bookNo.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 3).getFormatter());
         year.setTextFormatter(new TextFieldValidator(TextFieldValidator.ValidationModus.MAX_INTEGERS, 4).getFormatter());
 
-        title.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().title().set(title.getText()));
+        title.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().title().set(title.getText()));
 
-        writer.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().writer().set(writer.getText()));
-        narrator.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().narrator().set(narrator.getText()));
+        writer.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().writer().set(writer.getText()));
+        narrator.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().narrator().set(narrator.getText()));
 
-        genre.valueProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getValue()));
-        genre.getEditor().textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
+        genre.valueProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().genre().set(genre.getValue()));
+        genre.getEditor().textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
 
-        series.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().series().set(series.getText()));
+        series.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().series().set(series.getText()));
         bookNo.textProperty().addListener(o -> {
             if (StringUtils.isNotBlank(bookNo.getText()))
-                ConverterApplication.getContext().getBookInfo().bookNumber().set(bookNo.getText());
+                AudiobookConverter.getContext().getBookInfo().bookNumber().set(bookNo.getText());
         });
-        year.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().year().set(year.getText()));
-        comment.textProperty().addListener(o -> ConverterApplication.getContext().getBookInfo().comment().set(comment.getText()));
+        year.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().year().set(year.getText()));
+        comment.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().comment().set(comment.getText()));
 
-        ConverterApplication.getContext().addContextDetachListener(observable -> Platform.runLater(() -> clearTags()));
+        AudiobookConverter.getContext().addContextDetachListener(observable -> Platform.runLater(this::clearTags));
     }
 
     private void updateTags(ObservableList<MediaInfo> media, boolean clear) {
-        if (ConverterApplication.getContext().getBook() == null) {
+        if (AudiobookConverter.getContext().getBook() == null) {
             if (clear) {
                 clearTags();
             } else {

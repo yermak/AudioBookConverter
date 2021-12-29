@@ -26,6 +26,10 @@ public class ProgressCallback {
         this.fileName = fileName;
         this.conversionProgress = refreshable;
     }
+
+    public void setState(String message) {
+        conversionProgress.setState(message);
+    }
 }
 
         

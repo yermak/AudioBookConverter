@@ -22,9 +22,11 @@ public interface MediaInfo extends Organisable {
 
     void setChapter(Chapter chapter);
 
-    public Chapter getChapter();
+    Chapter getChapter();
 
-    public int getUID();
+    int getUID();
+
+    String getReference();
 }
 
         

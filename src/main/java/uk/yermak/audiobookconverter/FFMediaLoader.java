@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import javafx.scene.image.Image;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegChapter;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
@@ -13,9 +14,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +45,7 @@ public class FFMediaLoader {
     public List<MediaInfo> loadMediaInfo() {
         logger.info("Loading media info");
         try {
-            FFprobe ffprobe = new FFprobe(Utils.FFPROBE);
+            FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoCallable(ffprobe, fileName, conversionGroup));
@@ -204,8 +206,7 @@ public class FFMediaLoader {
     private static long parseCueTime(String substring) {
         String cleanText = cleanText(substring);
         String[] split = cleanText.split(":");
-        long time = 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 1000 / 75;
-        return time;
+        return 1000 * (Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1])) + Integer.parseInt(split[2]) * 1000 / 75;
     }
 
     private static String cleanText(String text) {
@@ -214,16 +215,21 @@ public class FFMediaLoader {
 
 
     static Collection<File> findPictures(File dir) {
-        return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
+        try {
+            return FileUtils.listFiles(dir, ArtWork.IMAGE_EXTENSIONS, true);
+        } catch (Exception e) {
+            logger.error("Failed to search for images in dir:" + dir, e);
+            return Collections.emptyList();
+        }
     }
 
-    static void searchForPosters(List<MediaInfo> media) {
+    static void searchForPosters(List<MediaInfo> media) throws FileNotFoundException {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
         List<File> pictures = new ArrayList<>();
 
-        ConversionContext context = ConverterApplication.getContext();
+        ConversionContext context = AudiobookConverter.getContext();
         for (File d : searchDirs) {
             pictures.addAll(findPictures(d));
         }
@@ -231,7 +237,8 @@ public class FFMediaLoader {
         //adding artificial limit of image count to address issue #153.
         if (!pictures.isEmpty()) {
             for (int i = 0; i < 10 && i < pictures.size(); i++) {
-                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+//                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+                context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(pictures.get(i).getPath()))));
             }
         }
     }

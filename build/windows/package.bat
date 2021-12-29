@@ -10,7 +10,7 @@ ECHO %APP_VERSION%
 mkdir target\release
 rmdir /s /q target\image\AudioBookConverter
 
-"%JAVA_HOME%\bin\jlink.exe" --module-path "%JAVA_HOME%\jmods";%JAVAFX_JMODS% --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --strip-native-commands --strip-debug --no-man-pages --no-header-files --exclude-files=**.md --output target\fx-jre
+"%JAVA_HOME%\bin\jlink.exe" --module-path "%JAVA_HOME%\jmods";%JAVAFX_JMODS% --add-modules java.base,java.sql,java.management,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --strip-native-commands --strip-debug --no-man-pages --no-header-files --exclude-files=**.md --output target\fx-jre
 
 "%JAVA_HOME%\bin\jpackage.exe" --app-version %APP_VERSION%  --icon AudioBookConverter.ico -t app-image --name AudioBookConverter --vendor Recoupler --input target\package\audiobookconverter-%APP_VERSION%-windows-installer\audiobookconverter-%APP_VERSION%\app --main-jar lib\audiobookconverter-%APP_VERSION%.jar --runtime-image target\fx-jre --dest target\image --java-options '--enable-preview'
 cd target\image

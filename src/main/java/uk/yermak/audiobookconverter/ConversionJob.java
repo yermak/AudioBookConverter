@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -31,7 +30,6 @@ public class ConversionJob implements Runnable {
     private final Map<String, ProgressCallback> progressCallbacks;
     private final String outputDestination;
     private final SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
-    long jobId;
 
 
     public ConversionJob(ConversionGroup conversionGroup, Convertable convertable, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
@@ -39,11 +37,10 @@ public class ConversionJob implements Runnable {
         this.convertable = convertable;
         this.progressCallbacks = progressCallbacks;
         this.outputDestination = outputDestination;
-        jobId = outputDestination.hashCode() + System.currentTimeMillis();
 
         addStatusChangeListener((observable, oldValue, newValue) -> {
             if (FINISHED.equals(newValue)) {
-                Platform.runLater(() -> ConverterApplication.showNotification(outputDestination));
+                Platform.runLater(() -> AudiobookConverter.showNotification(outputDestination));
             }
         });
 
@@ -54,16 +51,15 @@ public class ConversionJob implements Runnable {
 
         List<Future<String>> futures = new ArrayList<>();
 
-        String tempFile = Utils.getTmp(jobId, outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
+        String tempFile = Utils.getTmp(conversionGroup.getJobId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
-        File metaFile = null;
         try {
 //            conversion.getOutputParameters().updateAuto(conversion.getMedia());
 
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(jobId, mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(conversionGroup.getJobId(), mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -76,18 +72,31 @@ public class ConversionJob implements Runnable {
             }
             if (status.get().isOver()) return;
 
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(jobId, conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(conversionGroup.getJobId(), conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;
 
             if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
-                Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this);
+                Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this, progressCallbacks.get("output"));
                 artBuilder.coverArt(tempFile);
             }
 
             if (status.get().isOver()) return;
-            new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).moveResultingFile();
+
+            File destFile = new File(outputDestination);
+
+            if (getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
+                try {
+                    String optimisedOutput = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).optimize();
+                    if (destFile.exists()) FileUtils.deleteQuietly(destFile);
+                    FileUtils.moveFile(new File(optimisedOutput), destFile);
+                } finally {
+                    FileUtils.deleteQuietly(new File(tempFile));
+                }
+            } else {
+                FileUtils.moveFile(new File(tempFile), destFile);
+            }
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
@@ -95,8 +104,6 @@ public class ConversionJob implements Runnable {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             error(e.getMessage() + "; " + sw.getBuffer().toString());
-        } finally {
-            FileUtils.deleteQuietly(metaFile);
         }
     }
 

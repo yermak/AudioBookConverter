@@ -6,7 +6,6 @@ import javafx.scene.control.ListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
-import uk.yermak.audiobookconverter.fx.ConverterApplication;
 import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
@@ -30,6 +29,7 @@ public class ConversionGroup {
     private List<ArtWork> posters;
     private OutputParameters outputParameters;
     private boolean detached;
+    private long jobId = System.currentTimeMillis();
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -43,7 +43,7 @@ public class ConversionGroup {
 
         jobs.add(conversionJob);
         Executors.newSingleThreadExecutor().execute(conversionProgress);
-        ConverterApplication.getContext().addJob(conversionJob);
+        AudiobookConverter.getContext().addJob(conversionJob);
         return conversionProgress;
     }
 
@@ -133,22 +133,21 @@ public class ConversionGroup {
 //        String extension = FilenameUtils.getExtension(outputDestination);
         this.getOutputParameters().setupFormat(format);
 
+
         if (this.getOutputParameters().isSplitChapters()) {
-            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).collect(Collectors.toList());
+            List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).toList();
             logger.debug("Found {} chapters in the book", chapters.size());
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format.toString());
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
                 ConversionProgress conversionProgress = this.start(chapter, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
+                Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
 
             }
         } else {
@@ -157,15 +156,13 @@ public class ConversionGroup {
                 Part part = parts.get(i);
                 String finalDesination = outputDestination;
                 if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format.toString());
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
                 ConversionProgress conversionProgress = this.start(part, finalDesination);
-                Platform.runLater(() -> {
-                    progressQueue.getItems().add(0, new ProgressComponent(conversionProgress));
-                });
+                Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
             }
         }
 
@@ -181,6 +178,9 @@ public class ConversionGroup {
     }
 
 
+    public long getJobId() {
+        return jobId;
+    }
 }
 
 

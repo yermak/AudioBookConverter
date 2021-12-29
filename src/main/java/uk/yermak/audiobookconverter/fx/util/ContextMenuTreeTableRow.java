@@ -20,7 +20,11 @@ public class ContextMenuTreeTableRow<T> extends TreeTableRow<T> {
                 }
             });
             row.selectedProperty().addListener((observableValue, prev, current) -> {
-                row.setContextMenu(contextMenuBuilder.menu(row.getTreeItem().getValue()));
+                if (row.getTreeItem() != null) {
+                    row.setContextMenu(contextMenuBuilder.menu(row.getTreeItem().getValue()));
+                } else {
+                    row.setContextMenu(null);
+                }
             });
             return row;
         };

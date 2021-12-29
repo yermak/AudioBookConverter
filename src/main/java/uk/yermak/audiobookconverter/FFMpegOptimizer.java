@@ -61,7 +61,7 @@ public class FFMpegOptimizer {
                 optimize = new String[]{
                         Platform.FFMPEG,
                         "-i", tempFile,
-                        "-map", "0:v",
+                        "-map", "0:v?",
                         "-map", "0:a",
                         "-c", "copy",
                         "-progress", progressParser.getUri().toString(),

@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import javafx.scene.image.Image;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegChapter;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
@@ -220,7 +223,7 @@ public class FFMediaLoader {
         }
     }
 
-    static void searchForPosters(List<MediaInfo> media) {
+    static void searchForPosters(List<MediaInfo> media) throws FileNotFoundException {
         Set<File> searchDirs = new HashSet<>();
         media.forEach(mi -> searchDirs.add(new File(mi.getFileName()).getParentFile()));
 
@@ -234,7 +237,8 @@ public class FFMediaLoader {
         //adding artificial limit of image count to address issue #153.
         if (!pictures.isEmpty()) {
             for (int i = 0; i < 10 && i < pictures.size(); i++) {
-                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+//                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
+                context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(pictures.get(i).getPath()))));
             }
         }
     }

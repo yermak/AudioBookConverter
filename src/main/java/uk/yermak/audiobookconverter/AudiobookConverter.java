@@ -145,8 +145,6 @@ public class AudiobookConverter extends Application {
                     javafx.application.Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("New Version Available!");
-                        String path = FileManager.getPathToApplicationBundle();
-//                        alert.setContentText("path:"+ path);
                         alert.setContentText("Would you like to download new version?");
                         Optional<ButtonType> result = alert.showAndWait();
                         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {

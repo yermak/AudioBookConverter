@@ -166,7 +166,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         updateBookStructure();
     }
 
-    private void subTracks(ActionEvent actionEvent) {
+    void subTracks(ActionEvent actionEvent) {
         ObservableList<TreeTablePosition<Organisable, ?>> selectedCells = getSelectionModel().getSelectedCells();
         if (selectedCells.size() != 1) return;
         Organisable organisable = selectedCells.get(0).getTreeItem().getValue();

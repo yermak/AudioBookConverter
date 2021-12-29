@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+@Deprecated
 public class ArtWorkBean implements ArtWork {
     private final String fileName;
     private final long crc32;

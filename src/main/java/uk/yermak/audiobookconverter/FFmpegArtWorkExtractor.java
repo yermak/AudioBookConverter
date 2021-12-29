@@ -1,7 +1,10 @@
 package uk.yermak.audiobookconverter;
 
+import javafx.scene.image.Image;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +50,7 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             FFMediaLoader.logger.debug("ArtWork Out: {}", out);
             FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
-            ArtWorkBean artWorkBean = new ArtWorkBean(poster);
+            ArtWork artWorkBean = new ArtWorkImage(new Image(new FileInputStream(poster)));
             javafx.application.Platform.runLater(() -> {
                 if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
                     AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);

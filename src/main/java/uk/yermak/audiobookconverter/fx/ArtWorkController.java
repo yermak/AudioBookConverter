@@ -18,9 +18,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -43,20 +41,25 @@ public class ArtWorkController {
 
     @FXML
     private void addImage(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder");
-        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
-        fileChooser.setTitle("Select JPG or PNG file");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
-                new FileChooser.ExtensionFilter("png", "*.png"),
-                new FileChooser.ExtensionFilter("bmp", "*.bmp"));
+        try {
+            FileChooser fileChooser = new FileChooser();
+            String sourceFolder = AppSetting.getProperty("source.folder");
+            fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
+            fileChooser.setTitle("Select JPG or PNG file");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
+                    new FileChooser.ExtensionFilter("png", "*.png"),
+                    new FileChooser.ExtensionFilter("bmp", "*.bmp"));
 
-        File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
-        logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
-        if (file != null) {
-            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
-            logger.info("Added art work from file: {}", file);
+            File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
+            logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
+            if (file != null) {
+                imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(file.getAbsolutePath()))));
+//            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
+                logger.info("Added art work from file: {}", file);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -110,7 +113,12 @@ public class ArtWorkController {
                     java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
-                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+//                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
+                        try {
+                            AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(f))));
+                        } catch (FileNotFoundException e) {
+                            logger.error("failed to paste image", e);
+                        }
                     });
                 }
             }

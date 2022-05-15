@@ -1,8 +1,3 @@
-During Russian war in Ukraine development is on hold. 
-===============
-No new versions will be released or bugs will be fixed, as I have other priorities.
-===============
-
 ![image](https://user-images.githubusercontent.com/380491/157830449-4d35f490-1a60-4940-98ae-11a3247a43e0.png)
 ===============
 

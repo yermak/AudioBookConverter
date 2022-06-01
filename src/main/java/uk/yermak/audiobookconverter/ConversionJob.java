@@ -95,6 +95,7 @@ public class ConversionJob implements Runnable {
                     FileUtils.deleteQuietly(new File(tempFile));
                 }
             } else {
+                if (destFile.exists()) FileUtils.deleteQuietly(destFile);
                 FileUtils.moveFile(new File(tempFile), destFile);
             }
             finished();

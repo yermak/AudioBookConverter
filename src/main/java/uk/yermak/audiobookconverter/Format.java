@@ -16,6 +16,13 @@ public enum Format {
             return false;
         }
 
+        protected void setBitRateOptions(List<String> options, OutputParameters outputParameters) {
+            options.addAll(outputParameters.cbr
+                    ? List.of("-b:a", outputParameters.getBitRate() + "k")
+                    : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
+            );
+        }
+
     },
     M4A("ipod", "aac", "m4a", "alac") {
         @Override
@@ -27,48 +34,22 @@ public enum Format {
         public boolean ffmpegCompatible() {
             return false;
         }
+
+        protected void setBitRateOptions(List<String> options, OutputParameters outputParameters) {
+            options.addAll(outputParameters.cbr
+                    ? List.of("-b:a", outputParameters.getBitRate() + "k")
+                    : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
+            );
+        }
     },
 
     MP3("mp3", "libmp3lame", "mp3") {
-        @Override
-        public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
-            List<String> options = new ArrayList<>();
-            options.add(Platform.FFMPEG);
-            if (mediaInfo.getOffset() != -1) {
-                options.add("-ss");
-                options.add(toFFMpegTime(mediaInfo.getOffset()));
-            }
-            options.add("-i");
-            options.add(mediaInfo.getFileName());
-            options.add("-vn");
-            options.add("-codec:a");
-            options.add(codec);
 
-            options.add("-map_metadata");
-            options.add("-1");
-
+        protected void setBitRateOptions(List<String> options, OutputParameters outputParameters) {
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
                     : List.of("-q:a", String.valueOf(10 - outputParameters.vbrQuality * 2))
             );
-
-            options.add("-ac");
-            options.add(String.valueOf(outputParameters.getChannels()));
-            if (mediaInfo.getOffset() != -1) {
-                options.add("-t");
-                options.add(toFFMpegTime(mediaInfo.getDuration()));
-            }
-            if (outputParameters.getCutoff() != 0) {
-                options.add("-cutoff");
-                options.add(Integer.toString(outputParameters.getCutoff()));
-            }
-            options.add("-f");
-            options.add(format);
-            options.add("-progress");
-            options.add(progressUri);
-            options.add(outputFileName);
-            return options;
-
         }
 
         @Override
@@ -176,6 +157,16 @@ public enum Format {
             return false;
         }
 
+        protected void setBitRateOptions(List<String> options, OutputParameters outputParameters) {
+            if (outputParameters.cbr) {
+                options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
+                options.addAll(List.of("-vbr", "off"));
+            } else {
+                options.addAll(List.of("-b:a", outputParameters.getVbrQuality() * outputParameters.getVbrQuality() * 16 + "k"));
+                options.addAll(List.of("-vbr", "on"));
+            }
+        }
+
         @Override
         public List<String> getConcatOptions(String fileListFileName, MetadataBuilder metadataBuilder, String progressUri, String outputFileName) {
             List<String> options = new ArrayList<>();
@@ -203,50 +194,8 @@ public enum Format {
 
             return options;
 
-        }
 
-        @Override
-        public List<String> getReencodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName, OutputParameters outputParameters) {
-            List<String> options = new ArrayList<>();
-            options.add(Platform.FFMPEG);
-            if (mediaInfo.getOffset() != -1) {
-                options.add("-ss");
-                options.add(toFFMpegTime(mediaInfo.getOffset()));
-            }
-            options.add("-i");
-            options.add(mediaInfo.getFileName());
-            options.add("-vn");
-            options.add("-codec:a");
-            options.add(codec);
 
-            options.add("-map_metadata");
-            options.add("-1");
-
-            if (outputParameters.cbr) {
-                options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
-                options.addAll(List.of("-vbr", "off"));
-            } else {
-                options.addAll(List.of("-b:a", outputParameters.getVbrQuality() * outputParameters.getVbrQuality() * 16 + "k"));
-                options.addAll(List.of("-vbr", "on"));
-            }
-
-            options.add("-ac");
-            options.add(String.valueOf(outputParameters.getChannels()));
-            if (mediaInfo.getOffset() != -1) {
-                options.add("-t");
-                options.add(toFFMpegTime(mediaInfo.getDuration()));
-            }
-            if (outputParameters.getCutoff() != 0) {
-                options.add("-cutoff");
-                options.add(Integer.toString(outputParameters.getCutoff()));
-            }
-            options.add("-f");
-            options.add(format);
-
-            options.add("-progress");
-            options.add(progressUri);
-            options.add(outputFileName);
-            return options;
         }
     };
 
@@ -346,13 +295,12 @@ public enum Format {
         options.add("-map_metadata");
         options.add("-1");
 
-        options.addAll(outputParameters.cbr
-                ? List.of("-b:a", outputParameters.getBitRate() + "k")
-                : List.of("-q:a", String.valueOf(0.5 + outputParameters.vbrQuality * outputParameters.vbrQuality * 0.06))
-        );
+        setBitRateOptions(options, outputParameters);
 
         options.add("-ac");
         options.add(String.valueOf(outputParameters.getChannels()));
+        options.add("-ar");
+        options.add(String.valueOf(outputParameters.getFrequency()));
         if (mediaInfo.getOffset() != -1) {
             options.add("-t");
             options.add(toFFMpegTime(mediaInfo.getDuration()));
@@ -374,6 +322,8 @@ public enum Format {
         options.add(outputFileName);
         return options;
     }
+
+    protected abstract void setBitRateOptions(List<String> options, OutputParameters outputParameters);
 
     public List<String> getTranscodingOptions(MediaInfo mediaInfo, String progressUri, String outputFileName) {
         List<String> options = new ArrayList<>();

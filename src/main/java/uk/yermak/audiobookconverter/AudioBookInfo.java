@@ -30,7 +30,7 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("narratedby")), trimToEmpty(tags.get("composer")))),
                 new SmartStringProperty(trimToEmpty(tags.get("album"))),
                 new SmartStringProperty(trimToEmpty(tags.get("genre"))),
-                new SmartStringProperty(trimToEmpty(tags.get("year"))),
+                new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("year")), trimToEmpty(tags.get("year")))),
                 new SmartIntegerProperty(trackNumber == null ? 0 : Integer.parseInt(trackNumber)),
                 new SmartIntegerProperty(trackCount == null ? 0 : Integer.parseInt(trackCount)),
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("comment")), trimToEmpty(tags.get("comment-0")))),

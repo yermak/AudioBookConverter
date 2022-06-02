@@ -99,7 +99,7 @@ public class FFMediaLoader {
 
                 for (int i = 0; i < streams.size(); i++) {
                     FFmpegStream ffMpegStream = streams.get(i);
-                    if (AUDIO_CODECS.contains(ffMpegStream.codec_name)) {
+                    if (AUDIO_CODECS.contains(ffMpegStream.codec_name) || ffMpegStream.codec_name.startsWith("pcm")) {
                         logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                         mediaInfo.setCodec(ffMpegStream.codec_name);
                         mediaInfo.setChannels(ffMpegStream.channels);

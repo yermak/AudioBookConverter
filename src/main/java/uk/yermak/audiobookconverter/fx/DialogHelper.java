@@ -24,8 +24,9 @@ public class DialogHelper {
     public static final String FLAC = "flac";
     public static final String AAC = "aac";
     public static final String OGG = "ogg";
+    public static final String WAV = "wav";
 
-    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC};
+    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC, WAV};
 
 
     static String selectOutputFile(AudioBookInfo audioBookInfo) {

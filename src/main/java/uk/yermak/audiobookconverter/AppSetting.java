@@ -40,6 +40,7 @@ public class AppSetting {
     public static final String PRESET_FORCE = "force";
     public static final String PRESET_SPLIT_CHAPTERS = "split_chapters";
     public static final String DARK_MODE = "dark_mode";
+    public static final String CHAPTER_CONTEXT = "chapter_context";
     public static final String PART_FORMAT = "part_format";
     public static final String PART_FORMAT_DEFAULT = "<if(WRITER)><WRITER> <endif>" +
             "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +

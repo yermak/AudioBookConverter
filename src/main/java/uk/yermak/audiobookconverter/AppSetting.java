@@ -39,6 +39,7 @@ public class AppSetting {
     public static final String PRESET_SPEED = "speed";
     public static final String PRESET_FORCE = "force";
     public static final String PRESET_SPLIT_CHAPTERS = "split_chapters";
+    public static final String DARK_MODE = "dark_mode";
     private static Map<String, String> cache = new ConcurrentHashMap<>();
 
     public static final String VERSION = "version";

@@ -57,7 +57,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
 
     @FXML
     public void initialize() {
-        darkMode.setSelected(Boolean.parseBoolean(AppSetting.getProperty(AppSetting.DARK_MODE)));
+        darkMode.setSelected(Boolean.parseBoolean(AppSetting.getProperty(AppSetting.DARK_MODE, Boolean.FALSE.toString())));
     }
 
 }

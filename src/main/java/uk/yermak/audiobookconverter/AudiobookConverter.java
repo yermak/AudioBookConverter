@@ -87,9 +87,19 @@ public class AudiobookConverter extends Application {
             Screen primary = Screen.getPrimary();
 //            stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);
 //            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
-            stage.show();
             env = new JfxEnv(scene, getHostServices());
 
+
+            String property = AppSetting.getProperty(AppSetting.DARK_MODE);
+            if (StringUtils.isBlank(property)) {
+                AppSetting.setProperty(AppSetting.DARK_MODE, "false");
+            } else {
+                boolean dark = Boolean.parseBoolean(property);
+                if (dark) {
+                    env.setDarkMode(dark);
+                }
+            }
+            stage.show();
 
             stage.setOnCloseRequest(event -> {
                 logger.info("Closing application");

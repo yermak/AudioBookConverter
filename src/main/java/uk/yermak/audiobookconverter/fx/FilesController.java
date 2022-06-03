@@ -72,7 +72,6 @@ public class FilesController {
     private Button startButton;
 
 
-
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
@@ -151,7 +150,7 @@ public class FilesController {
 
         control.setOnDragDropped(event -> {
             List<File> files = event.getDragboard().getFiles();
-            if (files!=null && !files.isEmpty()) {
+            if (files != null && !files.isEmpty()) {
                 List<String> fileNames = DialogHelper.collectFiles(files);
                 processFiles(fileNames);
                 event.setDropCompleted(true);
@@ -253,7 +252,7 @@ public class FilesController {
         }
     }
 
-    public void editChapter(ActionEvent event){
+    public void editChapter(ActionEvent event) {
         if (chaptersMode.get()) {
             bookStructure.editChapter(event);
         }
@@ -431,5 +430,20 @@ public class FilesController {
                 progressQueue.getItems().remove(done);
             }
         });
+    }
+
+    public void settings(ActionEvent actionEvent) {
+        SettingsDialog dialog = new SettingsDialog(AudiobookConverter.getEnv().getWindow());
+
+        Optional<Map<String, Object>> result = dialog.showAndWait();
+        result.ifPresent(r -> {
+            Boolean darkMode = (Boolean) r.get(AppSetting.DARK_MODE);
+            AppSetting.setProperty(AppSetting.DARK_MODE, darkMode.toString());
+            AudiobookConverter.getEnv().setDarkMode(darkMode);
+        });
+    }
+
+    public void openIssues(ActionEvent actionEvent) {
+        AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
     }
 }

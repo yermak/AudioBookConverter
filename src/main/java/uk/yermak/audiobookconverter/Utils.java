@@ -45,17 +45,7 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        String chapterFormat = AppSetting.getProperty("chapter_format");
-        if (chapterFormat == null) {
-            chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
-                    "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
-                    "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
-                    "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER; format=\"%,03d\"> <endif>" +
-                    "<if(TAG)><TAG> <endif>" +
-                    "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
-                    "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
-            AppSetting.setProperty("chapter_format", chapterFormat);
-        }
+        String chapterFormat = AppSetting.getProperty(AppSetting.CHAPTER_FORMAT, AppSetting.CHAPTER_FORMAT_DEFAULT);
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
         g.registerRenderer(Duration.class, new DurationRender());
@@ -73,11 +63,7 @@ public class Utils {
 
 
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        String filenameFormat = AppSetting.getProperty("filename_format");
-        if (filenameFormat == null) {
-            filenameFormat = "<WRITER> <if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>] <endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
-            AppSetting.setProperty("filename_format", filenameFormat);
-        }
+        String filenameFormat = AppSetting.getProperty(AppSetting.FILENAME_FORMAT, AppSetting.FILENAME_FORMAT_DEFAULT);
 
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
@@ -146,21 +132,10 @@ public class Utils {
     }
 
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
-        String partFormat = AppSetting.getProperty("part_format");
-        if (partFormat == null) {
-            partFormat = "<if(WRITER)><WRITER> <endif>" +
-                    "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +
-                    "<if(TITLE)><TITLE><endif>" +
-                    "<if(NARRATOR)> (<NARRATOR>)<endif>" +
-                    "<if(YEAR)>-<YEAR><endif>" +
-                    "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
-            AppSetting.setProperty("part_format", partFormat);
-        }
-
+        String partFormat = AppSetting.getProperty(AppSetting.PART_FORMAT, AppSetting.PART_FORMAT_DEFAULT);
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
         ST partTemplate = new ST(g, partFormat);
-
 
         context.forEach((key, value) -> partTemplate.add(key, value.apply(part)));
 

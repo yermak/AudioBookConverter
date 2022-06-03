@@ -40,6 +40,23 @@ public class AppSetting {
     public static final String PRESET_FORCE = "force";
     public static final String PRESET_SPLIT_CHAPTERS = "split_chapters";
     public static final String DARK_MODE = "dark_mode";
+    public static final String PART_FORMAT = "part_format";
+    public static final String PART_FORMAT_DEFAULT = "<if(WRITER)><WRITER> <endif>" +
+            "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +
+            "<if(TITLE)><TITLE><endif>" +
+            "<if(NARRATOR)> (<NARRATOR>)<endif>" +
+            "<if(YEAR)>-<YEAR><endif>" +
+            "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
+    public static final String CHAPTER_FORMAT = "chapter_format";
+    public static final String CHAPTER_FORMAT_DEFAULT = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
+            "<if(BOOK_TITLE)><BOOK_TITLE>. <endif>" +
+            "<if(CHAPTER_TEXT)><CHAPTER_TEXT> <endif>" +
+            "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER; format=\"%,03d\"> <endif>" +
+            "<if(TAG)><TAG> <endif>" +
+            "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
+            "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
+    public static final String FILENAME_FORMAT = "filename_format";
+    public static final String FILENAME_FORMAT_DEFAULT = "<WRITER><if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>]<endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
     private static Map<String, String> cache = new ConcurrentHashMap<>();
 
     public static final String VERSION = "version";
@@ -54,7 +71,7 @@ public class AppSetting {
 
     }
 
-    public static synchronized String getProperty(String key) {
+    public static synchronized String getProperty(String key, String defaultValue) {
         String result = cache.get(key);
         if (result != null) return result;
         logger.debug("Settings cache is missed for property: " + key);
@@ -68,9 +85,20 @@ public class AppSetting {
                     return null;
                 }
             });
-            if (result != null) {
-                cache.put(key, result);
+
+        }
+        if (result != null) {
+            cache.put(key, result);
+        } else if (defaultValue != null) {
+            try (jetbrains.exodus.env.Environment env = Environments.newInstance(APP_DIR.getPath())) {
+                env.executeInTransaction(txn -> {
+                    final Store store = env.openStore(SETTINGS, StoreConfig.WITHOUT_DUPLICATES, txn);
+                    store.put(txn, StringBinding.stringToEntry(key), StringBinding.stringToEntry(defaultValue));
+                });
             }
+            result = defaultValue;
+            cache.put(key, result);
+
         }
         return result;
     }

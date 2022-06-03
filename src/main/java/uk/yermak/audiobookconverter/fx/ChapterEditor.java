@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.AppSetting;
 import uk.yermak.audiobookconverter.Chapter;
 import uk.yermak.audiobookconverter.Utils;
 
@@ -176,6 +177,8 @@ class ChapterEditor {
 
         CheckBox applyForAllChapters = new CheckBox("Apply for all chapters");
         grid.add(applyForAllChapters, 0, 2);
+        CheckBox saveAsDefault = new CheckBox("Apply and save as default for all books");
+        grid.add(saveAsDefault, 0, 3);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -183,24 +186,31 @@ class ChapterEditor {
 
         Optional result = dialog.showAndWait();
 
-        if (result.isPresent() && result.get() == ButtonType.OK){
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             chapter.getRenderMap().clear();
             chapter.getRenderMap().putAll(context);
             if (StringUtils.isNotEmpty(customTitle.getText())) {
                 chapter.setCustomTitle(customTitle.getText());
                 chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
             }
-            if (applyForAllChapters.isSelected()) {
-                List<Chapter> chapters = chapter.getPart().getBook().getChapters();
-                for (Chapter c : chapters) {
-                    c.getRenderMap().clear();
-                    c.getRenderMap().putAll(context);
-                    if (StringUtils.isNotEmpty(customTitle.getText())) {
-                        c.setCustomTitle(customTitle.getText());
-                        c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-                    }
+            if (applyForAllChapters.isSelected() || saveAsDefault.isSelected()) {
+                applyForAllChapters(context, customTitle);
+            }
+            if (saveAsDefault.isSelected()) {
+                String defaultChapterContext = String.join(":", context.keySet());
+                AppSetting.setProperty(AppSetting.CHAPTER_CONTEXT, defaultChapterContext);
+            }
+        }
+    }
 
-                }
+    private void applyForAllChapters(Map<String, Function<Chapter, Object>> context, TextField customTitle) {
+        List<Chapter> chapters = chapter.getPart().getBook().getChapters();
+        for (Chapter c : chapters) {
+            c.getRenderMap().clear();
+            c.getRenderMap().putAll(context);
+            if (StringUtils.isNotEmpty(customTitle.getText())) {
+                c.setCustomTitle(customTitle.getText());
+                c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
             }
         }
     }

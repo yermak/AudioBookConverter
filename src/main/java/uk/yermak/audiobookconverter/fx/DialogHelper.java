@@ -33,7 +33,7 @@ public class DialogHelper {
         JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
-        String outputFolder = AppSetting.getProperty("output.folder");
+        String outputFolder = AppSetting.getProperty("output.folder", System.getProperty("user.home"));
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
@@ -50,7 +50,7 @@ public class DialogHelper {
     public static List<String> selectFilesDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder");
+        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
@@ -74,7 +74,7 @@ public class DialogHelper {
     public static List<String> selectFolderDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder");
+        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
         directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");

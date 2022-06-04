@@ -153,7 +153,11 @@ class ChapterEditor {
 
         TextField customTitle = new TextField();
         customTitle.setPromptText("custom title");
-        customTitle.setText(chapter.getCustomTitle());
+//        if (StringUtils.isNotEmpty(chapter.getCustomTitle())) {
+            customTitle.setText(chapter.getCustomTitle());
+//        } else if (context.containsKey("CUSTOM_TITLE")) {
+//            customTitle.setText(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
+//        }
         customTitle.textProperty().addListener((observable, oldValue, newValue) -> {
             chapter.setCustomTitle(newValue);
             context.put("CUSTOM_TITLE", c -> newValue);
@@ -199,6 +203,9 @@ class ChapterEditor {
             if (saveAsDefault.isSelected()) {
                 String defaultChapterContext = String.join(":", context.keySet());
                 AppSetting.setProperty(AppSetting.CHAPTER_CONTEXT, defaultChapterContext);
+                if (StringUtils.isNotEmpty(customTitle.getText())) {
+                    AppSetting.setProperty(AppSetting.CHAPTER_CUSTOM_TITLE, customTitle.getText());
+                }
             }
         }
     }

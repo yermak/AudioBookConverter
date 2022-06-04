@@ -68,6 +68,10 @@ public class Chapter implements Organisable, Convertable {
         if (context.contains("TAG.8")) {
             renderMap.put("TAG.8", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
         }
+        if (context.contains("CUSTOM_TITLE")) {
+            this.setCustomTitle(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
+            renderMap.put("CUSTOM_TITLE", chapter -> customTitle);
+        }
     }
 
     public void replaceMediaWithTracks(MediaInfo mediaInfo, List<Track> tracks) {

@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 public class AppSetting {
+    public static final String CHAPTER_CUSTOM_TITLE = "CHAPTER_CUSTOM_TITLE";
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final File APP_DIR = new File(System.getProperty("APP_HOME"));
     public static final String PRESET_ENTITY = "Preset";

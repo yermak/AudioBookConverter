@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
@@ -121,7 +122,7 @@ public enum Format {
         }
     },
     OGG("ogg", "libopus", "ogg", "vorbis") {
-        private static Map<Integer, Integer> vbrMap = Map.of(1, 8, 2, 16, 3, 32, 4, 64, 5, 128);
+        private static Map<Integer, Integer> vbrMap = ImmutableMap.of(1, 8, 2, 16, 3, 32, 4, 64, 5, 128);
 
         @Override
         public List<Integer> cutoffs() {

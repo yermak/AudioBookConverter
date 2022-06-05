@@ -66,10 +66,10 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         return mediaInfo.getBookInfo();
     }
 
-    @Override
-    public ArtWork getArtWork() {
-        return mediaInfo.getArtWork();
-    }
+//    @Override
+//    public ArtWork getArtWork() {
+//        return mediaInfo.getArtWork();
+//    }
 
     @Override
     public String getCodec() {

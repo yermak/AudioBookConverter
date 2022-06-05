@@ -12,7 +12,7 @@ public interface MediaInfo extends Organisable {
 
     AudioBookInfo getBookInfo();
 
-    ArtWork getArtWork();
+//    ArtWork getArtWork();
 
     String getCodec();
 

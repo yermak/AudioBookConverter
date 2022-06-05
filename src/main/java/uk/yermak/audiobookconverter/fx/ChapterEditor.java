@@ -154,13 +154,17 @@ class ChapterEditor {
         TextField customTitle = new TextField();
         customTitle.setPromptText("custom title");
 //        if (StringUtils.isNotEmpty(chapter.getCustomTitle())) {
-            customTitle.setText(chapter.getCustomTitle());
+        customTitle.setText(chapter.getCustomTitle());
 //        } else if (context.containsKey("CUSTOM_TITLE")) {
 //            customTitle.setText(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
 //        }
         customTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-            chapter.setCustomTitle(newValue);
-            context.put("CUSTOM_TITLE", c -> newValue);
+//            chapter.setCustomTitle(newValue);
+            if (StringUtils.trimToNull(newValue) != null) {
+                context.put("CUSTOM_TITLE", c -> newValue);
+            } else{
+                context.remove("CUSTOM_TITLE");
+            }
             Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
         });
         customisationBox.getChildren().add(customTitle);
@@ -193,8 +197,8 @@ class ChapterEditor {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             chapter.getRenderMap().clear();
             chapter.getRenderMap().putAll(context);
+            chapter.setCustomTitle(StringUtils.trimToEmpty(customTitle.getText()));
             if (StringUtils.isNotEmpty(customTitle.getText())) {
-                chapter.setCustomTitle(customTitle.getText());
                 chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
             }
             if (applyForAllChapters.isSelected() || saveAsDefault.isSelected()) {
@@ -203,9 +207,7 @@ class ChapterEditor {
             if (saveAsDefault.isSelected()) {
                 String defaultChapterContext = String.join(":", context.keySet());
                 AppSetting.setProperty(AppSetting.CHAPTER_CONTEXT, defaultChapterContext);
-                if (StringUtils.isNotEmpty(customTitle.getText())) {
-                    AppSetting.setProperty(AppSetting.CHAPTER_CUSTOM_TITLE, customTitle.getText());
-                }
+                AppSetting.setProperty(AppSetting.CHAPTER_CUSTOM_TITLE, StringUtils.trimToNull(customTitle.getText()));
             }
         }
     }
@@ -216,9 +218,9 @@ class ChapterEditor {
             c.getRenderMap().clear();
             c.getRenderMap().putAll(context);
             if (StringUtils.isNotEmpty(customTitle.getText())) {
-                c.setCustomTitle(customTitle.getText());
                 c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
             }
+            c.setCustomTitle(customTitle.getText());
         }
     }
 }

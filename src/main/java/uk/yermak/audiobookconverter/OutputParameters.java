@@ -4,6 +4,7 @@ package uk.yermak.audiobookconverter;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class OutputParameters {
     }
 
     public OutputParameters(OutputParameters parameters) {
-        this(parameters. getFormat(),
+        this(parameters.getFormat(),
                 parameters.getBitRate(),
                 parameters.getFrequency(),
                 parameters.getChannels(),
@@ -72,7 +73,7 @@ public class OutputParameters {
     }
 
     public void setBitRate(final Integer bitRate) {
-        this.bitRate = bitRate;
+        this.bitRate = findNearestMatch(bitRate, format.bitrates(), format.defaultBitrate());
     }
 
     public Integer getFrequency() {
@@ -80,7 +81,16 @@ public class OutputParameters {
     }
 
     public void setFrequency(final Integer frequency) {
-        this.frequency = frequency;
+        this.frequency = findNearestMatch(frequency, format.frequencies(), format.defaultFrequency());
+    }
+
+    private static Integer findNearestMatch(int value, List<Integer> list, int defaultValue) {
+        //TODO: replace with binary search
+        for (Integer integer : list) {
+            if (integer >= value)
+                return integer;
+        }
+        return defaultValue;
     }
 
     public Integer getChannels() {
@@ -88,7 +98,7 @@ public class OutputParameters {
     }
 
     public void setChannels(final Integer channels) {
-        this.channels = channels;
+        this.channels = findNearestMatch(channels, format.channels(), format.defaultChannel());
     }
 
     public Integer getVbrQuality() {
@@ -96,7 +106,7 @@ public class OutputParameters {
     }
 
     public void setVbrQuality(final Integer vbrQuality) {
-        this.vbrQuality = vbrQuality;
+        this.vbrQuality = findNearestMatch(vbrQuality, format.vbrQualities(), format.defaultVbrQuality());
     }
 
     public Boolean isCbr() {

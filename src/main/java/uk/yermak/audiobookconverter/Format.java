@@ -44,7 +44,6 @@ public enum Format {
     },
 
     MP3("mp3", "libmp3lame", "mp3") {
-
         protected void setBitRateOptions(List<String> options, OutputParameters outputParameters) {
             options.addAll(outputParameters.cbr
                     ? List.of("-b:a", outputParameters.getBitRate() + "k")
@@ -122,6 +121,8 @@ public enum Format {
         }
     },
     OGG("ogg", "libopus", "ogg", "vorbis") {
+        private static Map<Integer, Integer> vbrMap = Map.of(1, 8, 2, 16, 3, 32, 4, 64, 5, 128);
+
         @Override
         public List<Integer> cutoffs() {
             return List.of(4000, 6000, 8000, 12000, 20000);
@@ -162,9 +163,11 @@ public enum Format {
                 options.addAll(List.of("-b:a", outputParameters.getBitRate() + "k"));
                 options.addAll(List.of("-vbr", "off"));
             } else {
-                options.addAll(List.of("-b:a", outputParameters.getVbrQuality() * outputParameters.getVbrQuality() * 16 + "k"));
+                options.addAll(List.of("-b:a", vbrMap.get(outputParameters.getVbrQuality()) * outputParameters.getChannels() + "k"));
                 options.addAll(List.of("-vbr", "on"));
             }
+//            options.add("-frame_duration");
+//            options.add("60");
         }
 
         @Override
@@ -193,7 +196,6 @@ public enum Format {
             options.add(outputFileName);
 
             return options;
-
 
 
         }

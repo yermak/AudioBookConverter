@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.fx.util.SmartIntegerProperty;
 import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 
@@ -21,7 +22,7 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
 
 
     public static AudioBookInfo instance(Map<String, String> tags) {
-        String trackNumber = tags.get("track number");
+        String trackNumber = firstNonBlank(trimToEmpty(tags.get("track number")), trimToEmpty(tags.get("track")));
         String trackCount = tags.get("track count");
 
         return new AudioBookInfo(
@@ -30,7 +31,7 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("narratedby")), trimToEmpty(tags.get("composer")))),
                 new SmartStringProperty(trimToEmpty(tags.get("album"))),
                 new SmartStringProperty(trimToEmpty(tags.get("genre"))),
-                new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("year")), trimToEmpty(tags.get("year")))),
+                new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("year")), StringUtils.substring(trimToEmpty(tags.get("date")),0, 4))),
                 new SmartIntegerProperty(trackNumber == null ? 0 : Integer.parseInt(trackNumber)),
                 new SmartIntegerProperty(trackCount == null ? 0 : Integer.parseInt(trackCount)),
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("comment")), trimToEmpty(tags.get("comment-0")))),

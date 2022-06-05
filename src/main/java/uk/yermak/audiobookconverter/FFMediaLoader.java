@@ -71,6 +71,8 @@ public class FFMediaLoader {
 
         private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
         private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
+        private static final Set<String> MP4_FILES = ImmutableSet.of("m4b", "m4a", "mp4");
+
         private final String filename;
         private final ConversionGroup conversionGroup;
         private final FFprobe ffprobe;
@@ -109,12 +111,21 @@ public class FFMediaLoader {
                         streamTags = ffMpegStream.tags;
                     } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
-
-
                         if (!conversionGroup.isDetached()) {
                             Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 1, TimeUnit.SECONDS);
                             ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                            mediaInfo.setArtWork(artWork);
+                            mediaInfo.addArtWork(artWork);
+                        }
+                    } else if (ffMpegStream.codec_name.equals("bin_data") && MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
+                        if (!conversionGroup.isDetached()) {
+                            List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
+                            for (int j = 0; j < imageFormats.size(); j++) {
+                                String imageType = imageFormats.get(j);
+//                                ArtWork artWork = new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j).call();
+                                Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1, TimeUnit.SECONDS);
+                                ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
+                                mediaInfo.addArtWork(artWork);
+                            }
                         }
                     }
                 }

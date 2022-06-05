@@ -75,9 +75,9 @@ public class MediaInfoProxy implements MediaInfo {
         return this.getMediaInfo().getBookInfo();
     }
 
-    public ArtWork getArtWork() {
-        return this.getMediaInfo().getArtWork();
-    }
+//    public ArtWork getArtWork() {
+//        return this.getMediaInfo().getArtWork();
+//    }
 
     public String toString() {
         return this.filename;

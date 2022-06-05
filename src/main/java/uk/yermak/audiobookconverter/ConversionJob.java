@@ -54,8 +54,6 @@ public class ConversionJob implements Runnable {
         String tempFile = Utils.getTmp(conversionGroup.getJobId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         try {
-//            conversion.getOutputParameters().updateAuto(conversion.getMedia());
-
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {

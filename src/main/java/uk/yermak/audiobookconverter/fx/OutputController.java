@@ -120,18 +120,6 @@ public class OutputController {
             }
         });
 
-      /*  AudiobookConverter.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
-            outputFormatBox.setValue(newParams.getFormat());
-            if (!oldParams.getFormat().equals(newParams.getFormat())) {
-                refreshFrequencies();
-                refreshBitrates();
-                refreshChannels();
-                refreshCutoffs();
-                refreshVbrQuality();
-                refreshCBR();
-            }
-        });*/
-
         refreshFrequencies();
         refreshBitrates();
         refreshChannels();
@@ -196,17 +184,6 @@ public class OutputController {
                 newBook.addListener(observable -> updateParameters(newBook.getMedia()));
             }
         });
-
-/*
-        AudiobookConverter.getContext().addOutputParametersChangeListener((observableValue, oldParams, newParams) -> {
-            Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-            bitRateBox.setValue(String.valueOf(findNearestMatch(newParams.getBitRate(), format.bitrates(), format.defaultBitrate())));
-            frequencyBox.setValue(String.valueOf(findNearestMatch(newParams.getFrequency(), format.frequencies(), format.defaultFrequency())));
-            channelsBox.setValue(String.valueOf(findNearestMatch(newParams.getChannels(), format.channels(), format.defaultChannel())));
-            vbrQuality.setValue(findNearestMatch(newParams.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
-            cutoff.setValue(String.valueOf(findNearestMatch(newParams.getCutoff(), format.cutoffs(), format.defaultCutoff())));
-        });
-*/
     }
 
     private void refreshCBR() {
@@ -276,21 +253,18 @@ public class OutputController {
             OutputParameters params = AudiobookConverter.getContext().getOutputParameters();
             if (book != null) {
                 params.updateAuto(book.getMedia());
-//                book.addListener(observable -> updateParameters(book.getMedia()));
             } else {
                 params.updateAuto(media);
             }
             Platform.runLater(() -> {
                 Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-                frequencyBox.setValue(String.valueOf(findNearestMatch(params.getFrequency(), format.frequencies(), format.defaultFrequency())));
-                bitRateBox.setValue(String.valueOf(findNearestMatch(params.getBitRate(), format.bitrates(), format.defaultBitrate())));
-                channelsBox.setValue(String.valueOf(findNearestMatch(params.getChannels(), format.channels(), format.defaultChannel())));
+                frequencyBox.getSelectionModel().select(String.valueOf(params.getFrequency()));
+                bitRateBox.getSelectionModel().select(String.valueOf(params.getBitRate()));
+                channelsBox.getSelectionModel().select(String.valueOf(params.getChannels()));
+                vbrQuality.setValue(params.getVbrQuality());
                 vbrQuality.setValue(findNearestMatch(params.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
             });
-
         });
-
-
     }
 
     private static Integer findNearestMatch(int value, List<Integer> list, int defaultValue) {

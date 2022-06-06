@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.io.FilenameUtils;
 
 import java.time.Duration;
 import java.util.*;
@@ -20,9 +21,57 @@ public class Chapter implements Organisable, Convertable {
         this.media.addListener(part.getBook());
         media.forEach(mediaInfo -> mediaInfo.setChapter(this));
         this.media.addAll(media);
-        renderMap.put("CHAPTER_NUMBER", Chapter::getNumber);
-        renderMap.put("CHAPTER_TEXT", c -> "Chapter");
-        renderMap.put("DURATION", c->Duration.ofMillis(c.getDuration()));
+        initRenderMap();
+    }
+
+    private void initRenderMap() {
+        String[] contextArray = AppSetting.getProperty(AppSetting.CHAPTER_CONTEXT, "CHAPTER_NUMBER:CHAPTER_TEXT:DURATION").split(":");
+
+        Set<String> context = new HashSet<>(Arrays.asList(contextArray));
+
+        if (context.contains("CHAPTER_NUMBER")) {
+            renderMap.put("CHAPTER_NUMBER", Chapter::getNumber);
+        }
+        if (context.contains("CHAPTER_TEXT")) {
+            renderMap.put("CHAPTER_TEXT", c -> "Chapter");
+        }
+        if (context.contains("DURATION")) {
+            renderMap.put("DURATION", c -> Duration.ofMillis(c.getDuration()));
+        }
+        if (context.contains("BOOK_NUMBER")) {
+            renderMap.put("BOOK_NUMBER", c -> String.valueOf(c.getPart().getBook().getBookInfo().bookNumber()));
+        }
+        if (context.contains("BOOK_TITLE")) {
+            renderMap.put("BOOK_TITLE", c -> c.getPart().getBook().getBookInfo().title());
+        }
+        if (context.contains("TAG.1")) {
+            renderMap.put("TAG.1", chapter -> chapter.getMedia().get(0).getBookInfo().title());
+        }
+        if (context.contains("TAG.2")) {
+            renderMap.put("TAG.2", chapter -> chapter.getMedia().get(0).getBookInfo().writer());
+        }
+        if (context.contains("TAG.3")) {
+            renderMap.put("TAG.3", chapter -> chapter.getMedia().get(0).getBookInfo().narrator());
+        }
+        if (context.contains("TAG.4")) {
+            renderMap.put("TAG.4", chapter -> chapter.getMedia().get(0).getBookInfo().series());
+        }
+        if (context.contains("TAG.5")) {
+            renderMap.put("TAG.5", chapter -> chapter.getMedia().get(0).getBookInfo().genre());
+        }
+        if (context.contains("TAG.6")) {
+            renderMap.put("TAG.6", chapter -> chapter.getMedia().get(0).getBookInfo().year());
+        }
+        if (context.contains("TAG.7")) {
+            renderMap.put("TAG.7", chapter -> chapter.getMedia().get(0).getBookInfo().comment());
+        }
+        if (context.contains("TAG.8")) {
+            renderMap.put("TAG.8", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
+        }
+        if (context.contains("CUSTOM_TITLE")) {
+            this.setCustomTitle(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
+            renderMap.put("CUSTOM_TITLE", chapter -> customTitle);
+        }
     }
 
     public void replaceMediaWithTracks(MediaInfo mediaInfo, List<Track> tracks) {

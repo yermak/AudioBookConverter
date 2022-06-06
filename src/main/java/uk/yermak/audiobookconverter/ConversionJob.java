@@ -54,8 +54,6 @@ public class ConversionJob implements Runnable {
         String tempFile = Utils.getTmp(conversionGroup.getJobId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         try {
-//            conversion.getOutputParameters().updateAuto(conversion.getMedia());
-
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
@@ -95,6 +93,7 @@ public class ConversionJob implements Runnable {
                     FileUtils.deleteQuietly(new File(tempFile));
                 }
             } else {
+                if (destFile.exists()) FileUtils.deleteQuietly(destFile);
                 FileUtils.moveFile(new File(tempFile), destFile);
             }
             finished();

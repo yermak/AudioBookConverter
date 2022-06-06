@@ -67,10 +67,15 @@ public class MP4v2ArtWorkChecker {
                 int imageId = Integer.parseInt(StringUtils.trimToEmpty(columns[0]));
                 if (i - 2 == imageId) {
                     String fileType = StringUtils.trimToEmpty(columns[3]);
-                    if ("implicit".equals(fileType)) {
-                        result.add("dat");
-                    } else {
-                        result.add(fileType);
+                    switch (fileType) {
+                        case "implicit":
+                            result.add("dat");
+                            break;
+                        case "jpeg":
+                            result.add("jpg");
+                            break;
+                        default:
+                            result.add(fileType);
                     }
                 } else {
                     logger.error("Unexpected result parsing mp4art output for line :" + (i - 2) + ", received image number: " + imageId);

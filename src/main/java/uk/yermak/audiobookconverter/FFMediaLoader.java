@@ -109,10 +109,10 @@ public class FFMediaLoader {
                         mediaInfo.setBitrate((int) ffMpegStream.bit_rate);
                         mediaInfo.setDuration(Math.round(ffMpegStream.duration * 1000));
                         streamTags = ffMpegStream.tags;
-                    } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name)) {
+                    } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name) && !MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
                         logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                         if (!conversionGroup.isDetached()) {
-                            Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 1, TimeUnit.SECONDS);
+                            Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 100, TimeUnit.MILLISECONDS);
                             ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                             mediaInfo.addArtWork(artWork);
                         }
@@ -122,7 +122,7 @@ public class FFMediaLoader {
                             for (int j = 0; j < imageFormats.size(); j++) {
                                 String imageType = imageFormats.get(j);
 //                                ArtWork artWork = new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j).call();
-                                Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1, TimeUnit.SECONDS);
+                                Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
                                 ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                                 mediaInfo.addArtWork(artWork);
                             }

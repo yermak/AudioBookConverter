@@ -1,14 +1,19 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.scene.image.Image;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 class FFmpegArtWorkExtractor implements Callable<ArtWork> {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MediaInfoBean mediaInfo;
     private final String format;
@@ -25,10 +30,11 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
     @Override
     public ArtWork call() throws Exception {
         Process process = null;
+        String poster = null;
         try {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
-            String poster = Utils.getTmp(mediaInfo.getUID(), stream, format);
+            poster = Utils.getTmp(mediaInfo.getUID(), stream, format);
             ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Platform.FFMPEG,
                     "-i", mediaInfo.getFileName(),
                     "-map", "0:" + stream,
@@ -57,6 +63,9 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
                 }
             });
             return artWorkBean;
+        } catch (Exception e) {
+            logger.error("Error in extracting image with FFMpeg:", e);
+            throw new RuntimeException(e);
         } finally {
             Utils.closeSilently(process);
         }

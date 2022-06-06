@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import javafx.scene.image.Image;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +31,12 @@ class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
     @Override
     public ArtWork call() throws Exception {
         Process process = null;
+        File poster = null;
         try {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
-            File poster = new File(new File(mediaInfo.getFileName()).getParentFile(),
+            poster = new File(new File(mediaInfo.getFileName()).getParentFile(),
                     FilenameUtils.getBaseName(mediaInfo.getFileName()) + ".art[" + index + "]." + format);
-            poster.deleteOnExit();
-
             ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Platform.MP4ART,
                     "--art-index", String.valueOf(index),
                     "--extract", "-o",
@@ -56,16 +56,18 @@ class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
             FFMediaLoader.logger.debug("ArtWork Out: {}", out);
             FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
-
             ArtWork artWorkBean = new ArtWorkImage(new Image(new FileInputStream(poster)));
             javafx.application.Platform.runLater(() -> {
                 if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
                     AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
                 }
             });
-            poster.delete();
             return artWorkBean;
+        } catch (Exception e) {
+            logger.error("Error in extracting image with MP4Art:", e);
+            throw new RuntimeException(e);
         } finally {
+            FileUtils.deleteQuietly(poster);
             Utils.closeSilently(process);
         }
     }

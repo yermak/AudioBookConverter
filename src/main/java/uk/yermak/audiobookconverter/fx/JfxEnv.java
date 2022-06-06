@@ -23,6 +23,14 @@ public class JfxEnv {
         this.hostServices = hostServices;
     }
 
+    public void setDarkMode(Boolean darkMode) {
+        if (darkMode) {
+            this.scene.getRoot().setStyle("-fx-base: rgba(60, 60, 60, 255);");
+        } else {
+            this.scene.getRoot().setStyle("");
+        }
+    }
+
     public Window getWindow() {
         return scene.getWindow();
     }

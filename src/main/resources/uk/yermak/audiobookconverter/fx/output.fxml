@@ -70,7 +70,7 @@
         <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
 
 
-        <Label text="Cut-off frequencies higher then" GridPane.columnIndex="3" GridPane.rowIndex="2"
+        <Label text="Cut-off frequencies higher than" GridPane.columnIndex="3" GridPane.rowIndex="2"
                GridPane.halignment="LEFT"/>
         <ComboBox fx:id="cutoff" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
 

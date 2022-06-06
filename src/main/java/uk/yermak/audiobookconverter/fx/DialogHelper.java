@@ -24,15 +24,16 @@ public class DialogHelper {
     public static final String FLAC = "flac";
     public static final String AAC = "aac";
     public static final String OGG = "ogg";
+    public static final String WAV = "wav";
 
-    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC};
+    private final static String[] FILE_EXTENSIONS = {MP3, M4A, M4B, WMA, FLAC, OGG, AAC, WAV};
 
 
     static String selectOutputFile(AudioBookInfo audioBookInfo) {
         JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
-        String outputFolder = AppSetting.getProperty("output.folder");
+        String outputFolder = AppSetting.getProperty("output.folder", System.getProperty("user.home"));
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
@@ -49,7 +50,7 @@ public class DialogHelper {
     public static List<String> selectFilesDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder");
+        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
@@ -73,7 +74,7 @@ public class DialogHelper {
     public static List<String> selectFolderDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder");
+        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
         directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");

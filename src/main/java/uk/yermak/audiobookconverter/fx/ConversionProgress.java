@@ -108,7 +108,7 @@ public class ConversionProgress implements Runnable {
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             this.progress.set(progress);
             this.remaining.set(remainingTime);
-            this.size.set((int) (estimatedSize / progress));
+            this.size.set((long) (estimatedSize / progress));
         }
     }
 

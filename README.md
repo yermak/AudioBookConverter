@@ -25,6 +25,7 @@ Supported source formats:
 * wma
 * m4a/m4b
 * aac
+* wav
 
 -----
 Supported output (codec) formats:

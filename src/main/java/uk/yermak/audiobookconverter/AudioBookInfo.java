@@ -3,9 +3,12 @@ package uk.yermak.audiobookconverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.util.SmartIntegerProperty;
 import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,18 +23,41 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
                             SmartStringProperty comment,
                             ObservableList<Track> tracks) {
 
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 
     public static AudioBookInfo instance(Map<String, String> tags) {
-        int trackNumber = tags.get("track number") == null ? 0 : Integer.parseInt(tags.get("track number"));
-        int trackCount = tags.get("track count") == null ? 0 : Integer.parseInt(tags.get("track count"));
+        int trackNumber = 0;
+        int trackCount = 0;
+        try {
+            trackNumber = tags.get("track number") == null ? 0 : Integer.parseInt(tags.get("track number"));
+            trackCount = tags.get("track count") == null ? 0 : Integer.parseInt(tags.get("track count"));
 
-        String track = tags.get("track");
-        if (StringUtils.isNotEmpty(track)) {
-            String[] split = StringUtils.split(track, "/");
-            trackNumber = Integer.parseInt(split[0]);
-            if (split.length > 1) {
-                trackCount = Integer.parseInt(split[1]);
+            String track = tags.get("track");
+
+            if (StringUtils.isNotBlank(track)) {
+                String[] split = track.split("/");
+
+                if (split.length > 0 && StringUtils.isNumeric(split[0])) {
+                    trackNumber = Integer.parseInt(split[0]);
+                }
+                if (split.length > 1 && StringUtils.isNumeric(split[1])) {
+                    trackCount = Integer.parseInt(split[1]);
+                }
             }
+
+/*
+
+            if (StringUtils.isNotEmpty(track)) {
+                String[] split = StringUtils.split(track, "/");
+                trackNumber = Integer.parseInt(StringUtils.trimToEmpty(split[0]));
+                if (split.length > 1) {
+                    trackCount = Integer.parseInt(StringUtils.trimToEmpty(split[1]));
+                }
+            }
+*/
+        } catch (Exception e) {
+            logger.warn("Failed to parse track number:" + e);
         }
 
         return new AudioBookInfo(

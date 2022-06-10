@@ -1,9 +1,13 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.loaders;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.Platform;
+import uk.yermak.audiobookconverter.StreamCopier;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

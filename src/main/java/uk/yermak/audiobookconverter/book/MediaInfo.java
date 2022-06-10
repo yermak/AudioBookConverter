@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 public interface MediaInfo extends Organisable {
 
@@ -11,8 +11,6 @@ public interface MediaInfo extends Organisable {
     String getFileName();
 
     AudioBookInfo getBookInfo();
-
-//    ArtWork getArtWork();
 
     String getCodec();
 

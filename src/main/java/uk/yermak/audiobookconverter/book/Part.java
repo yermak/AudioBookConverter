@@ -1,7 +1,8 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.time.Duration;
 import java.util.ArrayList;

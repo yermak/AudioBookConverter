@@ -1,9 +1,16 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.loaders;
 
 import javafx.collections.ObservableList;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.AudiobookConverter;
+import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.MediaInfoBean;
+import uk.yermak.audiobookconverter.book.Track;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
+import uk.yermak.audiobookconverter.loaders.ArtWorkBean;
+import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.io.IOException;
 import java.io.InputStream;

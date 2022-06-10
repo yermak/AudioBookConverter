@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 import javafx.scene.image.Image;
 

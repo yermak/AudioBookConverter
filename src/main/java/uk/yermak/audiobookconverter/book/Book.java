@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 import com.google.common.collect.ImmutableList;
 import javafx.beans.InvalidationListener;

@@ -1,4 +1,6 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
+
+import uk.yermak.audiobookconverter.AudiobookConverter;
 
 import java.util.List;
 import java.util.Objects;

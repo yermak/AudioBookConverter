@@ -1,4 +1,9 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.loaders;
+
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.AudiobookConverter;
+import uk.yermak.audiobookconverter.book.Chapter;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.util.List;
 import java.util.concurrent.Future;

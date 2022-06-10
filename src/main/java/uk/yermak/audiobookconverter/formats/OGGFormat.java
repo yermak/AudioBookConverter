@@ -5,6 +5,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.Convertable;
 
 import java.io.File;
 import java.io.IOException;

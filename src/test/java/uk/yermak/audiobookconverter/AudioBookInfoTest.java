@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
 
 import java.util.Map;
 

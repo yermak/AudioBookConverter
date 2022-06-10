@@ -9,9 +9,12 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.book.*;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,9 @@ import java.util.Set;
 import java.util.concurrent.*;
 
 class MediaInfoLoader implements Callable<MediaInfo> {
+
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 
     private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
     private static final ImmutableMap<String, String> ART_WORK_CODECS = ImmutableMap.of("mjpeg", "jpg", "png", "png", "bmp", "bmp");
@@ -97,10 +103,10 @@ class MediaInfoLoader implements Callable<MediaInfo> {
             processEmbededChapter(mediaInfo, probeResult.getChapters());
 
             if (FilenameUtils.getExtension(filename).equalsIgnoreCase("FLAC")) {
-                FFMediaLoader.parseCueChapters(mediaInfo);
+                FlacLoader.parseCueChapters(mediaInfo);
             }
 
-            FFMediaLoader.logger.info("Created AudioBookInfo {}", bookInfo);
+            logger.info("Created AudioBookInfo {}", bookInfo);
 
             return mediaInfo;
         } catch (Exception e) {

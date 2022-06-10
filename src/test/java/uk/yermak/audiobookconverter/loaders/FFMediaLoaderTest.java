@@ -9,8 +9,6 @@ import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.MediaInfoBean;
 import uk.yermak.audiobookconverter.book.Track;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
-import uk.yermak.audiobookconverter.loaders.ArtWorkBean;
-import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +54,7 @@ public class FFMediaLoaderTest {
         MediaInfoBean mediaInfo = new MediaInfoBean("test");
         mediaInfo.setBookInfo(bookInfo);
         mediaInfo.setDuration(2305071);
-        FFMediaLoader.parseCue(mediaInfo, cue);
+        FlacLoader.parseCue(mediaInfo, cue);
         assertEquals(bookInfo.genre().get(), "Classical");
         assertEquals(bookInfo.title().get(), "Брамс");
         assertEquals(bookInfo.year().get(), "2007");

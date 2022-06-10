@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;

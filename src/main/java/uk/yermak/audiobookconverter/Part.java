@@ -21,7 +21,7 @@ public class Part implements Organisable, Convertable {
     public Part(Book book) {
         this.book = book;
         chapters.addListener(book);
-        renderMap.put("BOOK_NUMBER", Part::getBookNumberString);
+        renderMap.put("BOOK_NUMBER", part -> part.getBook().getBookInfo().series().trimToNull());
         renderMap.put("SERIES", part -> part.getBook().getBookInfo().series().trimToNull());
         renderMap.put("TITLE", part -> part.getBook().getBookInfo().title().trimToNull());
         renderMap.put("WRITER", part -> part.getBook().getBookInfo().writer().trimToNull());
@@ -44,11 +44,6 @@ public class Part implements Organisable, Convertable {
     public void construct(ObservableList<Chapter> chapters) {
         chapters.forEach(c -> c.setPart(this));
         this.chapters.addAll(chapters);
-    }
-
-    private String getBookNumberString() {
-        if (getBook().getBookInfo().bookNumber().get() == 0) return null;
-        return String.valueOf(getBook().getBookInfo().bookNumber());
     }
 
     public String getTitle() {

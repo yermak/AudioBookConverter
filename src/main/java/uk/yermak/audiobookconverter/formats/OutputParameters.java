@@ -1,14 +1,19 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.formats;
 
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.MediaInfo;
 
-import java.util.Collections;
+import java.lang.invoke.MethodHandles;
 import java.util.Comparator;
 import java.util.List;
 
 public class OutputParameters {
+
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected Format format = Format.M4B;
     protected Integer bitRate = format.defaultBitrate();
@@ -26,10 +31,10 @@ public class OutputParameters {
     private boolean splitChapters = false;
 
 
-    OutputParameters() {
+    public OutputParameters() {
     }
 
-    OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality, double speed, Force force, boolean splitChapters) {
+    public OutputParameters(Format format, int bitRate, int frequency, int channels, int cutoff, boolean cbr, int quality, double speed, Force force, boolean splitChapters) {
         this.format = format;
         this.bitRate = bitRate;
         this.frequency = frequency;

@@ -150,7 +150,7 @@ public class FFMediaLoader {
                 logger.info("Created AudioBookInfo {}", bookInfo);
 
                 return mediaInfo;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("Failed to load media info", e);
                 e.printStackTrace();
                 throw e;

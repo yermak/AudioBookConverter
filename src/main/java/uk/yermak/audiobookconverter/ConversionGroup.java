@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.formats.Format;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
@@ -12,7 +14,6 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 06-Feb-18.
@@ -29,7 +30,7 @@ public class ConversionGroup {
     private List<ArtWork> posters;
     private OutputParameters outputParameters;
     private boolean detached;
-    private long jobId = System.currentTimeMillis();
+    private long groupId = System.currentTimeMillis();
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -60,7 +61,7 @@ public class ConversionGroup {
     }
 
     public String getWorkfileExtension() {
-        return outputParameters.format.extension;
+        return outputParameters.getFormat().toString();
     }
 
 
@@ -178,8 +179,8 @@ public class ConversionGroup {
     }
 
 
-    public long getJobId() {
-        return jobId;
+    public long getGroupId() {
+        return groupId;
     }
 }
 

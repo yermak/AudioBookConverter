@@ -74,7 +74,7 @@ public class Utils {
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
         filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
-        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().zeroToNull());
+        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().trimToNull());
         filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();

@@ -13,7 +13,7 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.AudiobookConverter;
-import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
 
 import java.io.File;

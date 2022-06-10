@@ -6,6 +6,8 @@ import javafx.beans.value.ChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.Convertable;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -51,13 +53,13 @@ public class ConversionJob implements Runnable {
 
         List<Future<String>> futures = new ArrayList<>();
 
-        String tempFile = Utils.getTmp(conversionGroup.getJobId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
+        String tempFile = Utils.getTmp(conversionGroup.getGroupId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         try {
             List<MediaInfo> prioritizedMedia = prioritiseMedia();
 
             for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(conversionGroup.getJobId(), mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
+                String tempOutput = Utils.getTmp(conversionGroup.getGroupId(), mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
                 Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
                 futures.add(converterFuture);
@@ -70,12 +72,12 @@ public class ConversionJob implements Runnable {
             }
             if (status.get().isOver()) return;
 
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, new MetadataBuilder(conversionGroup.getJobId(), conversionGroup, convertable), convertable.getMedia(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, convertable.getMedia(), progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;
 
-            if (conversionGroup.getOutputParameters().format.mp4Compatible()) {
+            if (conversionGroup.getOutputParameters().getFormat().mp4Compatible()) {
                 Mp4v2ArtBuilder artBuilder = new Mp4v2ArtBuilder(this, progressCallbacks.get("output"));
                 artBuilder.coverArt(tempFile);
             }

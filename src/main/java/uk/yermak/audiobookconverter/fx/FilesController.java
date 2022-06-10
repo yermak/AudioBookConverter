@@ -16,6 +16,11 @@ import javafx.scene.input.TransferMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.Book;
+import uk.yermak.audiobookconverter.book.Convertable;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.book.Organisable;
+import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;

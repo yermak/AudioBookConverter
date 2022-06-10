@@ -1,4 +1,4 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 public interface Countable {
     int getNumber();

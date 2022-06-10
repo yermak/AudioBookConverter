@@ -1,4 +1,7 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
+
+import uk.yermak.audiobookconverter.book.Countable;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.util.List;
 

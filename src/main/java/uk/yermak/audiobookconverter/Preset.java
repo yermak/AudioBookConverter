@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 

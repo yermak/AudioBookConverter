@@ -1,12 +1,10 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.book;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.fx.util.SmartIntegerProperty;
-import uk.yermak.audiobookconverter.fx.util.SmartLongProperty;
 import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 
 import java.lang.invoke.MethodHandles;

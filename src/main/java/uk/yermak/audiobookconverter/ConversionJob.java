@@ -6,6 +6,8 @@ import javafx.beans.value.ChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.Convertable;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.io.File;
 import java.io.PrintWriter;

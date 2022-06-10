@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.fx;
 
-import com.google.errorprone.annotations.FormatMethod;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
@@ -12,6 +11,8 @@ import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.Book;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 

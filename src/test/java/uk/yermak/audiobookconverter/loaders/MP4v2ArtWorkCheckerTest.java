@@ -1,8 +1,8 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.loaders;
 
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.loaders.MP4v2ArtWorkChecker;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.*;

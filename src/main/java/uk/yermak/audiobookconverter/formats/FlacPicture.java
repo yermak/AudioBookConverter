@@ -1,10 +1,11 @@
-package uk.yermak.audiobookconverter;
+package uk.yermak.audiobookconverter.formats;
 
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.ConversionException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -5,6 +5,7 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.io.ByteArrayOutputStream;

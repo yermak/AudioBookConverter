@@ -12,9 +12,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AppSetting;
-import uk.yermak.audiobookconverter.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.AudiobookConverter;
-import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
 import java.util.concurrent.Executors;

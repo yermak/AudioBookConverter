@@ -158,6 +158,10 @@ public class Utils {
 
     }
 
+    public static String cleanText(String text) {
+        return StringUtils.remove(StringUtils.trim(text), '"');
+    }
+
 
     private static class DurationRender implements AttributeRenderer<Duration> {
 

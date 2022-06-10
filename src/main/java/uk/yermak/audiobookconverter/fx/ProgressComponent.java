@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.ArtWork;
+import uk.yermak.audiobookconverter.book.ArtWork;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;

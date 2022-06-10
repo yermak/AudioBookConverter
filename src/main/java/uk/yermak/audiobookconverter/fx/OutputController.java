@@ -11,6 +11,10 @@ import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.Book;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.formats.Format;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -91,7 +95,7 @@ public class OutputController {
             AudiobookConverter.getContext().getOutputParameters().setForce(OutputParameters.Force.valueOf(newValue));
         });
 
-        outputFormatBox.getItems().addAll(Format.values());
+        outputFormatBox.getItems().addAll(Format.M4B, Format.M4A, Format.MP3, Format.OGG);
         outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             AudiobookConverter.getContext().getOutputParameters().setupFormat(newValue);

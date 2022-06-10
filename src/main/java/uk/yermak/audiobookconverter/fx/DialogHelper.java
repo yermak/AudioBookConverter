@@ -10,6 +10,7 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;

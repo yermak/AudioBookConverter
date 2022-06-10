@@ -1,5 +1,8 @@
 package uk.yermak.audiobookconverter;
 
+import uk.yermak.audiobookconverter.formats.Format;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
+
 import java.util.*;
 
 public class Preset extends OutputParameters {

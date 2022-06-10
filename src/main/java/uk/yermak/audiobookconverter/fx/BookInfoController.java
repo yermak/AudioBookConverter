@@ -117,11 +117,7 @@ public class BookInfoController {
         narrator.setText(bookInfo.narrator().get());
         genre.getEditor().setText(bookInfo.genre().get());
         series.setText(bookInfo.series().get());
-        if (bookInfo.bookNumber().get() != 0) {
-            bookNo.setText(bookInfo.bookNumber().toString());
-        } else{
-            bookNo.setText("");
-        }
+        bookNo.setText(bookInfo.bookNumber().get());
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());
     }

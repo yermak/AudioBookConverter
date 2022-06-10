@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.util.SmartIntegerProperty;
+import uk.yermak.audiobookconverter.fx.util.SmartLongProperty;
 import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 
 import java.lang.invoke.MethodHandles;
@@ -19,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 public record AudioBookInfo(SmartStringProperty title, SmartStringProperty writer,
                             SmartStringProperty narrator, SmartStringProperty series,
                             SmartStringProperty genre, SmartStringProperty year,
-                            SmartIntegerProperty bookNumber, SmartIntegerProperty totalTracks,
+                            SmartStringProperty bookNumber, SmartStringProperty totalTracks,
                             SmartStringProperty comment,
                             ObservableList<Track> tracks) {
 
@@ -27,11 +28,11 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
 
 
     public static AudioBookInfo instance(Map<String, String> tags) {
-        int trackNumber = 0;
-        int trackCount = 0;
+        long trackNumber = 0;
+        long trackCount = 0;
         try {
-            trackNumber = tags.get("track number") == null ? 0 : Integer.parseInt(tags.get("track number"));
-            trackCount = tags.get("track count") == null ? 0 : Integer.parseInt(tags.get("track count"));
+            trackNumber = tags.get("track number") == null ? 0 : Long.parseLong(tags.get("track number"));
+            trackCount = tags.get("track count") == null ? 0 : Long.parseLong(tags.get("track count"));
 
             String track = tags.get("track");
 
@@ -39,23 +40,12 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
                 String[] split = track.split("/");
 
                 if (split.length > 0 && StringUtils.isNumeric(split[0])) {
-                    trackNumber = Integer.parseInt(split[0]);
+                    trackNumber = Long.parseLong(split[0]);
                 }
                 if (split.length > 1 && StringUtils.isNumeric(split[1])) {
-                    trackCount = Integer.parseInt(split[1]);
+                    trackCount = Long.parseLong(split[1]);
                 }
             }
-
-/*
-
-            if (StringUtils.isNotEmpty(track)) {
-                String[] split = StringUtils.split(track, "/");
-                trackNumber = Integer.parseInt(StringUtils.trimToEmpty(split[0]));
-                if (split.length > 1) {
-                    trackCount = Integer.parseInt(StringUtils.trimToEmpty(split[1]));
-                }
-            }
-*/
         } catch (Exception e) {
             logger.warn("Failed to parse track number:" + e);
         }
@@ -67,8 +57,8 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
                 new SmartStringProperty(trimToEmpty(tags.get("album"))),
                 new SmartStringProperty(trimToEmpty(tags.get("genre"))),
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("year")), StringUtils.substring(trimToEmpty(tags.get("date")), 0, 4))),
-                new SmartIntegerProperty(trackNumber),
-                new SmartIntegerProperty(trackCount),
+                new SmartStringProperty(trackNumber == 0 ? "" : String.valueOf(trackNumber)),
+                new SmartStringProperty(trackCount == 0 ? "" : String.valueOf(trackCount)),
                 new SmartStringProperty(firstNonBlank(trimToEmpty(tags.get("comment")), trimToEmpty(tags.get("comment-0")))),
                 FXCollections.observableArrayList()
         );

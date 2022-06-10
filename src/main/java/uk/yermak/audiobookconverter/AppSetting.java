@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.formats.Format;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -201,7 +203,7 @@ public class AppSetting {
                     entity = entities.getFirst();
                 }
                 entity.setProperty(PRESET_NAME, preset.getName());
-                entity.setProperty(PRESET_FORMAT, preset.getFormat().extension);
+                entity.setProperty(PRESET_FORMAT, preset.getFormat().toString());
                 entity.setProperty(PRESET_BITRATE, preset.getBitRate());
                 entity.setProperty(PRESET_FREQUENCY, preset.getFrequency());
                 entity.setProperty(PRESET_CHANNELS, preset.getChannels());

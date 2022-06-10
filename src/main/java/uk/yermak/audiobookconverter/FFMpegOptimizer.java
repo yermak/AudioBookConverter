@@ -46,7 +46,7 @@ public class FFMpegOptimizer {
         Process process = null;
         try {
 
-            String tmp = Utils.getTmp(conversionJob.getConversionGroup().getJobId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
+            String tmp = Utils.getTmp(conversionJob.getConversionGroup().getGroupId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
             String[] optimize;
             if (conversionJob.getConversionGroup().getPosters().isEmpty()) {
                 optimize = new String[]{

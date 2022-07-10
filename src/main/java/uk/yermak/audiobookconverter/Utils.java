@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.Chapter;
+import uk.yermak.audiobookconverter.book.Part;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +77,7 @@ public class Utils {
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
         filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
-        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().zeroToNull());
+        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().trimToNull());
         filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();
@@ -153,6 +156,10 @@ public class Utils {
         }
         return mp3Filename;
 
+    }
+
+    public static String cleanText(String text) {
+        return StringUtils.remove(StringUtils.trim(text), '"');
     }
 
 

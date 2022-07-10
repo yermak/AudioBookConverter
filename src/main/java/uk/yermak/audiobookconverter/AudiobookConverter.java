@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;/**
  * Created by Yermak on 06-Jan-18.
  */
 
-import com.apple.eio.FileManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

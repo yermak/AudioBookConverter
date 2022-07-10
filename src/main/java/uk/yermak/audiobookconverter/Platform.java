@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Properties;
 
 public enum Platform {
@@ -34,6 +35,11 @@ public enum Platform {
     },
 
     WINDOWS {
+        @Override
+        public Process createProcess(List<String> arguments) throws IOException {
+            return Runtime.getRuntime().exec( String.join(" ", arguments));
+
+        }
     };
     static Platform current;
     private static Properties properties = new Properties();
@@ -49,12 +55,10 @@ public enum Platform {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
-
     public static final String FFPROBE = current.getPath("ffprobe");
     public static final String MP4INFO = current.getPath("mp4info").replaceAll(" ", "\\ ");
     public static final String MP4ART = current.getPath("mp4art").replaceAll(" ", "\\ ");
     public final static String FFMPEG = current.getPath("ffmpeg").replaceAll(" ", "\\ ");
-
 
 
     private boolean isDebug() {
@@ -111,5 +115,12 @@ public enum Platform {
         }
         File file = new File(sourceFolder);
         return file.exists() ? file : getInitialDirecotory(file.getParent());
+    }
+
+    //IMPORTANT !!!
+    //using custom processes for Windows here -  Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
+    public Process createProcess(List<String> arguments) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(arguments);
+        return pb.start();
     }
 }

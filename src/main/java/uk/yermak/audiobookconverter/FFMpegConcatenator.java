@@ -5,6 +5,8 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -25,16 +27,14 @@ public class FFMpegConcatenator {
     private final ConversionJob conversionJob;
     private final String outputFileName;
 
-    private final MetadataBuilder metadataBuilder;
     private List<MediaInfo> media;
     private final ProgressCallback callback;
     private ProgressParser progressParser;
     private List<String> tmpFiles = new ArrayList<>();
 
-    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, MetadataBuilder metadataBuilder, List<MediaInfo> media, ProgressCallback callback) {
+    public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, List<MediaInfo> media, ProgressCallback callback) {
         this.conversionJob = conversionJob;
         this.outputFileName = outputFileName;
-        this.metadataBuilder = metadataBuilder;
         this.media = media;
         this.callback = callback;
     }
@@ -48,7 +48,7 @@ public class FFMpegConcatenator {
 
     public void concat() throws IOException, InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
-        String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getJobId(), media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
+        String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getGroupId(), media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
 
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
@@ -61,15 +61,12 @@ public class FFMpegConcatenator {
         Process process = null;
         try {
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
-            List<String> concatOptions = outputParameters.format.getConcatOptions(fileListFileName, metadataBuilder, progressParser.getUri().toString(), outputFileName);
+            List<String> concatOptions = outputParameters.getFormat().getConcatOptions(fileListFileName, outputFileName, progressParser.getUri().toString(), conversionJob);
 
-            logger.debug("Starting concat with options {}", String.join(" ", concatOptions));
+            logger.info("Starting concat with options {}", String.join(" ", concatOptions));
 
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
-//            process = Runtime.getRuntime().exec( String.join(" ", concatOptions));
-
-            ProcessBuilder pb = new ProcessBuilder (concatOptions);
-            process = pb.start();
+            //using custom processes for Windows here -  Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
+            process = Platform.current.createProcess(concatOptions);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);
@@ -96,7 +93,7 @@ public class FFMpegConcatenator {
         } finally {
             Utils.closeSilently(process);
             Utils.closeSilently(progressParser);
-            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.getConversionGroup().getJobId(), mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
+            media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.getConversionGroup().getGroupId(), mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
             FileUtils.deleteQuietly(new File(fileListFileName));
         }
     }

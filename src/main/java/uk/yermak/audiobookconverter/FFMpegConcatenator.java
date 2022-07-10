@@ -63,13 +63,10 @@ public class FFMpegConcatenator {
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
             List<String> concatOptions = outputParameters.getFormat().getConcatOptions(fileListFileName, outputFileName, progressParser.getUri().toString(), conversionJob);
 
-            logger.debug("Starting concat with options {}", String.join(" ", concatOptions));
+            logger.info("Starting concat with options {}", String.join(" ", concatOptions));
 
-            //falling back to Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
-//            process = Runtime.getRuntime().exec( String.join(" ", concatOptions));
-
-            ProcessBuilder pb = new ProcessBuilder (concatOptions);
-            process = pb.start();
+            //using custom processes for Windows here -  Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
+            process = Platform.current.createProcess(concatOptions);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamCopier.copy(process.getInputStream(), out);

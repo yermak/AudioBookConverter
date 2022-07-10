@@ -9,7 +9,7 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AppSetting;
-import uk.yermak.audiobookconverter.Chapter;
+import uk.yermak.audiobookconverter.book.Chapter;
 import uk.yermak.audiobookconverter.Utils;
 
 import java.util.HashMap;

@@ -11,6 +11,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.loaders.ArtWorkImage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

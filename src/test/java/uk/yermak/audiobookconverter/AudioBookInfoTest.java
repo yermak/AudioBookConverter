@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import org.testng.annotations.Test;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
 
 import java.util.Map;
 
@@ -22,8 +23,8 @@ public class AudioBookInfoTest {
 
     @Test
     public void testInstance_TrackNumberAndTrackCount_from_iTunes_tag_track() {
-        AudioBookInfo bookInfo = AudioBookInfo.instance(Map.of("track", "2/3"));
-        assertEquals(bookInfo.bookNumber().toString(), "2");
-        assertEquals(bookInfo.totalTracks().toString(), "3");
+        AudioBookInfo bookInfo = AudioBookInfo.instance(Map.of("track", "1/436"));
+        assertEquals(bookInfo.bookNumber().toString(), "1");
+        assertEquals(bookInfo.totalTracks().toString(), "436");
     }
 }

@@ -4,7 +4,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import uk.yermak.audiobookconverter.ArtWork;
+import uk.yermak.audiobookconverter.book.ArtWork;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

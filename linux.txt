@@ -1,1 +1,1 @@
-AudiobookConverter-6.1.0
+AudiobookConverter-6.1.1

@@ -17,7 +17,7 @@
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
-<!--        <compiler.args.main>&#45;&#45;enable-preview</compiler.args.main>-->
+        <compiler.args.main>--enable-preview</compiler.args.main>
         <javafx.version>17.0.1</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -188,7 +188,7 @@
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <failOnWarning>false</failOnWarning>
-<!--                    <compilerArgs>${compiler.args.main}</compilerArgs>-->
+                    <compilerArgs>${compiler.args.main}</compilerArgs>
                 </configuration>
             </plugin>
 
@@ -196,9 +196,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
-<!--                <configuration>-->
-<!--                    <argLine>&#45;&#45;enable-preview</argLine>-->
-<!--                </configuration>-->
+                <configuration>
+                    <argLine>--enable-preview</argLine>
+                </configuration>
             </plugin>
 
             <plugin>

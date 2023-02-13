@@ -15,6 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,8 @@ public class FFMpegConcatenator {
         this.callback = callback;
     }
 
-    protected static File prepareFiles(long jobId, List<MediaInfo> media, String workfileExtension) throws IOException {
-        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId + ".txt");
+    protected static File prepareFiles(long jobId, List<MediaInfo> media, String workfileExtension, String outputFileName) throws IOException {
+        File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId +"_"+ Objects.hash(outputFileName)+ ".txt");
         List<String> outFiles = media.stream().map(mediaInfo -> "file '" + Utils.getTmp(jobId, mediaInfo.getUID(), workfileExtension) + "'").collect(Collectors.toList());
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
@@ -48,7 +49,7 @@ public class FFMpegConcatenator {
 
     public void concat() throws IOException, InterruptedException {
         if (conversionJob.getStatus().isOver()) return;
-        String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getGroupId(), media, conversionJob.getConversionGroup().getWorkfileExtension()).getAbsolutePath();
+        String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getGroupId(), media, conversionJob.getConversionGroup().getWorkfileExtension(), outputFileName).getAbsolutePath();
 
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();

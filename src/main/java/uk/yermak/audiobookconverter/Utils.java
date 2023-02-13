@@ -162,6 +162,11 @@ public class Utils {
         return StringUtils.remove(StringUtils.trim(text), '"');
     }
 
+    static String formatWithLeadingZeros(int size, int i) {
+        int digits =  (int) (Math.log10(size) + 1);
+        return String.format("%0"+digits+"d", i);
+    }
+
 
     private static class DurationRender implements AttributeRenderer<Duration> {
 

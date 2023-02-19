@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.fx.StringToContext;
 
 import java.time.Duration;
 import java.util.*;
@@ -71,7 +72,7 @@ public class Chapter implements Organisable, Convertable {
         }
         if (context.contains("CUSTOM_TITLE")) {
             this.setCustomTitle(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
-            renderMap.put("CUSTOM_TITLE", chapter -> customTitle);
+            renderMap.put("CUSTOM_TITLE", StringToContext.getFunction(this.getCustomTitle()));
         }
     }
 

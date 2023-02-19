@@ -9,8 +9,8 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AppSetting;
-import uk.yermak.audiobookconverter.book.Chapter;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.book.Chapter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -158,10 +158,27 @@ class ChapterEditor {
 //        } else if (context.containsKey("CUSTOM_TITLE")) {
 //            customTitle.setText(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
 //        }
+//        StringToContext stringToContext = new StringToContext();
+        String formattingStringExplanation = "Special tokens\n" +
+                "%BOOK_NUMBER%\n" +
+                "%comment-0%\n" +
+                "%year%\n" +
+                "%genre%\n" +
+                "%album%\n" +
+                "%album_artist%\n" +
+                "%title%\n" +
+                "%BOOK_TITLE%\n" +
+                "%DURATION%\n" +
+                "%file_name%\n" +
+                "%CHAPTER_TEXT%\n" +
+                "%CHAPTER_NUMBER%\n";
+        customTitle.setTooltip(new Tooltip(formattingStringExplanation));
+
         customTitle.textProperty().addListener((observable, oldValue, newValue) -> {
 //            chapter.setCustomTitle(newValue);
             if (StringUtils.trimToNull(newValue) != null) {
-                context.put("CUSTOM_TITLE", c -> newValue);
+                StringToContext.updateContextUsingPrintf(context,newValue);
+//                context.put("CUSTOM_TITLE", c -> newValue);
             } else{
                 context.remove("CUSTOM_TITLE");
             }
@@ -194,13 +211,14 @@ class ChapterEditor {
 
         Optional result = dialog.showAndWait();
 
+
         if (result.isPresent() && result.get() == ButtonType.OK) {
             chapter.getRenderMap().clear();
             chapter.getRenderMap().putAll(context);
-            chapter.setCustomTitle(StringUtils.trimToEmpty(customTitle.getText()));
-            if (StringUtils.isNotEmpty(customTitle.getText())) {
-                chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-            }
+//            chapter.setCustomTitle(StringUtils.trimToEmpty(customTitle.getText()));
+//            if (StringUtils.isNotEmpty(customTitle.getText())) {
+//                chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
+//            }
             if (applyForAllChapters.isSelected() || saveAsDefault.isSelected()) {
                 applyForAllChapters(context, customTitle);
             }
@@ -209,7 +227,13 @@ class ChapterEditor {
                 AppSetting.setProperty(AppSetting.CHAPTER_CONTEXT, defaultChapterContext);
                 AppSetting.setProperty(AppSetting.CHAPTER_CUSTOM_TITLE, StringUtils.trimToNull(customTitle.getText()));
             }
+
+            String t = AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE,"default");
+            if(t.length()>1)
+             StringToContext.updateContextUsingPrintf(context, t);
         }
+
+
     }
 
     private void applyForAllChapters(Map<String, Function<Chapter, Object>> context, TextField customTitle) {
@@ -217,10 +241,10 @@ class ChapterEditor {
         for (Chapter c : chapters) {
             c.getRenderMap().clear();
             c.getRenderMap().putAll(context);
-            if (StringUtils.isNotEmpty(customTitle.getText())) {
-                c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
-            }
-            c.setCustomTitle(customTitle.getText());
+//            if (StringUtils.isNotEmpty(customTitle.getText())) {
+//                c.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
+//            }
+//            c.setCustomTitle(customTitle.getText());
         }
     }
 }

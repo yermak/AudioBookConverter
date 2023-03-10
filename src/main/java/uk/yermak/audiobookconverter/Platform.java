@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,10 +28,14 @@ public enum Platform {
     },
 
     LINUX {
+        protected String getAppPath() {
+            URL jarLocation = this.getClass().getProtectionDomain().getCodeSource().getLocation();
+            return new File(jarLocation.getPath()).getParentFile().getParentFile().getPath() + "/";
+        }
+
         @Override
         protected File getConfigFilePath() {
-            return new File("../lib/app/path.properties");
-
+            return new File(getAppPath(), "external/path.properties");
         }
     },
 
@@ -103,7 +108,7 @@ public enum Platform {
                     logger.error("Error during loading properties", e);
                 }
             } else {
-                logger.error("Path properties is not found at: ", file.getPath());
+                logger.error("Path properties is not found at: {}", file.getPath());
             }
         }
         return properties;

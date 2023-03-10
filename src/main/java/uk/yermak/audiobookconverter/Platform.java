@@ -42,6 +42,9 @@ public enum Platform {
         }
     };
     static Platform current;
+
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static Properties properties = new Properties();
 
     static {
@@ -51,8 +54,6 @@ public enum Platform {
         if (DEV.isDebug()) current = DEV;
         properties = current.loadAppProperties();
     }
-
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     public static final String FFPROBE = current.getPath("ffprobe");

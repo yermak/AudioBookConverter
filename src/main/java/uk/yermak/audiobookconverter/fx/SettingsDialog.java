@@ -1,22 +1,15 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Window;
-import javafx.util.Pair;
-import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.AppSetting;
+import uk.yermak.audiobookconverter.Settings;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -29,6 +22,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
     @FXML
     private ToggleSwitch darkMode;
 
+    public static final String DARK_MODE = "dark_mode";
 
     public SettingsDialog(Window window) {
         setTitle("AudioBookConverter Settings");
@@ -37,10 +31,9 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
         getDialogPane().setContent(new GridPane());
 
 
-
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return Collections.singletonMap(AppSetting.DARK_MODE, darkMode.isSelected());
+                return Collections.singletonMap(DARK_MODE, darkMode.isSelected());
             }
             return null;
         });
@@ -57,7 +50,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
 
     @FXML
     public void initialize() {
-        darkMode.setSelected(Boolean.parseBoolean(AppSetting.getProperty(AppSetting.DARK_MODE, Boolean.FALSE.toString())));
+        darkMode.setSelected(Settings.loadSetting().isDarkMode());
     }
 
 }

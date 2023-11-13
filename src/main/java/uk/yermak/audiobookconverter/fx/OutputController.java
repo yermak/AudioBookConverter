@@ -10,13 +10,16 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.AudiobookConverter;
+import uk.yermak.audiobookconverter.Preset;
+import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.book.Book;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -107,19 +110,25 @@ public class OutputController {
             refreshCBR();
         });
 
-        List<Preset> presets = Preset.loadPresets();
+        List<Preset> presets = Settings.loadSetting().getPresets();
 
-        presetBox.getItems().add(Preset.DEFAULT);
+//        presetBox.getItems().add(Preset.DEFAULT);
         presetBox.getItems().addAll(presets.stream().map(Preset::getName).toList());
 
-        presetBox.getSelectionModel().select(Preset.DEFAULT);
+//        presetBox.getSelectionModel().select(Preset.DEFAULT);
+        presetBox.getSelectionModel().select(0);
         presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (!presetBox.getItems().contains(newValue)) {
-                presetBox.getItems().add(newValue);
-                Preset preset = Preset.copy(newValue, Preset.instance(oldValue));
+            Settings settings = Settings.loadSetting();
+            if (presetBox.getItems().contains(newValue)) {
+                Preset preset = settings.findPreset(newValue);
                 AudiobookConverter.getContext().setOutputParameters(preset);
             } else {
-                Preset preset = Preset.instance(newValue);
+                presetBox.getItems().add(newValue);
+                Preset preset = Preset.copy(newValue, settings.findPreset(oldValue));
+                ArrayList<Preset> newPresets = new ArrayList<>(settings.getPresets());
+                newPresets.add(preset);
+                settings.setPresets(newPresets);
+                settings.save();
                 AudiobookConverter.getContext().setOutputParameters(preset);
             }
         });
@@ -281,7 +290,10 @@ public class OutputController {
 
     public void savePreset(ActionEvent actionEvent) {
         Preset preset = new Preset(presetBox.getSelectionModel().getSelectedItem(), AudiobookConverter.getContext().getOutputParameters());
-        AppSetting.savePreset(preset);
+        Settings settings = Settings.loadSetting();
+        Preset remove = settings.findPreset(preset.getName());
+        settings.getPresets().remove(remove);
+        settings.getPresets().add(preset);
     }
 }
 

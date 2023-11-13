@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter.loaders;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionGroup;
@@ -59,7 +58,7 @@ public class MP4v2ArtWorkChecker {
         }
     }
 
-    @NotNull
+
     static List<String> parseMP4v2ArtList(String out) {
         ArrayList<String> result = new ArrayList<>();
         String[] lines = StringUtils.split(out, "\n");

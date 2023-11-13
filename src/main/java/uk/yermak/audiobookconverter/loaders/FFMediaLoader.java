@@ -5,8 +5,11 @@ import net.bramp.ffmpeg.FFprobe;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
-import uk.yermak.audiobookconverter.book.*;
+import uk.yermak.audiobookconverter.AudiobookConverter;
+import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.Platform;
+import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 
 import java.io.File;
@@ -14,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Background media info loader. Media files are processed in the same order as passed to the constructor.

@@ -3,7 +3,9 @@ package uk.yermak.audiobookconverter.formats;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.ConversionJob;
+import uk.yermak.audiobookconverter.Platform;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Convertable;
 import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
@@ -128,7 +130,7 @@ public class MP3Format extends Format {
 
         options.addAll(prepareId3v2Meta(convertable, conversionGroup.getBookInfo()));
         options.add("-f");
-        options.add(format);
+        options.add(name);
         options.add("-progress");
         options.add(progressUri);
         options.add(outputFileName);

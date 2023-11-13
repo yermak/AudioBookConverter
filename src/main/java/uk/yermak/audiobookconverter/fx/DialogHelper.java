@@ -34,7 +34,7 @@ public class DialogHelper {
         JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
-        String outputFolder = AppSetting.getProperty("output.folder", System.getProperty("user.home"));
+        String outputFolder = Settings.loadSetting().getOutputFolder();
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
@@ -44,14 +44,14 @@ public class DialogHelper {
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;
         File parentFolder = file.getParentFile();
-        AppSetting.setProperty("output.folder", parentFolder.getAbsolutePath());
+        Settings.loadSetting().setOutputFolder(parentFolder.getAbsolutePath()).save();
         return file.getPath();
     }
 
     public static List<String> selectFilesDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
+        String sourceFolder = Settings.loadSetting().getSourceFolder();
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
         StringJoiner filetypes = new StringJoiner("/");
 
@@ -67,7 +67,7 @@ public class DialogHelper {
         if (!files.isEmpty()) {
             File firstFile = files.get(0);
             File parentFile = firstFile.getParentFile();
-            AppSetting.setProperty("source.folder", parentFile.getAbsolutePath());
+            Settings.loadSetting().setSourceFolder(parentFile.getAbsolutePath()).save();
         }
         return collectFiles(files);
     }
@@ -75,7 +75,7 @@ public class DialogHelper {
     public static List<String> selectFolderDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = AppSetting.getProperty("source.folder", System.getProperty("user.home"));
+        String sourceFolder = Settings.loadSetting().getSourceFolder();
         directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
 
         StringJoiner filetypes = new StringJoiner("/");
@@ -86,7 +86,7 @@ public class DialogHelper {
         File selectedDirectory = directoryChooser.showDialog(window);
 
         if (selectedDirectory == null) return null;
-        AppSetting.setProperty("source.folder", selectedDirectory.getAbsolutePath());
+        Settings.loadSetting().setSourceFolder(selectedDirectory.getAbsolutePath()).save();
 
         return collectFiles(Collections.singleton(selectedDirectory));
     }

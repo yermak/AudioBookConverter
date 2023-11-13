@@ -13,7 +13,10 @@ import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 /**

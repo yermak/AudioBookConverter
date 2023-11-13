@@ -1,7 +1,7 @@
 JAVA_HOME=/Users/Yarick_Yermak/Library/Java/JavaVirtualMachines/temurin-17/Contents/Home
 #JAVA_HOME=$1
 JAVAFX_JMODS=jmods/mac
-APP_VERSION=6.0.0
+APP_VERSION=6.1.2
 
 rm -rf target/release
 mkdir target/release
@@ -26,7 +26,7 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  \
 --mac-entitlements build/mac/entitlements.plist \
 --mac-package-identifier com.recoupler.abc \
 --mac-package-name AudioBookConverter \
---mac-signing-key-user-name "3rd Party Mac Developer Application: Recoupler Limited" \
+--mac-signing-key-user-name "Developer ID Application: Recoupler Limited" \
 --mac-app-store \
 --mac-sign
 

@@ -130,6 +130,7 @@ public class FilesController {
 
         context.addSpeedChangeListener((observableValue, oldValue, newValue) -> {
             if (chaptersMode.get()) {
+                context.getOutputParameters().setSpeed(newValue);
                 Platform.runLater(() -> bookStructure.updateBookStructure());
             }
         });
@@ -442,8 +443,8 @@ public class FilesController {
 
         Optional<Map<String, Object>> result = dialog.showAndWait();
         result.ifPresent(r -> {
-            Boolean darkMode = (Boolean) r.get(AppSetting.DARK_MODE);
-            AppSetting.setProperty(AppSetting.DARK_MODE, darkMode.toString());
+            Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
+            Settings.loadSetting().setDarkMode(darkMode).save();
             AudiobookConverter.getEnv().setDarkMode(darkMode);
         });
     }

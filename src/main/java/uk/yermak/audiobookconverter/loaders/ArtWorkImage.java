@@ -4,9 +4,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.book.ArtWork;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.book.ArtWork;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

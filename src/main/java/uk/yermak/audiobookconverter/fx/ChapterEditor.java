@@ -8,9 +8,9 @@ import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.AppSetting;
-import uk.yermak.audiobookconverter.book.Chapter;
+import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.book.Chapter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 class ChapterEditor {
 
@@ -160,9 +162,9 @@ class ChapterEditor {
 //        }
         customTitle.textProperty().addListener((observable, oldValue, newValue) -> {
 //            chapter.setCustomTitle(newValue);
-            if (StringUtils.trimToNull(newValue) != null) {
+            if (trimToNull(newValue) != null) {
                 context.put("CUSTOM_TITLE", c -> newValue);
-            } else{
+            } else {
                 context.remove("CUSTOM_TITLE");
             }
             Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
@@ -206,8 +208,8 @@ class ChapterEditor {
             }
             if (saveAsDefault.isSelected()) {
                 String defaultChapterContext = String.join(":", context.keySet());
-                AppSetting.setProperty(AppSetting.CHAPTER_CONTEXT, defaultChapterContext);
-                AppSetting.setProperty(AppSetting.CHAPTER_CUSTOM_TITLE, StringUtils.trimToNull(customTitle.getText()));
+                Settings.loadSetting().setChapterContext(defaultChapterContext).save();
+                Settings.loadSetting().setChapterCustomTitle(trimToNull(customTitle.getText())).save();
             }
         }
     }

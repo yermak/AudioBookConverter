@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.fx.util;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 
 public class SmartLongProperty extends SimpleLongProperty {

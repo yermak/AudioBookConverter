@@ -1,10 +1,5 @@
 package uk.yermak.audiobookconverter.book;
 
-import uk.yermak.audiobookconverter.book.ArtWork;
-import uk.yermak.audiobookconverter.book.AudioBookInfo;
-import uk.yermak.audiobookconverter.book.MediaInfo;
-import uk.yermak.audiobookconverter.book.MediaInfoOrganiser;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

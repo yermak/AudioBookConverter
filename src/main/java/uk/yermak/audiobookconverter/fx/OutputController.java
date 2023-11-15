@@ -1,8 +1,5 @@
 package uk.yermak.audiobookconverter.fx;
 
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -13,15 +10,12 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Preset;
 import uk.yermak.audiobookconverter.Settings;
-import uk.yermak.audiobookconverter.book.Book;
-import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -30,8 +24,6 @@ import java.util.concurrent.Executors;
 public class OutputController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
-//    public static final String FORCE = "Always";
-
 
     @FXML
     public ComboBox<Format> outputFormatBox;
@@ -48,236 +40,264 @@ public class OutputController {
 
 
     @FXML
-    public ComboBox<String> cutoff;
+    public ComboBox<String> cutoffBox;
 
     @FXML
     private ComboBox<String> frequencyBox;
     @FXML
     private ComboBox<String> channelsBox;
     @FXML
-    private RadioButton cbr;
+    private RadioButton cbrRadio;
     @FXML
     private ComboBox<String> bitRateBox;
     @FXML
-    private RadioButton vbr;
+    private RadioButton vbrRadio;
     @FXML
-    private Slider vbrQuality;
+    private Slider vbrQualitySlider;
 
     public void cbr(ActionEvent actionEvent) {
         bitRateBox.setDisable(false);
-        vbrQuality.setDisable(true);
-        refreshBitrates();
-        AudiobookConverter.getContext().getOutputParameters().setCbr(true);
-
+        vbrQualitySlider.setDisable(true);
+        Settings settings = Settings.loadSetting();
+        Preset preset = currentPreset(settings);
+        preset.setCbr(true);
+        settings.save();
     }
 
     public void vbr(ActionEvent actionEvent) {
         bitRateBox.setDisable(true);
-        vbrQuality.setDisable(false);
-        refreshVbrQuality();
-        AudiobookConverter.getContext().getOutputParameters().setCbr(false);
+        vbrQualitySlider.setDisable(false);
+        Settings settings = Settings.loadSetting();
+        Preset preset = currentPreset(settings);
+        preset.setCbr(false);
+        settings.save();
     }
 
     @FXML
     private void initialize() {
-        splitFileBox.getSelectionModel().select(0);
-        splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            switch (newValue) {
-                case "parts" -> AudiobookConverter.getContext().getOutputParameters().setSplitChapters(false);
-                case "chapters" -> AudiobookConverter.getContext().getOutputParameters().setSplitChapters(true);
-            }
-        });
-
-        speedBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue == null) return;
-            AudiobookConverter.getContext().getOutputParameters().setSpeed(Double.parseDouble(newValue));
-        });
-        forceBox.getSelectionModel().select(0);
-        forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue == null) return;
-            AudiobookConverter.getContext().getOutputParameters().setForce(OutputParameters.Force.valueOf(newValue));
-        });
+        initPresetBox();
 
         outputFormatBox.getItems().addAll(Format.M4B, Format.M4A, Format.MP3, Format.OGG);
-        outputFormatBox.getSelectionModel().select(0);
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            AudiobookConverter.getContext().getOutputParameters().setupFormat(newValue);
-            refreshFrequencies();
-            refreshBitrates();
-            refreshChannels();
-            refreshCutoffs();
-            refreshVbrQuality();
-            refreshCBR();
-        });
-
-        List<Preset> presets = Settings.loadSetting().getPresets();
-
-//        presetBox.getItems().add(Preset.DEFAULT);
-        presetBox.getItems().addAll(presets.stream().map(Preset::getName).toList());
-
-//        presetBox.getSelectionModel().select(Preset.DEFAULT);
-        presetBox.getSelectionModel().select(0);
-        presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             Settings settings = Settings.loadSetting();
-            if (presetBox.getItems().contains(newValue)) {
-                Preset preset = settings.findPreset(newValue);
-                AudiobookConverter.getContext().setOutputParameters(preset);
-            } else {
-                presetBox.getItems().add(newValue);
-                Preset preset = Preset.copy(newValue, settings.findPreset(oldValue));
-                ArrayList<Preset> newPresets = new ArrayList<>(settings.getPresets());
-                newPresets.add(preset);
-                settings.setPresets(newPresets);
-                settings.save();
-                AudiobookConverter.getContext().setOutputParameters(preset);
-            }
+            Preset preset = currentPreset(settings);
+            preset.setupFormat(newValue);
+            settings.save();
+
+            refreshFrequencies(newValue, newValue.defaultFrequency());
+            refreshBitrates(newValue, newValue.defaultBitrate());
+            refreshChannels(newValue, newValue.defaultChannel());
+            refreshCutoffs(newValue, newValue.defaultCutoff());
+            refreshSpeeds(newValue, newValue.defaultSpeed());
+            updateVbrQuality(newValue.defaultVbrQuality());
+            updateCBR(newValue.defaultCBR());
         });
-
-        refreshFrequencies();
-        refreshBitrates();
-        refreshChannels();
-        refreshCutoffs();
-        refreshVbrQuality();
-        refreshCBR();
-        refreshSpeeds();
-
-        ConversionContext context = AudiobookConverter.getContext();
-        ObservableList<MediaInfo> media = context.getMedia();
-
+        outputFormatBox.getSelectionModel().select(currentPreset(Settings.loadSetting()).getFormat());
 
         bitRateBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                context.getOutputParameters().setBitRate(Integer.valueOf(newValue));
+                Settings settings = Settings.loadSetting();
+                Preset preset = currentPreset(settings);
+                preset.setBitRate(Integer.valueOf(newValue));
+                settings.save();
             }
         });
         frequencyBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                context.getOutputParameters().setFrequency(Integer.valueOf(newValue));
+                Settings settings = Settings.loadSetting();
+                Preset preset = currentPreset(settings);
+                preset.setFrequency(Integer.valueOf(newValue));
+                settings.save();
             }
         });
         channelsBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                context.getOutputParameters().setChannels(Integer.valueOf(newValue));
+                Settings settings = Settings.loadSetting();
+                Preset preset = currentPreset(settings);
+                preset.setChannels(Integer.valueOf(newValue));
+                settings.save();
             }
         });
-        vbrQuality.valueProperty().addListener((observable, oldValue, newValue) -> {
+
+        vbrQualitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                context.getOutputParameters().setVbrQuality((int) Math.round(newValue.doubleValue()));
+                Settings settings = Settings.loadSetting();
+                Preset preset = currentPreset(settings);
+                preset.setVbrQuality((int) Math.round(newValue.doubleValue()));
+                settings.save();
             }
         });
-        cutoff.valueProperty().addListener((observable, oldValue, newValue) -> {
+        cutoffBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
+            Settings settings = Settings.loadSetting();
+            Preset preset = currentPreset(settings);
             if (DISABLED.equals(newValue)) {
-                context.getOutputParameters().setCutoff(0);
+                preset.setCutoff(0);
             } else {
-                context.getOutputParameters().setCutoff(Integer.valueOf(newValue));
+                preset.setCutoff(Integer.valueOf(newValue));
+            }
+            settings.save();
+        });
+
+        speedBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) return;
+            Settings settings = Settings.loadSetting();
+            Preset preset = currentPreset(settings);
+            preset.setSpeed(Double.parseDouble(newValue));
+            settings.save();
+        });
+
+        splitFileBox.getSelectionModel().select(0);
+        splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            switch (newValue) {
+                case "parts" -> {
+                    Settings settings = Settings.loadSetting();
+                    Preset preset = currentPreset(settings);
+                    preset.setSplitChapters(false);
+                    settings.save();
+                }
+                case "chapters" -> {
+                    Settings settings = Settings.loadSetting();
+                    Preset preset = currentPreset(settings);
+                    preset.setSplitChapters(true);
+                    settings.save();
+                }
             }
         });
 
-        context.addOutputParametersChangeListener((observableValue, oldValue, newValue) -> {
-            outputFormatBox.valueProperty().set(newValue.getFormat());
-            bitRateBox.valueProperty().set(String.valueOf(newValue.getBitRate()));
-            frequencyBox.valueProperty().set(String.valueOf(newValue.getFrequency()));
-            channelsBox.valueProperty().set(String.valueOf(newValue.getChannels()));
-            vbrQuality.valueProperty().set(newValue.getVbrQuality());
-            cutoff.valueProperty().set(String.valueOf(newValue.getCutoff()));
-            if (newValue.isCbr()) {
-                cbr.fire();
-            } else {
-                vbr.fire();
-            }
-            speedBox.valueProperty().set(Double.toString(newValue.getSpeed()));
-            forceBox.getSelectionModel().select(newValue.getForce().toString());
-            splitFileBox.getSelectionModel().select(newValue.isSplitChapters() ? "chapters" : "parts");
+        forceBox.getSelectionModel().select(0);
+        forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) return;
+            Settings settings = Settings.loadSetting();
+            Preset preset = currentPreset(settings);
+            preset.setForce(OutputParameters.Force.valueOf(newValue));
+            settings.save();
         });
 
-        media.addListener((InvalidationListener) observable -> updateParameters(media));
-        AudiobookConverter.getContext().addBookChangeListener((observableValue, oldBook, newBook) -> {
-            if (newBook != null) {
-                newBook.addListener(observable -> updateParameters(newBook.getMedia()));
+
+        int selectedIndex = presetBox.getSelectionModel().getSelectedIndex();
+        Settings settings = Settings.loadSetting();
+        Preset preset = settings.getPresets().get(selectedIndex);
+        updateOutputSettingsFromPreset(preset);
+    }
+
+    private void initPresetBox() {
+        Settings settings = Settings.loadSetting();
+        presetBox.getItems().addAll(settings.getPresets().stream().map(Preset::getName).toList());
+        presetBox.getSelectionModel().select(settings.getLastUsedPreset());
+        presetBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == null) return;
+            Settings s = Settings.loadSetting();
+            int i = -1;
+            if ((i = presetBox.getItems().indexOf(newValue)) != -1) {
+                Preset preset = s.findPreset(newValue);
+                s.setLastUsedPreset(i);
+                s.save();
+                AudiobookConverter.getContext().setOutputParameters(preset);
+                updateOutputSettingsFromPreset(preset);
+            } else {
+                presetBox.getItems().add(newValue);
+                Preset preset = Preset.copy(newValue, s.findPreset(oldValue));
+                AudiobookConverter.getContext().setOutputParameters(preset);
+                ArrayList<Preset> newPresets = new ArrayList<>(s.getPresets());
+                newPresets.add(preset);
+                s.setPresets(newPresets);
+                s.setLastUsedPreset(newPresets.size() - 1);
+                s.save();
+                updateOutputSettingsFromPreset(preset);
             }
         });
     }
 
-    private void refreshCBR() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-        if (format.defaultCBR()) {
-            cbr.fire();
+    private Preset currentPreset(Settings settings) {
+        List<Preset> presets = settings.getPresets();
+        int selectedIndex = presetBox.getSelectionModel().getSelectedIndex();
+        Preset preset = presets.get(selectedIndex);
+        return preset;
+    }
+
+    private void updateCBR(Boolean cbr) {
+        if (cbr) {
+            cbrRadio.fire();
         } else {
-            vbr.fire();
+            vbrRadio.fire();
         }
     }
 
-    private void refreshVbrQuality() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-        vbrQuality.setValue(format.defaultVbrQuality());
+    private void updateVbrQuality(Integer quality) {
+        vbrQualitySlider.setValue(quality);
     }
 
-    private void refreshCutoffs() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-        cutoff.getItems().clear();
-        cutoff.getItems().add(DISABLED);
-        cutoff.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().cutoffs().stream().map(String::valueOf).toList());
-        cutoff.getSelectionModel().select(String.valueOf(format.defaultCutoff()));
+    private void refreshCutoffs(Format format, Integer cutoff) {
+        cutoffBox.getItems().clear();
+        cutoffBox.getItems().add(DISABLED);
+        cutoffBox.getItems().addAll(format.cutoffs().stream().map(String::valueOf).toList());
+        cutoffBox.getSelectionModel().select(String.valueOf(findNearestMatch(cutoff, format.cutoffs(), format.defaultCutoff())));
     }
 
-    private void refreshChannels() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
+    private void refreshChannels(Format format, Integer channel) {
         channelsBox.getItems().clear();
-        channelsBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().channels().stream().map(String::valueOf).toList());
-        channelsBox.getSelectionModel().select(String.valueOf(format.defaultChannel()));
+        channelsBox.getItems().addAll(format.channels().stream().map(String::valueOf).toList());
+        channelsBox.getSelectionModel().select(String.valueOf(findNearestMatch(channel, format.channels(), format.defaultChannel())));
     }
 
-    private void refreshBitrates() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
+    private void refreshBitrates(Format format, Integer bitrate) {
         bitRateBox.getItems().clear();
-        bitRateBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().bitrates().stream().map(String::valueOf).toList());
-        bitRateBox.getSelectionModel().select(String.valueOf(format.defaultBitrate()));
+        bitRateBox.getItems().addAll(format.bitrates().stream().map(String::valueOf).toList());
+        bitRateBox.getSelectionModel().select(String.valueOf(findNearestMatch(bitrate, format.bitrates(), format.defaultBitrate())));
     }
 
-    private void refreshSpeeds() {
-        Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
+    private void refreshSpeeds(Format format, Double speed) {
         speedBox.getItems().clear();
-        speedBox.getItems().addAll(AudiobookConverter.getContext().getOutputParameters().getFormat().speeds().stream().map(String::valueOf).toList());
-        speedBox.getSelectionModel().select(String.valueOf(format.defaultSpeed()));
+        speedBox.getItems().addAll(format.speeds().stream().map(String::valueOf).toList());
+        speedBox.getSelectionModel().select(String.valueOf(speed));
     }
 
-    private void refreshFrequencies() {
-        OutputParameters outputParameters = AudiobookConverter.getContext().getOutputParameters();
-        Format format = outputParameters.getFormat();
+    private void refreshFrequencies(Format format, Integer frequency) {
         frequencyBox.getItems().clear();
-        frequencyBox.getItems().addAll(outputParameters.getFormat().frequencies().stream().map(String::valueOf).toList());
-        frequencyBox.getSelectionModel().select(String.valueOf(format.defaultFrequency()));
+        frequencyBox.getItems().addAll(format.frequencies().stream().map(String::valueOf).toList());
+        frequencyBox.getSelectionModel().select(String.valueOf(findNearestMatch(frequency, format.frequencies(), format.defaultFrequency())));
     }
 
-    private void updateParameters(List<MediaInfo> media) {
-        Book book = AudiobookConverter.getContext().getBook();
 
-        if (media.isEmpty() && book == null) {
-            Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-            frequencyBox.setValue(String.valueOf(format.defaultFrequency()));
-            bitRateBox.setValue(String.valueOf(format.defaultBitrate()));
-            channelsBox.setValue(String.valueOf(format.defaultChannel()));
-            vbrQuality.setValue(format.defaultVbrQuality());
+    public void deletePreset(ActionEvent actionEvent) {
+        if (presetBox.getItems().size() == 1) {
             return;
         }
+        Settings settings = Settings.loadSetting();
+        Preset presetToRemove = currentPreset(settings);
+        settings.getPresets().remove(presetToRemove);
+        settings.setLastUsedPreset(0);
+        settings.save();
 
-        Executors.newSingleThreadExecutor().submit(() -> {
-            OutputParameters params = AudiobookConverter.getContext().getOutputParameters();
-            if (book != null) {
-                params.updateAuto(book.getMedia());
-            } else {
-                params.updateAuto(media);
-            }
-            Platform.runLater(() -> {
-                Format format = AudiobookConverter.getContext().getOutputParameters().getFormat();
-                frequencyBox.getSelectionModel().select(String.valueOf(params.getFrequency()));
-                bitRateBox.getSelectionModel().select(String.valueOf(params.getBitRate()));
-                channelsBox.getSelectionModel().select(String.valueOf(params.getChannels()));
-                vbrQuality.setValue(params.getVbrQuality());
-                vbrQuality.setValue(findNearestMatch(params.getVbrQuality(), format.vbrQualities(), format.defaultVbrQuality()));
-            });
-        });
+
+        Preset preset = settings.getPresets().get(0);
+        updateOutputSettingsFromPreset(preset);
+        AudiobookConverter.getContext().setOutputParameters(preset);
+
+        presetBox.getItems().remove(presetToRemove.getName());
+        presetBox.getSelectionModel().select(0);
+    }
+
+    private void updateForceSpeed(Preset preset) {
+        forceBox.getSelectionModel().select(preset.getForce().toString());
+    }
+
+    private void updateChapterSplit(Preset preset) {
+        splitFileBox.getSelectionModel().select(preset.isSplitChapters() ? "chapters" : "parts");
+    }
+
+    private void updateOutputSettingsFromPreset(Preset preset) {
+        outputFormatBox.getSelectionModel().select(preset.getFormat());
+        refreshFrequencies(preset.getFormat(), preset.getFrequency());
+        refreshBitrates(preset.getFormat(), preset.getBitRate());
+        refreshChannels(preset.getFormat(), preset.getChannels());
+        refreshCutoffs(preset.getFormat(), preset.getCutoff());
+        refreshSpeeds(preset.getFormat(), preset.getSpeed());
+        updateVbrQuality(preset.getVbrQuality());
+        updateCBR(preset.isCbr());
+        updateChapterSplit(preset);
+        updateForceSpeed(preset);
     }
 
     private static Integer findNearestMatch(int value, List<Integer> list, int defaultValue) {
@@ -286,14 +306,6 @@ public class OutputController {
                 return integer;
         }
         return defaultValue;
-    }
-
-    public void savePreset(ActionEvent actionEvent) {
-        Preset preset = new Preset(presetBox.getSelectionModel().getSelectedItem(), AudiobookConverter.getContext().getOutputParameters());
-        Settings settings = Settings.loadSetting();
-        Preset remove = settings.findPreset(preset.getName());
-        settings.getPresets().remove(remove);
-        settings.getPresets().add(preset);
     }
 }
 

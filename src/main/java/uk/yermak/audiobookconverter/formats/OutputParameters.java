@@ -122,6 +122,7 @@ public class OutputParameters {
         this.cbr = cbr;
     }
 
+/*
     public void updateAuto(final List<MediaInfo> media) {
         if (media.isEmpty()) return;
 
@@ -133,6 +134,7 @@ public class OutputParameters {
         setFrequency(maxFrequency);
         setBitRate(maxBitRate / 1000);
     }
+*/
 
     public Integer getCutoff() {
         return this.cutoff;

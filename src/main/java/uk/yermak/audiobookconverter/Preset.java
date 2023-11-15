@@ -1,10 +1,8 @@
 package uk.yermak.audiobookconverter;
 
-import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,6 +67,7 @@ public class Preset extends OutputParameters {
     }
 */
 
+/*
     @Override
     public void updateAuto(List<MediaInfo> media) {
         if (!defaultValues.contains(this)) {
@@ -77,6 +76,7 @@ public class Preset extends OutputParameters {
             //Ignoring auto-update and save for all other preset
         }
     }
+*/
 
     public String getName() {
         return name;

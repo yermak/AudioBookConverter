@@ -25,6 +25,7 @@ public class Settings {
             }).create();
 
     private boolean darkMode = false;
+    private int lastUsedPreset = 0;
     private List<Preset> presets = new ArrayList<>();
     private Set<String> genres = new TreeSet<>();
     private String chapterFormat = "<if(BOOK_NUMBER)><BOOK_NUMBER>. <endif>" +
@@ -166,6 +167,13 @@ public class Settings {
         return null;
     }
 
+    public int getLastUsedPreset() {
+        return lastUsedPreset;
+    }
+
+    public void setLastUsedPreset(int lastUsedPreset) {
+        this.lastUsedPreset = lastUsedPreset;
+    }
 
     public static class FormatInstanceCreator implements InstanceCreator<Format> {
         private final String formatType;

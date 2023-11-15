@@ -129,7 +129,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         });
         getRoot().getChildren().forEach(t -> t.setExpanded(true));
         refresh();
-        AudiobookConverter.getContext().getOutputParameters().updateAuto(book.getMedia());
+//        AudiobookConverter.getContext().getOutputParameters().updateAuto(book.getMedia());
     }
 
     void moveChapterDown(ActionEvent event) {

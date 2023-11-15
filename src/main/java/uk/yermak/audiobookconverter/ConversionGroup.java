@@ -136,7 +136,7 @@ public class ConversionGroup {
         ObservableList<Part> parts = book.getParts();
         Format format = this.getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
-        this.getOutputParameters().setupFormat(format);
+//        this.getOutputParameters().setupFormat(format);
 
 
         if (this.getOutputParameters().isSplitChapters()) {

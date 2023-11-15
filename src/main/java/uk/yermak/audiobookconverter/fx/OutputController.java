@@ -15,6 +15,7 @@ import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -82,7 +83,7 @@ public class OutputController {
             Settings settings = Settings.loadSetting();
             Preset preset = currentPreset(settings);
             preset.setupFormat(newValue);
-            settings.save();
+
 
             refreshFrequencies(newValue, newValue.defaultFrequency());
             refreshBitrates(newValue, newValue.defaultBitrate());
@@ -91,6 +92,8 @@ public class OutputController {
             refreshSpeeds(newValue, newValue.defaultSpeed());
             updateVbrQuality(newValue.defaultVbrQuality());
             updateCBR(newValue.defaultCBR());
+
+            settings.save();
         });
         outputFormatBox.getSelectionModel().select(currentPreset(Settings.loadSetting()).getFormat());
 

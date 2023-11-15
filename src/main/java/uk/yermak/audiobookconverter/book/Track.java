@@ -1,10 +1,5 @@
 package uk.yermak.audiobookconverter.book;
 
-import uk.yermak.audiobookconverter.book.Chapter;
-import uk.yermak.audiobookconverter.book.MediaInfo;
-import uk.yermak.audiobookconverter.book.MediaTrackAdaptor;
-import uk.yermak.audiobookconverter.book.Part;
-
 import java.util.Collections;
 
 public class Track {

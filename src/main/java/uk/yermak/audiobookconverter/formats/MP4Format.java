@@ -4,7 +4,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionException;
+import uk.yermak.audiobookconverter.ConversionJob;
+import uk.yermak.audiobookconverter.Platform;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Convertable;
 
@@ -101,7 +103,7 @@ public class MP4Format extends Format {
                 "-i", fileListFileName,
                 "-i", prepareMp4MetaFile(conversionJob),
                 "-map_metadata", "1",
-                "-f", format,
+                "-f", name,
                 "-c:a", "copy",
                 "-progress", progressUri,
                 outputFileName};

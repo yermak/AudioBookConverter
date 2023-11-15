@@ -22,7 +22,7 @@ public class OutputParameters {
     protected Integer vbrQuality = format.defaultVbrQuality();
     protected boolean cbr = format.defaultCBR();
     protected Integer cutoff = format.defaultCutoff();
-    protected transient SimpleObjectProperty<Double> speed = new SimpleObjectProperty<>(format.defaultSpeed());
+    protected Double speed = format.defaultSpeed();
 
     public enum Force {Auto, Always, Avoid}
 
@@ -42,7 +42,7 @@ public class OutputParameters {
         this.vbrQuality = quality;
         this.cbr = cbr;
         this.cutoff = cutoff;
-        this.speed.set(speed);
+        this.speed = speed;
         this.force = force;
         this.splitChapters = splitChapters;
     }
@@ -122,6 +122,7 @@ public class OutputParameters {
         this.cbr = cbr;
     }
 
+/*
     public void updateAuto(final List<MediaInfo> media) {
         if (media.isEmpty()) return;
 
@@ -133,6 +134,7 @@ public class OutputParameters {
         setFrequency(maxFrequency);
         setBitRate(maxBitRate / 1000);
     }
+*/
 
     public Integer getCutoff() {
         return this.cutoff;
@@ -155,19 +157,19 @@ public class OutputParameters {
     }
 
     public double getSpeed() {
-        return speed.get();
-    }
-
-    public void setSpeed(double speed) {
-        this.speed.set(speed);
-    }
-
-    public ObservableValue<Double> getSpeedObservable() {
         return speed;
     }
 
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public ObservableValue<Double> getSpeedObservable() {
+        return new SimpleObjectProperty(speed);
+    }
+
     protected void initSpeed() {
-        speed = new SimpleObjectProperty<>(1.0);
+        speed = 1.0;
     }
 
     public void setForce(Force force) {

@@ -1,6 +1,8 @@
 package uk.yermak.audiobookconverter.fx.util;
 
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
 public class ContextMenuTreeTableRow<T> extends TreeTableRow<T> {

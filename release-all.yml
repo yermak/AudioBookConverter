@@ -20,13 +20,13 @@ jobs:
 - job: Build_All
 
   strategy:
-      matrix:
-        linux:
-          imageName: 'ubuntu-18.04'
-        mac:
-          imageName: 'macos-10.15'
-        windows:
-          imageName: 'windows-latest'
+    matrix:
+      linux:
+        imageName: 'ubuntu-latest'
+      mac:
+        imageName: 'macos-latest'
+      windows:
+        imageName: 'windows-latest'
 
   pool:
     vmImage: $(imageName)

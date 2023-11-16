@@ -8,7 +8,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionGroup;
+import uk.yermak.audiobookconverter.ConversionJob;
+import uk.yermak.audiobookconverter.Preset;
+import uk.yermak.audiobookconverter.Settings;
+import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.Book;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
+import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
@@ -34,7 +43,7 @@ public class ConversionContext {
     private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>(Preset.DEFAULT_OUTPUT_PARAMETERS);
+    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -91,9 +100,11 @@ public class ConversionContext {
         conversionGroup.setPosters(new ArrayList<>(posters));
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
-        conversionGroup.setOutputParameters(new OutputParameters(outputParameters.get()));
+        conversionGroup.setOutputParameters(Preset.copy(String.valueOf(conversionGroup.getGroupId()), outputParameters.get()));
         conversionGroup.setDetached(true);
-        AppSetting.saveGenres(bookInfo.get().genre().get());
+        Settings settings = Settings.loadSetting();
+        settings.getGenres().add(bookInfo.get().genre().get());
+        settings.save();
 
         ConversionGroup newConversionGroup = new ConversionGroup();
         conversionGroupHolder.set(newConversionGroup);

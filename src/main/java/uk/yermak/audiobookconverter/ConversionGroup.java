@@ -5,14 +5,19 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.*;
+import uk.yermak.audiobookconverter.formats.Format;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 import uk.yermak.audiobookconverter.fx.ConversionProgress;
 import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * Created by Yermak on 06-Feb-18.
@@ -29,7 +34,7 @@ public class ConversionGroup {
     private List<ArtWork> posters;
     private OutputParameters outputParameters;
     private boolean detached;
-    private long jobId = System.currentTimeMillis();
+    private long groupId = System.currentTimeMillis();
 
     public ConversionProgress start(Convertable convertable, String outputDestination) {
 
@@ -60,7 +65,7 @@ public class ConversionGroup {
     }
 
     public String getWorkfileExtension() {
-        return outputParameters.format.extension;
+        return outputParameters.getFormat().toString();
     }
 
 
@@ -131,17 +136,18 @@ public class ConversionGroup {
         ObservableList<Part> parts = book.getParts();
         Format format = this.getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
-        this.getOutputParameters().setupFormat(format);
+//        this.getOutputParameters().setupFormat(format);
 
 
         if (this.getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).toList();
             logger.debug("Found {} chapters in the book", chapters.size());
+
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
@@ -178,8 +184,8 @@ public class ConversionGroup {
     }
 
 
-    public long getJobId() {
-        return jobId;
+    public long getGroupId() {
+        return groupId;
     }
 }
 

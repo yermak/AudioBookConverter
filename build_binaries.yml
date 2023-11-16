@@ -7,7 +7,7 @@ trigger:
 
 
 variables:
-  VERSION: 99.98
+  VERSION: 99.96
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
 
@@ -17,9 +17,9 @@ jobs:
   strategy:
       matrix:
         linux:
-          imageName: 'ubuntu-18.04'
+          imageName: 'ubuntu-latest'
         mac:
-          imageName: 'macos-10.15'
+          imageName: 'macos-latest'
         windows:
           imageName: 'windows-latest'
 
@@ -63,7 +63,7 @@ jobs:
         mvn clean package --no-transfer-progress
 
         $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
-        --add-modules java.base,java.sql,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/fx-jre
+        --add-modules java.base,java.sql,java.management,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/fx-jre
 
         $JAVA_HOME/bin/jpackage --app-version $(APP_VERSION)  --license-file LICENSE --icon AudioBookConverter.icns \
         --type dmg \

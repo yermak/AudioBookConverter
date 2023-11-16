@@ -13,8 +13,8 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.AudiobookConverter;
-import uk.yermak.audiobookconverter.MediaInfo;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by yermak on 26-Oct-18.
  */
-public class MediaPlayerController  {
+public class MediaPlayerController {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @FXML
@@ -120,13 +120,21 @@ public class MediaPlayerController  {
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(1.0);
 
-        mediaPlayer.rateProperty().bind(context.getOutputParameters().getSpeedObservable());
         mediaPlayer.rateProperty().set(context.getOutputParameters().getSpeed());
+        mediaPlayer.rateProperty().bind(context.getOutputParameters().getSpeedObservable());
 
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {
+                boolean wasPlaying = false;
+                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                    wasPlaying = true;
+                    mediaPlayer.pause();
+                }
                 playTime.setText(Utils.formatTime(timelapse.getValue() * 1000));
                 mediaPlayer.seek(Duration.seconds(timelapse.getValue()));
+                if (wasPlaying) {
+                    mediaPlayer.play();
+                }
             }
         });
 
@@ -134,7 +142,8 @@ public class MediaPlayerController  {
             executorService.shutdown();
             mediaPlayer.volumeProperty().unbindBidirectional(volume.valueProperty());
             mediaPlayer.dispose();
-            mediaPlayer = null;
+            mediaPlayer
+                    = null;
             totalTime.setText("00:00:00");
             playTime.setText("00:00:00");
 

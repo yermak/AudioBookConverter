@@ -120,8 +120,13 @@ class MediaInfoLoader implements Callable<MediaInfo> {
         AudioBookInfo bookInfo = mediaInfo.getBookInfo();
         for (int i = 0; i < chapters.size(); i++) {
             FFmpegChapter chapter = chapters.get(i);
-            Track track = new Track(StringUtils.leftPad(String.valueOf(i + 1), 3, "00"));
-            track.setTitle(chapter.tags.title);
+            String trackNo = StringUtils.leftPad(String.valueOf(i + 1), 3, "00");
+            Track track = new Track(trackNo);
+            if (chapter.tags != null) {
+                track.setTitle(chapter.tags.title);
+            } else {
+                track.setTitle("Chapter " + trackNo);
+            }
             track.setStart((long) (Double.parseDouble(chapter.start_time) * 1000));
             track.setEnd((long) (Double.parseDouble(chapter.end_time) * 1000));
             bookInfo.tracks().add(track);

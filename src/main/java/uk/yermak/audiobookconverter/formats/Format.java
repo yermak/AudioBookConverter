@@ -3,11 +3,13 @@ package uk.yermak.audiobookconverter.formats;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.ConversionJob;
+import uk.yermak.audiobookconverter.Platform;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Format {
 
@@ -18,7 +20,7 @@ public abstract class Format {
     public static final List<Integer> CUT_OFFS = List.of(4000, 6000, 8000, 12000, 20000);
     public static final List<Double> SPEEDS = List.of(0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0);
 
-    protected String format;
+    protected String name;
     protected String codec;
     protected String extension;
     private final String[] compatibleCodecs;
@@ -29,7 +31,7 @@ public abstract class Format {
     public static Format OGG = new OGGFormat();
 
     Format(String format, String codec, String extension, String... compatibleCodecs) {
-        this.format = format;
+        this.name = format;
         this.codec = codec;
         this.extension = extension;
         this.compatibleCodecs = compatibleCodecs;
@@ -128,7 +130,7 @@ public abstract class Format {
             options.add(toFFMpegTime(mediaInfo.getDuration()));
         }
         options.add("-f");
-        options.add(format);
+        options.add(name);
         options.add("-progress");
         options.add(progressUri);
         options.add(outputFileName);
@@ -166,7 +168,7 @@ public abstract class Format {
             options.add(Integer.toString(outputParameters.getCutoff()));
         }
         options.add("-f");
-        options.add(format);
+        options.add(name);
 
         if (outputParameters.getSpeed() != 1.0) {
             options.add("-filter:a");

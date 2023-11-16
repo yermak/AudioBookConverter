@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+
 /**
  * Created by Yermak on 29-Dec-17.
  */
@@ -48,7 +49,7 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        String chapterFormat = AppSetting.getProperty(AppSetting.CHAPTER_FORMAT, AppSetting.CHAPTER_FORMAT_DEFAULT);
+        String chapterFormat = Settings.loadSetting().getChapterFormat();
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
         g.registerRenderer(Duration.class, new DurationRender());
@@ -66,8 +67,7 @@ public class Utils {
 
 
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        String filenameFormat = AppSetting.getProperty(AppSetting.FILENAME_FORMAT, AppSetting.FILENAME_FORMAT_DEFAULT);
-
+        String filenameFormat = Settings.loadSetting().getFilenameFormat();
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
         g.registerRenderer(Duration.class, new DurationRender());
@@ -135,7 +135,7 @@ public class Utils {
     }
 
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
-        String partFormat = AppSetting.getProperty(AppSetting.PART_FORMAT, AppSetting.PART_FORMAT_DEFAULT);
+        String partFormat = Settings.loadSetting().getPartFormat();
         STGroup g = new STGroupString("");
         g.registerRenderer(Number.class, new NumberRenderer());
         ST partTemplate = new ST(g, partFormat);
@@ -160,6 +160,11 @@ public class Utils {
 
     public static String cleanText(String text) {
         return StringUtils.remove(StringUtils.trim(text), '"');
+    }
+
+    static String formatWithLeadingZeros(int size, int i) {
+        int digits = (int) (Math.log10(size) + 1);
+        return String.format("%0" + digits + "d", i);
     }
 
 

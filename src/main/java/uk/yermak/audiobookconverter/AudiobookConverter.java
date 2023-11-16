@@ -89,8 +89,7 @@ public class AudiobookConverter extends Application {
             env = new JfxEnv(scene, getHostServices());
 
 
-            String property = AppSetting.getProperty(AppSetting.DARK_MODE, Boolean.FALSE.toString());
-            boolean dark = Boolean.parseBoolean(property);
+            boolean dark = Settings.loadSetting().isDarkMode();
             if (dark) {
                 env.setDarkMode(dark);
             }

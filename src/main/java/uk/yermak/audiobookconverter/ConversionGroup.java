@@ -13,7 +13,10 @@ import uk.yermak.audiobookconverter.fx.ProgressComponent;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 /**
@@ -133,17 +136,18 @@ public class ConversionGroup {
         ObservableList<Part> parts = book.getParts();
         Format format = this.getOutputParameters().getFormat();
 //        String extension = FilenameUtils.getExtension(outputDestination);
-        this.getOutputParameters().setupFormat(format);
+//        this.getOutputParameters().setupFormat(format);
 
 
         if (this.getOutputParameters().isSplitChapters()) {
             List<Chapter> chapters = parts.stream().flatMap(p -> p.getChapters().stream()).toList();
             logger.debug("Found {} chapters in the book", chapters.size());
+
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
                 String finalDesination = outputDestination;
                 if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + (i + 1) + "." + format);
+                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) + "." + format);
                 }
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);

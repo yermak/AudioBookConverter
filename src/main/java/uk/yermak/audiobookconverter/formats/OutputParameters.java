@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Comparator;
 import java.util.List;
 
-public class OutputParameters {
+public  class OutputParameters {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

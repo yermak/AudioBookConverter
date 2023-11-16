@@ -97,6 +97,9 @@ public class FilesController {
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
 
+        Settings settings = Settings.loadSetting();
+        AudiobookConverter.getContext().setOutputParameters(settings.getPresets().get(settings.getLastUsedPreset()));
+
         initFileOpenMenu();
 
         ConversionContext context = AudiobookConverter.getContext();
@@ -130,7 +133,6 @@ public class FilesController {
 
         context.addSpeedChangeListener((observableValue, oldValue, newValue) -> {
             if (chaptersMode.get()) {
-                context.getOutputParameters().setSpeed(newValue);
                 Platform.runLater(() -> bookStructure.updateBookStructure());
             }
         });

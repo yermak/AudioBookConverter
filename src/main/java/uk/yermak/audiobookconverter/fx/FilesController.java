@@ -97,6 +97,9 @@ public class FilesController {
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
 
+        Settings settings = Settings.loadSetting();
+        AudiobookConverter.getContext().setOutputParameters(settings.getPresets().get(settings.getLastUsedPreset()));
+
         initFileOpenMenu();
 
         ConversionContext context = AudiobookConverter.getContext();
@@ -442,8 +445,8 @@ public class FilesController {
 
         Optional<Map<String, Object>> result = dialog.showAndWait();
         result.ifPresent(r -> {
-            Boolean darkMode = (Boolean) r.get(AppSetting.DARK_MODE);
-            AppSetting.setProperty(AppSetting.DARK_MODE, darkMode.toString());
+            Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
+            Settings.loadSetting().setDarkMode(darkMode).save();
             AudiobookConverter.getEnv().setDarkMode(darkMode);
         });
     }

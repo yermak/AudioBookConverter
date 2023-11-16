@@ -1,8 +1,8 @@
 package uk.yermak.audiobookconverter.loaders;
 
 import javafx.scene.image.Image;
-import uk.yermak.audiobookconverter.book.ArtWork;
 import uk.yermak.audiobookconverter.Utils;
+import uk.yermak.audiobookconverter.book.ArtWork;
 
 import java.io.File;
 import java.io.FileInputStream;

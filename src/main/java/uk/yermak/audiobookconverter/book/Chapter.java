@@ -3,7 +3,8 @@ package uk.yermak.audiobookconverter.book;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
-import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.Settings;
+import uk.yermak.audiobookconverter.Utils;
 
 import java.time.Duration;
 import java.util.*;
@@ -26,7 +27,7 @@ public class Chapter implements Organisable, Convertable {
     }
 
     private void initRenderMap() {
-        String[] contextArray = AppSetting.getProperty(AppSetting.CHAPTER_CONTEXT, "CHAPTER_NUMBER:CHAPTER_TEXT:DURATION").split(":");
+        String[] contextArray = Settings.loadSetting().getChapterContext().split(":");
 
         Set<String> context = new HashSet<>(Arrays.asList(contextArray));
 
@@ -70,7 +71,7 @@ public class Chapter implements Organisable, Convertable {
             renderMap.put("TAG.8", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
         }
         if (context.contains("CUSTOM_TITLE")) {
-            this.setCustomTitle(AppSetting.getProperty(AppSetting.CHAPTER_CUSTOM_TITLE, ""));
+            this.setCustomTitle(Settings.loadSetting().getChapterCustomTitle());
             renderMap.put("CUSTOM_TITLE", chapter -> customTitle);
         }
     }

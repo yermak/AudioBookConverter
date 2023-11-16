@@ -16,6 +16,11 @@ import javafx.scene.input.TransferMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
+import uk.yermak.audiobookconverter.book.Book;
+import uk.yermak.audiobookconverter.book.Convertable;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.book.Organisable;
+import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -93,6 +98,9 @@ public class FilesController {
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
 
+        Settings settings = Settings.loadSetting();
+        AudiobookConverter.getContext().setOutputParameters(settings.getPresets().get(settings.getLastUsedPreset()));
+
         initFileOpenMenu();
 
         ConversionContext context = AudiobookConverter.getContext();
@@ -151,7 +159,7 @@ public class FilesController {
 
         control.setOnDragDropped(event -> {
             List<File> files = event.getDragboard().getFiles();
-            if (files!=null && !files.isEmpty()) {
+            if (files != null && !files.isEmpty()) {
                 List<String> fileNames = DialogHelper.collectFiles(files);
                 processFiles(fileNames);
                 event.setDropCompleted(true);
@@ -253,13 +261,7 @@ public class FilesController {
         }
     }
 
-    public void subTracks(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.subTracks(event);
-        }
-    }
-
-    public void editChapter(ActionEvent event){
+    public void editChapter(ActionEvent event) {
         if (chaptersMode.get()) {
             bookStructure.editChapter(event);
         }
@@ -427,7 +429,30 @@ public class FilesController {
 
 
     public void clearQueue(ActionEvent actionEvent) {
-        List<ProgressComponent> dones = progressQueue.getItems().stream().filter(ProgressComponent::isOver).toList();
-        Platform.runLater(() -> progressQueue.getItems().removeAll(dones));
+        ObservableList<ProgressComponent> items = progressQueue.getItems();
+        List<ProgressComponent> dones = new ArrayList<>();
+        for (ProgressComponent item : items) {
+            if (item.isOver()) dones.add(item);
+        }
+        Platform.runLater(() -> {
+            for (ProgressComponent done : dones) {
+                progressQueue.getItems().remove(done);
+            }
+        });
+    }
+
+    public void settings(ActionEvent actionEvent) {
+        SettingsDialog dialog = new SettingsDialog(AudiobookConverter.getEnv().getWindow());
+
+        Optional<Map<String, Object>> result = dialog.showAndWait();
+        result.ifPresent(r -> {
+            Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
+            Settings.loadSetting().setDarkMode(darkMode).save();
+            AudiobookConverter.getEnv().setDarkMode(darkMode);
+        });
+    }
+
+    public void openIssues(ActionEvent actionEvent) {
+        AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
     }
 }

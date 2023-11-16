@@ -1,3 +1,6 @@
+![image](https://user-images.githubusercontent.com/380491/157830449-4d35f490-1a60-4940-98ae-11a3247a43e0.png)
+===============
+
 [![Build Status](https://recoupler.visualstudio.com/AudioBookConverter/_apis/build/status/yermak.AudioBookConverter?branchName=development)](https://recoupler.visualstudio.com/AudioBookConverter/_build/latest?definitionId=2&branchName=development)
 
 Official web-site
@@ -22,6 +25,7 @@ Supported source formats:
 * wma
 * m4a/m4b
 * aac
+* wav
 
 -----
 Supported output (codec) formats:

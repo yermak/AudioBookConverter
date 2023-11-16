@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,10 +12,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
-import uk.yermak.audiobookconverter.AppSetting;
-import uk.yermak.audiobookconverter.AudioBookInfo;
 import uk.yermak.audiobookconverter.AudiobookConverter;
-import uk.yermak.audiobookconverter.MediaInfo;
+import uk.yermak.audiobookconverter.Settings;
+import uk.yermak.audiobookconverter.book.AudioBookInfo;
+import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
 import java.util.concurrent.Executors;
@@ -46,13 +47,15 @@ public class BookInfoController {
 
         MenuItem menuItem = new MenuItem("Remove");
 
-        genre.setItems(AppSetting.loadGenres());
+        Settings settings = Settings.loadSetting();
+        genre.setItems(FXCollections.observableArrayList(settings.getGenres()));
         menuItem.setOnAction(event -> {
             String remove = genre.getItems().get(genre.getSelectionModel().getSelectedIndex());
-            AppSetting.removeGenre(remove);
-            genre.setItems(AppSetting.loadGenres());
+            settings.getGenres().remove(remove);
+            settings.save();
+            genre.getItems().remove(remove);
         });
-        AudiobookConverter.getContext().addContextDetachListener(observable -> genre.setItems(AppSetting.loadGenres()));
+        AudiobookConverter.getContext().addContextDetachListener(observable -> genre.setItems(FXCollections.observableArrayList(Settings.loadSetting().getGenres())));
 
         ContextMenu contextMenu = new ContextMenu(menuItem);
 
@@ -101,7 +104,7 @@ public class BookInfoController {
                 Executors.newSingleThreadExecutor().submit(() -> {
                     //getBookInfo is proxied blocking method should be executed outside of UI thread,
                     // when info become available - scheduling update in UI thread.
-                        AudioBookInfo info = media.get(0).getBookInfo();
+                    AudioBookInfo info = media.get(0).getBookInfo();
                     Platform.runLater(() -> copyTags(info));
 
                 });
@@ -117,11 +120,7 @@ public class BookInfoController {
         narrator.setText(bookInfo.narrator().get());
         genre.getEditor().setText(bookInfo.genre().get());
         series.setText(bookInfo.series().get());
-        if (bookInfo.bookNumber().get() != 0) {
-            bookNo.setText(bookInfo.bookNumber().toString());
-        } else{
-            bookNo.setText("");
-        }
+        bookNo.setText(bookInfo.bookNumber().get());
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());
     }

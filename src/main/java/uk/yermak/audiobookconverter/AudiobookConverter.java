@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;/**
  * Created by Yermak on 06-Jan-18.
  */
 
-import com.apple.eio.FileManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -87,9 +86,15 @@ public class AudiobookConverter extends Application {
             Screen primary = Screen.getPrimary();
 //            stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);
 //            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
-            stage.show();
             env = new JfxEnv(scene, getHostServices());
 
+
+            boolean dark = Settings.loadSetting().isDarkMode();
+            if (dark) {
+                env.setDarkMode(dark);
+            }
+
+            stage.show();
 
             stage.setOnCloseRequest(event -> {
                 logger.info("Closing application");

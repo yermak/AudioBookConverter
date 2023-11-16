@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml"
+         gridLinesVisible="false" hgap="5" vgap="2">
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS"/>
+        <ColumnConstraints hgrow="NEVER"/>
+    </columnConstraints>
+
+    <children>
+        <Label text="Dark Theme" GridPane.columnIndex="0" GridPane.rowIndex="0"
+               GridPane.halignment="LEFT"/>
+        <ToggleSwitch fx:id="darkMode" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+    </children>
+</fx:root>

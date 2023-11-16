@@ -4,6 +4,8 @@ import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.book.MediaInfo;
+import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.invoke.MethodHandles;
@@ -52,11 +54,11 @@ public class FFMpegNativeConverter implements Callable<String> {
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
 
             if (outputParameters.needReencode(mediaInfo.getCodec())) {
-                logger.debug("Re-encoding to {} for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
+                logger.debug("Re-encoding to {} for {}", outputParameters.getFormat(), outputFileName);
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getFormat().getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
             } else {
-                logger.debug("Transcoding {} stream for {}", outputParameters.format, outputFileName);
-                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.format.getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
+                logger.debug("Transcoding {} stream for {}", outputParameters.getFormat(), outputFileName);
+                ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getFormat().getTranscodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName));
             }
             process = ffmpegProcessBuilder.start();
 
@@ -72,7 +74,13 @@ public class FFMpegNativeConverter implements Callable<String> {
             logger.debug("ffmpeg out: {}", out);
             logger.warn("ffmpeg err: {}", err);
 
-            DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
+
+            if (process.exitValue() != 0) {
+                logger.error("Converstion failed: " + err);
+                throw new RuntimeException("Converstion failed: "+ err);
+            } else {
+                DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
+            }
             return outputFileName;
         } catch (CancellationException ce) {
             return null;

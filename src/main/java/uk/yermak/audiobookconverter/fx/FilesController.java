@@ -260,6 +260,11 @@ public class FilesController {
             fileList.moveFileDown(event);
         }
     }
+    public void subTracks(ActionEvent event) {
+        if (chaptersMode.get()) {
+            bookStructure.subTracks(event);
+        }
+    }
 
     public void editChapter(ActionEvent event) {
         if (chaptersMode.get()) {

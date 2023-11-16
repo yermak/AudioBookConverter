@@ -106,7 +106,7 @@ jobs:
   dependsOn:
     - 'Build_All'
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: 'ubuntu-latest'
 
   steps:
     - task: DownloadPipelineArtifact@2

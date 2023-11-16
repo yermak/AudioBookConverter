@@ -77,6 +77,7 @@ public class FilesController {
     private Button startButton;
 
 
+
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
@@ -257,6 +258,11 @@ public class FilesController {
             bookStructure.moveChapterDown(event);
         } else {
             fileList.moveFileDown(event);
+        }
+    }
+    public void subTracks(ActionEvent event) {
+        if (chaptersMode.get()) {
+            bookStructure.subTracks(event);
         }
     }
 

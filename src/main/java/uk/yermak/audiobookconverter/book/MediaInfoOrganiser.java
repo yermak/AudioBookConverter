@@ -38,7 +38,7 @@ public abstract class MediaInfoOrganiser implements Organisable {
     }
 
     public void moveDown() {
-        if (getNumber() > chapter.getMedia().size()) return;
+        if (getNumber() >= chapter.getMedia().size()) return;
         Collections.swap(chapter.getMedia(), getNumber() - 1, getNumber());
     }
 

@@ -147,7 +147,7 @@ public class Chapter implements Organisable, Convertable {
 
     @Override
     public void moveDown() {
-        if (getNumber() > part.getChapters().size()) return;
+        if (getNumber() >= part.getChapters().size()) return;
         Collections.swap(part.getChapters(), getNumber() - 1, getNumber());
     }
 

@@ -135,6 +135,7 @@
             <MenuItem text="Web-site" onAction="#openWebSite"/>
             <MenuItem text="About" onAction="#openAboutPage"/>
             <MenuItem text="Check new version" onAction="#checkVersion"/>
+            <MenuItem text="Repair" onAction="#repair"/>
         </Menu>
     </MenuBar>
 

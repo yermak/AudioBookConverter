@@ -1,7 +1,6 @@
 package uk.yermak.audiobookconverter;
 
 import com.google.gson.*;
-import org.apache.commons.io.FileUtils;
 import uk.yermak.audiobookconverter.formats.Format;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 
 public class Settings {
 
@@ -68,6 +66,11 @@ public class Settings {
         }
         Settings settings = gson.fromJson(settingsJson, Settings.class);
         return settings;
+    }
+
+    public static String getRawData() {
+        String settingsJson = preferences.get(Version.getVersionString(), null);
+        return settingsJson;
     }
 
     public boolean isDarkMode() {

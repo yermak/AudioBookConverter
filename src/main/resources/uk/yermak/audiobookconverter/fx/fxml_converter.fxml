@@ -312,6 +312,15 @@
                         </Button>
                         <Separator orientation="VERTICAL"/>
 
+                        <Button text="Edit" minWidth="${screen.visualBounds.width * 0.05}"
+                                onAction="#editChapter"
+                                disable="false">
+                            <tooltip>
+                                <Tooltip text="Edit Chapter"/>
+                            </tooltip>
+                        </Button>
+                        <Separator orientation="VERTICAL"/>
+
                         <Button text="Split" minWidth="${screen.visualBounds.width * 0.05}"
                                 onAction="#split"
                                 disable="false">

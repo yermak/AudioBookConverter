@@ -51,6 +51,10 @@ public class Settings {
         preferences.put(Version.getVersionString(), gson.toJson(settings));
     }
 
+    public static void clear() {
+        preferences.remove(Version.getVersionString());
+    }
+
     public void save() {
         saveSetting(this);
     }

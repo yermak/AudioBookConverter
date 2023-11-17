@@ -12,6 +12,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.TransferMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +24,13 @@ import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.book.Organisable;
 import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -458,7 +464,18 @@ public class FilesController {
     }
 
     public void openIssues(ActionEvent actionEvent) {
-        AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Report bug");
+        alert.setContentText("Your setting will be copied into buffer and you will be redirected to GitHub issues page.\n" +
+                "Please describe your problem and paste settings into the issue.\n" +
+                "Note: Your settings may contain sensitive information like your user name, paths to your files, etc.\n");
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Properties properties = System.getProperties();
+            clipboard.setContents(new StringSelection(Utils.propertiesToString(properties)+"\n"+Settings.getRawData()), null);
+            AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
+        }
     }
 
     public void repair(ActionEvent actionEvent) {

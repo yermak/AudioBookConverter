@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -167,6 +168,16 @@ public class Utils {
         return String.format("%0" + digits + "d", i);
     }
 
+    public static String propertiesToString(Properties properties) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (String key : properties.stringPropertyNames()) {
+            String value = properties.getProperty(key);
+            stringBuilder.append(key).append(": ").append(value).append(System.lineSeparator());
+        }
+
+        return stringBuilder.toString();
+    }
 
     private static class DurationRender implements AttributeRenderer<Duration> {
 

@@ -460,4 +460,15 @@ public class FilesController {
     public void openIssues(ActionEvent actionEvent) {
         AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
     }
+
+    public void repair(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Repair");
+        alert.setContentText("Are you sure you want to restore settings to default?\nProgram will be closed.");
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            Settings.clear();
+            System.exit(0);
+        }
+    }
 }

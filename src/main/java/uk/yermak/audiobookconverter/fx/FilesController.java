@@ -28,6 +28,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.List;
@@ -486,6 +487,14 @@ public class FilesController {
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
             Settings.clear();
             System.exit(0);
+        }
+    }
+
+    public void showHints(ActionEvent actionEvent) {
+        try {
+            AudiobookConverter.loadHints();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

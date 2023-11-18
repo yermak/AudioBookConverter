@@ -2,3 +2,8 @@ AudioBookConverter can open following format: mp3, m4a, m4b (aac/alac, with chap
 AudioBookConverter can convert to following formats: m4a, m4b (aac), mp3, ogg (opus).
 OGG format with opus codec will provide the best size to quality ratio, however, it's not supported by all book players.
 Your computer may become less responsive during encoding as AudioBookConverter uses all available CPU/Cores for encoding.
+To find art work AudioBookConverter checks all incoming media files and tries to extract art work from them, then it checks all dirrectories where source media files are located and load all images from them, then you could manually Add artwork file from file or Paste from the clipboard (you could just do screenshot or copy image from web). 
+AudioBookConverter verifies checksums of found art work images to avoid duplicates. Note: similar images or same image in different formats or different resolutions will not be detected automatically and you may want to remove them manually.
+AudioBookConverter supports international encodings and symbols for output. However, some old mp3s may contain legacy encodings which may not be automatically detected by AudioBookConverter.
+You can always report a bug or suggest feature at https://github.com/yermak/AudioBookConverter/issues
+You don't need to keep same bitrate as mp3 has to preserve quality especially for audiobooks without music. E.g. mp3 books encoded at 128kbps, could be encoded into m4b with bitrate of 64kbps or into ogg with bitrate of 48kbps without significant degradation of quality. (Subject to quality of your source file, your hearing abilities nad your listening conditions)

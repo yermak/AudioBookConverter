@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
 import org.controlsfx.control.ToggleSwitch;
@@ -13,16 +14,25 @@ import uk.yermak.audiobookconverter.Settings;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsDialog extends Dialog<Map<String, Object>> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String FILENAME_FORMAT = "filename_format";
+    public static final String PART_FORMAT = "part_format";
+    public static final String CHAPTER_FORMAT = "chapter_format";
+    public static final String DARK_MODE = "dark_mode";
 
     @FXML
     private ToggleSwitch darkMode;
+    @FXML
+    private TextArea filenameFormat;
+    @FXML
+    private TextArea partFormat;
+    @FXML
+    private TextArea chapterFormat;
 
-    public static final String DARK_MODE = "dark_mode";
 
     public SettingsDialog(Window window) {
         setTitle("AudioBookConverter Settings");
@@ -30,10 +40,14 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());
 
-
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return Collections.singletonMap(DARK_MODE, darkMode.isSelected());
+                HashMap results = new HashMap();
+                results.put(DARK_MODE, darkMode.isSelected());
+                results.put(FILENAME_FORMAT, filenameFormat.getText());
+                results.put(PART_FORMAT, partFormat.getText());
+                results.put(CHAPTER_FORMAT, chapterFormat.getText());
+                return results;
             }
             return null;
         });
@@ -50,7 +64,11 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
 
     @FXML
     public void initialize() {
-        darkMode.setSelected(Settings.loadSetting().isDarkMode());
+        Settings settings = Settings.loadSetting();
+        darkMode.setSelected(settings.isDarkMode());
+        filenameFormat.setText(settings.getFilenameFormat());
+        partFormat.setText(settings.getPartFormat());
+        chapterFormat.setText(settings.getChapterFormat());
     }
 
 }

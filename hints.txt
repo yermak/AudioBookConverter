@@ -15,3 +15,4 @@ You don't need to provide chapters information for your book you can press Start
 Using Steam version of app you will automatically get the latest updates. So, you don't need to re-download the app manually and installing it again.
 You can edit chapter information of existing m4b book. Open the book, switch to Chapters mode, select chapter and press Edit button. You can change chapter name using predefined settings, meta-information or use custom chapter name. You can also move chapters up and down by selecting chapter and pressing Move Up or Move Down button.
 When editing a chapter you could apply chapter settings to all chapters. This is useful if you want to change chapter name template for all chapters.
+Your opinion on speed vs quality is needed. You can vote here https://github.com/yermak/AudioBookConverter/discussions/512

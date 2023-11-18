@@ -16,14 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 import uk.yermak.audiobookconverter.fx.JfxEnv;
+import uk.yermak.audiobookconverter.fx.WizardDialog;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 public class AudiobookConverter extends Application {
@@ -109,9 +109,20 @@ public class AudiobookConverter extends Application {
 
             checkNewVersion();
 
+            loadHints();
+
         } catch (IOException e) {
             logger.error("Error initiating application", e);
             e.printStackTrace();
+        }
+    }
+
+    public static void loadHints() throws IOException {
+        List<String> hints = readListFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/hints.txt");
+        if (!hints.isEmpty()) {
+            Collections.shuffle(hints);
+            WizardDialog wizardDialog = new WizardDialog(hints);
+            wizardDialog.show();
         }
     }
 
@@ -135,6 +146,22 @@ public class AudiobookConverter extends Application {
         Notifications.create()
                 .title("AudioBookConverter: Conversion is completed")
                 .text(finalOutputDestination).show();
+    }
+
+    private static List<String> readListFromURL(String requestURL) throws IOException {
+        try {
+            try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+                scanner.useDelimiter("\\n");
+                List<String> result = new ArrayList<>();
+                while (scanner.hasNext()) {
+                    result.add(scanner.next());
+                }
+                return result;
+            }
+        }catch (Exception e){
+            logger.error("Failed to read hints", e);
+            return Collections.emptyList();
+        }
     }
 
     static class VersionChecker implements Runnable {

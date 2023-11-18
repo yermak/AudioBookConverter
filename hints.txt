@@ -1,2 +1,4 @@
-AudioBookConverter is Open Source software to convert different audio formats to AudioBooks. Primary goal was to support m4b format, but currently AudioBookConverter supports other formats and could be used as Audio Converter tool.
-Q: What input formats and codec are supported as input?\\nA: mp3, m4a, m4b (aac/alac, with chapters information), flac (with track information from .cue), ogg (vorbis/opus), wma.
+AudioBookConverter can open following format: mp3, m4a, m4b (aac/alac, with chapters information), flac (with track information from .cue), ogg (vorbis/opus), wma, wav.
+AudioBookConverter can convert to following formats: m4a, m4b (aac), mp3, ogg (opus).
+OGG format with opus codec will provide the best size to quality ratio, however, it's not supported by all book players.
+Your computer may become less responsive during encoding as AudioBookConverter uses all available CPU/Cores for encoding.

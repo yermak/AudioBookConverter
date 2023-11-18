@@ -125,17 +125,18 @@
                 </accelerator>
             </MenuItem>
         </Menu>
-
-
-        <Menu fx:id="mAbout" text="About">
+        <Menu text="System">
             <MenuItem text="Settings" onAction="#settings"/>
+            <MenuItem text="Repair" onAction="#repair"/>
+            <MenuItem text="Check new version" onAction="#checkVersion"/>
+        </Menu>
+        <Menu fx:id="mAbout" text="About">
+            <MenuItem text="Show hints" onAction="#showHints"/>
             <MenuItem text="FAQ" onAction="#openFAQ"/>
             <MenuItem text="Report bug" onAction="#openIssues"/>
             <MenuItem text="Discussions" onAction="#openDiscussions"/>
             <MenuItem text="Web-site" onAction="#openWebSite"/>
             <MenuItem text="About" onAction="#openAboutPage"/>
-            <MenuItem text="Check new version" onAction="#checkVersion"/>
-            <MenuItem text="Repair" onAction="#repair"/>
         </Menu>
     </MenuBar>
 

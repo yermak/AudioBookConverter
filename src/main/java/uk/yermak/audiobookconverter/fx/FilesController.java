@@ -84,7 +84,6 @@ public class FilesController {
     private Button startButton;
 
 
-
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final BooleanProperty chaptersMode = new SimpleBooleanProperty(false);
@@ -267,6 +266,7 @@ public class FilesController {
             fileList.moveFileDown(event);
         }
     }
+
     public void subTracks(ActionEvent event) {
         if (chaptersMode.get()) {
             bookStructure.subTracks(event);
@@ -459,7 +459,15 @@ public class FilesController {
         Optional<Map<String, Object>> result = dialog.showAndWait();
         result.ifPresent(r -> {
             Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
-            Settings.loadSetting().setDarkMode(darkMode).save();
+            String filenameFormat = (String) r.get(SettingsDialog.FILENAME_FORMAT);
+            String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
+            String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
+            Settings settings = Settings.loadSetting();
+            settings.setDarkMode(darkMode);
+            settings.setFilenameFormat(filenameFormat);
+            settings.setPartFormat(partFormat);
+            settings.setChapterFormat(chapterFormat);
+            settings.save();
             AudiobookConverter.getEnv().setDarkMode(darkMode);
         });
     }
@@ -474,7 +482,7 @@ public class FilesController {
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             Properties properties = System.getProperties();
-            clipboard.setContents(new StringSelection(Utils.propertiesToString(properties)+"\n"+Settings.getRawData()), null);
+            clipboard.setContents(new StringSelection(Utils.propertiesToString(properties) + "\n" + Settings.getRawData()), null);
             AudiobookConverter.getEnv().showDocument("https://github.com/yermak/AudioBookConverter/issues");
         }
     }

@@ -14,9 +14,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
 
-public class SubTracksDialog extends Dialog<Pair<Integer, Boolean>> {
+public class SubTracksDialog extends Dialog<Map<String, Object>> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String INTERVAL = "interval";
+    public static final String AUTO_CHAPTERS = "autoChapters";
+    public static final String REPEAT = "repeat";
 
     @FXML
     private Spinner<Integer> intervalSpinner;
@@ -24,15 +29,22 @@ public class SubTracksDialog extends Dialog<Pair<Integer, Boolean>> {
     @FXML
     private ToggleSwitch autoChaptersToggle;
 
+    @FXML
+    private ToggleSwitch splitOnceOrRepeat;
+
     public SubTracksDialog(Window window) {
         setTitle("Create sub-tracks");
-        setHeaderText("Sub-tracks for every period");
+        setHeaderText("Split once after number of seconds \nor cut every number of seconds");
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return new Pair<>(intervalSpinner.getValue(), autoChaptersToggle.isSelected());
+                HashMap<String, Object> results = new HashMap<>();
+                results.put(INTERVAL, intervalSpinner.getValue());
+                results.put(AUTO_CHAPTERS, autoChaptersToggle.isSelected());
+                results.put(REPEAT, splitOnceOrRepeat.isSelected());
+                return results;
             }
             return null;
         });

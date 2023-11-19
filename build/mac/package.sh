@@ -1,7 +1,8 @@
-JAVA_HOME=/Users/Yarick_Yermak/Library/Java/JavaVirtualMachines/temurin-17/Contents/Home
+JAVA_HOME=/Users/yermak/Library/Java/JavaVirtualMachines/azul-21.0.1/Contents/Home
 #JAVA_HOME=$1
-JAVAFX_JMODS=jmods/mac
-APP_VERSION=6.1.2
+#JAVAFX_JMODS=jmods/mac
+JAVAFX_JMODS=jmods/mac_m1
+APP_VERSION=6.2.6
 
 rm -rf target/release
 mkdir target/release

@@ -1,3 +1,5 @@
+To change one of the exising presets, just change its parameters, they will be saved automatically and preset could be used next time
+To create new preset select one of the existing presets, which will be used as a baseline, start typing preset name in text box, hit Enter when finished. How you have new preset and you could tune it accordingly
 AudioBookConverter can open following format: mp3, m4a, m4b (aac/alac, with chapters information), flac (with track information from .cue), ogg (vorbis/opus), wma, wav.
 AudioBookConverter can convert to following formats: m4a, m4b (aac), mp3, ogg (opus).
 OGG format with opus codec will provide the best size to quality ratio, however, it's not supported by all book players.

@@ -11,7 +11,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
       prefWidth="${screen.visualBounds.width * 0.50}"
-      prefHeight="${screen.visualBounds.height * 0.70}"
+      prefHeight="${screen.visualBounds.height * 0.80}"
 >
 
     <fx:define>
@@ -190,7 +190,7 @@
                         </Button>
 
                     </ToolBar>
-                    <ListView fx:id="progressQueue" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="progressQueue" prefHeight="${screen.visualBounds.height * 0.25}" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
 
@@ -264,7 +264,7 @@
                             </tooltip>
                         </Button>
                     </ToolBar>
-                    <FileListComponent fx:id="fileList" VBox.vgrow="ALWAYS"/>
+                    <FileListComponent fx:id="fileList" prefHeight="${screen.visualBounds.height * 0.25}" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
             <Tab fx:id="chaptersTab" text="Chapters" closable="false">
@@ -359,7 +359,7 @@
                         </Button>
 
                     </ToolBar>
-                    <BookStructureComponent fx:id="bookStructure" editable="true" VBox.vgrow="ALWAYS">
+                    <BookStructureComponent fx:id="bookStructure" editable="true" prefHeight="${screen.visualBounds.height * 0.025}" VBox.vgrow="ALWAYS">
                         <columns>
                             <TreeTableColumn text="Title" fx:id="chapterColumn" sortable="false"
                                              prefWidth="${screen.visualBounds.width * 0.1}"/>

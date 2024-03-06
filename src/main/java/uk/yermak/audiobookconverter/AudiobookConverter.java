@@ -84,8 +84,8 @@ public class AudiobookConverter extends Application {
             stage.setTitle(Version.getVersionString());
             stage.setScene(scene);
             Screen primary = Screen.getPrimary();
-//            stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);
-//            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
+            stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);
+            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
             env = new JfxEnv(scene, getHostServices());
 
 

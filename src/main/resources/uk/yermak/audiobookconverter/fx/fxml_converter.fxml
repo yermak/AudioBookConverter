@@ -11,6 +11,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
       prefWidth="${screen.visualBounds.width * 0.50}"
+      prefHeight="${screen.visualBounds.height * 0.70}"
 >
 
     <fx:define>

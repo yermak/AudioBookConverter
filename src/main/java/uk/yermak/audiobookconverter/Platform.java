@@ -44,6 +44,7 @@ public enum Platform {
     static Platform current;
     private static Properties properties = new Properties();
 
+    final static Logger logger = LoggerFactory.getLogger("Platform");
     static {
         if (LINUX.isLinux()) current = LINUX;
         if (MAC.isMac()) current = MAC;
@@ -51,9 +52,6 @@ public enum Platform {
         if (DEV.isDebug()) current = DEV;
         properties = current.loadAppProperties();
     }
-
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
 
     public static final String FFPROBE = current.getPath("ffprobe");
     public static final String MP4INFO = current.getPath("mp4info").replaceAll(" ", "\\ ");
@@ -102,7 +100,7 @@ public enum Platform {
                     logger.error("Error during loading properties", e);
                 }
             } else {
-                logger.error("Path properties is not found at: ", file.getPath());
+                logger.error("Path properties is not found at: {}", file.getAbsolutePath());
             }
         }
         return properties;

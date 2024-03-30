@@ -15,6 +15,7 @@ import uk.yermak.audiobookconverter.fx.ConversionContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -88,7 +89,11 @@ public class FFMediaLoader {
         if (!pictures.isEmpty()) {
             for (int i = 0; i < 10 && i < pictures.size(); i++) {
 //                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
-                context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(pictures.get(i).getPath()))));
+                try (var imageStream = new FileInputStream(pictures.get(i).getPath())) {
+                    context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

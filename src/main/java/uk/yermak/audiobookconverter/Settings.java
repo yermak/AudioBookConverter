@@ -23,6 +23,7 @@ public class Settings {
             }).create();
 
     private boolean darkMode = false;
+    private boolean showHints = true;
     private int lastUsedPreset = 0;
     private List<Preset> presets = new ArrayList<>();
     private Set<String> genres = new TreeSet<>();
@@ -79,6 +80,15 @@ public class Settings {
 
     public Settings setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+        return this;
+    }
+
+    public boolean isShowHints() {
+        return showHints;
+    }
+
+    public Settings setShowHints(boolean showHints) {
+        this.showHints = showHints;
         return this;
     }
 

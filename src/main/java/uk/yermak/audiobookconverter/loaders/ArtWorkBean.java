@@ -6,7 +6,7 @@ import uk.yermak.audiobookconverter.book.ArtWork;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Deprecated
 public class ArtWorkBean implements ArtWork {
@@ -36,9 +36,9 @@ public class ArtWorkBean implements ArtWork {
 
     @Override
     public Image image() {
-        try {
-            return  new Image(new FileInputStream(getFileName()));
-        } catch (FileNotFoundException e) {
+        try (var imageStream = new FileInputStream(getFileName())) {
+            return  new Image(imageStream);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

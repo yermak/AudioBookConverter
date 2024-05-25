@@ -23,6 +23,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
     public static final String PART_FORMAT = "part_format";
     public static final String CHAPTER_FORMAT = "chapter_format";
     public static final String DARK_MODE = "dark_mode";
+    public static final String SHOW_HINTS = "show_hints";
 
     @FXML
     private ToggleSwitch darkMode;
@@ -32,6 +33,8 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
     private TextArea partFormat;
     @FXML
     private TextArea chapterFormat;
+    @FXML
+    private ToggleSwitch showHints;
 
 
     public SettingsDialog(Window window) {
@@ -46,7 +49,8 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
                 results.put(DARK_MODE, darkMode.isSelected());
                 results.put(FILENAME_FORMAT, filenameFormat.getText());
                 results.put(PART_FORMAT, partFormat.getText());
-                results.put(CHAPTER_FORMAT, chapterFormat.getText());
+                results.put(SHOW_HINTS, showHints.isSelected());
+
                 return results;
             }
             return null;
@@ -69,6 +73,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
         filenameFormat.setText(settings.getFilenameFormat());
         partFormat.setText(settings.getPartFormat());
         chapterFormat.setText(settings.getChapterFormat());
+        showHints.setSelected(settings.isShowHints());
     }
 
 }

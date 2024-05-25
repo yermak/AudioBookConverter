@@ -165,6 +165,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
             }
         }
         updateBookStructure();
+        getSelectionModel().clearSelection();
     }
 
     void subTracks(ActionEvent actionEvent) {

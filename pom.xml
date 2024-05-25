@@ -7,20 +7,20 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-<!--
-    <version>6.1.2</version>
--->
 
-    <version>#{APP_VERSION}#</version>
+    <version>6.2.6</version>
+
+
+<!--    <version>#{APP_VERSION}#</version>-->
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>17.0.1</javafx.version>
+        <javafx.version>21.0.1</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -156,6 +156,27 @@
                     <executable>${java.home}\bin\java</executable>
                 </configuration>
             </plugin>
+
+            <!--<plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <executions>
+                    <execution>
+                        &lt;!&ndash; Default configuration for running with: mvn clean javafx:run &ndash;&gt;
+                        <id>default-cli</id>
+                        <configuration>
+                            <mainClass>uk.yermak.audiobookconverter.AudioBookConverter</mainClass>
+                            <launcher>app</launcher>
+                            <jlinkZipName>app</jlinkZipName>
+                            <jlinkImageName>app</jlinkImageName>
+                            <noManPages>true</noManPages>
+                            <stripDebug>true</stripDebug>
+                            <noHeaderFiles>true</noHeaderFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

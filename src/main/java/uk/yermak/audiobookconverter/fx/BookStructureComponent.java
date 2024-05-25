@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import javafx.util.Pair;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.book.*;
 import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
@@ -12,6 +11,7 @@ import uk.yermak.audiobookconverter.fx.util.ContextMenuTreeTableRow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,7 +60,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                     contextMenu.getItems().add(split);
                 }
 
-                if ((item instanceof Chapter || item instanceof Part)  && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() > 1 /*&& getSelectionModel().getSelectedItems().contains(item)*/) {
+                if ((item instanceof Chapter || item instanceof Part) && item.getTotalNumbers() > 1 && getSelectionModel().getSelectedItems().size() > 1 /*&& getSelectionModel().getSelectedItems().contains(item)*/) {
                     MenuItem combine = new MenuItem("Combine");
                     combine.setOnAction(BookStructureComponent.this::combineChapters);
                     contextMenu.getItems().add(combine);
@@ -175,16 +175,16 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         if (organisable instanceof MediaInfo) {
             SubTracksDialog dialog = new SubTracksDialog(AudiobookConverter.getEnv().getWindow());
 
-            Optional<Pair<Integer, Boolean>> result = dialog.showAndWait();
+            Optional<Map<String, Object>> result = dialog.showAndWait();
             result.ifPresent(r -> {
                 MediaInfo mediaInfo = (MediaInfo) organisable;
-                extractSubtracks(mediaInfo, r.getValue(), r.getKey() * 60000);
+                extractSubtracks(mediaInfo, ((Boolean) r.get(SubTracksDialog.AUTO_CHAPTERS)), ((Integer) r.get(SubTracksDialog.INTERVAL)) * 1000, ((Boolean) r.get(SubTracksDialog.REPEAT)));
                 updateBookStructure();
             });
         }
     }
 
-    private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval) {
+    private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval, Boolean repeat) {
         double speed = AudiobookConverter.getContext().getOutputParameters().getSpeed();
         long duration = mediaInfo.getDuration();
 
@@ -195,13 +195,32 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
 
         long fullTracks = duration / interval;
         List<Track> tracks = new ArrayList<>();
-        for (int i = 1; i <= fullTracks + (duration % interval > 0 ? 1 : 0); i++) {
-            Track track = new Track(String.valueOf(i));
-            track.setTitle(mediaInfo.getTitle());
-            track.setStart((i - 1) * interval);
-            track.setEnd(Math.min(i * interval - 1, duration));
-            tracks.add(track);
+
+        if (repeat) {
+            long count = fullTracks + (duration % interval > 0 ? 1 : 0);
+            for (int i = 1; i <= count; i++) {
+                Track track = new Track(String.valueOf(i));
+                track.setTitle(mediaInfo.getTitle());
+                track.setStart((i - 1) * interval);
+                track.setEnd(Math.min(i * interval - 1, duration));
+                tracks.add(track);
+            }
+        } else {
+            if (interval < duration) {
+                Track startTrack = new Track(String.valueOf(1));
+                startTrack.setTitle(mediaInfo.getTitle());
+                startTrack.setStart(0);
+                startTrack.setEnd(interval);
+                tracks.add(startTrack);
+
+                Track endTrack = new Track(String.valueOf(2));
+                endTrack.setTitle(mediaInfo.getTitle());
+                endTrack.setStart(interval);
+                endTrack.setEnd(duration);
+                tracks.add(endTrack);
+            }
         }
+
 
         if (wrapWithChapters) {
             Part part = mediaInfo.getChapter().getPart();

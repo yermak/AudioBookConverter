@@ -17,7 +17,7 @@ public enum Platform {
 
     MAC {
         protected String getAppPath() {
-            return com.apple.eio.FileManager.getPathToApplicationBundle() + "/";
+            return /*com.apple.eio.FileManager.getPathToApplicationBundle() +*/ "/";
         }
 
         @Override

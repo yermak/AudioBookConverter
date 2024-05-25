@@ -42,8 +42,8 @@ public class Settings {
             "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
     private String chapterContext = "CHAPTER_NUMBER:CHAPTER_TEXT:DURATION";
     private String chapterCustomTitle = "";
-    private String outputFolder = System.getProperty("user.home");
-    private String sourceFolder = System.getProperty("user.home");
+    private String outputFolder = System.getProperty("user.home")+"/Documents/";
+    private String sourceFolder = System.getProperty("user.home")+"/Documents/";
 
     public static void saveSetting(Settings settings) {
         preferences.put(Version.getVersionString(), gson.toJson(settings));

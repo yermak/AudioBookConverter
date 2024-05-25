@@ -7,9 +7,9 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-    <version>6.3.0</version>
+    <!--<version>6.3.0</version>-->
 
-<!--    <version>#{APP_VERSION}#</version>-->
+    <version>#{APP_VERSION}#</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

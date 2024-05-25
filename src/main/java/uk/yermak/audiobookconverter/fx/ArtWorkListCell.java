@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import uk.yermak.audiobookconverter.book.ArtWork;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ArtWorkListCell extends ListCell<ArtWork> {
     private final ImageView imageView = new ImageView();
@@ -19,8 +19,8 @@ public class ArtWorkListCell extends ListCell<ArtWork> {
             setText(null);
             setGraphic(null);
         } else {
-            try {
-                Image image = new Image(new FileInputStream(artWork.getFileName()));
+            try (var imageStream = new FileInputStream(artWork.getFileName())) {
+                Image image = new Image(imageStream);
                 imageView.setImage(image);
                 imageView.setFitHeight(110);
                 imageView.setPreserveRatio(true);
@@ -28,7 +28,7 @@ public class ArtWorkListCell extends ListCell<ArtWork> {
                 double height = image.getHeight();
                 double width = image.getWidth();
                 setTooltip(new Tooltip("["+Math.round(width) + "x" + Math.round(height)+"] - "+artWork.getFileName()));
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             setGraphic(imageView);

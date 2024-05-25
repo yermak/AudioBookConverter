@@ -7,7 +7,7 @@ trigger:
 
 
 variables:
-  VERSION: 99.96
+  VERSION: 99.95
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
 
@@ -18,8 +18,6 @@ jobs:
       matrix:
         linux:
           imageName: 'ubuntu-latest'
-        mac:
-          imageName: 'macos-latest'
         windows:
           imageName: 'windows-latest'
 
@@ -39,9 +37,9 @@ jobs:
         tokenSuffix: '}#'
 
     - bash: |
-        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_linux-x64_bin.tar.gz -O openjdk-17.0.1_linux-x64_bin.tar.gz  
-        tar -xzf openjdk-17.0.1_linux-x64_bin.tar.gz
-        export JAVA_HOME=jdk-17.0.1
+        wget -q https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
+        tar -xzf openjdk-21+35_linux-x64_bin.tar.gz
+        export JAVA_HOME=jdk-21
         export JAVAFX_JMODS=jmods/linux
         mvn clean package --no-transfer-progress
 
@@ -50,39 +48,15 @@ jobs:
       condition: eq( variables['Agent.OS'], 'Linux' )
       displayName: 'Build deb package'
 
-    - bash: |
-        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_macos-x64_bin.tar.gz -O openjdk-17.0.1_osx-x64_bin.tar.gz
-        tar -xzf openjdk-17.0.1_osx-x64_bin.tar.gz
-        sudo mv jdk-17.0.1.jdk /Library/Java/JavaVirtualMachines/
-        rm openjdk-17.0.1_osx-x64_bin.tar.gz
-        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home
-        brew install ffmpeg
-        brew install mp4v2
-        export JAVAFX_JMODS=jmods/mac
-
-        mvn clean package --no-transfer-progress
-
-        $JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
-        --add-modules java.base,java.sql,java.management,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics --output target/fx-jre
-
-        $JAVA_HOME/bin/jpackage --app-version $(APP_VERSION)  --license-file LICENSE --icon AudioBookConverter.icns \
-        --type dmg \
-        --input target/package/audiobookconverter-$(APP_VERSION)-mac-installer/audiobookconverter-$(APP_VERSION)/app \
-        --main-jar lib/audiobookconverter-$(APP_VERSION).jar --runtime-image target/fx-jre --java-options '--enable-preview'
-        mkdir target/release
-        mv -f *.dmg target/release
-
-      condition: eq( variables['Agent.OS'], 'Darwin' )
-      displayName: 'Build dmg package'
-
 
     - script: |
         ECHO ON
         choco install 7zip --no-progress
         choco install wget --no-progress
-        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip
-        7z.exe x openjdk-17.0.1_windows-x64_bin.zip
-        setx JAVA_HOME jdk-17.0.1
+        wget -q https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_windows-x64_bin.zip
+#        wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip
+        7z.exe x openjdk-21+35_windows-x64_bin.zip
+        setx JAVA_HOME jdk-21
         call refreshenv
         SET JAVAFX_JMODS=jmods/windows
 

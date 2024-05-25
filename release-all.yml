@@ -35,7 +35,7 @@ jobs:
       fetchDepth: '1'
       persistCredentials: true
 
-    - task: replacetokens@6
+    - task: replacetokens@3
       inputs:
         targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java'
         tokenPrefix: '#{'

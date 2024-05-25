@@ -148,10 +148,15 @@ public abstract class Format {
         options.add(mediaInfo.getFileName());
         options.add("-vn");
         options.add("-codec:a");
-        options.add(codec);
+        options.add(codec+"_at");
+        //Apple notive codec requires ffmpeg with --enable-audiotoolbox
+//        options.add(codec+"_at");
 
         options.add("-map_metadata");
         options.add("-1");
+//        options.add("-aac_coder");
+//        options.add("fast");
+
 
         setBitRateOptions(options, outputParameters);
 

@@ -18,9 +18,10 @@ steps:
 
   - script: |
       choco install wget --no-progress
-      wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip      
-      7z.exe x openjdk-17.0.1_windows-x64_bin.zip
-      setx JAVA_HOME jdk-17.0.1
+      wget -q https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_windows-x64_bin.zip
+#      wget -q https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_windows-x64_bin.zip -O openjdk-17.0.1_windows-x64_bin.zip
+      7z.exe x openjdk-21+35_windows-x64_bin.zip
+      setx JAVA_HOME jdk-21
       call refreshenv
       call mvn -X clean package -Dexec.skip=true --no-transfer-progress $(MAVEN_OPTS)
     displayName: 'Build app without installer'

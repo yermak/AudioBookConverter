@@ -7,9 +7,7 @@
     <groupId>uk.yermak</groupId>
     <artifactId>audiobookconverter</artifactId>
 
-
-    <version>6.2.6</version>
-
+    <version>6.3.0</version>
 
 <!--    <version>#{APP_VERSION}#</version>-->
 
@@ -20,15 +18,15 @@
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
         <compiler.args.main>--enable-preview</compiler.args.main>
-        <javafx.version>21.0.1</javafx.version>
+        <javafx.version>21.0.3</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
 
     <repositories>
         <repository>
-            <id>github-mvn-repo-ffmpeg-cli-wrapper-snapshot</id>
-            <url>https://github.com/yermak/ffmpeg-cli-wrapper/raw/mvn-repo/</url>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -85,7 +83,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.1.1</version>
+            <version>11.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.openjfx</groupId>
@@ -109,7 +107,7 @@
         <dependency>
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
-            <version>0.6.3-SNAPSHOT</version>
+            <version>0.8.0</version>
         </dependency>
 
         <dependency>
@@ -157,34 +155,16 @@
                 </configuration>
             </plugin>
 
-            <!--<plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        &lt;!&ndash; Default configuration for running with: mvn clean javafx:run &ndash;&gt;
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>uk.yermak.audiobookconverter.AudioBookConverter</mainClass>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
-                            <stripDebug>true</stripDebug>
-                            <noHeaderFiles>true</noHeaderFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <compilerArgs>
+                        --enable-preview
+                    </compilerArgs>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
@@ -196,7 +176,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>3.2.5</version>
                 <configuration>
                     <argLine>--enable-preview</argLine>
                 </configuration>
@@ -205,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -219,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.7.1</version>
                 <executions>
                     <execution>
                         <id>installer</id>

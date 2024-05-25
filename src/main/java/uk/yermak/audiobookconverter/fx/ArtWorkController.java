@@ -45,26 +45,26 @@ public class ArtWorkController {
 
     @FXML
     private void addImage(ActionEvent actionEvent) {
-        try {
-            FileChooser fileChooser = new FileChooser();
-            String sourceFolder = Settings.loadSetting().getSourceFolder();
-            fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
-            fileChooser.setTitle("Select JPG or PNG file");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
-                    new FileChooser.ExtensionFilter("png", "*.png"),
-                    new FileChooser.ExtensionFilter("bmp", "*.bmp"));
+        FileChooser fileChooser = new FileChooser();
+        String sourceFolder = Settings.loadSetting().getSourceFolder();
+        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
+        fileChooser.setTitle("Select JPG or PNG file");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
+                new FileChooser.ExtensionFilter("png", "*.png"),
+                new FileChooser.ExtensionFilter("bmp", "*.bmp"));
 
-            File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
-            logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
-            if (file != null) {
-                imageList.getItems().add(new ArtWorkImage(new Image(new FileInputStream(file.getAbsolutePath()))));
-//            imageList.getItems().add(new ArtWorkBean(Utils.tempCopy(file.getAbsolutePath())));
-                logger.info("Added art work from file: {}", file);
+        File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
+        logger.debug("Opened dialog for art image in folder: {}", sourceFolder);
+        if (file != null) {
+            try (var imageStream = new FileInputStream(file.getAbsolutePath())) {
+                imageList.getItems().add(new ArtWorkImage(new Image(imageStream)));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            logger.info("Added art work from file: {}", file);
         }
+
     }
 
     @FXML
@@ -118,9 +118,9 @@ public class ArtWorkController {
 
                     artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
 //                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
-                        try {
-                            AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(new FileInputStream(f))));
-                        } catch (FileNotFoundException e) {
+                        try (var imageStream = new FileInputStream(f)) {
+                            AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
+                        } catch (IOException e) {
                             logger.error("failed to paste image", e);
                         }
                     });
@@ -141,10 +141,12 @@ public class ArtWorkController {
             image = bufferedImage;
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write((RenderedImage) image, "png", out);
-        out.flush();
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-        return new javafx.scene.image.Image(in);
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            ImageIO.write((RenderedImage) image, "png", out);
+            out.flush();
+            try (ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray())) {
+                return new javafx.scene.image.Image(in);
+            }
+        }
     }
 }

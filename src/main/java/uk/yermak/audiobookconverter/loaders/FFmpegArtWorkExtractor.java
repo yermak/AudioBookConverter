@@ -58,13 +58,15 @@ class FFmpegArtWorkExtractor implements Callable<ArtWork> {
             FFMediaLoader.logger.debug("ArtWork Out: {}", out);
             FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
-            ArtWork artWorkBean = new ArtWorkImage(new Image(new FileInputStream(poster)));
-            javafx.application.Platform.runLater(() -> {
-                if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
-                    AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
-                }
-            });
-            return artWorkBean;
+            try (var imageStream = new FileInputStream(poster)) {
+                ArtWork artWorkBean = new ArtWorkImage(new Image(imageStream));
+                javafx.application.Platform.runLater(() -> {
+                    if (!conversionGroup.isOver() && !conversionGroup.isStarted() && !conversionGroup.isDetached()) {
+                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(artWorkBean);
+                    }
+                });
+                return artWorkBean;
+            }
         } catch (Exception e) {
             logger.error("Error in extracting image with FFMpeg:", e);
             throw new RuntimeException(e);

@@ -462,11 +462,13 @@ public class FilesController {
             String filenameFormat = (String) r.get(SettingsDialog.FILENAME_FORMAT);
             String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
             String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
+            Boolean showHints = (Boolean) r.get(SettingsDialog.SHOW_HINTS);
             Settings settings = Settings.loadSetting();
             settings.setDarkMode(darkMode);
             settings.setFilenameFormat(filenameFormat);
             settings.setPartFormat(partFormat);
             settings.setChapterFormat(chapterFormat);
+            settings.setShowHints(showHints);
             settings.save();
             AudiobookConverter.getEnv().setDarkMode(darkMode);
         });

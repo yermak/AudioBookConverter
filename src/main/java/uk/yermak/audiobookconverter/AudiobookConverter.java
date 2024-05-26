@@ -88,8 +88,8 @@ public class AudiobookConverter extends Application {
 //            stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
             env = new JfxEnv(scene, getHostServices());
 
-
-            boolean dark = Settings.loadSetting().isDarkMode();
+            Settings settings = Settings.loadSetting();
+            boolean dark = settings.isDarkMode();
             if (dark) {
                 env.setDarkMode(dark);
             }
@@ -109,7 +109,9 @@ public class AudiobookConverter extends Application {
 
             checkNewVersion();
 
-            loadHints();
+            if (settings.isShowHints()) {
+                loadHints();
+            }
 
         } catch (IOException e) {
             logger.error("Error initiating application", e);

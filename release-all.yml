@@ -108,6 +108,7 @@ jobs:
   displayName: 'Build and Release to Chocolatey'
   dependsOn:
     - 'Release_GitHub'
+pool:
   vmImage: 'windows-latest'
 
   steps:

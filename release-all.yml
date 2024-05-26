@@ -106,12 +106,11 @@ jobs:
 
 - job: BuildAndRelease
   displayName: 'Build and Release to Chocolatey'
-  steps:
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '6.x.x' # Use the appropriate .NET version if your package requires it
+  dependsOn:
+    - 'Release_GitHub'
+  vmImage: 'windows-latest'
 
+  steps:
     - script: |
         choco install chocolatey --no-progress --yes
       displayName: 'Install Chocolatey'

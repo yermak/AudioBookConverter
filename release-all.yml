@@ -15,7 +15,7 @@ variables:
   VERSION: 6.3
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
-  chocolatey_api_key: $(CHOCOLATEY_API_KEY)
+ 
 
 jobs:
 - job: Build_All

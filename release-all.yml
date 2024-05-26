@@ -15,6 +15,7 @@ variables:
   VERSION: 6.3
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
+  chocolatey_api_key: $(CHOCOLATEY_API_KEY)
 
 jobs:
 - job: Build_All
@@ -37,7 +38,7 @@ jobs:
 
     - task: replacetokens@3
       inputs:
-        targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java'
+        targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java,build/windows/chocolaty/audiobookconverter.nuspec,build/windows/chocolaty/tools/chocolateyinstall.ps1'
         tokenPrefix: '#{'
         tokenSuffix: '}#'
 
@@ -102,3 +103,40 @@ jobs:
         #releaseNotesFile: # Optional
         #releaseNotes: # Optional
         assets: '$(Pipeline.Workspace)/*' # Optional
+
+- job: BuildAndRelease
+  displayName: 'Build and Release to Chocolatey'
+  steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '6.x.x' # Use the appropriate .NET version if your package requires it
+
+    - script: |
+        choco install chocolatey --no-progress --yes
+      displayName: 'Install Chocolatey'
+
+    - powershell: |
+        $checksum = Get-FileHash -Path $(Build.ArtifactStagingDirectory)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+        Write-Host "##vso[task.setvariable variable=binary_checksum]$checksum"
+        displayName: 'Generate Checksum'
+
+    - powershell: |
+        (Get-Content tools\chocolateyInstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content tools\chocolateyInstall.ps1
+        displayName: 'Update chocolateyInstall.ps1 with Checksum'
+
+    - script: |
+        choco pack audiobookconverter.nuspec
+      displayName: 'Create Chocolatey Package'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+        artifactName: 'drop'
+        publishLocation: 'Container'
+
+    - script: |
+        choco push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://push.chocolatey.org/ --api-key $(chocolatey_api_key)
+      displayName: 'Push Package to Chocolatey'
+      env:
+        CHOCO_API_KEY: $(chocolatey_api_key)

@@ -15,7 +15,6 @@ variables:
   VERSION: 6.3
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
-  chocolatey_api_key: $(CHOCOLATEY_API_KEY)
 
 jobs:
 - job: Build_All
@@ -112,12 +111,16 @@ jobs:
     vmImage: 'windows-latest'
 
   steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: 'AudioBookConverter-$(APP_VERSION)'
+
     - script: |
         choco install chocolatey --no-progress --yes
       displayName: 'Install Chocolatey'
 
     - powershell: |
-        $checksum = Get-FileHash -Path $(Build.ArtifactStagingDirectory)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+        $checksum = Get-FileHash -Path $(Pipeline.Workspace)/AudioBookConverter-$(APP_VERSION)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         Write-Host "##vso[task.setvariable variable=binary_checksum]$checksum"
         displayName: 'Generate Checksum'
 

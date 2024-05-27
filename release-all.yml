@@ -114,7 +114,7 @@ jobs:
   
     - script: |
         choco install chocolatey --no-progress --yes
-      displayName: 'Install Chocolatey'
+        displayName: 'Install Chocolatey'
     - task: DownloadPipelineArtifact@2
       inputs:
         artifact: 'AudioBookConverter-$(APP_VERSION)'

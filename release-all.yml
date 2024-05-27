@@ -125,17 +125,17 @@ jobs:
     - powershell: |
         dir '$(Pipeline.Workspace)'
         dir '$(System.ArtifactsDirectory)'
-        $checksum = Get-FileHash -Path $(System.ArtifactsDirectory)/AudioBookConverter-$(APP_VERSION)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+        $checksum = Get-FileHash -Path $(Pipeline.Workspace)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         Write-Host "##vso[task.setvariable variable=binary_checksum]$checksum"
-        displayName: 'Generate Checksum'
+      displayName: 'Generate Checksum'
 
     - powershell: |
         (Get-Content tools\chocolateyInstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content tools\chocolateyInstall.ps1
-        displayName: 'Update chocolateyInstall.ps1 with Checksum'
+      displayName: 'Update chocolateyInstall.ps1 with Checksum'
 
     - script: |
         choco pack audiobookconverter.nuspec
-        displayName: 'Create Chocolatey Package'
+      displayName: 'Create Chocolatey Package'
 
     - task: PublishBuildArtifacts@1
       inputs:

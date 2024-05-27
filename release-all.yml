@@ -111,10 +111,6 @@ jobs:
     vmImage: 'windows-latest'
 
   steps:
-  
-    - script: |
-        choco install chocolatey --no-progress --yes
-        displayName: 'Install Chocolatey'
     - task: DownloadPipelineArtifact@2
       inputs:
         artifact: 'AudioBookConverter-$(APP_VERSION)'
@@ -151,5 +147,5 @@ jobs:
         choco push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://push.chocolatey.org/ --api-key $(CHOCOLATEY_API_KEY)
         displayName: 'Push Package to Chocolatey'
       env:
-        CHOCO_API_KEY: $(CHOCOLATEY_API_KEY)
+        CHOCOLATEY_API_KEY: $(CHOCOLATEY_API_KEY)
       

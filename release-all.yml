@@ -139,7 +139,7 @@ jobs:
 
     - script: |
         choco pack audiobookconverter.nuspec
-      displayName: 'Create Chocolatey Package'
+        displayName: 'Create Chocolatey Package'
 
     - task: PublishBuildArtifacts@1
       inputs:
@@ -148,7 +148,8 @@ jobs:
         publishLocation: 'Container'
 
     - script: |
-        choco push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://push.chocolatey.org/ --api-key $(chocolatey_api_key)
-      displayName: 'Push Package to Chocolatey'
+        choco push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://push.chocolatey.org/ --api-key $(CHOCOLATEY_API_KEY)
+        displayName: 'Push Package to Chocolatey'
       env:
-        CHOCO_API_KEY: $(chocolatey_api_key)
+        CHOCO_API_KEY: $(CHOCOLATEY_API_KEY)
+      

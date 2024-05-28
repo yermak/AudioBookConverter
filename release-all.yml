@@ -115,7 +115,6 @@ jobs:
       inputs:
         artifact: 'AudioBookConverter-$(APP_VERSION)'
         targetPath: '$(Pipeline.Workspace)'
-
     - task: DownloadBuildArtifacts@0
       inputs:
         buildType: 'current'

@@ -129,7 +129,7 @@ jobs:
       displayName: 'Generate Checksum'
 
     - powershell: |
-        (Get-Content build\windows\chocolaty\tools\chocolateyinstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content tools\chocolateyInstall.ps1
+        (Get-Content build\windows\chocolaty\tools\chocolateyinstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content build\windows\chocolaty\tools\chocolateyInstall.ps1
       displayName: 'Update chocolateyInstall.ps1 with Checksum'
 
     - script: |

@@ -133,6 +133,7 @@ jobs:
       displayName: 'Update chocolateyInstall.ps1 with Checksum'
 
     - script: |
+        cd build\windows\chocolaty
         choco pack audiobookconverter.nuspec
       displayName: 'Create Chocolatey Package'
 

@@ -118,7 +118,7 @@ jobs:
 
     - task: PublishBuildArtifacts@1
       inputs:
-        pathToPublish: cd build\windows\chocolaty\*.nupkg'
+        pathToPublish: build\windows\chocolaty\*.nupkg'
         artifactName: 'drop'
         publishLocation: 'Container'
 

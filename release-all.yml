@@ -123,8 +123,10 @@ jobs:
     #     publishLocation: 'Container'
 
     - script: |
+        dir build\windows\chocolaty\
+        echo $(CHOCOLATEY_API_KEY)
         choco push build\windows\chocolaty\*.nupkg --source https://push.chocolatey.org/ --api-key $(CHOCOLATEY_API_KEY)
-        displayName: 'Push Package to Chocolatey'
+      displayName: 'Push Package to Chocolatey'
       env:
         CHOCOLATEY_API_KEY: $(CHOCOLATEY_API_KEY)
       

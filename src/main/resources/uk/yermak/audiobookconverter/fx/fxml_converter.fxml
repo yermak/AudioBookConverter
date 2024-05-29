@@ -376,7 +376,7 @@
 
     <TabPane fx:id="tabs" VBox.vgrow="NEVER">
         <padding>
-            <Insets top="10" right="10" bottom="10" left="10"/>
+            <Insets top="5" right="10" bottom="10" left="10"/>
         </padding>
         <Tab text="Book Info" closable="false">
             <fx:include source="book_info.fxml"/>

@@ -2,14 +2,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
           fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController" VBox.vgrow="NEVER" hgap="10">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 
     </fx:define>
+    <padding>
+        <Insets top="0" right="10" bottom="0" left="10"/>
+    </padding>
+
     <columnConstraints>
         <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="NEVER"/>

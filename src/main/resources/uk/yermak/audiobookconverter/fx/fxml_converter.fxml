@@ -50,12 +50,12 @@
             <SeparatorMenuItem/>
             <MenuItem text="Up" onAction="#moveUp">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="UP" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <MenuItem text="Down" onAction="#moveDown">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="DOWN" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="DOWN" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <SeparatorMenuItem/>
@@ -93,12 +93,12 @@
             <SeparatorMenuItem/>
             <MenuItem text="Up" onAction="#moveUp">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="UP" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <MenuItem text="Down" onAction="#moveDown">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="DOWN" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="DOWN" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
 

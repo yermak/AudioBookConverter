@@ -23,6 +23,7 @@ public class Settings {
             }).create();
 
     private boolean darkMode = false;
+    private boolean showHints = true;
     private int lastUsedPreset = 0;
     private List<Preset> presets = new ArrayList<>();
     private Set<String> genres = new TreeSet<>();
@@ -42,8 +43,8 @@ public class Settings {
             "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
     private String chapterContext = "CHAPTER_NUMBER:CHAPTER_TEXT:DURATION";
     private String chapterCustomTitle = "";
-    private String outputFolder = System.getProperty("user.home");
-    private String sourceFolder = System.getProperty("user.home");
+    private String outputFolder = System.getProperty("user.home")+"/Documents/";
+    private String sourceFolder = System.getProperty("user.home")+"/Documents/";
 
     public static void saveSetting(Settings settings) {
         preferences.put(Version.getVersionString(), gson.toJson(settings));
@@ -79,6 +80,15 @@ public class Settings {
 
     public Settings setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+        return this;
+    }
+
+    public boolean isShowHints() {
+        return showHints;
+    }
+
+    public Settings setShowHints(boolean showHints) {
+        this.showHints = showHints;
         return this;
     }
 

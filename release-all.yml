@@ -15,7 +15,6 @@ variables:
   VERSION: 6.3
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
-  chocolatey_api_key: $(CHOCOLATEY_API_KEY)
 
 jobs:
 - job: Build_All
@@ -38,7 +37,7 @@ jobs:
 
     - task: replacetokens@3
       inputs:
-        targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java,build/windows/chocolaty/audiobookconverter.nuspec,build/windows/chocolaty/tools/chocolateyinstall.ps1'
+        targetFiles: 'pom.xml,src/main/java/uk/yermak/audiobookconverter/Version.java'
         tokenPrefix: '#{'
         tokenSuffix: '}#'
 
@@ -79,13 +78,24 @@ jobs:
         ArtifactName: 'AudioBookConverter-$(APP_VERSION)'
         publishLocation: 'Container'
 
-- job: Release_GitHub
+- job: Release_Chocolatey
+  displayName: 'Release to Chocolatey'
   dependsOn:
     - 'Build_All'
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-latest'
 
   steps:
+    - checkout: self
+      clean: 'true'
+      fetchDepth: '1'
+      persistCredentials: true
+    - task: replacetokens@3
+      inputs:
+        targetFiles: 'build/windows/chocolaty/audiobookconverter.nuspec,build/windows/chocolaty/tools/chocolateyinstall.ps1'
+        tokenPrefix: '#{'
+        tokenSuffix: '}#'
+
     - task: DownloadPipelineArtifact@2
       inputs:
         artifact: 'AudioBookConverter-$(APP_VERSION)'
@@ -116,27 +126,34 @@ jobs:
         choco install chocolatey --no-progress --yes
       displayName: 'Install Chocolatey'
 
+        targetPath: '$(Pipeline.Workspace)'
     - powershell: |
+        dir '$(Pipeline.Workspace)'
+        dir '$(System.ArtifactsDirectory)'
+        $checksum = Get-FileHash -Path $(Pipeline.Workspace)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         $checksum = Get-FileHash -Path $(Pipeline.Workspace)/AudioBookConverter-$(APP_VERSION)/AudioBookConverter-NoDeps-$(APP_VERSION).msi -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         Write-Host "##vso[task.setvariable variable=binary_checksum]$checksum"
-        displayName: 'Generate Checksum'
+      displayName: 'Generate Checksum'
 
     - powershell: |
-        (Get-Content tools\chocolateyInstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content tools\chocolateyInstall.ps1
-        displayName: 'Update chocolateyInstall.ps1 with Checksum'
+        (Get-Content build\windows\chocolaty\tools\chocolateyinstall.ps1) -replace '##yourbinarychecksum##', '$(binary_checksum)' | Set-Content build\windows\chocolaty\tools\chocolateyInstall.ps1
+      displayName: 'Update chocolateyInstall.ps1 with Checksum'
 
     - script: |
+        cd build\windows\chocolaty
         choco pack audiobookconverter.nuspec
       displayName: 'Create Chocolatey Package'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        artifactName: 'drop'
-        publishLocation: 'Container'
+    # - task: PublishBuildArtifacts@1
+    #   inputs:
+    #     pathToPublish: build\windows\chocolaty\*.nupkg'
+    #     artifactName: 'drop'
+    #     publishLocation: 'Container'
 
     - script: |
-        choco push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://push.chocolatey.org/ --api-key $(chocolatey_api_key)
+        dir build\windows\chocolaty\
+        echo $(CHOCOLATEY_API_KEY)
+        choco push build\windows\chocolaty\audiobookconverter.$(APP_VERSION).nupkg --source https://push.chocolatey.org/ --api-key $(CHOCOLATEY_API_KEY)
       displayName: 'Push Package to Chocolatey'
       env:
-        CHOCO_API_KEY: $(chocolatey_api_key)
+        CHOCOLATEY_API_KEY: $(CHOCOLATEY_API_KEY)

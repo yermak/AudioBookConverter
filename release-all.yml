@@ -116,11 +116,11 @@ jobs:
         choco pack audiobookconverter.nuspec
       displayName: 'Create Chocolatey Package'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: build\windows\chocolaty\*.nupkg'
-        artifactName: 'drop'
-        publishLocation: 'Container'
+    # - task: PublishBuildArtifacts@1
+    #   inputs:
+    #     pathToPublish: build\windows\chocolaty\*.nupkg'
+    #     artifactName: 'drop'
+    #     publishLocation: 'Container'
 
     - script: |
         choco push build\windows\chocolaty\*.nupkg --source https://push.chocolatey.org/ --api-key $(CHOCOLATEY_API_KEY)

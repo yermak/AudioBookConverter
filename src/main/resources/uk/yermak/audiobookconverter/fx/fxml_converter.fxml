@@ -81,13 +81,13 @@
             <SeparatorMenuItem/>
             <MenuItem text="Combine" onAction="#combine">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="PLUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="UP" code="MULTIPLY" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
 
             <MenuItem text="Split" onAction="#split">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="MINUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="UP" code="DIVIDE" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <SeparatorMenuItem/>

@@ -240,7 +240,6 @@
                         <Separator orientation="VERTICAL"/>
                         <Button fx:id="importButton" text="Chapters"
                                 minWidth="${screen.visualBounds.width * 0.04}"
-                                prefWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#importChapters"
                                 GridPane.valignment="TOP">
                             <font>

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
 <?import java.lang.String?>
-<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="10"
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="5" vgap="5"
           fx:controller="uk.yermak.audiobookconverter.fx.OutputController"
           gridLinesVisible="false">
     <fx:define>
@@ -14,7 +14,7 @@
     </fx:define>
 
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets top="5" right="5" bottom="0" left="5"/>
     </padding>
     <columnConstraints>
         <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
@@ -64,10 +64,10 @@
         <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
         <Label text="Sampling frequency, Hz" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="frequencyBox" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="frequencyBox" GridPane.columnIndex="4" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
 
         <Label text="Channels" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
 
 
         <Label text="Cut-off frequencies higher than" GridPane.columnIndex="3" GridPane.rowIndex="2"

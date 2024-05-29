@@ -5,14 +5,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
-          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController" maxHeight="${screen.visualBounds.height*0.2}"
+          fx:controller="uk.yermak.audiobookconverter.fx.ArtWorkController" prefHeight="${screen.visualBounds.height*0.03}" vgap="5"
           gridLinesVisible="false">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
 
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets top="5" right="5" bottom="0" left="5"/>
     </padding>
     <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS"/>
@@ -21,41 +21,38 @@
     </columnConstraints>
     <children>
         <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"
+                  orientation="HORIZONTAL" />
 
-                  minHeight="${screen.visualBounds.height*0.06}"
-                  maxHeight="${screen.visualBounds.height*0.12}"
-                  orientation="HORIZONTAL" GridPane.fillHeight="false"/>
-
-        <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"
-                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
+        <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.05}" onAction="#addImage"
+                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.halignment="CENTER">
             <tooltip>
                 <Tooltip text="Add cover image from external file"/>
             </tooltip>
         </Button>
 
-        <Button fx:id="pasteButton" text="Paste" minWidth="${screen.visualBounds.width * 0.04}" onAction="#pasteImage"
-                GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2">
+        <Button fx:id="pasteButton" text="Paste" minWidth="${screen.visualBounds.width * 0.05}" onAction="#pasteImage"
+                GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER">
             <tooltip>
                 <Tooltip text="Add cover image from buffer"/>
             </tooltip>
         </Button>
 
-        <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
+        <Button fx:id="removeButton" text="Remove" minWidth="${screen.visualBounds.width * 0.05}"
                 onAction="#removeImage"
-                GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER">
             <tooltip>
                 <Tooltip text="Remove cover image from the list"/>
             </tooltip>
         </Button>
-        <Button fx:id="left" text="&lt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#left"
-                GridPane.columnIndex="1" GridPane.rowIndex="3">
+        <Button fx:id="left" text="&lt;" minWidth="${screen.visualBounds.width * 0.025}" onAction="#left"
+                GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="LEFT">
             <tooltip>
                 <Tooltip text="Move image left"/>
             </tooltip>
         </Button>
 
-        <Button fx:id="right" text="&gt;" minWidth="${screen.visualBounds.width * 0.02}" onAction="#right"
-                GridPane.columnIndex="2" GridPane.rowIndex="3">
+        <Button fx:id="right" text="&gt;" minWidth="${screen.visualBounds.width * 0.025}" onAction="#right"
+                GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
             <tooltip>
                 <Tooltip text="Move image right"/>
             </tooltip>

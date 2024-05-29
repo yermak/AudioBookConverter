@@ -12,7 +12,7 @@
     </fx:define>
 
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets top="5" right="5" bottom="0" left="5"/>
     </padding>
     <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS"/>
@@ -23,7 +23,7 @@
         <ListView fx:id="imageList" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4"
 
                   minHeight="${screen.visualBounds.height*0.06}"
-                  maxHeight="${screen.visualBounds.height*0.12}"
+                  maxHeight="${screen.visualBounds.height*0.20}"
                   orientation="HORIZONTAL" GridPane.fillHeight="false"/>
 
         <Button fx:id="addButton" text="Add" minWidth="${screen.visualBounds.width * 0.04}" onAction="#addImage"

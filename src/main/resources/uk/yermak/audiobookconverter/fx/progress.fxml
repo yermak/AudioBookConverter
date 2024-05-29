@@ -11,7 +11,6 @@
 
     </fx:define>
     <columnConstraints>
-        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="ALWAYS"/>

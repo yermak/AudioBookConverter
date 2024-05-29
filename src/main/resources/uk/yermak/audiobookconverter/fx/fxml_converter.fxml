@@ -10,8 +10,9 @@
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
-      prefWidth="${screen.visualBounds.width * 0.50}"
+      prefWidth="${screen.visualBounds.width * 0.70}"
       prefHeight="${screen.visualBounds.height * 0.80}"
+      alignment="BOTTOM_CENTER"
 >
 
     <fx:define>
@@ -49,12 +50,12 @@
             <SeparatorMenuItem/>
             <MenuItem text="Up" onAction="#moveUp">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="UP" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <MenuItem text="Down" onAction="#moveDown">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="DOWN" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="DOWN" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <SeparatorMenuItem/>
@@ -80,24 +81,24 @@
             <SeparatorMenuItem/>
             <MenuItem text="Combine" onAction="#combine">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="PLUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="UP" code="MULTIPLY" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
 
             <MenuItem text="Split" onAction="#split">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="MINUS" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="UP" code="DIVIDE" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <SeparatorMenuItem/>
             <MenuItem text="Up" onAction="#moveUp">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="UP" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
             <MenuItem text="Down" onAction="#moveDown">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" code="DOWN" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                    <KeyCodeCombination alt="DOWN" code="DOWN" control="UP" meta="UP" shift="UP" shortcut="UP"/>
                 </accelerator>
             </MenuItem>
 
@@ -145,7 +146,7 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS">
+    <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
@@ -239,7 +240,6 @@
                         <Separator orientation="VERTICAL"/>
                         <Button fx:id="importButton" text="Chapters"
                                 minWidth="${screen.visualBounds.width * 0.04}"
-                                prefWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#importChapters"
                                 GridPane.valignment="TOP">
                             <font>
@@ -374,9 +374,9 @@
 
     <fx:include source="mediaplayer.fxml"/>
 
-    <TabPane fx:id="tabs" VBox.vgrow="SOMETIMES">
+    <TabPane fx:id="tabs" VBox.vgrow="NEVER">
         <padding>
-            <Insets top="10" right="10" bottom="10" left="10"/>
+            <Insets top="5" right="10" bottom="10" left="10"/>
         </padding>
         <Tab text="Book Info" closable="false">
             <fx:include source="book_info.fxml"/>

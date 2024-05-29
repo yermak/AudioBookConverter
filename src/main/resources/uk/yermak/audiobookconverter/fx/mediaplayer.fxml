@@ -2,39 +2,45 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
-          fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController" VBox.vgrow="NEVER">
+          fx:controller="uk.yermak.audiobookconverter.fx.MediaPlayerController" VBox.vgrow="NEVER" hgap="10">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
 
     </fx:define>
     <columnConstraints>
-        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
+        <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="NEVER"/>
     </columnConstraints>
 
-    <Slider fx:id="timelapse" minorTickCount="4" GridPane.hgrow="ALWAYS"
-            minWidth="${screen.visualBounds.width * 0.35}" majorTickUnit="1"
-            GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
-    <Slider fx:id="volume" orientation="VERTICAL" maxHeight="10"
-            min="0" max="1.0" value="1.0"
-            GridPane.rowIndex="0" GridPane.columnIndex="3" GridPane.rowSpan="2"/>
-    <Label fx:id="playTime" text="00:00:00"
-           GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="LEFT"/>
-
-    <Button fx:id="playButton" text="Play/Pause"
-            minWidth="${screen.visualBounds.width * 0.05}"
-            onAction="#play"
-            GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.rowSpan="2" GridPane.halignment="CENTER">
+    <Button fx:id="playButton"
+            onAction="#play" text="&#x25B6;&#x23F8;" style="-fx-font-size: 15px;"
+            GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.rowSpan="2">
         <tooltip>
             <Tooltip text="Play selected media file"/>
         </tooltip>
     </Button>
 
+
+    <Slider fx:id="timelapse" minorTickCount="4" GridPane.hgrow="ALWAYS" GridPane.valignment="BOTTOM"
+            minWidth="${screen.visualBounds.width * 0.35}" majorTickUnit="1"
+            GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+    <Label fx:id="volumeSign" text="&#x1F50A;" style="-fx-font-size: 24px;"
+           GridPane.rowIndex="0" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowSpan="2"/>
+
+    <Slider fx:id="volume" orientation="VERTICAL" maxHeight="24"
+            min="0" max="1.0" value="1.0"
+            GridPane.rowIndex="0" GridPane.columnIndex="5" GridPane.rowSpan="2"/>
+    <Label fx:id="playTime" text="00:00:00"
+           GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="LEFT"/>
+
+
     <Label fx:id="totalTime" text="00:00:00"
-           GridPane.rowIndex="1" GridPane.columnIndex="2" GridPane.halignment="RIGHT"/>
+           GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.halignment="RIGHT"/>
 
 </GridPane>

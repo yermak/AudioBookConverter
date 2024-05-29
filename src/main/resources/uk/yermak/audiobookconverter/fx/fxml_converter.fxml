@@ -10,8 +10,9 @@
 <VBox fx:controller="uk.yermak.audiobookconverter.fx.FilesController"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
-      prefWidth="${screen.visualBounds.width * 0.50}"
+      prefWidth="${screen.visualBounds.width * 0.70}"
       prefHeight="${screen.visualBounds.height * 0.80}"
+      alignment="BOTTOM_CENTER"
 >
 
     <fx:define>
@@ -145,7 +146,7 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-        <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS">
+    <TabPane fx:id="filesChapters" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
@@ -374,7 +375,7 @@
 
     <fx:include source="mediaplayer.fxml"/>
 
-    <TabPane fx:id="tabs" VBox.vgrow="SOMETIMES">
+    <TabPane fx:id="tabs" VBox.vgrow="NEVER">
         <padding>
             <Insets top="10" right="10" bottom="10" left="10"/>
         </padding>

@@ -154,13 +154,15 @@
             <Tab text="Queue" closable="false" fx:id="queueTab">
                 <VBox>
                     <ToolBar>
-                        <Button text="New Book" minWidth="${screen.visualBounds.width * 0.04}"
+                        <Button text="New Book" minWidth="${screen.visualBounds.width * 0.04}" style="-fx-font-size: 15;"
                                 onAction="#addFiles">
+<!--
                             <font>
                                 <Font name="Arial Black" size="12.0"/>
                             </font>
+-->
                             <tooltip>
-                                <Tooltip text="Add files for conversionGroup to the list"/>
+                                <Tooltip text="Create new audiobook from folder or set of files. You need to select at least one to start the process"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>

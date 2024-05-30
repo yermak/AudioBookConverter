@@ -148,6 +148,7 @@ public class OutputController {
             Preset preset = currentPreset(settings);
             preset.setSpeed(Double.parseDouble(newValue));
             settings.save();
+            AudiobookConverter.getContext().setSpeed(Double.parseDouble(newValue));
         });
 
         splitFileBox.getSelectionModel().select(0);
@@ -196,12 +197,14 @@ public class OutputController {
                 Preset preset = s.findPreset(newValue);
                 s.setLastUsedPreset(i);
                 s.save();
-                AudiobookConverter.getContext().setOutputParameters(preset);
+//                AudiobookConverter.getContext().setOutputParameters(preset);
+                AudiobookConverter.getContext().setPresetName(preset.getName());
                 updateOutputSettingsFromPreset(preset);
             } else {
                 presetBox.getItems().add(newValue);
                 Preset preset = Preset.copy(newValue, s.findPreset(oldValue));
-                AudiobookConverter.getContext().setOutputParameters(preset);
+//                AudiobookConverter.getContext().setOutputParameters(preset);
+                AudiobookConverter.getContext().setPresetName(preset.getName());
                 ArrayList<Preset> newPresets = new ArrayList<>(s.getPresets());
                 newPresets.add(preset);
                 s.setPresets(newPresets);
@@ -276,7 +279,7 @@ public class OutputController {
 
         Preset preset = settings.getPresets().get(0);
         updateOutputSettingsFromPreset(preset);
-        AudiobookConverter.getContext().setOutputParameters(preset);
+        AudiobookConverter.getContext().setPresetName(preset.getName());
 
         presetBox.getItems().remove(presetToRemove.getName());
         presetBox.getSelectionModel().select(0);

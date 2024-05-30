@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter.formats;
 
+import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -146,4 +147,29 @@ public class MP4Format extends Format {
         }
     }
 
+    public String[] getOptimizeOptions(String source, ProgressParser progressParser, String output, boolean hasPosters) {
+        if (hasPosters) {
+            return new String[]{
+                    Platform.FFMPEG,
+                    "-i", source,
+                    "-map", "0:v?",
+                    "-map", "0:a",
+                    "-c", "copy",
+                    "-f", name,
+                    "-progress", progressParser.getUri().toString(),
+                    "-movflags", "+faststart",
+                    output
+            };
+        } else {
+            return new String[]{
+                    Platform.FFMPEG,
+                    "-i", source,
+                    "-c", "copy",
+                    "-f", name,
+                    "-progress", progressParser.getUri().toString(),
+                    "-movflags", "+faststart",
+                    output
+            };
+        }
+    }
 }

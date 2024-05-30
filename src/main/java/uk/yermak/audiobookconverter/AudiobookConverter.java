@@ -76,9 +76,12 @@ public class AudiobookConverter extends Application {
 
         logger.info("Initialising application");
 
+        Locale locale = new Locale("en");
+        ResourceBundle bundle = ResourceBundle.getBundle("locales/messages", locale);
+
         try {
             URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
-            root = FXMLLoader.load(resource);
+            root = FXMLLoader.load(resource, bundle);
 
             Scene scene = new Scene(root);
             stage.setTitle(Version.getVersionString());

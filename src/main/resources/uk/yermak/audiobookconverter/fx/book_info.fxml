@@ -21,27 +21,58 @@
     </columnConstraints>
     <children>
 
-        <Label text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="Writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="Narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="Genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
-        <TextField fx:id="title" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        <TextField fx:id="writer" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <TextField fx:id="narrator" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <!--<TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>-->
-        <ComboBox fx:id="genre" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true"/>
+        <TextField fx:id="title" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.title"/>
+            </tooltip>
+        </TextField>
+        <TextField fx:id="writer" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.author"/>
+            </tooltip>
+        </TextField>
+        <TextField fx:id="narrator" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.narrator"/>
+            </tooltip>
+        </TextField>
+        <ComboBox fx:id="genre" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.genre"/>
+            </tooltip>
+        </ComboBox>
 
-        <Label text="Series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="Book #" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="Year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="Comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.bookno" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
-        <TextField fx:id="series" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-        <!--<Spinner fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1" min="$min" max="$max"/>-->
-        <TextField fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-        <TextField fx:id="year" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
-        <TextField fx:id="comment" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+        <TextField fx:id="series" GridPane.columnIndex="3" GridPane.rowIndex="0">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.series"/>
+            </tooltip>
+        </TextField>
+        <TextField fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.bookno"/>
+            </tooltip>
+        </TextField>
+        <TextField fx:id="year" GridPane.columnIndex="3" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.year"/>
+            </tooltip>
+        </TextField>
+
+        <TextField fx:id="comment" GridPane.columnIndex="3" GridPane.rowIndex="3">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.comment"/>
+            </tooltip>
+        </TextField>
 
     </children>
 </GridPane>

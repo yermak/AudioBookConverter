@@ -28,6 +28,5 @@
         <Label text="Show Tips of the day" GridPane.columnIndex="0" GridPane.rowIndex="8"
                GridPane.halignment="LEFT"/>
         <ToggleSwitch fx:id="showHints" GridPane.columnIndex="1" GridPane.rowIndex="8" GridPane.halignment="RIGHT"/>
-
     </children>
 </fx:root>

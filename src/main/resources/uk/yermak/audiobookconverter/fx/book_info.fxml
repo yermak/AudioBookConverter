@@ -21,10 +21,10 @@
     </columnConstraints>
     <children>
 
-        <Label text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="Writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="Narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="Genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
         <TextField fx:id="title" GridPane.columnIndex="1" GridPane.rowIndex="0">
             <tooltip>
@@ -47,10 +47,10 @@
             </tooltip>
         </ComboBox>
 
-        <Label text="Series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="Book #" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="Year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="Comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.bookno" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%label.bookinfo.comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
         <TextField fx:id="series" GridPane.columnIndex="3" GridPane.rowIndex="0">
             <tooltip>

@@ -154,39 +154,36 @@
             <Tab text="Queue" closable="false" fx:id="queueTab">
                 <VBox>
                     <ToolBar>
-                        <Button text="New Book" minWidth="${screen.visualBounds.width * 0.04}"
+                        <Button text="%queue.button.newbook" minWidth="${screen.visualBounds.width * 0.04}" style="-fx-font-size: 15;"
                                 onAction="#addFiles">
-                            <font>
-                                <Font name="Arial Black" size="12.0"/>
-                            </font>
                             <tooltip>
-                                <Tooltip text="Add files for conversionGroup to the list"/>
+                                <Tooltip text="%queue.tooltip.newbook"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
 
-                        <Button fx:id="pauseButton" text="Pause all"
+                        <Button fx:id="pauseButton" text="%queue.button.pause_all"
                                 minWidth="${screen.visualBounds.width * 0.04}"
                                 GridPane.fillHeight="true"
                                 onAction="#pause">
                             <tooltip>
-                                <Tooltip text="Pause conversionGroup of files"/>
+                                <Tooltip text="%queue.tooltip.pause_all"/>
                             </tooltip>
                         </Button>
-                        <Button fx:id="stopButton" text="Stop all"
+                        <Button fx:id="stopButton" text="%queue.button.stop_all"
                                 minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#stop">
                             <tooltip>
-                                <Tooltip text="Stop conversionGroup of files"/>
+                                <Tooltip text="%queue.tooltip.stop_all"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
 
-                        <Button fx:id="clearQueueButton" text="Clear completed"
+                        <Button fx:id="clearQueueButton" text="%queue.button.clear"
                                 minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#clearQueue">
                             <tooltip>
-                                <Tooltip text="Clear completed or cancelled conversions"/>
+                                <Tooltip text="%queue.tooltip.clear"/>
                             </tooltip>
                         </Button>
 

@@ -105,7 +105,7 @@ public class FilesController {
         addDragEvenHandlers(progressQueue);
 
         Settings settings = Settings.loadSetting();
-        AudiobookConverter.getContext().setOutputParameters(settings.getPresets().get(settings.getLastUsedPreset()));
+        AudiobookConverter.getContext().setPresetName(settings.getPresets().get(settings.getLastUsedPreset()).getName());
 
         initFileOpenMenu();
 

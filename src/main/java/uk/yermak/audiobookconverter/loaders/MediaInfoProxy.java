@@ -44,7 +44,7 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     public long getDuration() {
-        return (long) (this.getMediaInfo().getDuration() / AudiobookConverter.getContext().getOutputParameters().getSpeed());
+        return (long) (this.getMediaInfo().getDuration() / AudiobookConverter.getContext().getSpeed());
     }
 
     @Override

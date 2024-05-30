@@ -17,7 +17,6 @@
         <Insets top="5" right="5" bottom="0" left="5"/>
     </padding>
     <columnConstraints>
-        <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="60.0" prefWidth="60.0"/>-->
         <ColumnConstraints hgrow="ALWAYS"/>
         <ColumnConstraints hgrow="NEVER"/>
         <ColumnConstraints hgrow="NEVER"/>
@@ -33,19 +32,27 @@
         </fx:define>
 
 
-        <Label text="Preset" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <Label text="%output.label.preset" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
 
         <ComboBox fx:id="presetBox" minWidth="${screen.visualBounds.width * 0.05}" editable="true"
-                  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+                  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.presets"/>
+            </tooltip>
+        </ComboBox>
 
 
-        <Label text="Format" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <Label text="%output.label.format" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
 
         <ComboBox fx:id="outputFormatBox"
                   minWidth="${screen.visualBounds.width * 0.05}" GridPane.columnIndex="1" GridPane.rowIndex="1"
-                  GridPane.halignment="RIGHT"/>
+                  GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.formats"/>
+            </tooltip>
+        </ComboBox>
 
-        <Label text="Split by" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <Label text="%output.label.split" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <ComboBox fx:id="splitFileBox"
                   minWidth="${screen.visualBounds.width * 0.05}" GridPane.columnIndex="1" GridPane.rowIndex="2"
                   GridPane.halignment="RIGHT">
@@ -55,26 +62,44 @@
                     <String fx:value="chapters"/>
                 </FXCollections>
             </items>
+            <tooltip>
+                <Tooltip text="%output.tooltip.split"/>
+            </tooltip>
         </ComboBox>
 
-        <Label text="Speed" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <ComboBox fx:id="speedBox" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%output.label.speed" textAlignment="LEFT" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="speedBox" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.speed"/>
+            </tooltip>
+        </ComboBox>
 
 
         <Pane prefWidth="50" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
-        <Label text="Sampling frequency, Hz" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="frequencyBox" GridPane.columnIndex="4" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%output.label.sampling_frequency" GridPane.columnIndex="3" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="frequencyBox" GridPane.columnIndex="4" GridPane.rowIndex="0" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.sampling_frequency"/>
+            </tooltip>
+        </ComboBox>
 
-        <Label text="Channels" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%output.label.channels" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
+        <ComboBox fx:id="channelsBox" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.channels"/>
+            </tooltip>
+        </ComboBox>
 
-
-        <Label text="Cut-off frequencies higher than" GridPane.columnIndex="3" GridPane.rowIndex="2"
+        <Label text="%output.label.cut_off" GridPane.columnIndex="3" GridPane.rowIndex="2"
                GridPane.halignment="LEFT"/>
-        <ComboBox fx:id="cutoffBox" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <ComboBox fx:id="cutoffBox" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.cut_off"/>
+            </tooltip>
+        </ComboBox>
 
-        <Label text="Force re-encoding" GridPane.columnIndex="3" GridPane.rowIndex="3"
+        <Label text="%output.label.reencoding" GridPane.columnIndex="3" GridPane.rowIndex="3"
                GridPane.halignment="LEFT"/>
         <ComboBox fx:id="forceBox" GridPane.columnIndex="4" GridPane.rowIndex="3" GridPane.halignment="RIGHT">
             <items>
@@ -84,29 +109,46 @@
                     <String fx:value="Avoid"/>
                 </FXCollections>
             </items>
+            <tooltip>
+                <Tooltip text="%output.tooltip.reencode"/>
+            </tooltip>
         </ComboBox>
 
         <Pane prefWidth="50" GridPane.columnIndex="5" GridPane.rowIndex="0" GridPane.rowSpan="4"/>
 
-        <RadioButton fx:id="cbrRadio" text="Constant bitrate, kb/s"
+        <RadioButton fx:id="cbrRadio" text="%output.radio.cbr"
                      GridPane.columnIndex="6" GridPane.rowIndex="0"
-                     toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT"/>
+                     toggleGroup="$br" onAction="#cbr" selected="true" wrapText="true" GridPane.halignment="LEFT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.cbr"/>
+            </tooltip>
+        </RadioButton>
 
-        <ComboBox fx:id="bitRateBox" GridPane.columnIndex="7" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <ComboBox fx:id="bitRateBox" GridPane.columnIndex="7" GridPane.rowIndex="0" GridPane.halignment="RIGHT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.bitrate"/>
+            </tooltip>
+        </ComboBox>
 
-
-
-
-        <RadioButton fx:id="vbrRadio" text="Variable bitrate, Quality" GridPane.columnIndex="6" GridPane.rowIndex="1" GridPane.columnSpan="2"
-
-                     toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT"/>
+        <RadioButton fx:id="vbrRadio" text="%output.radio.vbr" GridPane.columnIndex="6" GridPane.rowIndex="1" GridPane.columnSpan="2"
+                     toggleGroup="$br" onAction="#vbr" wrapText="true" GridPane.halignment="LEFT">
+            <tooltip>
+                <Tooltip text="%output.tooltip.vbr"/>
+            </tooltip>
+        </RadioButton>
 
         <Slider fx:id="vbrQualitySlider" GridPane.columnIndex="6" GridPane.rowIndex="2" min="1" max="5" GridPane.columnSpan="2"
                 value="4"
                 showTickMarks="true" showTickLabels="true" majorTickUnit="1" snapToTicks="true" minorTickCount="0"
-                disable="true"/>
-        <Button text="Delete Preset" onAction="#deletePreset" GridPane.columnIndex="7" GridPane.rowIndex="3" GridPane.halignment="RIGHT" />
-
-
+                disable="true">
+            <tooltip>
+                <Tooltip text="%output.tooltip.vbr_quality"/>
+            </tooltip>
+        </Slider>
+        <Button text="%output.button.delete_preset" onAction="#deletePreset" GridPane.columnIndex="7" GridPane.rowIndex="3" GridPane.halignment="RIGHT" >
+            <tooltip>
+                <Tooltip text="%output.tooltip.delete_preset"/>
+            </tooltip>
+        </Button>
     </children>
 </GridPane>

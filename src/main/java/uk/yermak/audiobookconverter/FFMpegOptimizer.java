@@ -4,6 +4,7 @@ import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.formats.MP4Format;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,57 +47,38 @@ public class FFMpegOptimizer {
         Process process = null;
         try {
 
-            String tmp = Utils.getTmp(conversionJob.getConversionGroup().getGroupId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
-            String[] optimize;
-            if (conversionJob.getConversionGroup().getPosters().isEmpty()) {
-                optimize = new String[]{
-                        Platform.FFMPEG,
-                        "-i", tempFile,
-                        "-c", "copy",
-                        "-progress", progressParser.getUri().toString(),
-                        "-movflags", "+faststart",
-                        tmp
-                };
-            } else {
-                optimize = new String[]{
-                        Platform.FFMPEG,
-                        "-i", tempFile,
-                        "-map", "0:v?",
-                        "-map", "0:a",
-                        "-c", "copy",
-                        "-progress", progressParser.getUri().toString(),
-                        "-movflags", "+faststart",
-                        tmp
-                };
+            String optimizedFile = Utils.getTmp(conversionJob.getConversionGroup().getGroupId(), outputFileName.hashCode() + 1, conversionJob.getConversionGroup().getWorkfileExtension());
+            if (conversionJob.getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
+                MP4Format format = (MP4Format) conversionJob.getConversionGroup().getOutputParameters().getFormat();
+
+                boolean hasPosters = !conversionJob.getConversionGroup().getPosters().isEmpty();
+                String[] optimize = format.getOptimizeOptions(tempFile, progressParser, optimizedFile, hasPosters);
+                logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
+
+                ProcessBuilder pb = new ProcessBuilder(optimize);
+                process = pb.start();
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                StreamCopier.copy(process.getInputStream(), out);
+                ByteArrayOutputStream err = new ByteArrayOutputStream();
+                StreamCopier.copy(process.getErrorStream(), err);
+
+                boolean finished = false;
+                while (!conversionJob.getStatus().isOver() && !finished) {
+                    finished = process.waitFor(500, TimeUnit.MILLISECONDS);
+                }
+                logger.debug("Optimize Out: {}", out);
+                logger.error("Optimize Error: {}", err);
+
+                if (process.exitValue() != 0) {
+                    throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
+                }
+
+                if (!new File(optimizedFile).exists()) {
+                    throw new ConversionException("Optimisation failed, no output file:" + out, new Error(err.toString()));
+                }
             }
-
-            logger.debug("Starting optimisation with options {}", String.join(" ", optimize));
-
-            ProcessBuilder pb = new ProcessBuilder(optimize);
-            process = pb.start();
-
-//            process = Runtime.getRuntime().exec( String.join(" ", optimize));
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            StreamCopier.copy(process.getInputStream(), out);
-            ByteArrayOutputStream err = new ByteArrayOutputStream();
-            StreamCopier.copy(process.getErrorStream(), err);
-
-            boolean finished = false;
-            while (!conversionJob.getStatus().isOver() && !finished) {
-                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-            }
-            logger.debug("Optimize Out: {}", out);
-            logger.error("Optimize Error: {}", err);
-
-            if (process.exitValue() != 0) {
-                throw new ConversionException("Optimisation exit code " + process.exitValue() + "!=0", new Error(err.toString()));
-            }
-
-            if (!new File(tmp).exists()) {
-                throw new ConversionException("Optimisation failed, no output file:" + out, new Error(err.toString()));
-            }
-            return tmp;
+            return optimizedFile;
         } catch (Exception e) {
             logger.error("Error during optimisation of resulting file:", e);
             throw new RuntimeException(e);

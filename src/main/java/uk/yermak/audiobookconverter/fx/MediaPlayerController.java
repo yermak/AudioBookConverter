@@ -120,8 +120,8 @@ public class MediaPlayerController {
         mediaPlayer.volumeProperty().bindBidirectional(volume.valueProperty());
         mediaPlayer.volumeProperty().set(1.0);
 
-        mediaPlayer.rateProperty().set(context.getOutputParameters().getSpeed());
-        mediaPlayer.rateProperty().bind(context.getOutputParameters().getSpeedObservable());
+        mediaPlayer.rateProperty().set(context.getSpeed());
+        mediaPlayer.rateProperty().bind(context.getSpeedObservable());
 
         timelapse.valueProperty().addListener(observable -> {
             if (timelapse.isValueChanging()) {

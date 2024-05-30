@@ -70,15 +70,22 @@ public class AudiobookConverter extends Application {
         Executors.newSingleThreadExecutor().submit(new VersionChecker());
     }
 
+    private ResourceBundle getBundleWithFallback(Locale locale) {
+        ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
+        return ResourceBundle.getBundle("locales/messages", locale, control);
+    }
     @Override
     public void start(Stage stage) {
         Parent root;
 
         logger.info("Initialising application");
 
+        Locale defaultLocale = Locale.getDefault();
+        ResourceBundle bundle = getBundleWithFallback(defaultLocale);
+
         try {
             URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
-            root = FXMLLoader.load(resource);
+            root = FXMLLoader.load(resource, bundle);
 
             Scene scene = new Scene(root);
             stage.setTitle(Version.getVersionString());

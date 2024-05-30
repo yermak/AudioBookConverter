@@ -2,6 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -16,7 +17,7 @@ import uk.yermak.audiobookconverter.book.ArtWork;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Book;
 import uk.yermak.audiobookconverter.book.MediaInfo;
-import uk.yermak.audiobookconverter.formats.OutputParameters;
+import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.lang.invoke.MethodHandles;
@@ -43,16 +44,18 @@ public class ConversionContext {
     private final SimpleObjectProperty<Book> book = new SimpleObjectProperty<>();
     private final ObservableList<MediaInfo> media = FXCollections.observableArrayList();
     private final ObservableList<ArtWork> posters = FXCollections.observableArrayList();
-    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
+//    private final SimpleObjectProperty<OutputParameters> outputParameters = new SimpleObjectProperty<>();
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
     private FFMediaLoader mediaLoader;
     private Set<ArtWork> removedArtWorks = new HashSet<>();
+    private String presetName;
+    private SimpleDoubleProperty speed = new SimpleDoubleProperty(1.0);
 
 
     public ConversionContext() {
-//        resetForNewConversion();
+
     }
 
     public void stopConversions() {
@@ -94,15 +97,15 @@ public class ConversionContext {
         mediaLoader.detach();
 
 
-
         ConversionGroup conversionGroup = conversionGroupHolder.get();
         conversionGroup.setMedia(new ArrayList<>(media));
         conversionGroup.setPosters(new ArrayList<>(posters));
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
-        conversionGroup.setOutputParameters(Preset.copy(String.valueOf(conversionGroup.getGroupId()), outputParameters.get()));
+        conversionGroup.setOutputParameters(Preset.copy(String.valueOf(conversionGroup.getGroupId()), Settings.loadSetting().findPreset(presetName)));
         conversionGroup.setDetached(true);
         Settings settings = Settings.loadSetting();
+
         settings.getGenres().add(bookInfo.get().genre().get());
         settings.save();
 
@@ -121,10 +124,6 @@ public class ConversionContext {
 
     public void addContextDetachListener(InvalidationListener invalidationListener) {
         conversionGroupHolder.addListener(invalidationListener);
-    }
-
-    public void setOutputParameters(OutputParameters outputParameters) {
-        this.outputParameters.set(outputParameters);
     }
 
     public void setBookInfo(AudioBookInfo bookInfo) {
@@ -163,12 +162,8 @@ public class ConversionContext {
         });
     }
 
-    public void addOutputParametersChangeListener(ChangeListener<OutputParameters> changeListener) {
-        outputParameters.addListener(changeListener);
-    }
-
-    public void addSpeedChangeListener(ChangeListener<Double> changeListener) {
-        outputParameters.get().getSpeedObservable().addListener(changeListener);
+    public void addSpeedChangeListener(ChangeListener changeListener) {
+        speed.addListener(changeListener);
     }
 
     public void setBook(Book book) {
@@ -179,9 +174,9 @@ public class ConversionContext {
         book.addListener(listener);
     }
 
-    public OutputParameters getOutputParameters() {
-        return outputParameters.get();
-    }
+//    public OutputParameters getOutputParameters() {
+//        return outputParameters.get();
+//    }
 
     public AudioBookInfo getBookInfo() {
         return bookInfo.get();
@@ -215,4 +210,23 @@ public class ConversionContext {
         removedArtWorks.add(artWork);
     }
 
+    public void setPresetName(String presetName) {
+        this.presetName = presetName;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed.set(speed);
+    }
+
+    public double getSpeed() {
+        return speed.get();
+    }
+
+    public SimpleDoubleProperty getSpeedObservable() {
+        return speed;
+    }
+
+    public Format getFormat() {
+        return Settings.loadSetting().findPreset(presetName).getFormat();
+    }
 }

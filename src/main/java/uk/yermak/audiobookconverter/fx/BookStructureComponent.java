@@ -186,7 +186,7 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
     }
 
     private void extractSubtracks(MediaInfo mediaInfo, Boolean wrapWithChapters, long interval, Boolean repeat) {
-        double speed = AudiobookConverter.getContext().getOutputParameters().getSpeed();
+        double speed = AudiobookConverter.getContext().getSpeed();
         long duration = mediaInfo.getDuration();
 
         if (speed != 1.0) {

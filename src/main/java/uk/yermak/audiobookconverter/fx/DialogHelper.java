@@ -38,8 +38,9 @@ public class DialogHelper {
         fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
+        String formatAsString = AudiobookConverter.getContext().getFormat().toString();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(AudiobookConverter.getContext().getOutputParameters().getFormat().toString(), "*." + AudiobookConverter.getContext().getOutputParameters().getFormat().toString())
+                new FileChooser.ExtensionFilter(formatAsString, "*." + formatAsString)
         );
         File file = fileChooser.showSaveDialog(env.getWindow());
         if (file == null) return null;

@@ -21,56 +21,56 @@
     </columnConstraints>
     <children>
 
-        <Label text="%label.bookinfo.title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.title" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.writer" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.narrator" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.genre" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
         <TextField fx:id="title" GridPane.columnIndex="1" GridPane.rowIndex="0">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.title"/>
+                <Tooltip text="%bookinfo.tooltip.title"/>
             </tooltip>
         </TextField>
         <TextField fx:id="writer" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.author"/>
+                <Tooltip text="%bookinfo.tooltip.author"/>
             </tooltip>
         </TextField>
         <TextField fx:id="narrator" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.narrator"/>
+                <Tooltip text="%bookinfo.tooltip.narrator"/>
             </tooltip>
         </TextField>
         <ComboBox fx:id="genre" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="true">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.genre"/>
+                <Tooltip text="%bookinfo.tooltip.genre"/>
             </tooltip>
         </ComboBox>
 
-        <Label text="%label.bookinfo.series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.bookno" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
-        <Label text="%label.bookinfo.comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.series" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.bookno" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.year" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>
+        <Label text="%bookinfo.label.comment" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>
 
         <TextField fx:id="series" GridPane.columnIndex="3" GridPane.rowIndex="0">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.series"/>
+                <Tooltip text="%bookinfo.tooltip.series"/>
             </tooltip>
         </TextField>
         <TextField fx:id="bookNo" GridPane.columnIndex="3" GridPane.rowIndex="1">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.bookno"/>
+                <Tooltip text="%bookinfo.tooltip.bookno"/>
             </tooltip>
         </TextField>
         <TextField fx:id="year" GridPane.columnIndex="3" GridPane.rowIndex="2">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.year"/>
+                <Tooltip text="%bookinfo.tooltip.year"/>
             </tooltip>
         </TextField>
 
         <TextField fx:id="comment" GridPane.columnIndex="3" GridPane.rowIndex="3">
             <tooltip>
-                <Tooltip text="%tooltip.bookinfo.comment"/>
+                <Tooltip text="%bookinfo.tooltip.comment"/>
             </tooltip>
         </TextField>
 

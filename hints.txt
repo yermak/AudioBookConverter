@@ -19,3 +19,4 @@ You can edit chapter information of existing m4b book. Open the book, switch to 
 When editing a chapter you could apply chapter settings to all chapters. This is useful if you want to change chapter name template for all chapters.
 Starting from version 6.3.1 encoding will be about 50% slower, but should give much better quality
 In chapters mode you can split track into sub-tracks not only at equal intervals, but at specific time, in case 1 track contains several chapters and you want cut track at specific time and make each sub-track a separate chapter.
+You can play selected media file in file mode and in chapter mode. Note: you need to select specific file not the chapter

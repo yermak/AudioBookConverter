@@ -50,7 +50,7 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public long getDuration() {
-        return (long) (duration / AudiobookConverter.getContext().getOutputParameters().getSpeed());
+        return (long) (duration / AudiobookConverter.getContext().getSpeed());
     }
 
     @Override

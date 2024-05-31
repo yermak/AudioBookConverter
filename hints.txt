@@ -20,3 +20,4 @@ When editing a chapter you could apply chapter settings to all chapters. This is
 Starting from version 6.3.1 encoding will be about 50% slower, but should give much better quality
 In chapters mode you can split track into sub-tracks not only at equal intervals, but at specific time, in case 1 track contains several chapters and you want cut track at specific time and make each sub-track a separate chapter.
 You can play selected media file in file mode and in chapter mode. Note: you need to select specific file not the chapter
+If your books have non-Latin symbols, you need to enable Unicode support in Windows: Windows Settings -> Time & Language -> Language & Region -> Admistrative language settings -> Language for non-Unicode programs: Change System locale...-> Beta: use Unicode UTF-8 for worldwide language support -> Tick the checkbox

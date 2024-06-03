@@ -154,7 +154,8 @@
             <Tab text="Queue" closable="false" fx:id="queueTab">
                 <VBox>
                     <ToolBar>
-                        <Button text="%queue.button.newbook" minWidth="${screen.visualBounds.width * 0.04}" style="-fx-font-size: 15;"
+                        <Button text="%queue.button.newbook" minWidth="${screen.visualBounds.width * 0.04}"
+                                style="-fx-font-size: 15;"
                                 onAction="#addFiles">
                             <tooltip>
                                 <Tooltip text="%queue.tooltip.newbook"/>
@@ -188,7 +189,11 @@
                         </Button>
 
                     </ToolBar>
-                    <ListView fx:id="progressQueue" prefHeight="${screen.visualBounds.height * 0.25}" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="progressQueue" prefHeight="${screen.visualBounds.height * 0.25}" VBox.vgrow="ALWAYS">
+                        <tooltip>
+                            <Tooltip text="%queue.tooltip.list"/>
+                        </tooltip>
+                    </ListView>
                 </VBox>
             </Tab>
 
@@ -199,13 +204,13 @@
                         <Button text="Add" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#addFiles">
                             <tooltip>
-                                <Tooltip text="Add files for conversionGroup to the list"/>
+                                <Tooltip text="%files.tooltip.button_add"/>
                             </tooltip>
                         </Button>
                         <Button text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#remove">
                             <tooltip>
-                                <Tooltip text="Remove selected files from conversion list"/>
+                                <Tooltip text="%files.tooltip.button_remove"/>
                             </tooltip>
                         </Button>
 
@@ -215,7 +220,7 @@
                                 onAction="#clear"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Remove all files from the list"/>
+                                <Tooltip text="%files.tooltip.button_clear"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
@@ -223,14 +228,14 @@
                                 onAction="#moveUp"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Move selected file up"/>
+                                <Tooltip text="%files.tooltip.button_up"/>
                             </tooltip>
                         </Button>
                         <Button text="Move down" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#moveDown"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Move selected file down"/>
+                                <Tooltip text="%files.tooltip.button_down"/>
                             </tooltip>
                         </Button>
 
@@ -238,13 +243,10 @@
                         <Button fx:id="importButton" text="Chapters"
                                 minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#importChapters"
-                                GridPane.valignment="TOP">
-                            <font>
-                                <Font name="Arial Black" size="12.0"/>
-                            </font>
-
+                                GridPane.valignment="TOP"
+                                style="-fx-font-size: 15;">
                             <tooltip>
-                                <Tooltip text="Import files into chapters"/>
+                                <Tooltip text="%files.tooltip.button_chapters"/>
                             </tooltip>
                         </Button>
 
@@ -252,12 +254,10 @@
 
                         <Button fx:id="startButton" text="Start" disable="false" GridPane.halignment="CENTER"
                                 minWidth="${screen.visualBounds.width * 0.04}"
-                                onAction="#start">
-                            <font>
-                                <Font name="Arial Black" size="12.0"/>
-                            </font>
+                                onAction="#start"
+                                style="-fx-font-size: 15;">
                             <tooltip>
-                                <Tooltip text="Start conversionGroup of files"/>
+                                <Tooltip text="%files.tooltip.button_start"/>
                             </tooltip>
                         </Button>
                     </ToolBar>
@@ -269,18 +269,15 @@
                     <ToolBar>
                         <Button text="Add" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#addFiles">
-                            <font>
-                                <Font name="Arial Black" size="12.0"/>
-                            </font>
                             <tooltip>
-                                <Tooltip text="Add files for conversionGroup to the list"/>
+                                <Tooltip text="%chapters.tooltip.button_add"/>
                             </tooltip>
                         </Button>
                         <Button text="Remove" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#remove"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Remove part or chapter or track"/>
+                                <Tooltip text="%chapters.tooltip.button_remove"/>
                             </tooltip>
                         </Button>
 
@@ -290,7 +287,7 @@
                                 onAction="#clear"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Remove all files from the list"/>
+                                <Tooltip text="%chapters.tooltip.button_clear"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
@@ -299,14 +296,14 @@
                                 onAction="#moveUp"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Move chapter up"/>
+                                <Tooltip text="%chatpers.tooltip.button_up"/>
                             </tooltip>
                         </Button>
                         <Button text="Move down" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#moveDown"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Move chapter down"/>
+                                <Tooltip text="%chapters.tooltip.button_down"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
@@ -315,7 +312,7 @@
                                 onAction="#editChapter"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Edit Chapter"/>
+                                <Tooltip text="%chapters.tooltip.button_edit"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
@@ -324,14 +321,14 @@
                                 onAction="#split"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Split chapter or parts"/>
+                                <Tooltip text="%chapters.tooltip.button_split"/>
                             </tooltip>
                         </Button>
                         <Button text="Combine" minWidth="${screen.visualBounds.width * 0.04}"
                                 onAction="#combine"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Combine chapters or parts"/>
+                                <Tooltip text="%chapters.tooltip.button_combine"/>
                             </tooltip>
                         </Button>
                         <Separator orientation="VERTICAL"/>
@@ -339,19 +336,18 @@
                                 onAction="#subTracks"
                                 disable="false">
                             <tooltip>
-                                <Tooltip text="Split file by sub-tracks"/>
+                                <Tooltip text="%chapters.tooltip.button_subtrack"/>
                             </tooltip>
                         </Button>
 
                         <Separator orientation="VERTICAL"/>
                         <Button text="Start" disable="false" GridPane.halignment="CENTER"
                                 minWidth="${screen.visualBounds.width * 0.04}"
-                                onAction="#start">
-                            <font>
-                                <Font name="Arial Black" size="12.0"/>
-                            </font>
+                                onAction="#start"
+                                style="-fx-font-size: 15;"
+                        >
                             <tooltip>
-                                <Tooltip text="Start conversionGroup of files"/>
+                                <Tooltip text="%chapters.tooltip.button_start"/>
                             </tooltip>
                         </Button>
 
@@ -376,13 +372,22 @@
             <Insets top="5" right="10" bottom="10" left="10"/>
         </padding>
         <Tab text="Book Info" closable="false">
+            <tooltip>
+                <Tooltip text="%bookinfo.tooltip.tab"/>
+            </tooltip>
             <fx:include source="book_info.fxml"/>
         </Tab>
         <Tab text="Art Work" closable="false">
+            <tooltip>
+                <Tooltip text="%artwork.tooltip.tab"/>
+            </tooltip>
             <fx:include source="art_work.fxml"/>
         </Tab>
 
         <Tab text="Quality" closable="false">
+            <tooltip>
+                <Tooltip text="%output.tooltip.tab"/>
+            </tooltip>
             <fx:include source="output.fxml"/>
         </Tab>
     </TabPane>

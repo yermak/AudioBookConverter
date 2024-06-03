@@ -40,7 +40,7 @@ jobs:
         wget -q https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
         tar -xzf openjdk-21+35_linux-x64_bin.tar.gz
         export JAVA_HOME=jdk-21
-        export JAVAFX_JMODS=jmods/linux
+        export JAVAFX_JMODS=javafx/jmods/linux
         mvn clean package --no-transfer-progress
 
         build/linux/package.sh $JAVA_HOME $JAVAFX_JMODS $(APP_VERSION)
@@ -57,7 +57,7 @@ jobs:
         7z.exe x openjdk-21+35_windows-x64_bin.zip
         setx JAVA_HOME jdk-21
         call refreshenv
-        SET JAVAFX_JMODS=jmods/windows
+        SET JAVAFX_JMODS=javafx/jmods/windows
 
         call mvn clean package --no-transfer-progress
 

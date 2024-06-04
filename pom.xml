@@ -24,9 +24,19 @@
 
 
     <repositories>
+<!--
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+-->
+        <repository>
+            <id>github-mvn-repo-ffmpeg-cli-wrapper-snapshot</id>
+            <url>https://github.com/yermak/ffmpeg-cli-wrapper/raw/mvn-repo/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -107,7 +117,7 @@
         <dependency>
             <groupId>net.bramp.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
-            <version>0.8.0</version>
+            <version>0.8.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

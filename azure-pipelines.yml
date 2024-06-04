@@ -8,6 +8,7 @@ variables:
 steps:
   - checkout: self
     clean: 'true'
+    lfs: 'true'
     fetchDepth: '1'
 
   - task: Cache@2

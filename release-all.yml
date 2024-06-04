@@ -33,6 +33,7 @@ jobs:
       - checkout: self
         clean: 'true'
         fetchDepth: '1'
+        lfs: 'true'
         persistCredentials: true
 
       - task: replacetokens@3
@@ -115,7 +116,9 @@ jobs:
       - checkout: self
         clean: 'true'
         fetchDepth: '1'
+        lfs: true
         persistCredentials: true
+
       - task: replacetokens@3
         inputs:
           targetFiles: 'build/windows/chocolaty/audiobookconverter.nuspec,build/windows/chocolaty/tools/chocolateyinstall.ps1'

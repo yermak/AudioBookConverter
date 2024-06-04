@@ -12,7 +12,7 @@ trigger:
 
 variables:
   #  APP_VERSION: '5.4.$(Build.BuildNumber)'
-  VERSION: 6.4
+  VERSION: 6.5
   BUILD_COUNTER: $[counter(variables['VERSION'], 0)]
   APP_VERSION: '$(VERSION).$(BUILD_COUNTER)'
 

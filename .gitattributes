@@ -5,3 +5,8 @@
 *.jmod filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.exe filter=lfs diff=lfs merge=lfs -text
+ffmpeg filter=lfs diff=lfs merge=lfs -text
+ffprobe filter=lfs diff=lfs merge=lfs -text
+mp4art filter=lfs diff=lfs merge=lfs -text
+mp4info filter=lfs diff=lfs merge=lfs -text
+

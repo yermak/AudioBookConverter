@@ -28,6 +28,7 @@ jobs:
     - checkout: self
       clean: 'true'
       fetchDepth: '1'
+      lfs: 'true'
       persistCredentials: true
 
     - task: replacetokens@3

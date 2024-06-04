@@ -1,0 +1,2 @@
+VM_OPTIONS=--module-path "javafx\sdk\windows\lib" --add-modules javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics,javafx.web
+ENV_VAR=FFMPEG=external/x64/windows

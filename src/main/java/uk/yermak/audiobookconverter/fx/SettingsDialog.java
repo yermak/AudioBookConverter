@@ -49,8 +49,8 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
                 results.put(DARK_MODE, darkMode.isSelected());
                 results.put(FILENAME_FORMAT, filenameFormat.getText());
                 results.put(PART_FORMAT, partFormat.getText());
+                results.put(CHAPTER_FORMAT, chapterFormat.getText());
                 results.put(SHOW_HINTS, showHints.isSelected());
-
                 return results;
             }
             return null;

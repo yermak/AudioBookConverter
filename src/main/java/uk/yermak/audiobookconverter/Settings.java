@@ -47,11 +47,11 @@ public class Settings {
     private String sourceFolder = System.getProperty("user.home")+"/Documents/";
 
     public static void saveSetting(Settings settings) {
-        preferences.put(Version.getVersionString(), gson.toJson(settings));
+        preferences.put(Version.getSettingsVersion(), gson.toJson(settings));
     }
 
     public static void clear() {
-        preferences.remove(Version.getVersionString());
+        preferences.remove(Version.getSettingsVersion());
     }
 
     public void save() {
@@ -59,7 +59,7 @@ public class Settings {
     }
 
     public static Settings loadSetting() {
-        String settingsJson = preferences.get(Version.getVersionString(), null);
+        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
         if (settingsJson == null) {
             Settings settings = new Settings();
             settings.setPresets(Preset.defaultValues);
@@ -70,7 +70,7 @@ public class Settings {
     }
 
     public static String getRawData() {
-        String settingsJson = preferences.get(Version.getVersionString(), null);
+        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
         return settingsJson;
     }
 

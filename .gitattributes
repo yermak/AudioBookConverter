@@ -4,6 +4,7 @@
 *.dll filter=lfs diff=lfs merge=lfs -text
 *.jmod filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
 *.exe !text !filter !merge !diff
 *.dll !text !filter !merge !diff
 *.zip !text !filter !merge !diff

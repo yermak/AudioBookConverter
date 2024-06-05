@@ -12,6 +12,7 @@ import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.book.Chapter;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +177,7 @@ class ChapterEditor {
         customisationBox.getChildren().add(duration);
         duration.setOnAction(event -> {
             if (duration.isSelected()) {
-                context.put("DURATION", Chapter::getDuration);
+                context.put("DURATION", c -> Duration.ofMillis(c.getDuration()));
             } else {
                 context.remove("DURATION");
             }

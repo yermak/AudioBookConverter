@@ -88,7 +88,7 @@ public class AudiobookConverter extends Application {
             root = FXMLLoader.load(resource, bundle);
 
             Scene scene = new Scene(root);
-            stage.setTitle(Version.getVersionString());
+            stage.setTitle("AudioBookConverter-"+Version.getVersionString());
             stage.setScene(scene);
             Screen primary = Screen.getPrimary();
             stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);

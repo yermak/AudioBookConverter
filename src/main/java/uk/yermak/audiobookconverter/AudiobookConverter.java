@@ -11,6 +11,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +39,9 @@ public class AudiobookConverter extends Application {
         String appdata = System.getenv("APPDATA");
         File appDir;
         if (appdata != null) {
-            appDir = new File(appdata, Version.getVersionString());
+            appDir = new File(appdata, MethodHandles.lookup().lookupClass() + "-" + Version.getVersionString());
         } else {
-            File file = new File(".abc", Version.getVersionString());
+            File file = new File(".abc", MethodHandles.lookup().lookupClass() + "-" + Version.getVersionString());
             appDir = new File(System.getProperty("user.home"), file.getPath());
         }
         if (appDir.exists() || appDir.mkdirs()) {
@@ -56,6 +57,11 @@ public class AudiobookConverter extends Application {
     public static void main(String[] args) {
         //GitHub certificate issue
         System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
+        String log4jConfigFile = Platform.current.getLog4jConfig().getPath();
+
+        PropertyConfigurator.configure(log4jConfigFile);
+
 
         //-Dprism.allowhidpi=false
         //below does not work
@@ -74,6 +80,7 @@ public class AudiobookConverter extends Application {
         ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
         return ResourceBundle.getBundle("locales/messages", locale, control);
     }
+
     @Override
     public void start(Stage stage) {
         Parent root;
@@ -88,7 +95,7 @@ public class AudiobookConverter extends Application {
             root = FXMLLoader.load(resource, bundle);
 
             Scene scene = new Scene(root);
-            stage.setTitle("AudioBookConverter-"+Version.getVersionString());
+            stage.setTitle("AudioBookConverter-" + Version.getVersionString());
             stage.setScene(scene);
             Screen primary = Screen.getPrimary();
             stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);
@@ -167,7 +174,7 @@ public class AudiobookConverter extends Application {
                 }
                 return result;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to read hints", e);
             return Collections.emptyList();
         }

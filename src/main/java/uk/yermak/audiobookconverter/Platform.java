@@ -24,13 +24,22 @@ public enum Platform {
         protected File getConfigFilePath() {
             return new File(getAppPath(), "Contents/app/path.properties");
         }
+
+        @Override
+        protected File getLog4jConfig() {
+            return new File(getAppPath(), "Contents/app/log4j.properties");
+        }
     },
 
     LINUX {
         @Override
         protected File getConfigFilePath() {
             return new File("../lib/app/path.properties");
+        }
 
+        @Override
+        protected File getLog4jConfig() {
+            return new File("../lib/app/log4j.properties");
         }
     },
 
@@ -38,9 +47,9 @@ public enum Platform {
         @Override
         public Process createProcess(List<String> arguments) throws IOException {
             return Runtime.getRuntime().exec( String.join(" ", arguments));
-
         }
     };
+
     static Platform current;
     private static Properties properties = new Properties();
 
@@ -89,6 +98,10 @@ public enum Platform {
 
     protected File getConfigFilePath() {
         return new File("app/path.properties");
+    }
+
+    protected File getLog4jConfig() {
+        return new File("app/log4j.properties");
     }
 
     synchronized Properties loadAppProperties() {

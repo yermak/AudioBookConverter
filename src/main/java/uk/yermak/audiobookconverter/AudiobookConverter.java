@@ -71,9 +71,16 @@ public class AudiobookConverter extends Application {
     }
 
     private ResourceBundle getBundleWithFallback(Locale locale) {
+        ResourceBundle bundle = null;
         ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
-        return ResourceBundle.getBundle("locales/messages", locale, control);
+        try {
+            bundle = ResourceBundle.getBundle("locales/messages", locale, control);
+        } catch (MissingResourceException e) {
+            logger.error("Error getBundle", e);
+        }
+        return bundle != null ? bundle : ResourceBundle.getBundle("locales/messages", new Locale("en"), control);
     }
+
     @Override
     public void start(Stage stage) {
         Parent root;
@@ -88,7 +95,7 @@ public class AudiobookConverter extends Application {
             root = FXMLLoader.load(resource, bundle);
 
             Scene scene = new Scene(root);
-            stage.setTitle(Version.getVersionString());
+            stage.setTitle("AudioBookConverter-"+Version.getVersionString());
             stage.setScene(scene);
             Screen primary = Screen.getPrimary();
             stage.setMinHeight(primary.getVisualBounds().getHeight() * 0.7);

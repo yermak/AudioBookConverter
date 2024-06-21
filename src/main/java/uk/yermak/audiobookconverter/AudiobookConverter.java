@@ -71,9 +71,16 @@ public class AudiobookConverter extends Application {
     }
 
     private ResourceBundle getBundleWithFallback(Locale locale) {
+        ResourceBundle bundle = null;
         ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
-        return ResourceBundle.getBundle("locales/messages", locale, control);
+        try {
+            bundle = ResourceBundle.getBundle("locales/messages", locale, control);
+        } catch (MissingResourceException e) {
+            logger.error("Error getBundle", e);
+        }
+        return bundle != null ? bundle : ResourceBundle.getBundle("locales/messages", new Locale("en"), control);
     }
+
     @Override
     public void start(Stage stage) {
         Parent root;

@@ -76,9 +76,30 @@ public class AudiobookConverter extends Application {
         try {
             bundle = ResourceBundle.getBundle("locales/messages", locale, control);
         } catch (MissingResourceException e) {
-            logger.error("Error getBundle", e);
+            logger.warn("Resource bundle not found for locale: {}. Falling back to default.", locale);
         }
-        return bundle != null ? bundle : ResourceBundle.getBundle("locales/messages", new Locale("en"), control);
+        
+        if (bundle == null) {
+            try {
+                bundle = ResourceBundle.getBundle("locales/messages", Locale.ENGLISH, control);
+            } catch (MissingResourceException e) {
+                logger.error("Failed to load even the default English resource bundle", e);
+                // As a last resort, return an empty ResourceBundle to avoid null pointer exceptions
+                return new ResourceBundle() {
+                    @Override
+                    protected Object handleGetObject(String key) {
+                        return key; // Return the key itself as a fallback
+                    }
+
+                    @Override
+                    public Enumeration<String> getKeys() {
+                        return Collections.emptyEnumeration();
+                    }
+                };
+            }
+        }
+        
+        return bundle;
     }
 
     @Override

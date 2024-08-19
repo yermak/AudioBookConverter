@@ -22,7 +22,7 @@ public enum Platform {
 
         @Override
         protected File getConfigFilePath() {
-            return new File(getAppPath(), "Contents/app/path.properties");
+            return new File(getAppPath(), "/Users/franneirik/Code/AudioBookConverter/external/x64/mac/path.properties");
         }
     },
 

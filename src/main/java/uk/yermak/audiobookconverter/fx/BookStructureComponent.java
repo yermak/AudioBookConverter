@@ -4,16 +4,22 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.book.*;
 import uk.yermak.audiobookconverter.fx.util.ContextMenuBuilder;
 import uk.yermak.audiobookconverter.fx.util.ContextMenuTreeTableRow;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static uk.yermak.audiobookconverter.fx.FilesController.logger;
 
 public class BookStructureComponent extends TreeTableView<Organisable> {
 
@@ -102,6 +108,36 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
         if (organisable instanceof Chapter) {
             new ChapterEditor((Chapter) organisable).editChapter();
             refresh();
+        }
+    }
+
+    public void importChapterNames(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Chapter Names File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+        File file = fileChooser.showOpenDialog(AudiobookConverter.getEnv().getWindow());
+        
+        if (file != null) {
+            try {
+                List<String> chapterNames = Files.readAllLines(file.toPath());
+                Book book = AudiobookConverter.getContext().getBook();
+                List<Chapter> chapters = book.getChapters();
+                
+                int minSize = Math.min(chapters.size(), chapterNames.size());
+                
+                for (int i = 0; i < minSize; i++) {
+                    Chapter chapter = chapters.get(i);
+                    String chapterName = chapterNames.get(i);
+                    chapter.setCustomTitle(chapterName);
+                    chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
+                }
+                
+                updateBookStructure();
+            } catch (IOException e) {
+                logger.error("Error reading chapter names file", e);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Error reading chapter names file: " + e.getMessage());
+                alert.showAndWait();
+            }
         }
     }
 

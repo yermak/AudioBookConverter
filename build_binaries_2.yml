@@ -3,7 +3,7 @@ pr: none
 trigger:
   branches:
     include:
-      - development
+      - import-chapternames-from-txt-pr
 
 
 variables:

@@ -25,9 +25,35 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 class ChapterEditor {
 
     private final Chapter chapter;
+    private CheckBox bookNo;
+    private CheckBox bookTitle;
+    private CheckBox chapterText;
+    private CheckBox chapterNo;
+    private CheckBox duration;
+    private ComboBox<String> tagsSelection;
 
     public ChapterEditor(Chapter chapter) {
         this.chapter = chapter;
+        initializeUIElements();
+    }
+
+    private void initializeUIElements() {
+        bookNo = new CheckBox("Book No");
+        bookTitle = new CheckBox("Book title");
+        chapterText = new CheckBox("\"Chapter\"");
+        chapterNo = new CheckBox("Chapter No");
+        duration = new CheckBox("Duration");
+        tagsSelection = new ComboBox<>();
+        tagsSelection.getItems().addAll("None", "title", "artist", "album_artist", "album", "genre", "year", "comment-0", "file_name");
+    }
+
+    void uncheckAllBoxes() {
+        if (bookNo != null) bookNo.setSelected(false);
+        if (bookTitle != null) bookTitle.setSelected(false);
+        if (chapterText != null) chapterText.setSelected(false);
+        if (chapterNo != null) chapterNo.setSelected(false);
+        if (duration != null) duration.setSelected(false);
+        if (tagsSelection != null) tagsSelection.getSelectionModel().select(0); // Select "None"
     }
 
     void editChapter() {
@@ -50,7 +76,7 @@ class ChapterEditor {
 
         Map<String, Function<Chapter, Object>> context = new HashMap<>(chapter.getRenderMap());
 
-        CheckBox bookNo = new CheckBox("Book No");
+        bookNo = new CheckBox("Book No");
         bookNo.setSelected(context.containsKey("BOOK_NUMBER"));
         bookNo.setOnAction(event -> {
             if (bookNo.isSelected()) {
@@ -63,7 +89,7 @@ class ChapterEditor {
 
         customisationBox.getChildren().add(bookNo);
 
-        CheckBox bookTitle = new CheckBox("Book title");
+        bookTitle = new CheckBox("Book title");
         bookTitle.setSelected(context.containsKey("BOOK_TITLE"));
         customisationBox.getChildren().add(bookTitle);
 
@@ -76,7 +102,7 @@ class ChapterEditor {
             Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
         });
 
-        CheckBox chapterText = new CheckBox("\"Chapter\"");
+        chapterText = new CheckBox("\"Chapter\"");
         chapterText.setSelected(context.containsKey("CHAPTER_TEXT"));
         customisationBox.getChildren().add(chapterText);
         chapterText.setOnAction(event -> {
@@ -88,7 +114,7 @@ class ChapterEditor {
             Platform.runLater(() -> preview.setText(Utils.renderChapter(chapter, context)));
         });
 
-        CheckBox chapterNo = new CheckBox("Chapter No");
+        chapterNo = new CheckBox("Chapter No");
         chapterNo.setSelected(context.containsKey("CHAPTER_NUMBER"));
         chapterNo.setOnAction(event -> {
             if (chapterNo.isSelected()) {
@@ -101,7 +127,7 @@ class ChapterEditor {
 
         customisationBox.getChildren().add(chapterNo);
 
-        ComboBox<String> tagsSelection = new ComboBox<>();
+        tagsSelection = new ComboBox<>();
         tagsSelection.getItems().addAll("None", "title", "artist", "album_artist", "album", "genre", "year", "comment-0", "file_name");
         AtomicInteger selected = new AtomicInteger();
         context.keySet().stream()
@@ -172,7 +198,7 @@ class ChapterEditor {
         });
         customisationBox.getChildren().add(customTitle);
 
-        CheckBox duration = new CheckBox("Duration");
+        duration = new CheckBox("Duration");
         duration.setSelected(context.containsKey("DURATION"));
         customisationBox.getChildren().add(duration);
         duration.setOnAction(event -> {

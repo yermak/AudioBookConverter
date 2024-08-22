@@ -128,7 +128,10 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                 for (int i = 0; i < minSize; i++) {
                     Chapter chapter = chapters.get(i);
                     String chapterName = chapterNames.get(i);
+                    ChapterEditor chapterEditor = new ChapterEditor(chapter);
+                    chapterEditor.uncheckAllBoxes();
                     chapter.setCustomTitle(chapterName);
+                    chapter.getRenderMap().clear();  // Clear existing render map
                     chapter.getRenderMap().put("CUSTOM_TITLE", Chapter::getCustomTitle);
                 }
                 

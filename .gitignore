@@ -22,3 +22,4 @@ out/
 .idea/
 target/
 AudiobookConverter.iml
+.aider*

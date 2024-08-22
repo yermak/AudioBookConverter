@@ -22,7 +22,7 @@ public enum Platform {
 
         @Override
         protected File getConfigFilePath() {
-            return new File(getAppPath(), "/Users/aeraxys/Code/AudioBookConverter/external/x64/mac/path.properties");
+            return new File(getAppPath(), "Contents/app/path.properties");
         }
     },
 
@@ -44,24 +44,15 @@ public enum Platform {
     static Platform current;
     private static Properties properties = new Properties();
 
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     static {
-        try {
-            if (LINUX.isLinux()) current = LINUX;
-            else if (MAC.isMac()) current = MAC;
-            else if (WINDOWS.isWindows()) current = WINDOWS;
-            else if (DEV.isDebug()) current = DEV;
-            else {
-                logger.error("Unable to determine current platform");
-                current = DEV; // Default to DEV if unable to determine
-            }
-            properties = current.loadAppProperties();
-        } catch (Exception e) {
-            logger.error("Error during Platform initialization", e);
-            throw new ExceptionInInitializerError(e);
-        }
+        if (LINUX.isLinux()) current = LINUX;
+        if (MAC.isMac()) current = MAC;
+        if (WINDOWS.isWindows()) current = WINDOWS;
+        if (DEV.isDebug()) current = DEV;
+        properties = current.loadAppProperties();
     }
+
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     public static final String FFPROBE = current.getPath("ffprobe");
@@ -103,19 +94,15 @@ public enum Platform {
     synchronized Properties loadAppProperties() {
         if (properties.isEmpty()) {
             File file = getConfigFilePath();
-            if (file == null) {
-                logger.error("Config file path is null");
-                return new Properties();
-            }
 
             if (file.exists()) {
                 try (FileInputStream in = new FileInputStream(file)) {
                     properties.load(in);
                 } catch (IOException e) {
-                    logger.error("Error during loading properties from file: " + file.getAbsolutePath(), e);
+                    logger.error("Error during loading properties", e);
                 }
             } else {
-                logger.error("Path properties file not found at: " + file.getAbsolutePath());
+                logger.error("Path properties is not found at: ", file.getPath());
             }
         }
         return properties;

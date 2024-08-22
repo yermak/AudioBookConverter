@@ -315,6 +315,13 @@
                                 <Tooltip text="%chapters.tooltip.button_edit"/>
                             </tooltip>
                         </Button>
+                        <Button text="Import Chapter Names" minWidth="${screen.visualBounds.width * 0.04}"
+                                onAction="#importChapterNames"
+                                disable="false">
+                            <tooltip>
+                                <Tooltip text="%chapters.tooltip.button_import_chapter_names"/>
+                            </tooltip>
+                        </Button>
                         <Separator orientation="VERTICAL"/>
 
                         <Button text="Split" minWidth="${screen.visualBounds.width * 0.04}"

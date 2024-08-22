@@ -279,6 +279,12 @@ public class FilesController {
         }
     }
 
+    public void importChapterNames(ActionEvent event) {
+        if (chaptersMode.get()) {
+            bookStructure.importChapterNames(event);
+        }
+    }
+
 
     public void start(ActionEvent actionEvent) {
         ConversionContext context = AudiobookConverter.getContext();

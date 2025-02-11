@@ -3,7 +3,7 @@ package uk.yermak.audiobookconverter;
 public class Version {
 
     public static String getVersionString() {
-        return "#{APP_VERSION}#";
+        return "AudioBookConverter-#{APP_VERSION}#";
     }
 
     public static String getSettingsVersion() {

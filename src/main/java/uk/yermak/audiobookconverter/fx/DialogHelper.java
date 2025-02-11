@@ -9,14 +9,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 public class DialogHelper {
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String M4B = "m4b";
     private static final String M4A = "m4a";
@@ -36,8 +40,8 @@ public class DialogHelper {
         JfxEnv env = AudiobookConverter.getEnv();
 
         final FileChooser fileChooser = new FileChooser();
-        String outputFolder = Settings.loadSetting().getOutputFolder();
-        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(outputFolder));
+        File outputFolder = Settings.loadSetting().getOutputFolder();
+        fileChooser.setInitialDirectory(outputFolder);
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
         fileChooser.setTitle("Save AudioBook");
         String formatAsString = AudiobookConverter.getContext().getFormat().toString();
@@ -54,8 +58,12 @@ public class DialogHelper {
     public static List<String> selectFilesDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        String sourceFolder = Settings.loadSetting().getSourceFolder();
-        fileChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
+        try {
+            File sourceFolder = Settings.loadSetting().getSourceFolder();
+            fileChooser.setInitialDirectory(sourceFolder);
+        } catch (Exception e) {
+            logger.error("Failed to load Source Folder and set Initial Directory", e);
+        }
         StringJoiner filetypes = new StringJoiner("/");
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
@@ -78,8 +86,12 @@ public class DialogHelper {
     public static List<String> selectFolderDialog() {
         Window window = AudiobookConverter.getEnv().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        String sourceFolder = Settings.loadSetting().getSourceFolder();
-        directoryChooser.setInitialDirectory(Platform.getInitialDirecotory(sourceFolder));
+        try {
+            File sourceFolder = Settings.loadSetting().getSourceFolder();
+            directoryChooser.setInitialDirectory(sourceFolder);
+        } catch (Exception e) {
+            logger.error("Failed to load Source Folder and set Initial Directory", e);
+        }
 
         StringJoiner filetypes = new StringJoiner("/");
 

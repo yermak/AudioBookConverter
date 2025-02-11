@@ -43,8 +43,8 @@ public class Settings {
             "<if(PART)>, Part <PART; format=\"%,03d\"><endif>";
     private String chapterContext = "CHAPTER_NUMBER:CHAPTER_TEXT:DURATION";
     private String chapterCustomTitle = "";
-    private String outputFolder = System.getProperty("user.home")+"/Documents/";
-    private String sourceFolder = System.getProperty("user.home")+"/Documents/";
+    private String outputFolder = System.getProperty("user.home");
+    private String sourceFolder = System.getProperty("user.home");
 
     public static void saveSetting(Settings settings) {
         preferences.put(Version.getSettingsVersion(), gson.toJson(settings));
@@ -151,11 +151,14 @@ public class Settings {
         return this;
     }
 
-    public String getOutputFolder() {
-        if (new File(outputFolder).exists()) {
-            return outputFolder;
+    public File getOutputFolder() {
+        File output = new File(outputFolder);
+        if (output.exists()) {
+            return output;
+        } else if (output.getParentFile().exists()) {
+            return output.getParentFile();
         } else {
-            return System.getProperty("user.home");
+            return new File(System.getProperty("user.home"));
         }
     }
 
@@ -164,11 +167,14 @@ public class Settings {
         return this;
     }
 
-    public String getSourceFolder() {
-        if (new File(sourceFolder).exists()) {
-            return sourceFolder;
+    public File getSourceFolder() {
+        File source = new File(sourceFolder);
+        if (source.exists()) {
+            return source;
+        } else if (source.getParentFile().exists()) {
+            return source.getParentFile();
         } else {
-            return System.getProperty("user.home");
+            return new File(System.getProperty("user.home"));
         }
     }
 

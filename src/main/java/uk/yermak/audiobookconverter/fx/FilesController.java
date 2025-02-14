@@ -173,8 +173,8 @@ public class FilesController {
                 if (!chaptersMode.get()) {
                     if (!filesChapters.getTabs().contains(filesTab)) {
                         filesChapters.getTabs().add(filesTab);
-                        filesChapters.getSelectionModel().select(filesTab);
                     }
+                    filesChapters.getSelectionModel().select(filesTab);
                 }
             }
         });

@@ -16,7 +16,8 @@ import java.lang.invoke.MethodHandles;
 
 public class ArtWorkImage implements ArtWork {
     private final Image image;
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private ArtWork bean;
 
     public Image image() {
@@ -65,7 +66,6 @@ public class ArtWorkImage implements ArtWork {
 
     public ArtWorkImage(final Image image) {
         this.image = image;
-        this.logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
         this.bean = null;
     }
 }

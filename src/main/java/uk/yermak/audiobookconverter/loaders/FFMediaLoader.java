@@ -43,15 +43,20 @@ public class FFMediaLoader {
         logger.info("Loading media info");
         try {
             FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
+            logger.info("FFprobe created: " + ffprobe.getPath());
             List<MediaInfo> media = new ArrayList<>();
             for (String fileName : fileNames) {
                 Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoLoader(ffprobe, fileName, conversionGroup));
+                logger.info("MediaLoader submitted for file:" + fileName);
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
-
-            searchForPosters(media);
-
+            try {
+                searchForPosters(media);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("Failed to search for posters", e);
+            }
             return media;
         } catch (Exception e) {
             logger.error("Error during loading media info", e);
@@ -92,7 +97,7 @@ public class FFMediaLoader {
                 try (var imageStream = new FileInputStream(pictures.get(i).getPath())) {
                     context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    logger.error("Failed to add poster:", e);
                 }
             }
         }

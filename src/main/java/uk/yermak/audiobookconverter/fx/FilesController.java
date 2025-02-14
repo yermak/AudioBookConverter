@@ -14,6 +14,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.TransferMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,10 @@ import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.List;
@@ -155,29 +158,34 @@ public class FilesController {
 
 
     private void addDragEvenHandlers(Control control) {
-        control.setOnDragOver(event -> {
-            if (event.getGestureSource() != control && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.ANY);
-            }
-
-            event.consume();
-        });
-
-        control.setOnDragDropped(event -> {
-            List<File> files = event.getDragboard().getFiles();
-            if (files != null && !files.isEmpty()) {
-                List<String> fileNames = DialogHelper.collectFiles(files);
-                processFiles(fileNames);
-                event.setDropCompleted(true);
-                event.consume();
-                if (!chaptersMode.get()) {
-                    if (!filesChapters.getTabs().contains(filesTab)) {
-                        filesChapters.getTabs().add(filesTab);
-                    }
-                    filesChapters.getSelectionModel().select(filesTab);
+        try {
+            control.setOnDragOver(event -> {
+                if (event.getGestureSource() != control && event.getDragboard().hasFiles()) {
+                    event.acceptTransferModes(TransferMode.ANY);
                 }
-            }
-        });
+
+                event.consume();
+            });
+
+            control.setOnDragDropped(event -> {
+                List<File> files = event.getDragboard().getFiles();
+                if (files != null && !files.isEmpty()) {
+                    List<String> fileNames = DialogHelper.collectFiles(files);
+                    processFiles(fileNames);
+                    event.setDropCompleted(true);
+                    event.consume();
+                    if (!chaptersMode.get()) {
+                        if (!filesChapters.getTabs().contains(filesTab)) {
+                            filesChapters.getTabs().add(filesTab);
+                        }
+                        filesChapters.getSelectionModel().select(filesTab);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -188,21 +196,26 @@ public class FilesController {
     }
 
     public void selectFolder() {
-        List<String> fileNames = DialogHelper.selectFolderDialog();
-        if (fileNames != null) {
-            processFiles(fileNames);
-            if (!chaptersMode.get()) {
-                if (!filesChapters.getTabs().contains(filesTab)) {
-                    filesChapters.getTabs().add(filesTab);
+        try {
+            List<String> fileNames = DialogHelper.selectFolderDialog();
+            if (fileNames != null) {
+                processFiles(fileNames);
+                if (!chaptersMode.get()) {
+                    if (!filesChapters.getTabs().contains(filesTab)) {
+                        filesChapters.getTabs().add(filesTab);
+                    }
+                    filesChapters.getSelectionModel().select(filesTab);
                 }
-                filesChapters.getSelectionModel().select(filesTab);
             }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
 
     private void processFiles(List<String> fileNames) {
-        FFMediaLoader mediaLoader = createMediaLoader(fileNames);
+        FFMediaLoader mediaLoader = new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
         AudiobookConverter.getContext().setMediaLoader(mediaLoader);
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
@@ -213,87 +226,132 @@ public class FilesController {
         }
     }
 
-
-    private FFMediaLoader createMediaLoader(List<String> fileNames) {
-        return new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
+    private static void showError(Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Unexpected Error");
+        alert.setHeaderText(e.toString());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        e.printStackTrace(new PrintStream(out));
+        TextArea errorStack = new TextArea();
+        alert.getDialogPane().setContent(errorStack);
+        errorStack.setMinHeight(200);
+        errorStack.setMinWidth(500);
+        errorStack.setEditable(false);
+        errorStack.setFocusTraversable(false);
+        errorStack.setWrapText(false);
+        errorStack.setText(out.toString());
+        alert.showAndWait();
     }
 
+
     public void selectFiles() {
-        List<String> fileNames = DialogHelper.selectFilesDialog();
-        if (fileNames != null) {
-            processFiles(fileNames);
-            if (!chaptersMode.get()) {
-                if (!filesChapters.getTabs().contains(filesTab)) {
-                    filesChapters.getTabs().add(filesTab);
+        try {
+            List<String> fileNames = DialogHelper.selectFilesDialog();
+            if (fileNames != null) {
+                processFiles(fileNames);
+                if (!chaptersMode.get()) {
+                    if (!filesChapters.getTabs().contains(filesTab)) {
+                        filesChapters.getTabs().add(filesTab);
+                    }
+                    filesChapters.getSelectionModel().select(filesTab);
                 }
-                filesChapters.getSelectionModel().select(filesTab);
             }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     @FXML
     public void remove(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.removeChapters(event);
-        } else {
-            fileList.removeFiles(event);
+        try {
+            if (chaptersMode.get()) {
+                bookStructure.removeChapters(event);
+            } else {
+                fileList.removeFiles(event);
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     public void clear(ActionEvent event) {
-        fileList.getItems().clear();
-        AudiobookConverter.getContext().getConversionGroup().cancel();
-        AudiobookConverter.getContext().detach();
-        bookStructure.setRoot(null);
-        filesChapters.getTabs().remove(filesTab);
-        filesChapters.getTabs().remove(chaptersTab);
-        chaptersMode.set(false);
-
+        try {
+            fileList.getItems().clear();
+            AudiobookConverter.getContext().getConversionGroup().cancel();
+            AudiobookConverter.getContext().detach();
+            bookStructure.setRoot(null);
+            filesChapters.getTabs().remove(filesTab);
+            filesChapters.getTabs().remove(chaptersTab);
+            chaptersMode.set(false);
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void moveUp(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.moveChapterUp(event);
-        } else {
-            fileList.moveFileUp(event);
+        try {
+            if (chaptersMode.get()) {
+                bookStructure.moveChapterUp(event);
+            } else {
+                fileList.moveFileUp(event);
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     public void moveDown(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.moveChapterDown(event);
-        } else {
-            fileList.moveFileDown(event);
+        try {
+            if (chaptersMode.get()) {
+                bookStructure.moveChapterDown(event);
+            } else {
+                fileList.moveFileDown(event);
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     public void subTracks(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.subTracks(event);
+        try {
+            if (chaptersMode.get()) {
+                bookStructure.subTracks(event);
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     public void editChapter(ActionEvent event) {
-        if (chaptersMode.get()) {
-            bookStructure.editChapter(event);
+        try {
+            if (chaptersMode.get()) {
+                bookStructure.editChapter(event);
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
 
     public void start(ActionEvent actionEvent) {
-        ConversionContext context = AudiobookConverter.getContext();
-        if (context.getBook() == null && fileList.getItems().isEmpty()) return;
+        try {
+            ConversionContext context = AudiobookConverter.getContext();
+            if (context.getBook() == null && fileList.getItems().isEmpty()) return;
 
-        String outputDestination = DialogHelper.selectOutputFile(AudiobookConverter.getContext().getBookInfo());
+            String outputDestination = DialogHelper.selectOutputFile(AudiobookConverter.getContext().getBookInfo());
 
-        if (outputDestination == null) {
-            return;
-        }
+            if (outputDestination == null) {
+                return;
+            }
 
-//        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
-
-
-        ConversionGroup conversionGroup = AudiobookConverter.getContext().detach();
+            ConversionGroup conversionGroup = AudiobookConverter.getContext().detach();
 
 /* TODO!!!!
         conversionGroup.setOutputParameters(new OutputParameters(context.getOutputParameters()));
@@ -301,101 +359,125 @@ public class FilesController {
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 */
 
-        ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+            ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
 
 
-        Executors.newSingleThreadExecutor().submit(() -> {
-            Platform.runLater(() -> {
-                progressQueue.getItems().add(0, placeHolderProgress);
-                filesChapters.getSelectionModel().select(queueTab);
+            Executors.newSingleThreadExecutor().submit(() -> {
+                Platform.runLater(() -> {
+                    progressQueue.getItems().add(0, placeHolderProgress);
+                    filesChapters.getSelectionModel().select(queueTab);
+                });
+                conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
             });
-            conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
-
-//            launch(conversionGroup, mediaInfos, placeHolderProgress, outputDestination);
-        });
-
-//        ConverterApplication.getContext().resetForNewConversion();
-        bookStructure.setRoot(null);
-        filesChapters.getTabs().remove(filesTab);
-        filesChapters.getTabs().remove(chaptersTab);
-        context.getMedia().clear();
-        context.getPosters().clear();
-//        fileList.getItems().clear();
-        chaptersMode.set(false);
+            bookStructure.setRoot(null);
+            filesChapters.getTabs().remove(filesTab);
+            filesChapters.getTabs().remove(chaptersTab);
+            context.getMedia().clear();
+            context.getPosters().clear();
+            chaptersMode.set(false);
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void importChapters(ActionEvent actionEvent) {
-        if (fileList.getItems().isEmpty()) {
-            return;
+        try {
+            if (fileList.getItems().isEmpty()) {
+                return;
+            }
+
+            startButton.setDisable(true);
+
+            filesChapters.getTabs().add(chaptersTab);
+            filesChapters.getTabs().remove(filesTab);
+
+            bookStructure.setShowRoot(false);
+
+            ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
+
+            Book book = new Book(AudiobookConverter.getContext().getBookInfo());
+
+            TreeItem<Organisable> bookItem = new TreeItem<>(book);
+            bookStructure.setRoot(bookItem);
+            AudiobookConverter.getContext().setBook(book);
+
+            bookStructure.updateBookStructure();
+
+            bookItem.setExpanded(true);
+
+            filesChapters.getSelectionModel().select(chaptersTab);
+            fileList.getItems().clear();
+            chaptersMode.set(true);
+
+
+            long lastBookUpdate = System.currentTimeMillis();
+            book.addListener(observable -> {
+                logger.debug("Captured book modification");
+                if (System.currentTimeMillis() - lastBookUpdate > 1000) {
+                    Platform.runLater(() -> bookStructure.updateBookStructure());
+                }
+            });
+
+            Executors.newSingleThreadExecutor().submit(() -> {
+                try {
+                    book.construct(mediaInfos);
+                    bookStructure.updateBookStructure();
+                } finally {
+                    startButton.setDisable(false);
+                }
+            });
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
-
-        startButton.setDisable(true);
-
-        filesChapters.getTabs().add(chaptersTab);
-        filesChapters.getTabs().remove(filesTab);
-
-        bookStructure.setShowRoot(false);
-
-        ObservableList<MediaInfo> mediaInfos = FXCollections.observableArrayList(fileList.getItems());
-
-        Book book = new Book(AudiobookConverter.getContext().getBookInfo());
-
-        TreeItem<Organisable> bookItem = new TreeItem<>(book);
-        bookStructure.setRoot(bookItem);
-        AudiobookConverter.getContext().setBook(book);
-
-        bookStructure.updateBookStructure();
-
-        bookItem.setExpanded(true);
-
-        filesChapters.getSelectionModel().select(chaptersTab);
-        fileList.getItems().clear();
-        chaptersMode.set(true);
-
-
-        long lastBookUpdate = System.currentTimeMillis();
-        book.addListener(observable -> {
-            logger.debug("Captured book modification");
-            if (System.currentTimeMillis() - lastBookUpdate > 1000) {
-                Platform.runLater(() -> bookStructure.updateBookStructure());
-            }
-        });
-
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                book.construct(mediaInfos);
-                bookStructure.updateBookStructure();
-            } finally {
-                startButton.setDisable(false);
-            }
-        });
     }
 
     @FXML
     public void combine(ActionEvent event) {
-        bookStructure.combineChapters(event);
+        try {
+            bookStructure.combineChapters(event);
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
     public void split(ActionEvent event) {
-        bookStructure.split(event);
+        try {
+            bookStructure.split(event);
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
 
     @FXML
     public void pause(ActionEvent actionEvent) {
-        ConversionContext context = AudiobookConverter.getContext();
-        if (context.isPaused()) {
-            context.resumeConversions();
-            pauseButton.setText("Pause all");
-        } else {
-            context.pauseConversions();
-            pauseButton.setText("Resume all");
+        try {
+            ConversionContext context = AudiobookConverter.getContext();
+            if (context.isPaused()) {
+                context.resumeConversions();
+                pauseButton.setText("Pause all");
+            } else {
+                context.pauseConversions();
+                pauseButton.setText("Resume all");
+            }
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
         }
     }
 
     public void stop(ActionEvent actionEvent) {
-        AudiobookConverter.getContext().stopConversions();
+        try {
+            AudiobookConverter.getContext().stopConversions();
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -441,37 +523,47 @@ public class FilesController {
 
 
     public void clearQueue(ActionEvent actionEvent) {
-        ObservableList<ProgressComponent> items = progressQueue.getItems();
-        List<ProgressComponent> dones = new ArrayList<>();
-        for (ProgressComponent item : items) {
-            if (item.isOver()) dones.add(item);
-        }
-        Platform.runLater(() -> {
-            for (ProgressComponent done : dones) {
-                progressQueue.getItems().remove(done);
+        try {
+            ObservableList<ProgressComponent> items = progressQueue.getItems();
+            List<ProgressComponent> dones = new ArrayList<>();
+            for (ProgressComponent item : items) {
+                if (item.isOver()) dones.add(item);
             }
-        });
+            Platform.runLater(() -> {
+                for (ProgressComponent done : dones) {
+                    progressQueue.getItems().remove(done);
+                }
+            });
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void settings(ActionEvent actionEvent) {
-        SettingsDialog dialog = new SettingsDialog(AudiobookConverter.getEnv().getWindow());
+        try {
+            SettingsDialog dialog = new SettingsDialog(AudiobookConverter.getEnv().getWindow());
 
-        Optional<Map<String, Object>> result = dialog.showAndWait();
-        result.ifPresent(r -> {
-            Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
-            String filenameFormat = (String) r.get(SettingsDialog.FILENAME_FORMAT);
-            String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
-            String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
-            Boolean showHints = (Boolean) r.get(SettingsDialog.SHOW_HINTS);
-            Settings settings = Settings.loadSetting();
-            settings.setDarkMode(darkMode);
-            settings.setFilenameFormat(filenameFormat);
-            settings.setPartFormat(partFormat);
-            settings.setChapterFormat(chapterFormat);
-            settings.setShowHints(showHints);
-            settings.save();
-            AudiobookConverter.getEnv().setDarkMode(darkMode);
-        });
+            Optional<Map<String, Object>> result = dialog.showAndWait();
+            result.ifPresent(r -> {
+                Boolean darkMode = (Boolean) r.get(SettingsDialog.DARK_MODE);
+                String filenameFormat = (String) r.get(SettingsDialog.FILENAME_FORMAT);
+                String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
+                String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
+                Boolean showHints = (Boolean) r.get(SettingsDialog.SHOW_HINTS);
+                Settings settings = Settings.loadSetting();
+                settings.setDarkMode(darkMode);
+                settings.setFilenameFormat(filenameFormat);
+                settings.setPartFormat(partFormat);
+                settings.setChapterFormat(chapterFormat);
+                settings.setShowHints(showHints);
+                settings.save();
+                AudiobookConverter.getEnv().setDarkMode(darkMode);
+            });
+        } catch (Exception e) {
+            showError(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void openIssues(ActionEvent actionEvent) {
@@ -503,8 +595,8 @@ public class FilesController {
     public void showHints(ActionEvent actionEvent) {
         try {
             AudiobookConverter.loadHints();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            showError(e);
         }
     }
 }

@@ -51,8 +51,6 @@ public class FFMediaLoader {
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
-            int i = 5 / 0;
-            System.out.println("i = " + i);
             try {
                 searchForPosters(media);
             } catch (Exception e) {

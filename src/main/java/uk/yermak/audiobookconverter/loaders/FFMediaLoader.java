@@ -51,6 +51,8 @@ public class FFMediaLoader {
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);
             }
+            int i = 5 / 0;
+            System.out.println("i = " + i);
             try {
                 searchForPosters(media);
             } catch (Exception e) {
@@ -98,6 +100,7 @@ public class FFMediaLoader {
                     context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
                 } catch (IOException e) {
                     logger.error("Failed to add poster:", e);
+//                    throw new RuntimeException(e);
                 }
             }
         }

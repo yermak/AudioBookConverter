@@ -238,7 +238,11 @@ public class OutputController {
         cutoffBox.getItems().clear();
         cutoffBox.getItems().add(DISABLED);
         cutoffBox.getItems().addAll(format.cutoffs().stream().map(String::valueOf).toList());
-        cutoffBox.getSelectionModel().select(String.valueOf(findNearestMatch(cutoff, format.cutoffs(), format.defaultCutoff())));
+        if (cutoff == 0) {
+            cutoffBox.getSelectionModel().select(0);
+        } else {
+            cutoffBox.getSelectionModel().select(String.valueOf(findNearestMatch(cutoff, format.cutoffs(), format.defaultCutoff())));
+        }
     }
 
     private void refreshChannels(Format format, Integer channel) {

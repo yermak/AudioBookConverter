@@ -163,7 +163,7 @@ public class Chapter implements Organisable, Convertable {
         metaData.add("TIMEBASE=1/1000");
         metaData.add("START=" + 0);
         metaData.add("END=" + getDuration());
-        metaData.add("title= " + Utils.renderChapter(this, renderMap));
+        metaData.add("title=" + Utils.renderChapter(this, renderMap));
         return metaData;
     }
 

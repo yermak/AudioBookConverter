@@ -10,8 +10,8 @@ Official web-site
 
 AudioBookConverter
 ===============
-AudioBookConverter was originally designed as simple and lightweigh application to convert set of mp3 files to single m4b (aac) file to be played on your i-device (or any device now)
-Overtime AudioBookConverter evolved and currently can support converion of most of popular formats to m4b, it also can handle existing m4b files and process them. AudioBookConverter can working smart to find relevant artwork and can do avanced chapter management.
+AudioBookConverter was originally designed as simple and lightweight application to convert a set of mp3 files to a single m4b (aac) file to be played on your i-device (or any device now)
+Over time AudioBookConverter evolved and currently can support conversion of most of popular formats to m4b, it also can handle existing m4b files and process them. AudioBookConverter can work smart to find relevant artwork and can do advanced chapter management.
 
 **Note:** Mac and Linux versions are experimental and may require some skills to install and run them and may not work as you expect
 
@@ -43,7 +43,7 @@ Main features:
 * Advanced chapters support, including re-import of chapters from flac (cue) and m4b.
 * Flexible quality management: find balance between size and quality
 * Instant playback: listen what you are going to encode
-* Simple and lightweigh user interface: Convert a book with few clicks
+* Simple and lightweight user interface: Convert a book with few clicks
 
 
 
@@ -63,9 +63,9 @@ Usage:
 Just run the program, add files, press convert all other things are optional
 
 
-Latest fetures of version 4.x are shown here
+Latest features of version 4.x are shown here
 -------------
-Short video demonstrating latest features related to chapters support: https://www.youtube.com/watch?v=N7JrujMfids 
+Short video demonstrating the latest features related to chapters support: https://www.youtube.com/watch?v=N7JrujMfids 
 
 --------------
 <a href="https://github.com/yermak/AudioBookConverter/wiki/Home">Read more on Wiki</a>

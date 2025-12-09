@@ -14,8 +14,8 @@ rmdir /s /q target\image\AudioBookConverter
 
 "%JAVA_HOME%\bin\jpackage.exe" --app-version %APP_VERSION%  --icon AudioBookConverter.ico -t app-image --name AudioBookConverter --vendor Recoupler --input target\package\audiobookconverter-%APP_VERSION%-windows-installer\audiobookconverter-%APP_VERSION%\app --main-jar lib\audiobookconverter-%APP_VERSION%.jar --runtime-image target\fx-jre --dest target\image --java-options '--enable-preview'
 cd target\image
-7z.exe a -t7z -mx9 -mmt4 -sfx7z.sfx ..\release\AudioBookConverter-Portable-%APP_VERSION%.exe AudioBookConverter
-7z.exe a -tzip -mx9 -mmt4 ..\release\AudioBookConverter-Portable-%APP_VERSION%.zip AudioBookConverter
+7z.exe a -t7z -mx9 -mmt44 -sfx7z.sfx ..\release\AudioBookConverter-Portable-%APP_VERSION%.exe AudioBookConverter
+7z.exe a -tzip -mx9 -mmt44 ..\release\AudioBookConverter-Portable-%APP_VERSION%.zip AudioBookConverter
 cd ..\..
 
 "%JAVA_HOME%\bin\jpackage.exe" --app-version %APP_VERSION%  --license-file LICENSE --icon AudioBookConverter.ico -t msi --win-dir-chooser --win-shortcut --win-menu --win-menu-group AudioBookConverter --name AudioBookConverter --vendor Recoupler --input target\package\audiobookconverter-%APP_VERSION%-windows-installer\audiobookconverter-%APP_VERSION%\app --main-jar lib\audiobookconverter-%APP_VERSION%.jar --runtime-image target\fx-jre --java-options '--enable-preview'

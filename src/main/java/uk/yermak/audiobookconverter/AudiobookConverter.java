@@ -38,7 +38,8 @@ public class AudiobookConverter extends Application {
         String appdata = System.getenv("APPDATA");
         File appDir;
         if (appdata != null) {
-            appDir = new File(appdata, Version.getVersionString());
+            File file = new File("AudioBookConverter", Version.getVersionString());
+            appDir = new File(appdata, file.getPath());
         } else {
             File file = new File(".abc", Version.getVersionString());
             appDir = new File(System.getProperty("user.home"), file.getPath());

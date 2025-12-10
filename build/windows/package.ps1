@@ -2,7 +2,7 @@
 .SYNOPSIS
     Builds the AudioBookConverter distribution.
 .DESCRIPTION
-    Replaces package.bat. Requires 'env.TEAMCITY_7ZIP_PATH' in buildAgent.properties.
+    Requires 'env.TEAMCITY_7ZIP_PATH' in buildAgent.properties.
     Extracts local JMODs zip to target/jmods automatically.
     Builds MSIs from the modified App Image to include injected FFmpeg binaries.
 .EXAMPLE
@@ -165,7 +165,7 @@ $ZipName = "..\release\AudioBookConverter-Portable-$AppVersion.zip"
 if (Test-Path $SfxName) { Remove-Item $SfxName }
 if (Test-Path $ZipName) { Remove-Item $ZipName }
 
-# --- FIX: Retrieve 7z path from TeamCity Agent Config ---
+# --- Retrieve 7z path from TeamCity Agent Config ---
 if (-not $env:TEAMCITY_7ZIP_PATH) {
     Write-Warning "TEAMCITY_7ZIP_PATH not found. Attempting to resolve 7z.exe from PATH."
     $7zCommand = Get-Command "7z.exe" -ErrorAction SilentlyContinue
@@ -196,8 +196,6 @@ Pop-Location
 # --- 7. Build MSIs (jpackage) ---
 Write-Host "--- Building MSI Installers ---" -ForegroundColor Cyan
 
-# FIX: We now use --app-image to package the directory containing the injected FFmpeg.
-# We DO NOT use --input, --main-jar, or --runtime-image here because they are inside the image.
 $MsiBaseArgs = @(
     "--name", "AudioBookConverter",
     "--vendor", "Recoupler",

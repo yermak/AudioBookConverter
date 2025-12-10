@@ -4,6 +4,7 @@
 .DESCRIPTION
     Replaces package.bat. Requires 'env.TEAMCITY_7ZIP_PATH' in buildAgent.properties.
     Extracts local JMODs zip to target/jmods automatically.
+    Builds MSIs from the modified App Image to include injected FFmpeg binaries.
 .EXAMPLE
     .\package.ps1 -JavaHome "C:\Path\To\Jdk" -AppVersion "1.0.0"
 #>
@@ -41,11 +42,9 @@ if (Test-Path $AppImageDir) {
 # --- 2. Prepare JavaFX JMODs ---
 Write-Host "--- Preparing JavaFX JMODs ---" -ForegroundColor Cyan
 
-# Find the zip file (Supports wildcards, checks current dir or subdirs if needed, here we look in root)
 $jmodsZip = Get-ChildItem -Path . -Filter "openjfx-*_windows-x64_bin-jmods.zip" -Recurse | Select-Object -First 1
 
 if (-not $jmodsZip) {
-    # Fallback: check if the user meant the literal path "javafx/jmods/" mentioned in prompt
     if (Test-Path "javafx/jmods") {
         $jmodsZip = Get-ChildItem -Path "javafx/jmods" -Filter "openjfx-*_windows-x64_bin-jmods.zip" | Select-Object -First 1
     }
@@ -57,21 +56,19 @@ if (-not $jmodsZip) {
 
 Write-Host "Found JMODs archive: $($jmodsZip.FullName)"
 
-# Clean and recreate target/jmods
 if (Test-Path $TargetJmods) { Remove-Item $TargetJmods -Recurse -Force }
 New-Item -ItemType Directory -Path $TargetJmods -Force | Out-Null
 
-# --- FIX: Use 7-Zip from Env Var if available, else fallback to PATH (for local dev) ---
+# --- FIX: Use 7-Zip from Env Var if available ---
 if ($env:TEAMCITY_7ZIP_PATH) {
     $7zExe = $env:TEAMCITY_7ZIP_PATH
 } else {
-    $7zExe = "7z.exe" # Fallback for local dev
+    $7zExe = "7z.exe"
 }
 
 Write-Host "Extracting JMODs to $TargetJmods using $7zExe..."
 & $7zExe x $jmodsZip.FullName "-o$TargetJmods" -y | Out-Null
 
-# Find the actual directory containing .jmod files
 $actualJmodsDir = Get-ChildItem -Path $TargetJmods -Recurse -Directory |
         Where-Object { (Get-ChildItem -Path $_.FullName -Filter "*.jmod").Count -gt 0 } |
         Select-Object -First 1
@@ -96,7 +93,6 @@ $JLinkArgs = @(
     "--output", $OutputJre
 )
 
-# Clean previous JRE if exists
 if (Test-Path $OutputJre) { Remove-Item $OutputJre -Recurse -Force }
 & $JLinkExe $JLinkArgs
 if ($LASTEXITCODE -ne 0) { throw "jlink failed" }
@@ -134,10 +130,8 @@ if ($ffmpegArchive) {
     $ffmpegExtractPath = Join-Path $env:TEMP "ffmpeg_extract_$(Get-Random)"
     New-Item -ItemType Directory -Force -Path $ffmpegExtractPath | Out-Null
 
-    # Extract to temp
     & $7zExe x $ffmpegArchive.FullName "-o$ffmpegExtractPath" -y | Out-Null
 
-    # Find bin folder recursively inside the archive
     $binDir = Get-ChildItem -Path $ffmpegExtractPath -Recurse -Directory |
             Where-Object { $_.Name -eq "bin" -and (Test-Path (Join-Path $_.FullName "ffmpeg.exe")) } |
             Select-Object -First 1
@@ -145,7 +139,6 @@ if ($ffmpegArchive) {
     if ($binDir) {
         $FFmpegDestDir = Join-Path $AppImageDir "app\external"
 
-        # Create directory if it doesn't exist
         if (-not (Test-Path $FFmpegDestDir)) {
             New-Item -ItemType Directory -Force -Path $FFmpegDestDir | Out-Null
         }
@@ -172,9 +165,8 @@ $ZipName = "..\release\AudioBookConverter-Portable-$AppVersion.zip"
 if (Test-Path $SfxName) { Remove-Item $SfxName }
 if (Test-Path $ZipName) { Remove-Item $ZipName }
 
-# --- FIX START: Retrieve 7z path from TeamCity Agent Config ---
+# --- FIX: Retrieve 7z path from TeamCity Agent Config ---
 if (-not $env:TEAMCITY_7ZIP_PATH) {
-    # If running locally without the var, try to resolve 7z.exe from PATH to get sfx location
     Write-Warning "TEAMCITY_7ZIP_PATH not found. Attempting to resolve 7z.exe from PATH."
     $7zCommand = Get-Command "7z.exe" -ErrorAction SilentlyContinue
     if ($7zCommand) {
@@ -186,9 +178,7 @@ if (-not $env:TEAMCITY_7ZIP_PATH) {
     $7zExe = $env:TEAMCITY_7ZIP_PATH
 }
 
-# Calculate the directory where 7z.exe lives
 $7zDir = Split-Path -Parent $7zExe
-# Calculate the location of the SFX module in that same directory
 $SfxModule = Join-Path $7zDir "7z.sfx"
 
 if (-not (Test-Path $SfxModule)) {
@@ -198,7 +188,6 @@ if (-not (Test-Path $SfxModule)) {
 Write-Host "Using 7-Zip: $7zExe"
 Write-Host "Using SFX:   $SfxModule"
 
-# Use the variables to run the command
 & $7zExe a -t7z -mx9 -mmt "-sfx$SfxModule" $SfxName $AppImageName
 & $7zExe a -tzip -mx9 -mmt $ZipName $AppImageName
 
@@ -207,30 +196,32 @@ Pop-Location
 # --- 7. Build MSIs (jpackage) ---
 Write-Host "--- Building MSI Installers ---" -ForegroundColor Cyan
 
-$MsiCommonArgs = $BaseJPackageArgs + @(
+# FIX: We now use --app-image to package the directory containing the injected FFmpeg.
+# We DO NOT use --input, --main-jar, or --runtime-image here because they are inside the image.
+$MsiBaseArgs = @(
+    "--name", "AudioBookConverter",
+    "--vendor", "Recoupler",
+    "--app-version", $AppVersion,
     "--license-file", "LICENSE",
     "--type", "msi",
     "--win-shortcut",
     "--win-menu",
-    "--win-menu-group", "AudioBookConverter"
+    "--win-menu-group", "AudioBookConverter",
+    "--app-image", $AppImageDir
 )
 
 # A. All Users MSI
 Write-Host "Building: All Users MSI"
-$MsiAllUsersArgs = $MsiCommonArgs + @(
-    "--win-dir-chooser",
-    "--input", $InputPath
-)
+$MsiAllUsersArgs = $MsiBaseArgs + "--win-dir-chooser"
 & $JPackageExe $MsiAllUsersArgs
+if ($LASTEXITCODE -ne 0) { throw "jpackage (msi-all-users) failed" }
 Move-Item -Path "AudioBookConverter-$AppVersion.msi" -Destination "$TargetRelease\AudioBookConverter-All-Users-$AppVersion.msi" -Force
 
 # B. Single User MSI
 Write-Host "Building: Single User MSI"
-$MsiSingleUserArgs = $MsiCommonArgs + @(
-    "--win-per-user-install",
-    "--input", $InputPath
-)
+$MsiSingleUserArgs = $MsiBaseArgs + "--win-per-user-install"
 & $JPackageExe $MsiSingleUserArgs
+if ($LASTEXITCODE -ne 0) { throw "jpackage (msi-single-user) failed" }
 Move-Item -Path "AudioBookConverter-$AppVersion.msi" -Destination "$TargetRelease\AudioBookConverter-Single-User-$AppVersion.msi" -Force
 
 Write-Host "--- Build Complete ---" -ForegroundColor Green

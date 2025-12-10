@@ -166,7 +166,7 @@ $ZipName = "..\release\AudioBookConverter-Portable-$AppVersion.zip"
 if (Test-Path $SfxName) { Remove-Item $SfxName }
 if (Test-Path $ZipName) { Remove-Item $ZipName }
 
-& 7z.exe a -t7z -mx5 -mmt -sfxCon7z.sfx $SfxName $AppImageName
+& 7z.exe a -t7z -mx5 -mmt -sfx7z.sfx $SfxName $AppImageName
 & 7z.exe a -tzip -mx5 -mmt $ZipName $AppImageName
 
 Pop-Location

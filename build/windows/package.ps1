@@ -188,8 +188,8 @@ if (-not (Test-Path $SfxModule)) {
 Write-Host "Using 7-Zip: $7zExe"
 Write-Host "Using SFX:   $SfxModule"
 
-& $7zExe a -t7z -mx9 -mmt "-sfx$SfxModule" $SfxName $AppImageName
-& $7zExe a -tzip -mx9 -mmt $ZipName $AppImageName
+& $7zExe a -t7z -mx5 -mmt "-sfx$SfxModule" $SfxName $AppImageName
+& $7zExe a -tzip -mx5 -mmt $ZipName $AppImageName
 
 Pop-Location
 

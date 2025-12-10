@@ -134,7 +134,7 @@ public class Part implements Organisable, Convertable {
             metaData.add("START=" + totalDuration);
             totalDuration += chapter.getDuration();
             metaData.add("END=" + totalDuration);
-            metaData.add("title= " + Utils.renderChapter(chapter, chapter.getRenderMap()));
+            metaData.add("title=" + Utils.renderChapter(chapter, chapter.getRenderMap()));
         }
         return metaData;
     }

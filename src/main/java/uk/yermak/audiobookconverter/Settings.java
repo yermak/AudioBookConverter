@@ -33,7 +33,7 @@ public class Settings {
             "<if(CHAPTER_NUMBER)><CHAPTER_NUMBER; format=\"%,03d\"> <endif>" +
             "<if(TAG)><TAG> <endif>" +
             "<if(CUSTOM_TITLE)><CUSTOM_TITLE> <endif>" +
-            "<if(DURATION)> - <DURATION; format=\"%02d:%02d:%02d\"><endif>";
+            "<if(DURATION)>- <DURATION; format=\"%02d:%02d:%02d\"><endif>";
     private String filenameFormat = "<WRITER><if(SERIES)> - [<SERIES><if(BOOK_NUMBER)> - <BOOK_NUMBER; format=\"%,02d\"><endif>]<endif> - <TITLE><if(NARRATOR)> (<NARRATOR>)<endif>";
     private String partFormat = "<if(WRITER)><WRITER> <endif>" +
             "<if(SERIES)>- [<SERIES><if(BOOK_NUMBER)> -<BOOK_NUMBER><endif>] - <endif>" +

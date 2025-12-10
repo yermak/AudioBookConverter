@@ -9,7 +9,7 @@
 
     <!--<version>6.3.0</version>-->
 
-    <version>#{APP_VERSION}#</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -219,7 +219,6 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/deploy/assembly/${installer.assembly.full}</descriptor>
-                                <descriptor>src/main/deploy/assembly/${installer.assembly.nodeps}</descriptor>
                             </descriptors>
                             <outputDirectory>target/package</outputDirectory>
                         </configuration>
@@ -239,10 +238,8 @@
             </activation>
             <properties>
                 <installer.assembly.full>windows-installer.xml</installer.assembly.full>
-                <installer.assembly.nodeps>windows-nodeps-installer.xml</installer.assembly.nodeps>
             </properties>
         </profile>
-
         <profile>
             <id>lin</id>
             <activation>
@@ -252,7 +249,6 @@
             </activation>
             <properties>
                 <installer.assembly.full>linux-installer.xml</installer.assembly.full>
-                <installer.assembly.nodeps>linux-nodeps-installer.xml</installer.assembly.nodeps>
             </properties>
         </profile>
         <profile>
@@ -264,7 +260,6 @@
             </activation>
             <properties>
                 <installer.assembly.full>mac-installer.xml</installer.assembly.full>
-                <installer.assembly.nodeps>mac-nodeps-installer.xml</installer.assembly.nodeps>
             </properties>
         </profile>
 

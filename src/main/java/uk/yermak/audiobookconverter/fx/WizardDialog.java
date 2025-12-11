@@ -5,6 +5,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 
 public class WizardDialog extends Dialog<Void> {
@@ -15,7 +16,8 @@ public class WizardDialog extends Dialog<Void> {
 
     public WizardDialog(List<String> hints) {
         this.hints = hints;
-        setTitle("Tip of the day...");
+        ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+        setTitle(resources.getString("dialog.tip.title"));
         initModality(Modality.APPLICATION_MODAL);
         hintsArea.setMinHeight(200);
         hintsArea.setMinWidth(500);

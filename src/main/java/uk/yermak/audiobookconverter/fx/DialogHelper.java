@@ -17,6 +17,7 @@ import uk.yermak.audiobookconverter.fx.util.Comparators;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
+import java.text.MessageFormat;
 import java.util.*;
 
 public class DialogHelper {
@@ -43,7 +44,9 @@ public class DialogHelper {
         File outputFolder = Settings.loadSetting().getOutputFolder();
         fileChooser.setInitialDirectory(outputFolder);
         fileChooser.setInitialFileName(Utils.getOuputFilenameSuggestion(audioBookInfo));
-        fileChooser.setTitle("Save AudioBook");
+        ResourceBundle bundle = AudiobookConverter.getBundle();
+        String title = bundle != null ? bundle.getString("chooser.save_audiobook") : "Save AudioBook";
+        fileChooser.setTitle(title);
         String formatAsString = AudiobookConverter.getContext().getFormat().toString();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter(formatAsString, "*." + formatAsString)
@@ -68,7 +71,11 @@ public class DialogHelper {
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
 
-        fileChooser.setTitle("Select " + filetypes + " files for conversion");
+        ResourceBundle bundle = AudiobookConverter.getBundle();
+        String title = bundle != null
+                ? MessageFormat.format(bundle.getString("chooser.select_files"), filetypes)
+                : MessageFormat.format("Select {0} files for conversion", filetypes);
+        fileChooser.setTitle(title);
 
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio", Arrays.asList(toSuffixes("*.", FILE_EXTENSIONS))));
 
@@ -97,7 +104,11 @@ public class DialogHelper {
 
         Arrays.stream(FILE_EXTENSIONS).map(String::toUpperCase).forEach(filetypes::add);
 
-        directoryChooser.setTitle("Select folder with " + filetypes + " files for conversion");
+        ResourceBundle bundle = AudiobookConverter.getBundle();
+        String title = bundle != null
+                ? MessageFormat.format(bundle.getString("chooser.select_folder"), filetypes)
+                : MessageFormat.format("Select folder with {0} files for conversion", filetypes);
+        directoryChooser.setTitle(title);
         File selectedDirectory = directoryChooser.showDialog(window);
 
         if (selectedDirectory == null) return null;

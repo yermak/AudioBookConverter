@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 
 public class AudiobookConverter extends Application {
     private static JfxEnv env;
+    private static ResourceBundle bundle;
 
     //TODO clean-up
     static {
@@ -89,7 +90,7 @@ public class AudiobookConverter extends Application {
         logger.info("Initialising application");
 
         Locale defaultLocale = Locale.getDefault();
-        ResourceBundle bundle = getBundleWithFallback(defaultLocale);
+        bundle = getBundleWithFallback(defaultLocale);
 
         try {
             URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
@@ -132,6 +133,10 @@ public class AudiobookConverter extends Application {
             logger.error("Error initiating application", e);
             e.printStackTrace();
         }
+    }
+
+    public static ResourceBundle getBundle() {
+        return bundle;
     }
 
     public static void loadHints() throws IOException {

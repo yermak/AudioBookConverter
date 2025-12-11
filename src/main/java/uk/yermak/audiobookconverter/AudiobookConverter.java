@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -68,8 +69,8 @@ public class AudiobookConverter extends Application {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static void checkNewVersion() {
-        Executors.newSingleThreadExecutor().submit(new VersionChecker());
+    public static void checkNewVersion(ResourceBundle bundle) {
+        Executors.newSingleThreadExecutor().submit(new VersionChecker(bundle));
     }
 
     private ResourceBundle getBundleWithFallback(Locale locale) {
@@ -123,7 +124,7 @@ public class AudiobookConverter extends Application {
                 System.exit(0);
             });
 
-            checkNewVersion();
+            checkNewVersion(bundle);
 
             if (settings.isShowHints()) {
                 loadHints();
@@ -165,9 +166,11 @@ public class AudiobookConverter extends Application {
     }
 
     public static void showNotification(String finalOutputDestination) {
+        ResourceBundle resources = getBundle();
         Notifications.create()
-                .title("AudioBookConverter: Conversion is completed")
-                .text(finalOutputDestination).show();
+                .title(resources.getString("notification.conversion_complete.title"))
+                .text(MessageFormat.format(resources.getString("notification.conversion_complete.text"), finalOutputDestination))
+                .show();
     }
 
     private static List<String> readListFromURL(String requestURL) throws IOException {
@@ -187,6 +190,12 @@ public class AudiobookConverter extends Application {
     }
 
     static class VersionChecker implements Runnable {
+        private final ResourceBundle resources;
+
+        VersionChecker(ResourceBundle resources) {
+            this.resources = resources;
+        }
+
         @Override
         public void run() {
             try {
@@ -198,8 +207,8 @@ public class AudiobookConverter extends Application {
                     logger.info("New version found: {}", version);
                     javafx.application.Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                        alert.setTitle("New Version Available!");
-                        alert.setContentText("Would you like to download new version?");
+                        alert.setTitle(resources.getString("alert.update_available.title"));
+                        alert.setContentText(resources.getString("alert.update_available.message"));
                         Optional<ButtonType> result = alert.showAndWait();
                         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
                             AudiobookConverter.getEnv().showDocument("https://store.steampowered.com/app/1529240/AudioBookConverter/");

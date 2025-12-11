@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public class SettingsDialog extends Dialog<Map<String, Object>> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -38,7 +39,8 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
 
 
     public SettingsDialog(Window window) {
-        setTitle("AudioBookConverter Settings");
+        ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+        setTitle(resources.getString("dialog.settings.title"));
         setHeaderText("Customize AudioBookConverter");
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());

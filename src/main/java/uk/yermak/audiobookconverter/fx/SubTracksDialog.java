@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public class SubTracksDialog extends Dialog<Map<String, Object>> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -33,7 +34,8 @@ public class SubTracksDialog extends Dialog<Map<String, Object>> {
     private ToggleSwitch splitOnceOrRepeat;
 
     public SubTracksDialog(Window window) {
-        setTitle("Create sub-tracks");
+        ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+        setTitle(resources.getString("dialog.subtracks.title"));
         setHeaderText("Split once after number of seconds \nor cut every number of seconds");
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());

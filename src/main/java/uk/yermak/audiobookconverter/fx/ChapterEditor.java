@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 class ChapterEditor {
 
     private final Chapter chapter;
+    private final ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
 
     public ChapterEditor(Chapter chapter) {
         this.chapter = chapter;
@@ -34,7 +36,7 @@ class ChapterEditor {
         Label preview = new Label(chapter.getTitle());
 
         Dialog<Pair<String, Boolean>> dialog = new Dialog<>();
-        dialog.setTitle("Edit chapter");
+        dialog.setTitle(resources.getString("dialog.chapter_editor.title"));
         dialog.setHeaderText("Customise chapter title");
 
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);

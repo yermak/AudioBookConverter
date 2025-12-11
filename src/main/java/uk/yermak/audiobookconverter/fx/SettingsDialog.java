@@ -41,7 +41,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
     public SettingsDialog(Window window) {
         ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
         setTitle(resources.getString("dialog.settings.title"));
-        setHeaderText("Customize AudioBookConverter");
+        setHeaderText(resources.getString("dialog.settings.header"));
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());
 
@@ -57,7 +57,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
             }
             return null;
         });
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("settings.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("settings.fxml"), resources);
 
         fxmlLoader.setRoot(getDialogPane().getContent());
         fxmlLoader.setController(this);

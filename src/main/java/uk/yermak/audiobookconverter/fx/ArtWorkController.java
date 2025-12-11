@@ -24,6 +24,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  * Created by yermak on 03-Dec-18.
@@ -34,6 +36,9 @@ public class ArtWorkController {
     ListView<ArtWork> imageList;
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    @FXML
+    private ResourceBundle resources;
 
     @FXML
     private void initialize() {
@@ -48,7 +53,12 @@ public class ArtWorkController {
         FileChooser fileChooser = new FileChooser();
         File sourceFolder = Settings.loadSetting().getSourceFolder();
         fileChooser.setInitialDirectory(sourceFolder);
-        fileChooser.setTitle("Select JPG or PNG file");
+        ResourceBundle bundle = resources != null ? resources : AudiobookConverter.getBundle();
+        String fileTypes = "JPG, PNG, BMP";
+        String title = bundle != null
+                ? MessageFormat.format(bundle.getString("chooser.select_image"), fileTypes)
+                : MessageFormat.format("Select {0} file", fileTypes);
+        fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("jpg", "*.jpg", "*.jpeg", "*.jfif"),
                 new FileChooser.ExtensionFilter("png", "*.png"),

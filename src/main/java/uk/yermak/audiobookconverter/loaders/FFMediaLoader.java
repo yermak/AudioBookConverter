@@ -45,8 +45,9 @@ public class FFMediaLoader {
             FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
             logger.info("FFprobe created: " + ffprobe.getPath());
             List<MediaInfo> media = new ArrayList<>();
+            ResourceBundle bundle = AudiobookConverter.getBundle();
             for (String fileName : fileNames) {
-                Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoLoader(ffprobe, fileName, conversionGroup));
+                Future<MediaInfo> futureLoad = mediaExecutor.submit(new MediaInfoLoader(ffprobe, fileName, conversionGroup, bundle));
                 logger.info("MediaLoader submitted for file:" + fileName);
                 MediaInfo mediaInfo = new MediaInfoProxy(fileName, futureLoad);
                 media.add(mediaInfo);

@@ -36,7 +36,7 @@ public class SubTracksDialog extends Dialog<Map<String, Object>> {
     public SubTracksDialog(Window window) {
         ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
         setTitle(resources.getString("dialog.subtracks.title"));
-        setHeaderText("Split once after number of seconds \nor cut every number of seconds");
+        setHeaderText(resources.getString("dialog.subtracks.header"));
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         getDialogPane().setContent(new GridPane());
 
@@ -50,7 +50,7 @@ public class SubTracksDialog extends Dialog<Map<String, Object>> {
             }
             return null;
         });
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("subtracks.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("subtracks.fxml"), resources);
 
         fxmlLoader.setRoot(getDialogPane().getContent());
         fxmlLoader.setController(this);

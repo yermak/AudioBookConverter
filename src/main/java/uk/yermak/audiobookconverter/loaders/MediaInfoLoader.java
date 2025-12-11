@@ -14,12 +14,14 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionGroup;
 import uk.yermak.audiobookconverter.book.*;
 
+import java.text.MessageFormat;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.ResourceBundle;
 
 class MediaInfoLoader implements Callable<MediaInfo> {
 
@@ -33,14 +35,16 @@ class MediaInfoLoader implements Callable<MediaInfo> {
     private final String filename;
     private final ConversionGroup conversionGroup;
     private final FFprobe ffprobe;
+    private final ResourceBundle resources;
 
     private static final ScheduledExecutorService artExecutor = Executors.newScheduledThreadPool(8);
 
 
-    public MediaInfoLoader(FFprobe ffprobe, String filename, ConversionGroup conversionGroup) {
+    public MediaInfoLoader(FFprobe ffprobe, String filename, ConversionGroup conversionGroup, ResourceBundle resources) {
         this.ffprobe = ffprobe;
         this.filename = filename;
         this.conversionGroup = conversionGroup;
+        this.resources = resources;
     }
 
     @Override
@@ -125,7 +129,7 @@ class MediaInfoLoader implements Callable<MediaInfo> {
             if (chapter.tags != null) {
                 track.setTitle(chapter.tags.title);
             } else {
-                track.setTitle("Chapter " + trackNo);
+                track.setTitle(MessageFormat.format(resources.getString("chapter.default_title"), trackNo));
             }
             track.setStart((long) (Double.parseDouble(chapter.start_time) * 1000));
             track.setEnd((long) (Double.parseDouble(chapter.end_time) * 1000));

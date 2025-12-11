@@ -12,20 +12,20 @@
     </columnConstraints>
 
     <children>
-        <Label text="Dark Theme" GridPane.columnIndex="0" GridPane.rowIndex="0"
+        <Label text="%settings.dark_theme" GridPane.columnIndex="0" GridPane.rowIndex="0"
                GridPane.halignment="LEFT"/>
         <ToggleSwitch fx:id="darkMode" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>
         <Separator GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
-        <Label text="Book filename template" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
+        <Label text="%settings.filename_template.book" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
                GridPane.halignment="LEFT"/>
         <TextArea fx:id="filenameFormat" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2" maxHeight="60" minWidth="400" wrapText="true"/>
-        <Label text="Book Part filename template" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
+        <Label text="%settings.filename_template.book_part" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
                GridPane.halignment="LEFT"/>
         <TextArea fx:id="partFormat" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2" maxHeight="60" minWidth="400" wrapText="true"/>
-        <Label text="Chapter template" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2"
+        <Label text="%settings.filename_template.chapter" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2"
                GridPane.halignment="LEFT"/>
         <TextArea fx:id="chapterFormat" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2" maxHeight="60" minWidth="400" wrapText="true"/>
-        <Label text="Show Tips of the day" GridPane.columnIndex="0" GridPane.rowIndex="8"
+        <Label text="%settings.show_tips" GridPane.columnIndex="0" GridPane.rowIndex="8"
                GridPane.halignment="LEFT"/>
         <ToggleSwitch fx:id="showHints" GridPane.columnIndex="1" GridPane.rowIndex="8" GridPane.halignment="RIGHT"/>
     </children>

@@ -30,7 +30,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
@@ -511,7 +510,7 @@ public class FilesController {
     }
 
     public void checkVersion(ActionEvent actionEvent) {
-        AudiobookConverter.checkNewVersion();
+        AudiobookConverter.checkNewVersion(resources);
     }
 
     public void exit(ActionEvent actionEvent) {

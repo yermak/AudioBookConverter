@@ -152,9 +152,10 @@ public class FilesController {
     }
 
     private void initFileOpenMenu() {
-        MenuItem item1 = new MenuItem("Files");
+        ResourceBundle bundle = Objects.requireNonNull(resources, "Resource bundle not initialized");
+        MenuItem item1 = new MenuItem(bundle.getString("context.files"));
         item1.setOnAction(e -> selectFiles());
-        MenuItem item2 = new MenuItem("Folder");
+        MenuItem item2 = new MenuItem(bundle.getString("context.folder"));
         item2.setOnAction(e -> selectFolder());
         contextMenu.getItems().addAll(item1, item2);
     }
@@ -231,8 +232,7 @@ public class FilesController {
 
     private void showError(Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        String unexpectedErrorTitle = resources != null ? resources.getString("dialog.unexpected_error.title") : "Unexpected Error";
-        alert.setTitle(unexpectedErrorTitle);
+        alert.setTitle(Objects.requireNonNull(resources, "Resource bundle not initialized").getString("dialog.unexpected_error.title"));
         alert.setHeaderText(e.toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(out));

@@ -86,6 +86,9 @@ public class FilesController {
     @FXML
     private Button startButton;
 
+    @FXML
+    private ResourceBundle resources;
+
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -226,9 +229,10 @@ public class FilesController {
         }
     }
 
-    private static void showError(Exception e) {
+    private void showError(Exception e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Unexpected Error");
+        String unexpectedErrorTitle = resources != null ? resources.getString("dialog.unexpected_error.title") : "Unexpected Error";
+        alert.setTitle(unexpectedErrorTitle);
         alert.setHeaderText(e.toString());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(out));
@@ -460,10 +464,10 @@ public class FilesController {
             ConversionContext context = AudiobookConverter.getContext();
             if (context.isPaused()) {
                 context.resumeConversions();
-                pauseButton.setText("Pause all");
+                pauseButton.setText(resources.getString("button.pause_all"));
             } else {
                 context.pauseConversions();
-                pauseButton.setText("Resume all");
+                pauseButton.setText(resources.getString("button.resume_all"));
             }
         } catch (Exception e) {
             showError(e);
@@ -568,10 +572,8 @@ public class FilesController {
 
     public void openIssues(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Report bug");
-        alert.setContentText("Your setting will be copied into buffer and you will be redirected to GitHub issues page.\n" +
-                "Please describe your problem and paste settings into the issue.\n" +
-                "Note: Your settings may contain sensitive information like your user name, paths to your files, etc.\n");
+        alert.setTitle(resources.getString("dialog.report_bug.title"));
+        alert.setContentText(resources.getString("dialog.report_bug.message"));
         Optional<ButtonType> result = alert.showAndWait();
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -583,8 +585,8 @@ public class FilesController {
 
     public void repair(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Repair");
-        alert.setContentText("Are you sure you want to restore settings to default?\nProgram will be closed.");
+        alert.setTitle(resources.getString("dialog.repair.title"));
+        alert.setContentText(resources.getString("dialog.repair.message"));
         Optional<ButtonType> result = alert.showAndWait();
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
             Settings.clear();

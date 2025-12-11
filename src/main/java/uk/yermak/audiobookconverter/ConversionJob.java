@@ -88,7 +88,7 @@ public class ConversionJob implements Runnable {
 
             if (getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
                 try {
-                    String optimisedOutput = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output")).optimize();
+                    String optimisedOutput = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output"), AudiobookConverter.getBundle()).optimize();
                     if (destFile.exists()) FileUtils.deleteQuietly(destFile);
                     FileUtils.moveFile(new File(optimisedOutput), destFile);
                 } finally {

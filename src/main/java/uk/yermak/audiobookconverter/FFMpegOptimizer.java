@@ -11,11 +11,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
+import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 public class FFMpegOptimizer {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ConversionJob conversionJob;
+    private final ResourceBundle resources;
 
     private String tempFile;
     private final String outputFileName;
@@ -23,19 +25,19 @@ public class FFMpegOptimizer {
 
     private ProgressParser progressParser;
 
-
-    public FFMpegOptimizer(ConversionJob conversionJob, String tempFile, String outputFileName, ProgressCallback callback) {
+    public FFMpegOptimizer(ConversionJob conversionJob, String tempFile, String outputFileName, ProgressCallback callback, ResourceBundle resources) {
         this.conversionJob = conversionJob;
         this.tempFile = tempFile;
         this.outputFileName = outputFileName;
         this.callback = callback;
+        this.resources = resources;
     }
 
 
     String optimize() throws InterruptedException, IOException {
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
         callback.reset();
-        callback.setState("Optimising...");
+        callback.setState(resources.getString("progress.state.optimizing"));
         try {
             progressParser = new TcpProgressParser(progress -> {
                 callback.converted(progress.out_time_ns / 1000000, progress.total_size);

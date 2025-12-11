@@ -14,10 +14,12 @@ import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.book.ArtWork;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
 
@@ -53,10 +55,12 @@ public class ProgressComponent extends GridPane {
 
 
     private final ConversionProgress conversionProgress;
+    private final ResourceBundle resources;
 
 
     public ProgressComponent(ConversionProgress conversionProgress) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("progress.fxml"));
+        resources = AudiobookConverter.getBundle();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("progress.fxml"), resources);
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         try {
@@ -91,7 +95,7 @@ public class ProgressComponent extends GridPane {
     private void updateButtons(ProgressStatus newValue) {
         Platform.runLater(() -> {
             switch (newValue) {
-                case PAUSED -> pauseButton.setText("Resume");
+                case PAUSED -> pauseButton.setText(resources.getString("progress.button.resume"));
                 case FINISHED -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
@@ -101,7 +105,7 @@ public class ProgressComponent extends GridPane {
                     stopButton.setDisable(true);
                 }
                 case IN_PROGRESS -> {
-                    pauseButton.setText("Pause");
+                    pauseButton.setText(resources.getString("progress.button.pause"));
                     pauseButton.setDisable(false);
                     stopButton.setDisable(false);
                 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.Preferences;
@@ -45,6 +46,7 @@ public class Settings {
     private String chapterCustomTitle = "";
     private String outputFolder = System.getProperty("user.home");
     private String sourceFolder = System.getProperty("user.home");
+    private String language = "";
 
     public static void saveSetting(Settings settings) {
         preferences.put(Version.getSettingsVersion(), gson.toJson(settings));
@@ -180,6 +182,15 @@ public class Settings {
 
     public Settings setSourceFolder(String sourceFolder) {
         this.sourceFolder = sourceFolder;
+        return this;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public Settings setLanguage(String language) {
+        this.language = language;
         return this;
     }
 

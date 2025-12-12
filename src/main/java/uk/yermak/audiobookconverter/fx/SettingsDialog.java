@@ -3,16 +3,11 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.Window;
 import org.controlsfx.control.ToggleSwitch;
 import uk.yermak.audiobookconverter.Settings;
@@ -38,7 +33,6 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
             new LocaleOption("fr", "settings.language.fr"),
             new LocaleOption("it", "settings.language.it"),
             new LocaleOption("pt", "settings.language.pt"),
-            new LocaleOption("nl", "settings.language.nl"),
             new LocaleOption("ru", "settings.language.ru"),
             new LocaleOption("ua", "settings.language.ua"),
             new LocaleOption("tr", "settings.language.tr"),

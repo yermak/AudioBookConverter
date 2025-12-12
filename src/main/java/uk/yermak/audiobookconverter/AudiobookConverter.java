@@ -90,8 +90,13 @@ public class AudiobookConverter extends Application {
 
         logger.info("Initialising application");
 
-        Locale defaultLocale = Locale.getDefault();
-        bundle = getBundleWithFallback(defaultLocale);
+        Settings settings = Settings.loadSetting();
+        Locale selectedLocale = Optional.ofNullable(settings.getLanguage())
+                .filter(StringUtils::isNotBlank)
+                .map(Locale::forLanguageTag)
+                .orElse(Locale.getDefault());
+        Locale.setDefault(selectedLocale);
+        bundle = getBundleWithFallback(selectedLocale);
 
         try {
             URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
@@ -105,7 +110,6 @@ public class AudiobookConverter extends Application {
             stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
             env = new JfxEnv(scene, getHostServices());
 
-            Settings settings = Settings.loadSetting();
             boolean dark = settings.isDarkMode();
             if (dark) {
                 env.setDarkMode(dark);

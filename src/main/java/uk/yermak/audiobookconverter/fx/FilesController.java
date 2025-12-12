@@ -554,12 +554,14 @@ public class FilesController {
                 String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
                 String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
                 Boolean showHints = (Boolean) r.get(SettingsDialog.SHOW_HINTS);
+                String language = (String) r.get(SettingsDialog.LANGUAGE);
                 Settings settings = Settings.loadSetting();
                 settings.setDarkMode(darkMode);
                 settings.setFilenameFormat(filenameFormat);
                 settings.setPartFormat(partFormat);
                 settings.setChapterFormat(chapterFormat);
                 settings.setShowHints(showHints);
+                settings.setLanguage(language);
                 settings.save();
                 AudiobookConverter.getEnv().setDarkMode(darkMode);
             });

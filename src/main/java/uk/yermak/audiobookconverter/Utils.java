@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,16 +121,6 @@ public class Utils {
         } else {
             DecimalFormat mbFormat = new DecimalFormat("0");
             return mbFormat.format((double) bytes / 1048576.0D) + " MB";
-        }
-    }
-
-    public static String tempCopy(String fileName) {
-        File destFile = new File(getTmp(System.currentTimeMillis(), 0, FilenameUtils.getExtension(fileName)));
-        try {
-            FileUtils.copyFile(new File(fileName), destFile);
-            return destFile.getPath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

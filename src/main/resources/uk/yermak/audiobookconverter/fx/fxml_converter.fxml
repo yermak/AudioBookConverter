@@ -365,7 +365,7 @@
             </Tab>
         </TabPane>
 
-    <fx:include source="mediaplayer.fxml"/>
+    <StackPane fx:id="mediaPlayerContainer" VBox.vgrow="NEVER"/>
 
     <TabPane fx:id="tabs" VBox.vgrow="NEVER">
         <padding>

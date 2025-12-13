@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
@@ -77,6 +78,9 @@ public class FilesController {
     private Button stopButton;
 
     @FXML
+    private StackPane mediaPlayerContainer;
+
+    @FXML
     private FileListComponent fileList;
 
     @FXML
@@ -108,6 +112,8 @@ public class FilesController {
         addDragEvenHandlers(bookStructure);
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
+
+        mediaPlayerContainer.getChildren().add(new MediaPlayerController());
 
         Settings settings = Settings.loadSetting();
         AudiobookConverter.getContext().setPresetName(settings.getPresets().get(settings.getLastUsedPreset()).getName());

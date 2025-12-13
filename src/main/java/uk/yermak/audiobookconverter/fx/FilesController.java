@@ -81,6 +81,9 @@ public class FilesController {
     private StackPane mediaPlayerContainer;
 
     @FXML
+    private StackPane artworkContainer;
+
+    @FXML
     private FileListComponent fileList;
 
     @FXML
@@ -114,6 +117,7 @@ public class FilesController {
         addDragEvenHandlers(progressQueue);
 
         mediaPlayerContainer.getChildren().add(new MediaPlayerController());
+        artworkContainer.getChildren().add(new ArtWorkController());
 
         Settings settings = Settings.loadSetting();
         AudiobookConverter.getContext().setPresetName(settings.getPresets().get(settings.getLastUsedPreset()).getName());

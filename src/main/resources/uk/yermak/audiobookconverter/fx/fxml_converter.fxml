@@ -381,7 +381,7 @@
             <tooltip>
                 <Tooltip text="%artwork.tooltip.tab"/>
             </tooltip>
-            <fx:include source="art_work.fxml"/>
+            <StackPane fx:id="artworkContainer"/>
         </Tab>
 
         <Tab text="%tab.quality" closable="false">

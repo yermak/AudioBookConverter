@@ -1,13 +1,17 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionJob;
@@ -16,7 +20,6 @@ import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.book.ArtWork;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,30 +32,19 @@ import static uk.yermak.audiobookconverter.ProgressStatus.PAUSED;
 public class ProgressComponent extends GridPane {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @FXML
-    private Label title;
-    @FXML
-    private Label elapsedTime;
-    @FXML
-    private Label remainingTime;
-    @FXML
-    private Label estimatedSize;
-    @FXML
-    private Label state;
-    @FXML
-    private Label filesCount;
-    @FXML
-    private ProgressBar progressBar;
+    private final Label title;
+    private final Label elapsedTime;
+    private final Label remainingTime;
+    private final Label estimatedSize;
+    private final Label state;
+    private final Label filesCount;
+    private final ProgressBar progressBar;
 
-    @FXML
-    private Button pauseButton;
+    private final Button pauseButton;
 
-    @FXML
-    private Button stopButton;
+    private final Button stopButton;
 
-    @FXML
-    private ImageView imageView;
-
+    private final ImageView imageView;
 
     private final ConversionProgress conversionProgress;
     private final ResourceBundle resources;
@@ -60,14 +52,64 @@ public class ProgressComponent extends GridPane {
 
     public ProgressComponent(ConversionProgress conversionProgress) {
         resources = AudiobookConverter.getBundle();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("progress.fxml"), resources);
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
+        setHgap(5);
+        setVgap(2);
+
+        ColumnConstraints col0 = new ColumnConstraints();
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setHgrow(Priority.ALWAYS);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.ALWAYS);
+        ColumnConstraints col3 = new ColumnConstraints();
+        ColumnConstraints col4 = new ColumnConstraints();
+        ColumnConstraints col5 = new ColumnConstraints();
+        getColumnConstraints().addAll(col0, col1, col2, col3, col4, col5);
+
+        imageView = new ImageView();
+        title = new Label(resources.getString("progress.label.title"));
+        state = new Label();
+        progressBar = new ProgressBar();
+        Label convertedFilesLabel = new Label(resources.getString("progress.label.converted_files"));
+        filesCount = new Label("0/0");
+        Label estimatedSizeLabel = new Label(resources.getString("progress.label.estimated_size"));
+        estimatedSize = new Label("0MB");
+        pauseButton = new Button(resources.getString("progress.button.pause"));
+        pauseButton.setTooltip(new javafx.scene.control.Tooltip(resources.getString("progress.tooltip.pause")));
+        Label elapsedLabel = new Label(resources.getString("progress.label.time_elapsed"));
+        elapsedTime = new Label("0:00:00");
+        Label remainingLabel = new Label(resources.getString("progress.label.time_remaining"));
+        remainingTime = new Label("0:00:00");
+        stopButton = new Button(resources.getString("progress.button.stop"));
+        stopButton.setTooltip(new javafx.scene.control.Tooltip(resources.getString("progress.tooltip.stop")));
+
+        add(imageView, 0, 0, 1, 4);
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.075);
+
+        title.setFont(Font.font("Arial Black", 12));
+        add(title, 1, 0, 4, 1);
+        GridPane.setValignment(title, VPos.TOP);
+        add(state, 5, 0);
+
+        add(progressBar, 1, 1, 5, 1);
+        GridPane.setHalignment(progressBar, HPos.CENTER);
+
+        add(convertedFilesLabel, 1, 2);
+        add(filesCount, 2, 2, 3, 1);
+        add(estimatedSizeLabel, 3, 2);
+        add(estimatedSize, 4, 2);
+        add(pauseButton, 5, 2);
+        pauseButton.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() * 0.05);
+
+        add(elapsedLabel, 1, 3);
+        add(elapsedTime, 2, 3);
+        add(remainingLabel, 3, 3);
+        add(remainingTime, 4, 3);
+        add(stopButton, 5, 3);
+        stopButton.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() * 0.05);
+
+        pauseButton.setOnAction(event -> pause());
+        stopButton.setOnAction(event -> stop());
 
         List<ArtWork> posters = conversionProgress.getConversionJob().getConversionGroup().getPosters();
         if (!posters.isEmpty()) {
@@ -83,8 +125,6 @@ public class ProgressComponent extends GridPane {
         title.setText(fileName);
         filesCount.setText(conversionProgress.filesCount.get());
 
-        pauseButton.setOnAction(event -> pause());
-        stopButton.setOnAction(event -> stop());
         this.conversionProgress = conversionProgress;
 
         assignListeners(conversionProgress);

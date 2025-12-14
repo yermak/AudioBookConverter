@@ -6,7 +6,7 @@ This PR addresses critical performance issues in AudioBookConverter, starting wi
 
 ## Changes in This PR
 
-### 1. ✅ FFprobe Singleton Fix (IMPLEMENTED)
+### 1. ✅ FFprobe Singleton Fix (IMPLEMENTED) + Thread Safety
 
 **File:** `DurationVerifier.java`
 
@@ -19,12 +19,22 @@ This PR addresses critical performance issues in AudioBookConverter, starting wi
 - Created singleton FFprobe instance with thread-safe lazy initialization
 - Moved AUDIO_CODECS to static final field
 - Used double-checked locking pattern for thread safety
-- Added debug logging
+- **Added synchronization around probe() call** for thread-safe concurrent access
+
+**Thread Safety Analysis:**
+- FFprobe library is NOT thread-safe (verified from [source code](https://github.com/bramp/ffmpeg-cli-wrapper))
+  - `FFcommon` has unsynchronized mutable `processOutputStream`/`processErrorStream`
+  - `RunProcessFunction` has unsynchronized mutable `workingDirectory` field
+- DurationVerifier is called from parallel `WorkStealingPool` (multiple conversion jobs)
+- Without synchronization, concurrent probe() calls would cause race conditions
+- **Fix:** Added `synchronized (ffprobe) { probe() }` to ensure sequential access
 
 **Impact:**
 - ✅ Reduces from N instances to 1 for entire application lifecycle
 - ✅ Eliminates redundant object creation overhead
+- ✅ **Thread-safe for concurrent conversions** (no race conditions)
 - ✅ Improves conversion performance for multi-file audiobooks
+- ⚠️ Slight serialization cost for probe() calls (but safer and still better than N instances)
 
 ### 2. 📊 Performance Analysis Documentation (INCLUDED)
 

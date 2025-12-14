@@ -41,7 +41,6 @@ public class ConversionProgress implements Runnable {
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
-    private final ResourceBundle resources;
 
     public ConversionProgress(ConversionJob conversionJob) {
         this.conversionJob = conversionJob;
@@ -180,5 +179,3 @@ public class ConversionProgress implements Runnable {
         state.set(message);
     }
 }
-import java.util.ResourceBundle;
-

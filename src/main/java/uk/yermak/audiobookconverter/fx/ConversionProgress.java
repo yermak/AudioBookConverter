@@ -47,7 +47,7 @@ public class ConversionProgress implements Runnable {
         this.conversionJob = conversionJob;
         this.totalFiles = conversionJob.getConvertable().getMedia().size();
         this.totalDuration = conversionJob.getConvertable().getDuration();
-        this.resources = AudiobookConverter.getBundle();
+        ResourceBundle resources = AudiobookConverter.getBundle();
         conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
@@ -121,6 +121,7 @@ public class ConversionProgress implements Runnable {
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
+            ResourceBundle resources = AudiobookConverter.getBundle();
             setState(resources.getString("progress.state.merging"));
             progress.set(1.0);
         }
@@ -129,10 +130,12 @@ public class ConversionProgress implements Runnable {
 
     private void finished() {
         finished = true;
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setState(resources.getString("progress.state.completed"));
     }
     private void error() {
         finished = true;
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setState(resources.getString("progress.state.error"));
     }
 
@@ -144,18 +147,21 @@ public class ConversionProgress implements Runnable {
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setState(resources.getString("progress.state.cancelled"));
     }
 
     private void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setState(resources.getString("progress.state.paused"));
     }
 
     private void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setState(resources.getString("progress.state.converting"));
     }
 
@@ -174,3 +180,5 @@ public class ConversionProgress implements Runnable {
         state.set(message);
     }
 }
+import java.util.ResourceBundle;
+

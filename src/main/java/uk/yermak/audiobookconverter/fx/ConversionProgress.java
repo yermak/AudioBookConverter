@@ -179,12 +179,12 @@ public class ConversionProgress implements Runnable {
         setState(resources.getString("progress.state.converting"));
     }
 
-    public void reset() {
-        durations.clear();
-        sizes.clear();
-        progress.set(0);
-        remaining.set(60 * 1000);
-        sizeFinalized = false;
+    public void reset(boolean sizeFinalized) {
+        this.durations.clear();
+        this.sizes.clear();
+        this.progress.set(0);
+        this.remaining.set(60 * 1000);
+        this.sizeFinalized = sizeFinalized;
     }
 
     public ConversionJob getConversionJob() {

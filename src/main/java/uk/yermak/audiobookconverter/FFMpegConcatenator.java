@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.apache.commons.io.FileUtils;
@@ -13,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -30,8 +30,6 @@ public class FFMpegConcatenator {
 
     private List<MediaInfo> media;
     private final ProgressCallback callback;
-    private ProgressParser progressParser;
-    private List<String> tmpFiles = new ArrayList<>();
 
     public FFMpegConcatenator(ConversionJob conversionJob, String outputFileName, List<MediaInfo> media, ProgressCallback callback) {
         this.conversionJob = conversionJob;
@@ -52,20 +50,17 @@ public class FFMpegConcatenator {
         String fileListFileName = prepareFiles(conversionJob.getConversionGroup().getGroupId(), media, conversionJob.getConversionGroup().getWorkfileExtension(), outputFileName).getAbsolutePath();
 
         while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
-        callback.reset();
-        try {
-            progressParser = new TcpProgressParser(progress -> callback.converted(progress.out_time_ns / 1000000, progress.total_size));
-            progressParser.start();
-        } catch (URISyntaxException e) {
-        }
+        callback.reset(false);
 
         Process process = null;
-        try {
+
+        try(ProgressParser progressParser = new TcpProgressParser(this::progress)){
+            progressParser.start();
+
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
             List<String> concatOptions = outputParameters.getFormat().getConcatOptions(fileListFileName, outputFileName, progressParser.getUri().toString(), conversionJob);
 
             logger.info("Starting concat with options {}", String.join(" ", concatOptions));
-
             //using custom processes for Windows here -  Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
             process = Platform.current.createProcess(concatOptions);
 
@@ -88,14 +83,20 @@ public class FFMpegConcatenator {
             if (!new File(outputFileName).exists()) {
                 throw new ConversionException("Concatenation failed, no output file:" + out, new Error(err.toString()));
             }
+        } catch (URISyntaxException e) {
+            logger.error("Error during concatination of files:", e);
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.error("Error during concatination of files:", e);
             throw new RuntimeException(e);
         } finally {
             Utils.closeSilently(process);
-            Utils.closeSilently(progressParser);
             media.forEach(mediaInfo -> FileUtils.deleteQuietly(new File(Utils.getTmp(conversionJob.getConversionGroup().getGroupId(), mediaInfo.getUID(), conversionJob.getConversionGroup().getWorkfileExtension()))));
             FileUtils.deleteQuietly(new File(fileListFileName));
         }
+    }
+
+    private void progress(Progress progress) {
+        callback.converted(progress.out_time_ns / 1000000, progress.total_size);
     }
 }

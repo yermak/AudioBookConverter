@@ -12,7 +12,7 @@ import uk.yermak.audiobookconverter.ProgressStatus;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.ResourceBundle;
 
 /**
  * Created by yermak on 08-Feb-18.
@@ -178,4 +178,4 @@ public class ConversionProgress implements Runnable {
         state.set(message);
     }
 }
-import java.util.ResourceBundle;
+

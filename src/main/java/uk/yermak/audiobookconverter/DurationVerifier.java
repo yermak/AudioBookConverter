@@ -41,7 +41,16 @@ public class DurationVerifier {
 
     public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
         FFprobe ffprobe = getFFprobeInstance();
-        FFmpegProbeResult probe = ffprobe.probe(outputFileName);
+
+        // Synchronize probe() call because FFprobe is NOT thread-safe:
+        // - FFcommon has unsynchronized mutable processOutputStream/processErrorStream
+        // - RunProcessFunction has unsynchronized mutable workingDirectory field
+        // This is called from parallel conversion jobs (WorkStealingPool), so synchronization required
+        FFmpegProbeResult probe;
+        synchronized (ffprobe) {
+            probe = ffprobe.probe(outputFileName);
+        }
+
         List<FFmpegStream> streams = probe.getStreams();
         for (FFmpegStream stream : streams) {
             if (AUDIO_CODECS.contains(stream.codec_name)) {

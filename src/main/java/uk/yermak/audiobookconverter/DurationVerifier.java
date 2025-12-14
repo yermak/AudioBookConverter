@@ -18,10 +18,29 @@ import java.util.Set;
  */
 public class DurationVerifier {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
+
+    // Singleton FFprobe instance - reused across all calls to avoid creating new process wrappers
+    private static volatile FFprobe ffprobeInstance;
+
+    /**
+     * Get or create the singleton FFprobe instance.
+     * Uses double-checked locking for thread-safe lazy initialization.
+     */
+    private static FFprobe getFFprobeInstance() throws IOException {
+        if (ffprobeInstance == null) {
+            synchronized (DurationVerifier.class) {
+                if (ffprobeInstance == null) {
+                    ffprobeInstance = new FFprobe(Platform.FFPROBE);
+                    logger.debug("Created FFprobe instance at: {}", Platform.FFPROBE);
+                }
+            }
+        }
+        return ffprobeInstance;
+    }
 
     public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
-        final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
-        FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
+        FFprobe ffprobe = getFFprobeInstance();
         FFmpegProbeResult probe = ffprobe.probe(outputFileName);
         List<FFmpegStream> streams = probe.getStreams();
         for (FFmpegStream stream : streams) {

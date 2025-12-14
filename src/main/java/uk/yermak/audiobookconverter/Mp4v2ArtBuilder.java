@@ -29,7 +29,7 @@ public class Mp4v2ArtBuilder {
     public void coverArt(String outputFileName) {
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
         if (posters.isEmpty()) return;
-        progressCallback.reset();
+        progressCallback.reset(true);
         ResourceBundle resources = AudiobookConverter.getBundle();
         progressCallback.setState(resources.getString("progress.state.addingArtwork"));
         long duration = conversionJob.getConvertable().getDuration();

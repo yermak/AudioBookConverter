@@ -1,5 +1,6 @@
 package uk.yermak.audiobookconverter;
 
+import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.slf4j.Logger;
@@ -36,18 +37,10 @@ public class FFMpegNativeConverter implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        try {
-            if (conversionJob.getStatus().isOver()) return null;
-            while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
+        if (conversionJob.getStatus().isOver()) return null;
+        while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
 
-            progressParser = new TcpProgressParser(progress -> {
-                callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-//                logger.debug("Completed conversion: {} from {}", progress.out_time_ns / 1000000, progress.total_size);
-                if (progress.isEnd()) {
-                    callback.converted(progress.out_time_ns / 1000000, progress.total_size);
-                    callback.completedConversion();
-                }
-            });
+        try (ProgressParser progressParser = new TcpProgressParser(this::progress)) {
             progressParser.start();
 
             ProcessBuilder ffmpegProcessBuilder;
@@ -74,10 +67,9 @@ public class FFMpegNativeConverter implements Callable<String> {
             logger.debug("ffmpeg out: {}", out);
             logger.warn("ffmpeg err: {}", err);
 
-
             if (process.exitValue() != 0) {
                 logger.error("Converstion failed: " + err);
-                throw new RuntimeException("Converstion failed: "+ err);
+                throw new RuntimeException("Converstion failed: " + err);
             } else {
                 DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
             }
@@ -88,9 +80,16 @@ public class FFMpegNativeConverter implements Callable<String> {
             throw new RuntimeException(e);
         } finally {
             Utils.closeSilently(process);
-            Utils.closeSilently(progressParser);
         }
     }
 
 
+    private void progress(Progress progress) {
+        callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+//                logger.debug("Completed conversion: {} from {}", progress.out_time_ns / 1000000, progress.total_size);
+        if (progress.isEnd()) {
+            callback.converted(progress.out_time_ns / 1000000, progress.total_size);
+            callback.completedConversion();
+        }
+    }
 }

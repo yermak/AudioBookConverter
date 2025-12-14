@@ -18,8 +18,8 @@ public class ProgressCallback {
         this.conversionProgress.incCompleted(this.fileName());
     }
 
-    public void reset() {
-        this.conversionProgress.reset();
+    public void reset(boolean sizeFinalized) {
+        this.conversionProgress.reset(sizeFinalized);
     }
 
     public ProgressCallback(final String fileName, final ConversionProgress refreshable) {

@@ -2,7 +2,6 @@ package uk.yermak.audiobookconverter;
 
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,12 +48,41 @@ public class Utils {
         }
     }
 
+    /**
+     * Invalid characters that cannot be used in filenames across most operating systems.
+     */
+    private static final char[] INVALID_FILENAME_CHARS = {':', '\\', '/', '>', '<', '|', '?', '*', '"'};
+
+    /**
+     * Creates a StringTemplate with registered renderers for Number and Duration.
+     *
+     * @param templateFormat the template format string
+     * @return configured ST instance ready for use
+     */
+    private static ST createTemplate(String templateFormat) {
+        STGroup group = new STGroupString("");
+        group.registerRenderer(Number.class, new NumberRenderer());
+        group.registerRenderer(Duration.class, new DurationRender());
+        return new ST(group, templateFormat);
+    }
+
+    /**
+     * Removes invalid filename characters from the given string.
+     *
+     * @param filename the filename to sanitize
+     * @return sanitized filename safe for use across operating systems
+     */
+    private static String removeInvalidFilenameCharacters(String filename) {
+        String result = filename;
+        for (char c : INVALID_FILENAME_CHARS) {
+            result = StringUtils.remove(result, c);
+        }
+        return result;
+    }
+
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         String chapterFormat = Settings.loadSetting().getChapterFormat();
-        STGroup g = new STGroupString("");
-        g.registerRenderer(Number.class, new NumberRenderer());
-        g.registerRenderer(Duration.class, new DurationRender());
-        ST chapterTemplate = new ST(g, chapterFormat);
+        ST chapterTemplate = createTemplate(chapterFormat);
 
         context.forEach((key, value) -> {
             if (key.contains("TAG")) {
@@ -69,11 +97,8 @@ public class Utils {
 
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
         String filenameFormat = Settings.loadSetting().getFilenameFormat();
-        STGroup g = new STGroupString("");
-        g.registerRenderer(Number.class, new NumberRenderer());
-        g.registerRenderer(Duration.class, new DurationRender());
+        ST filenameTemplate = createTemplate(filenameFormat);
 
-        ST filenameTemplate = new ST(g, filenameFormat);
         filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
@@ -82,18 +107,13 @@ public class Utils {
         filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();
-        char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};
-        for (char c : toRemove) {
-            result = StringUtils.remove(result, c);
-        }
-        String mp3Filename;
+        result = removeInvalidFilenameCharacters(result);
 
         if (StringUtils.isBlank(result)) {
-            mp3Filename = "NewBook";
+            return "NewBook";
         } else {
-            mp3Filename = result;
+            return result;
         }
-        return mp3Filename;
 //        return mp3Filename.replaceFirst("\\.\\w*$", ".m4b");
     }
 
@@ -125,38 +145,20 @@ public class Utils {
         }
     }
 
-    public static String tempCopy(String fileName) {
-        File destFile = new File(getTmp(System.currentTimeMillis(), 0, FilenameUtils.getExtension(fileName)));
-        try {
-            FileUtils.copyFile(new File(fileName), destFile);
-            return destFile.getPath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
         String partFormat = Settings.loadSetting().getPartFormat();
-        STGroup g = new STGroupString("");
-        g.registerRenderer(Number.class, new NumberRenderer());
-        ST partTemplate = new ST(g, partFormat);
+        ST partTemplate = createTemplate(partFormat);
 
         context.forEach((key, value) -> partTemplate.add(key, value.apply(part)));
 
         String result = partTemplate.render();
-        char[] toRemove = new char[]{':', '\\', '/', '>', '<', '|', '?', '*', '"'};
-        for (char c : toRemove) {
-            result = StringUtils.remove(result, c);
-        }
-        String mp3Filename;
+        result = removeInvalidFilenameCharacters(result);
 
         if (StringUtils.isBlank(result)) {
-            mp3Filename = "NewBook";
+            return "NewBook";
         } else {
-            mp3Filename = result;
+            return result;
         }
-        return mp3Filename;
-
     }
 
     public static String cleanText(String text) {

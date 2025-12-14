@@ -108,17 +108,6 @@ public enum Platform {
         return properties;
     }
 
-
-/*
-    public static File getInitialDirectory(String sourceFolder) {
-        if (sourceFolder == null) {
-            return new File(System.getProperty("user.home"));
-        }
-        File file = new File(sourceFolder);
-        return file.exists() ? file : getInitialDirectory(file.getParent());
-    }
-*/
-
     //IMPORTANT !!!
     //using custom processes for Windows here -  Runtime.exec() due to JDK specific way of interpreting quoted arguments in ProcessBuilder https://bugs.openjdk.java.net/browse/JDK-8131908
     public Process createProcess(List<String> arguments) throws IOException {

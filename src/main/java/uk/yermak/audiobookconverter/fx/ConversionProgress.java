@@ -5,12 +5,14 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 
 /**
@@ -39,11 +41,13 @@ public class ConversionProgress implements Runnable {
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
+    private final ResourceBundle resources;
 
     public ConversionProgress(ConversionJob conversionJob) {
         this.conversionJob = conversionJob;
         this.totalFiles = conversionJob.getConvertable().getMedia().size();
         this.totalDuration = conversionJob.getConvertable().getDuration();
+        this.resources = AudiobookConverter.getBundle();
         conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
@@ -65,11 +69,11 @@ public class ConversionProgress implements Runnable {
                     break;
             }
         });
+        setState(resources.getString("progress.state.converting"));
     }
 
 
     public void run() {
-        state.set("Converting...");
         startTime = System.currentTimeMillis();
 
         filesCount.set(completedFiles + "/" + totalFiles);
@@ -117,7 +121,7 @@ public class ConversionProgress implements Runnable {
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-            state.set("Merging chapters...");
+            setState(resources.getString("progress.state.merging"));
             progress.set(1.0);
         }
         filesCount.set(completedFiles + "/" + totalFiles);
@@ -125,11 +129,11 @@ public class ConversionProgress implements Runnable {
 
     private void finished() {
         finished = true;
-        state.set("Completed!");
+        setState(resources.getString("progress.state.completed"));
     }
     private void error() {
         finished = true;
-        state.set("Error!");
+        setState(resources.getString("progress.state.error"));
     }
 
     private void cancelled() {
@@ -140,19 +144,19 @@ public class ConversionProgress implements Runnable {
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
-        state.set("Cancelled");
+        setState(resources.getString("progress.state.cancelled"));
     }
 
     private void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
-        state.set("Paused");
+        setState(resources.getString("progress.state.paused"));
     }
 
     private void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
-        state.set("Converting...");
+        setState(resources.getString("progress.state.converting"));
     }
 
     public void reset() {

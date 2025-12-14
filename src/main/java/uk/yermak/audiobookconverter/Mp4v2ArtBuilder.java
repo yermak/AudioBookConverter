@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,7 +30,8 @@ public class Mp4v2ArtBuilder {
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
         if (posters.isEmpty()) return;
         progressCallback.reset();
-        progressCallback.setState("Adding artwork...");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        progressCallback.setState(resources.getString("progress.state.addingArtwork"));
         long duration = conversionJob.getConvertable().getDuration();
         long step = duration / posters.size();
         for (int i = 0; i < posters.size(); i++) {

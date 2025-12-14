@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;/**
  */
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,13 +14,12 @@ import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
+import uk.yermak.audiobookconverter.fx.FilesController;
 import uk.yermak.audiobookconverter.fx.JfxEnv;
 import uk.yermak.audiobookconverter.fx.WizardDialog;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
@@ -99,8 +97,7 @@ public class AudiobookConverter extends Application {
         bundle = getBundleWithFallback(selectedLocale);
 
         try {
-            URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
-            root = FXMLLoader.load(resource, bundle);
+            root = new FilesController(bundle);
 
             Scene scene = new Scene(root);
             stage.setTitle("AudioBookConverter-"+Version.getVersionString());

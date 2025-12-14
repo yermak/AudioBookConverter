@@ -1,10 +1,16 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.AudiobookConverter;
@@ -15,46 +21,130 @@ import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 
 /**
  * Created by yermak on 08/09/2018.
  */
-public class OutputController {
+public class OutputController extends GridPane {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
 
-    @FXML
-    public ComboBox<Format> outputFormatBox;
-    @FXML
-    public ComboBox<String> presetBox;
+    public final ComboBox<Format> outputFormatBox;
+    public final ComboBox<String> presetBox;
+    public final ComboBox<String> forceBox;
+    private final ComboBox<String> splitFileBox;
+    private final ComboBox<String> speedBox;
+    public final ComboBox<String> cutoffBox;
+    private final ComboBox<String> frequencyBox;
+    private final ComboBox<String> channelsBox;
+    private final RadioButton cbrRadio;
+    private final ComboBox<String> bitRateBox;
+    private final RadioButton vbrRadio;
+    private final Slider vbrQualitySlider;
 
-    public ComboBox<String> forceBox;
+    public OutputController() {
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setPadding(new Insets(5, 5, 0, 5));
+        setHgap(5);
+        setVgap(5);
 
-    @FXML
-    private ComboBox<String> splitFileBox;
+        for (int i = 0; i < 8; i++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            if (i % 2 == 0) {
+                cc.setHgrow(Priority.ALWAYS);
+            }
+            getColumnConstraints().add(cc);
+        }
 
-    @FXML
-    private ComboBox<String> speedBox;
+        presetBox = new ComboBox<>();
+        outputFormatBox = new ComboBox<>();
+        splitFileBox = new ComboBox<>();
+        speedBox = new ComboBox<>();
+        frequencyBox = new ComboBox<>();
+        channelsBox = new ComboBox<>();
+        cutoffBox = new ComboBox<>();
+        forceBox = new ComboBox<>();
+        cbrRadio = new RadioButton(resources.getString("output.radio.cbr"));
+        bitRateBox = new ComboBox<>();
+        vbrRadio = new RadioButton(resources.getString("output.radio.vbr"));
+        vbrQualitySlider = new Slider(1, 5, 4);
+        vbrQualitySlider.setMajorTickUnit(1);
+        vbrQualitySlider.setMinorTickCount(0);
+        vbrQualitySlider.setShowTickMarks(true);
+        vbrQualitySlider.setShowTickLabels(true);
+        vbrQualitySlider.setSnapToTicks(true);
+        vbrQualitySlider.setDisable(true);
 
+        addRow(0,
+                new Label(resources.getString("output.label.preset")),
+                comboWithTooltip(presetBox, resources.getString("output.tooltip.presets")),
+                spacer(),
+                new Label(resources.getString("output.label.sampling_frequency")),
+                comboWithTooltip(frequencyBox, resources.getString("output.tooltip.sampling_frequency")),
+                spacer(),
+                radioWithTooltip(cbrRadio, resources.getString("output.tooltip.cbr")),
+                comboWithTooltip(bitRateBox, resources.getString("output.tooltip.bitrate")));
+        addRow(1,
+                new Label(resources.getString("output.label.format")),
+                comboWithTooltip(outputFormatBox, resources.getString("output.tooltip.formats")),
+                spacer(),
+                new Label(resources.getString("output.label.channels")),
+                comboWithTooltip(channelsBox, resources.getString("output.tooltip.channels")),
+                spacer(),
+                radioWithTooltip(vbrRadio, resources.getString("output.tooltip.vbr")),
+                new Label());
+        addRow(2,
+                new Label(resources.getString("output.label.split")),
+                comboWithTooltip(splitFileBox, resources.getString("output.tooltip.split")),
+                spacer(),
+                new Label(resources.getString("output.label.cut_off")),
+                comboWithTooltip(cutoffBox, resources.getString("output.tooltip.cut_off")),
+                spacer(),
+                sliderWithTooltip(vbrQualitySlider, resources.getString("output.tooltip.vbr_quality")),
+                new Label());
+        Button deletePreset = new Button(resources.getString("output.button.delete_preset"));
+        deletePreset.setOnAction(this::deletePreset);
+        addRow(3,
+                new Label(resources.getString("output.label.speed")),
+                comboWithTooltip(speedBox, resources.getString("output.tooltip.speed")),
+                spacer(),
+                new Label(resources.getString("output.label.reencoding")),
+                comboWithTooltip(forceBox, resources.getString("output.tooltip.reencode")),
+                spacer(),
+                new Label(),
+                deletePreset);
 
-    @FXML
-    public ComboBox<String> cutoffBox;
+        initialize();
+    }
 
-    @FXML
-    private ComboBox<String> frequencyBox;
-    @FXML
-    private ComboBox<String> channelsBox;
-    @FXML
-    private RadioButton cbrRadio;
-    @FXML
-    private ComboBox<String> bitRateBox;
-    @FXML
-    private RadioButton vbrRadio;
-    @FXML
-    private Slider vbrQualitySlider;
+    private ComboBox<String> comboWithTooltip(ComboBox<String> comboBox, String text) {
+        comboBox.setTooltip(new Tooltip(text));
+        return comboBox;
+    }
+
+    private ComboBox<Format> comboWithTooltip(ComboBox<Format> comboBox, String text) {
+        comboBox.setTooltip(new Tooltip(text));
+        return comboBox;
+    }
+
+    private RadioButton radioWithTooltip(RadioButton radioButton, String text) {
+        radioButton.setTooltip(new Tooltip(text));
+        return radioButton;
+    }
+
+    private Slider sliderWithTooltip(Slider slider, String text) {
+        slider.setTooltip(new Tooltip(text));
+        return slider;
+    }
+
+    private Label spacer() {
+        Label spacer = new Label();
+        spacer.setMinWidth(50);
+        return spacer;
+    }
 
     public void cbr(ActionEvent actionEvent) {
         bitRateBox.setDisable(false);
@@ -74,7 +164,6 @@ public class OutputController {
         settings.save();
     }
 
-    @FXML
     private void initialize() {
         initPresetBox();
 

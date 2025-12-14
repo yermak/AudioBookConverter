@@ -3,12 +3,18 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Screen;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +25,7 @@ import uk.yermak.audiobookconverter.book.MediaInfo;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,31 +33,72 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by yermak on 26-Oct-18.
  */
-public class MediaPlayerController {
+public class MediaPlayerController extends GridPane {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @FXML
-    private Button playButton;
-    @FXML
-    private Slider timelapse;
-    @FXML
-    private Slider volume;
-    @FXML
-    private Label playTime;
-    @FXML
-    private Label totalTime;
+    private final Button playButton;
+    private final Slider timelapse;
+    private final Slider volume;
+    private final Label playTime;
+    private final Label totalTime;
 
     private static MediaPlayer mediaPlayer;
     private MediaInfo playingTrack = null;
     private ScheduledExecutorService executorService;
-//    private ObservableList<MediaInfo> media;
 
-    @FXML
-    public void initialize() {
-//        media = context.getMedia();
-//        ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
-//        selectedMedia.addListener((ListChangeListener<MediaInfo>) c -> disablePlayer(selectedMedia.isEmpty() && mediaPlayer == null));
+    public MediaPlayerController() {
+        ResourceBundle bundle = AudiobookConverter.getBundle();
 
+        setHgap(10);
+        setPadding(new Insets(0, 10, 0, 10));
+
+        ColumnConstraints fixed = new ColumnConstraints();
+        ColumnConstraints fixed2 = new ColumnConstraints();
+        ColumnConstraints grow = new ColumnConstraints();
+        grow.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+        ColumnConstraints fixed3 = new ColumnConstraints();
+        ColumnConstraints fixed4 = new ColumnConstraints();
+        ColumnConstraints fixed5 = new ColumnConstraints();
+        getColumnConstraints().addAll(fixed, fixed2, grow, fixed3, fixed4, fixed5);
+
+        playButton = new Button("▶⏸");
+        playButton.setStyle("-fx-font-size: 15px;");
+        playButton.setOnAction(this::play);
+        playButton.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.playpause")));
+        add(playButton, 0, 0, 1, 2);
+
+        double minWidth = Screen.getPrimary().getVisualBounds().getWidth() * 0.35;
+        timelapse = new Slider();
+        timelapse.setMinorTickCount(4);
+        timelapse.setMajorTickUnit(1);
+        timelapse.setMinWidth(minWidth);
+        timelapse.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.timeslider")));
+        setValignment(timelapse, VPos.BOTTOM);
+        add(timelapse, 1, 0, 3, 1);
+
+        Label volumeSign = new Label("🔊");
+        volumeSign.setStyle("-fx-font-size: 24px;");
+        setHalignment(volumeSign, HPos.RIGHT);
+        add(volumeSign, 4, 0, 1, 2);
+
+        volume = new Slider();
+        volume.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        volume.setMaxHeight(24);
+        volume.setMin(0);
+        volume.setMax(1.0);
+        volume.setValue(1.0);
+        volume.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.volumeslider")));
+        add(volume, 5, 0, 1, 2);
+
+        playTime = new Label("00:00:00");
+        setHalignment(playTime, HPos.LEFT);
+        playTime.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.playtime")));
+        add(playTime, 1, 1);
+
+        totalTime = new Label("00:00:00");
+        setHalignment(totalTime, HPos.RIGHT);
+        totalTime.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.totaltime")));
+        add(totalTime, 3, 1);
     }
 
     private void disablePlayer(boolean disable) {
@@ -163,7 +211,7 @@ public class MediaPlayerController {
         ObservableList<MediaInfo> media = context.getMedia();
 
         int i = media.indexOf(selected);
-        if (i < media.size()) {
+        if (i >= 0 && i < media.size() - 1) {
             return media.get(i + 1);
         }
         return null;

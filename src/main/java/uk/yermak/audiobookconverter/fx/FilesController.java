@@ -325,7 +325,8 @@ public class FilesController extends VBox {
         filesBar.getItems().addAll(addButton, removeButton, new Separator(), clearButton, new Separator(), moveUp, moveDown,
                 new Separator(), importButton, new Separator(), startButton);
 
-        fileList.setPrefHeight(screen.getVisualBounds().getHeight() * 0.25);
+        fileList.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(fileList, Priority.ALWAYS);
         VBox filesBox = new VBox(filesBar, fileList);
         filesTab.setContent(filesBox);
     }

@@ -38,6 +38,7 @@ public class OutputController extends GridPane {
     private final RadioButton cbrRadio;
     private final ComboBox<String> bitRateBox;
     private final RadioButton vbrRadio;
+    private final ToggleGroup bitRateModeGroup;
     private final Slider vbrQualitySlider;
 
     public OutputController() {
@@ -65,6 +66,7 @@ public class OutputController extends GridPane {
         cbrRadio = new RadioButton(resources.getString("output.radio.cbr"));
         bitRateBox = new ComboBox<>();
         vbrRadio = new RadioButton(resources.getString("output.radio.vbr"));
+        bitRateModeGroup = new ToggleGroup();
         vbrQualitySlider = new Slider(1, 5, 4);
         vbrQualitySlider.setMajorTickUnit(1);
         vbrQualitySlider.setMinorTickCount(0);
@@ -72,6 +74,11 @@ public class OutputController extends GridPane {
         vbrQualitySlider.setShowTickLabels(true);
         vbrQualitySlider.setSnapToTicks(true);
         vbrQualitySlider.setDisable(true);
+
+        cbrRadio.setToggleGroup(bitRateModeGroup);
+        vbrRadio.setToggleGroup(bitRateModeGroup);
+        cbrRadio.setOnAction(this::cbr);
+        vbrRadio.setOnAction(this::vbr);
 
         addRow(0,
                 new Label(resources.getString("output.label.preset")),
@@ -142,21 +149,11 @@ public class OutputController extends GridPane {
     }
 
     public void cbr(ActionEvent actionEvent) {
-        bitRateBox.setDisable(false);
-        vbrQualitySlider.setDisable(true);
-        Settings settings = Settings.loadSetting();
-        Preset preset = currentPreset(settings);
-        preset.setCbr(true);
-        settings.save();
+        selectCbr(true);
     }
 
     public void vbr(ActionEvent actionEvent) {
-        bitRateBox.setDisable(true);
-        vbrQualitySlider.setDisable(false);
-        Settings settings = Settings.loadSetting();
-        Preset preset = currentPreset(settings);
-        preset.setCbr(false);
-        settings.save();
+        selectVbr(true);
     }
 
     private void initialize() {
@@ -308,9 +305,9 @@ public class OutputController extends GridPane {
 
     private void updateCBR(Boolean cbr) {
         if (cbr) {
-            cbrRadio.fire();
+            selectCbr(false);
         } else {
-            vbrRadio.fire();
+            selectVbr(false);
         }
     }
 
@@ -400,6 +397,30 @@ public class OutputController extends GridPane {
                 return integer;
         }
         return defaultValue;
+    }
+
+    private void selectVbr(boolean save) {
+        vbrRadio.setSelected(true);
+        bitRateBox.setDisable(true);
+        vbrQualitySlider.setDisable(false);
+        if (save) {
+            Settings settings = Settings.loadSetting();
+            Preset preset = currentPreset(settings);
+            preset.setCbr(false);
+            settings.save();
+        }
+    }
+
+    private void selectCbr(boolean save) {
+        cbrRadio.setSelected(true);
+        bitRateBox.setDisable(false);
+        vbrQualitySlider.setDisable(true);
+        if (save) {
+            Settings settings = Settings.loadSetting();
+            Preset preset = currentPreset(settings);
+            preset.setCbr(true);
+            settings.save();
+        }
     }
 }
 

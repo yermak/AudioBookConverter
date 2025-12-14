@@ -19,7 +19,9 @@ import uk.yermak.audiobookconverter.fx.JfxEnv;
 import uk.yermak.audiobookconverter.fx.WizardDialog;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;

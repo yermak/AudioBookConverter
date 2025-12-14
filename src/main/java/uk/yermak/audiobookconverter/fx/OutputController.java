@@ -2,12 +2,7 @@ package uk.yermak.audiobookconverter.fx;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -89,7 +84,7 @@ public class OutputController extends GridPane {
                 comboWithTooltip(bitRateBox, resources.getString("output.tooltip.bitrate")));
         addRow(1,
                 new Label(resources.getString("output.label.format")),
-                comboWithTooltip(outputFormatBox, resources.getString("output.tooltip.formats")),
+                comboWithTooltip2(outputFormatBox, resources.getString("output.tooltip.formats")),
                 spacer(),
                 new Label(resources.getString("output.label.channels")),
                 comboWithTooltip(channelsBox, resources.getString("output.tooltip.channels")),
@@ -125,7 +120,7 @@ public class OutputController extends GridPane {
         return comboBox;
     }
 
-    private ComboBox<Format> comboWithTooltip(ComboBox<Format> comboBox, String text) {
+    private ComboBox<Format> comboWithTooltip2(ComboBox<Format> comboBox, String text) {
         comboBox.setTooltip(new Tooltip(text));
         return comboBox;
     }
@@ -168,7 +163,7 @@ public class OutputController extends GridPane {
         initPresetBox();
 
         outputFormatBox.getItems().addAll(Format.M4B, Format.M4A, Format.MP3, Format.OGG);
-        outputFormatBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+        outputFormatBox.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             Settings settings = Settings.loadSetting();
             Preset preset = currentPreset(settings);
             preset.setupFormat(newValue);
@@ -186,7 +181,7 @@ public class OutputController extends GridPane {
         });
         outputFormatBox.getSelectionModel().select(currentPreset(Settings.loadSetting()).getFormat());
 
-        bitRateBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        bitRateBox.valueProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 Settings settings = Settings.loadSetting();
                 Preset preset = currentPreset(settings);

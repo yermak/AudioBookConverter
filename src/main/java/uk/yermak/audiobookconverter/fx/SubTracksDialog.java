@@ -24,9 +24,9 @@ public class SubTracksDialog extends Dialog<Map<String, Object>> {
     public static final String AUTO_CHAPTERS = "autoChapters";
     public static final String REPEAT = "repeat";
 
-    private final Spinner<Integer> intervalSpinner;
-    private final ToggleSwitch autoChaptersToggle;
-    private final ToggleSwitch splitOnceOrRepeat;
+    private Spinner<Integer> intervalSpinner;
+    private ToggleSwitch autoChaptersToggle;
+    private ToggleSwitch splitOnceOrRepeat;
 
     public SubTracksDialog(Window window) {
         ResourceBundle resources = ResourceBundle.getBundle("locales/messages");

@@ -9,25 +9,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.TabPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +189,7 @@ public class FilesController extends VBox {
         Menu addMenu = new Menu(resources.getString("menu.file.add"));
         MenuItem addFiles = menuItem(resources.getString("menu.file.add.files"), this::selectFiles,
                 new KeyCodeCombination(KeyCode.INSERT));
-        MenuItem addFolder = menuItem(resources.getString("menu.file.add.folder"), event -> selectFolder(),
+        MenuItem addFolder = menuItem(resources.getString("menu.file.add.folder"), this::selectFolder,
                 new KeyCodeCombination(KeyCode.INSERT, KeyCombination.CONTROL_DOWN));
         addMenu.getItems().addAll(addFiles, addFolder);
         fileMenu.getItems().add(addMenu);
@@ -408,7 +407,7 @@ public class FilesController extends VBox {
         ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
-        selectedMedia.addListener((InvalidationListener) observable -> {
+        selectedMedia.addListener((InvalidationListener) _ -> {
             if (selectedMedia.isEmpty() || chaptersMode.get()) return;
             fileList.reselect();
         });
@@ -444,9 +443,9 @@ public class FilesController extends VBox {
     private void initFileOpenMenu() {
         ResourceBundle bundle = Objects.requireNonNull(resources, "Resource bundle not initialized");
         MenuItem item1 = new MenuItem(bundle.getString("context.files"));
-        item1.setOnAction(e -> selectFiles());
+        item1.setOnAction(this::selectFiles);
         MenuItem item2 = new MenuItem(bundle.getString("context.folder"));
-        item2.setOnAction(e -> selectFolder());
+        item2.setOnAction(this::selectFolder);
         contextMenu.getItems().addAll(item1, item2);
     }
 
@@ -488,7 +487,7 @@ public class FilesController extends VBox {
         contextMenu.show(node, Side.RIGHT, 0, 0);
     }
 
-    public void selectFolder() {
+    public void selectFolder(ActionEvent actionEvent) {
         try {
             List<String> fileNames = DialogHelper.selectFolderDialog();
             if (fileNames != null) {
@@ -537,7 +536,7 @@ public class FilesController extends VBox {
     }
 
 
-    public void selectFiles() {
+    public void selectFiles(ActionEvent actionEvent) {
         try {
             List<String> fileNames = DialogHelper.selectFilesDialog();
             if (fileNames != null) {

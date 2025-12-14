@@ -37,6 +37,7 @@ public class ConversionProgress implements Runnable {
     private final long totalDuration;
     private final Map<String, Long> durations = new HashMap<>();
     private final Map<String, Long> sizes = new HashMap<>();
+    private boolean sizeFinalized;
     private boolean paused;
     private boolean cancelled;
     private long pausePeriod;
@@ -111,25 +112,39 @@ public class ConversionProgress implements Runnable {
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             this.progress.set(progress);
             this.remaining.set(remainingTime);
-            this.size.set((long) (estimatedSize / progress));
+            if (!sizeFinalized) {
+                this.size.set((long) (estimatedSize / progress));
+            }
         }
     }
 
     public synchronized void incCompleted(String fileName) {
         logger.debug("Completed conversion of file: {}", fileName);
+        if (sizeFinalized) return;
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
             ResourceBundle resources = AudiobookConverter.getBundle();
             setState(resources.getString("progress.state.merging"));
             progress.set(1.0);
+            finalizeEstimatedSize();
         }
         filesCount.set(completedFiles + "/" + totalFiles);
+    }
+
+    private void finalizeEstimatedSize() {
+        long estimatedSize = sizes.values().stream().mapToLong(l -> l).sum();
+        if (estimatedSize > 0) {
+            size.set(estimatedSize);
+        }
+        sizeFinalized = true;
     }
 
     private void finished() {
         finished = true;
         ResourceBundle resources = AudiobookConverter.getBundle();
+        progress.set(1.0);
+        remaining.set(0);
         setState(resources.getString("progress.state.completed"));
     }
     private void error() {
@@ -169,6 +184,7 @@ public class ConversionProgress implements Runnable {
         sizes.clear();
         progress.set(0);
         remaining.set(60 * 1000);
+        sizeFinalized = false;
     }
 
     public ConversionJob getConversionJob() {

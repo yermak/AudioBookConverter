@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+
 /**
  * Created by yermak on 08-Feb-18.
  */
@@ -40,6 +41,7 @@ public class ConversionProgress implements Runnable {
     private boolean cancelled;
     private long pausePeriod;
     private long pauseTime;
+    private final ResourceBundle resources;
 
     public ConversionProgress(ConversionJob conversionJob) {
         this.conversionJob = conversionJob;

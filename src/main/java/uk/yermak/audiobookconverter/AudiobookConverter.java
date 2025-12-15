@@ -3,7 +3,6 @@ package uk.yermak.audiobookconverter;/**
  */
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,6 +14,7 @@ import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
+import uk.yermak.audiobookconverter.fx.FilesController;
 import uk.yermak.audiobookconverter.fx.JfxEnv;
 import uk.yermak.audiobookconverter.fx.WizardDialog;
 
@@ -90,12 +90,16 @@ public class AudiobookConverter extends Application {
 
         logger.info("Initialising application");
 
-        Locale defaultLocale = Locale.getDefault();
-        bundle = getBundleWithFallback(defaultLocale);
+        Settings settings = Settings.loadSetting();
+        Locale selectedLocale = Optional.ofNullable(settings.getLanguage())
+                .filter(StringUtils::isNotBlank)
+                .map(Locale::forLanguageTag)
+                .orElse(Locale.getDefault());
+        Locale.setDefault(selectedLocale);
+        bundle = getBundleWithFallback(selectedLocale);
 
         try {
-            URL resource = AudiobookConverter.class.getResource("/uk/yermak/audiobookconverter/fx/fxml_converter.fxml");
-            root = FXMLLoader.load(resource, bundle);
+            root = new FilesController(bundle);
 
             Scene scene = new Scene(root);
             stage.setTitle("AudioBookConverter-"+Version.getVersionString());
@@ -105,7 +109,6 @@ public class AudiobookConverter extends Application {
             stage.setMinWidth(primary.getVisualBounds().getWidth() * 0.4);
             env = new JfxEnv(scene, getHostServices());
 
-            Settings settings = Settings.loadSetting();
             boolean dark = settings.isDarkMode();
             if (dark) {
                 env.setDarkMode(dark);

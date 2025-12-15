@@ -5,12 +5,14 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 
 /**
@@ -35,6 +37,7 @@ public class ConversionProgress implements Runnable {
     private final long totalDuration;
     private final Map<String, Long> durations = new HashMap<>();
     private final Map<String, Long> sizes = new HashMap<>();
+    private boolean sizeFinalized;
     private boolean paused;
     private boolean cancelled;
     private long pausePeriod;
@@ -44,6 +47,7 @@ public class ConversionProgress implements Runnable {
         this.conversionJob = conversionJob;
         this.totalFiles = conversionJob.getConvertable().getMedia().size();
         this.totalDuration = conversionJob.getConvertable().getDuration();
+        ResourceBundle resources = AudiobookConverter.getBundle();
         conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
             switch (newValue) {
                 case CANCELLED:
@@ -65,11 +69,11 @@ public class ConversionProgress implements Runnable {
                     break;
             }
         });
+        setState(resources.getString("progress.state.converting"));
     }
 
 
     public void run() {
-        state.set("Converting...");
         startTime = System.currentTimeMillis();
 
         filesCount.set(completedFiles + "/" + totalFiles);
@@ -108,28 +112,45 @@ public class ConversionProgress implements Runnable {
             long remainingTime = ((long) (delta / progress)) - delta + 1000;
             this.progress.set(progress);
             this.remaining.set(remainingTime);
-            this.size.set((long) (estimatedSize / progress));
+            if (!sizeFinalized) {
+                this.size.set((long) (estimatedSize / progress));
+            }
         }
     }
 
     public synchronized void incCompleted(String fileName) {
         logger.debug("Completed conversion of file: {}", fileName);
+        if (sizeFinalized) return;
         completedFiles++;
         if (paused || cancelled) return;
         if (completedFiles == totalFiles) {
-            state.set("Merging chapters...");
+            ResourceBundle resources = AudiobookConverter.getBundle();
+            setState(resources.getString("progress.state.merging"));
             progress.set(1.0);
+            finalizeEstimatedSize();
         }
         filesCount.set(completedFiles + "/" + totalFiles);
     }
 
+    private void finalizeEstimatedSize() {
+        long estimatedSize = sizes.values().stream().mapToLong(l -> l).sum();
+        if (estimatedSize > 0) {
+            size.set(estimatedSize);
+        }
+        sizeFinalized = true;
+    }
+
     private void finished() {
         finished = true;
-        state.set("Completed!");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        progress.set(1.0);
+        remaining.set(0);
+        setState(resources.getString("progress.state.completed"));
     }
     private void error() {
         finished = true;
-        state.set("Error!");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setState(resources.getString("progress.state.error"));
     }
 
     private void cancelled() {
@@ -140,26 +161,30 @@ public class ConversionProgress implements Runnable {
         remaining.set(0);
         elapsed.set(0);
         size.set(-1);
-        state.set("Cancelled");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setState(resources.getString("progress.state.cancelled"));
     }
 
     private void paused() {
         paused = true;
         pauseTime = System.currentTimeMillis();
-        state.set("Paused");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setState(resources.getString("progress.state.paused"));
     }
 
     private void resumed() {
         paused = false;
         pausePeriod += System.currentTimeMillis() - pauseTime;
-        state.set("Converting...");
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setState(resources.getString("progress.state.converting"));
     }
 
-    public void reset() {
-        durations.clear();
-        sizes.clear();
-        progress.set(0);
-        remaining.set(60 * 1000);
+    public void reset(boolean sizeFinalized) {
+        this.durations.clear();
+        this.sizes.clear();
+        this.progress.set(0);
+        this.remaining.set(60 * 1000);
+        this.sizeFinalized = sizeFinalized;
     }
 
     public ConversionJob getConversionJob() {

@@ -9,13 +9,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.*;
@@ -40,53 +52,42 @@ import java.util.stream.Collectors;
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class FilesController {
+public class FilesController extends VBox {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public MenuItem removeMenu;
 
 
-    @FXML
-    private Button addButton;
-    @FXML
-    private Button clearButton;
+    private final Button addButton;
+    private final Button clearButton;
 
-    @FXML
-    private Button importButton;
+    private final Button importButton;
 
-    @FXML
-    private TabPane filesChapters;
-    @FXML
-    private Tab chaptersTab;
-    @FXML
-    private Tab filesTab;
+    private final TabPane filesChapters;
+    private final Tab chaptersTab;
+    private final Tab filesTab;
 
-    @FXML
-    private Tab queueTab;
+    private final Tab queueTab;
 
 
-    @FXML
-    private ListView<ProgressComponent> progressQueue;
+    private final ListView<ProgressComponent> progressQueue;
 
-    @FXML
-    private TabPane tabs;
+    private final TabPane tabs;
 
 
-    @FXML
-    private Button pauseButton;
-    @FXML
-    private Button stopButton;
+    private final Button pauseButton;
+    private final Button stopButton;
 
-    @FXML
-    private FileListComponent fileList;
+    private final StackPane mediaPlayerContainer;
 
-    @FXML
+    private final StackPane artworkContainer;
+
+    private final FileListComponent fileList;
+
     BookStructureComponent bookStructure;
 
-    @FXML
-    private Button startButton;
+    private final Button startButton;
 
-    @FXML
-    private ResourceBundle resources;
+    private final ResourceBundle resources;
 
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -95,19 +96,309 @@ public class FilesController {
 
 
     //TODO move columns into BookStructureComponent
-    @FXML
-    private TreeTableColumn<Organisable, String> chapterColumn;
-    @FXML
-    private TreeTableColumn<Organisable, String> durationColumn;
-    @FXML
-    private TreeTableColumn<Organisable, String> detailsColumn;
+    private final TreeTableColumn<Organisable, String> chapterColumn;
+    private final TreeTableColumn<Organisable, String> durationColumn;
+    private final TreeTableColumn<Organisable, String> detailsColumn;
 
+    public FilesController() {
+        this(AudiobookConverter.getBundle());
+    }
 
-    @FXML
+    public FilesController(ResourceBundle resources) {
+        this.resources = resources;
+
+        Screen screen = Screen.getPrimary();
+        setPadding(new Insets(10, 10, 10, 10));
+        setAlignment(Pos.BOTTOM_CENTER);
+        setPrefWidth(screen.getVisualBounds().getWidth() * 0.70);
+        setPrefHeight(screen.getVisualBounds().getHeight() * 0.80);
+
+        MenuBar menuBar = buildMenuBar();
+
+        filesChapters = new TabPane();
+        VBox.setVgrow(filesChapters, Priority.ALWAYS);
+        filesChapters.setPadding(new Insets(10));
+
+        queueTab = new Tab(resources.getString("tab.queue"));
+        queueTab.setClosable(false);
+        filesTab = new Tab(resources.getString("tab.files"));
+        filesTab.setClosable(false);
+        chaptersTab = new Tab(resources.getString("tab.chapters"));
+        chaptersTab.setClosable(false);
+
+        pauseButton = new Button(resources.getString("queue.button.pause_all"));
+        stopButton = new Button(resources.getString("queue.button.stop_all"));
+        clearButton = new Button(resources.getString("files.button.clear_all"));
+        addButton = new Button(resources.getString("files.button.add"));
+        importButton = new Button(resources.getString("files.button.chapters"));
+        startButton = new Button(resources.getString("files.button.start"));
+
+        fileList = new FileListComponent();
+        progressQueue = new ListView<>();
+        progressQueue.setTooltip(new Tooltip(resources.getString("queue.tooltip.list")));
+        VBox.setVgrow(progressQueue, Priority.ALWAYS);
+
+        bookStructure = new BookStructureComponent();
+        bookStructure.setEditable(true);
+        VBox.setVgrow(bookStructure, Priority.ALWAYS);
+        chapterColumn = new TreeTableColumn<>(resources.getString("column.chapter.title"));
+        durationColumn = new TreeTableColumn<>(resources.getString("column.chapter.duration"));
+        detailsColumn = new TreeTableColumn<>(resources.getString("column.chapter.details"));
+        bookStructure.getColumns().addAll(List.of(chapterColumn, durationColumn, detailsColumn));
+
+        mediaPlayerContainer = new StackPane();
+        artworkContainer = new StackPane();
+
+        tabs = new TabPane();
+        tabs.setPadding(new Insets(5, 10, 10, 10));
+
+        buildQueueTab(screen);
+        buildFilesTab(screen);
+        buildChaptersTab(screen);
+
+        filesChapters.getTabs().add(queueTab);
+
+        Tab bookInfoTab = new Tab(resources.getString("tab.book_info"));
+        bookInfoTab.setClosable(false);
+        bookInfoTab.setTooltip(new Tooltip(resources.getString("bookinfo.tooltip.tab")));
+        bookInfoTab.setContent(new BookInfoController());
+
+        Tab artTab = new Tab(resources.getString("tab.art_work"));
+        artTab.setClosable(false);
+        artTab.setTooltip(new Tooltip(resources.getString("artwork.tooltip.tab")));
+        artTab.setContent(artworkContainer);
+
+        Tab qualityTab = new Tab(resources.getString("tab.quality"));
+        qualityTab.setClosable(false);
+        qualityTab.setTooltip(new Tooltip(resources.getString("output.tooltip.tab")));
+        qualityTab.setContent(new OutputController());
+
+        tabs.getTabs().addAll(bookInfoTab, artTab, qualityTab);
+
+        mediaPlayerContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+        getChildren().addAll(menuBar, filesChapters, mediaPlayerContainer, tabs);
+
+        initialize();
+    }
+
+    private MenuBar buildMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        Menu fileMenu = new Menu(resources.getString("menu.file"));
+        Menu addMenu = new Menu(resources.getString("menu.file.add"));
+        MenuItem addFiles = menuItem(resources.getString("menu.file.add.files"), this::selectFiles,
+                new KeyCodeCombination(KeyCode.INSERT));
+        MenuItem addFolder = menuItem(resources.getString("menu.file.add.folder"), this::selectFolder,
+                new KeyCodeCombination(KeyCode.INSERT, KeyCombination.CONTROL_DOWN));
+        addMenu.getItems().addAll(addFiles, addFolder);
+        fileMenu.getItems().add(addMenu);
+        fileMenu.getItems().add(new SeparatorMenuItem());
+        removeMenu = menuItem(resources.getString("menu.file.remove"), this::remove,
+                new KeyCodeCombination(KeyCode.DELETE));
+        fileMenu.getItems().add(removeMenu);
+        fileMenu.getItems().add(menuItem(resources.getString("menu.file.clear"), this::clear,
+                new KeyCodeCombination(KeyCode.DELETE, KeyCombination.CONTROL_DOWN)));
+        fileMenu.getItems().add(new SeparatorMenuItem());
+        fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_up"), this::moveUp,
+                new KeyCodeCombination(KeyCode.UP)));
+        fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_down"), this::moveDown,
+                new KeyCodeCombination(KeyCode.DOWN)));
+        fileMenu.getItems().add(new SeparatorMenuItem());
+        fileMenu.getItems().add(menuItem(resources.getString("menu.file.exit"), this::exit,
+                new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN)));
+
+        Menu chapterMenu = new Menu(resources.getString("menu.chapter"));
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.import"), this::importChapters,
+                new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN)));
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.edit"), this::editChapter,
+                new KeyCodeCombination(KeyCode.F2, KeyCombination.CONTROL_DOWN)));
+        chapterMenu.getItems().add(new SeparatorMenuItem());
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.combine"), this::combine,
+                new KeyCodeCombination(KeyCode.MULTIPLY, KeyCombination.CONTROL_DOWN)));
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.split"), this::split,
+                new KeyCodeCombination(KeyCode.DIVIDE, KeyCombination.CONTROL_DOWN)));
+        chapterMenu.getItems().add(new SeparatorMenuItem());
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_up"), this::moveUp,
+                new KeyCodeCombination(KeyCode.UP)));
+        chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_down"), this::moveDown,
+                new KeyCodeCombination(KeyCode.DOWN)));
+
+        Menu convertMenu = new Menu(resources.getString("menu.convert"));
+        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.start"), this::start,
+                new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN)));
+        convertMenu.getItems().add(new SeparatorMenuItem());
+        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.pause_all"), this::pause,
+                new KeyCodeCombination(KeyCode.HOME, KeyCombination.CONTROL_DOWN)));
+        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.stop_all"), this::stop,
+                new KeyCodeCombination(KeyCode.END, KeyCombination.CONTROL_DOWN)));
+        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.clear_queue"), this::clearQueue,
+                new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN)));
+
+        Menu systemMenu = new Menu(resources.getString("menu.system"));
+        systemMenu.getItems().add(menuItem(resources.getString("menu.system.settings"), this::settings, null));
+        systemMenu.getItems().add(menuItem(resources.getString("menu.system.repair"), this::repair, null));
+        systemMenu.getItems().add(menuItem(resources.getString("menu.system.check_version"), this::checkVersion, null));
+
+        Menu aboutMenu = new Menu(resources.getString("menu.about"));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.show_hints"), this::showHints, null));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.faq"), this::openFAQ, null));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.report_bug"), this::openIssues, null));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.discussions"), this::openDiscussions, null));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.website"), this::openWebSite, null));
+        aboutMenu.getItems().add(menuItem(resources.getString("menu.about.about"), this::openAboutPage, null));
+
+        menuBar.getMenus().addAll(fileMenu, chapterMenu, convertMenu, systemMenu, aboutMenu);
+        return menuBar;
+    }
+
+    private MenuItem menuItem(String title, EventHandler<ActionEvent> handler, KeyCombination accelerator) {
+        MenuItem item = new MenuItem(title);
+        item.setOnAction(handler);
+        if (accelerator != null) {
+            item.setAccelerator(accelerator);
+        }
+        return item;
+    }
+
+    private void buildQueueTab(Screen screen) {
+        ToolBar queueBar = new ToolBar();
+
+        Button newBook = new Button(resources.getString("queue.button.newbook"));
+        newBook.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        newBook.setStyle("-fx-font-size: 15;");
+        newBook.setOnAction(this::addFiles);
+        newBook.setTooltip(new Tooltip(resources.getString("queue.tooltip.newbook")));
+        queueBar.getItems().addAll(newBook, new Separator());
+
+        pauseButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        pauseButton.setOnAction(this::pause);
+        pauseButton.setTooltip(new Tooltip(resources.getString("queue.tooltip.pause_all")));
+        stopButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        stopButton.setOnAction(this::stop);
+        stopButton.setTooltip(new Tooltip(resources.getString("queue.tooltip.stop_all")));
+        Button clearQueueButton = new Button(resources.getString("queue.button.clear"));
+        clearQueueButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        clearQueueButton.setOnAction(this::clearQueue);
+        clearQueueButton.setTooltip(new Tooltip(resources.getString("queue.tooltip.clear")));
+        queueBar.getItems().addAll(pauseButton, stopButton, new Separator(), clearQueueButton);
+
+        VBox queueBox = new VBox(queueBar, progressQueue);
+        queueTab.setContent(queueBox);
+    }
+
+    private void buildFilesTab(Screen screen) {
+        ToolBar filesBar = new ToolBar();
+        addButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        addButton.setOnAction(this::addFiles);
+        addButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_add")));
+
+        Button removeButton = new Button(resources.getString("files.button.remove"));
+        removeButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        removeButton.setOnAction(this::remove);
+        removeButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_remove")));
+
+        clearButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        clearButton.setOnAction(this::clear);
+        clearButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_clear")));
+
+        Button moveUp = new Button(resources.getString("files.button.move_up"));
+        moveUp.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        moveUp.setOnAction(this::moveUp);
+        moveUp.setTooltip(new Tooltip(resources.getString("files.tooltip.button_up")));
+
+        Button moveDown = new Button(resources.getString("files.button.move_down"));
+        moveDown.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        moveDown.setOnAction(this::moveDown);
+        moveDown.setTooltip(new Tooltip(resources.getString("files.tooltip.button_down")));
+
+        importButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        importButton.setOnAction(this::importChapters);
+        importButton.setStyle("-fx-font-size: 15;");
+        importButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_chapters")));
+
+        startButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        startButton.setOnAction(this::start);
+        startButton.setStyle("-fx-font-size: 15;");
+        startButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_start")));
+
+        filesBar.getItems().addAll(addButton, removeButton, new Separator(), clearButton, new Separator(), moveUp, moveDown,
+                new Separator(), importButton, new Separator(), startButton);
+
+        fileList.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(fileList, Priority.ALWAYS);
+        VBox filesBox = new VBox(filesBar, fileList);
+        filesTab.setContent(filesBox);
+    }
+
+    private void buildChaptersTab(Screen screen) {
+        ToolBar chaptersBar = new ToolBar();
+        Button add = new Button(resources.getString("chapters.button.add"));
+        add.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        add.setOnAction(this::addFiles);
+        add.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_add")));
+
+        Button remove = new Button(resources.getString("chapters.button.remove"));
+        remove.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        remove.setOnAction(this::remove);
+        remove.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_remove")));
+
+        Button clear = new Button(resources.getString("chapters.button.clear"));
+        clear.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        clear.setOnAction(this::clear);
+        clear.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_clear")));
+
+        Button moveUp = new Button(resources.getString("chapters.button.move_up"));
+        moveUp.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        moveUp.setOnAction(this::moveUp);
+        moveUp.setTooltip(new Tooltip(resources.getString("chatpers.tooltip.button_up")));
+
+        Button moveDown = new Button(resources.getString("chapters.button.move_down"));
+        moveDown.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        moveDown.setOnAction(this::moveDown);
+        moveDown.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_down")));
+
+        Button edit = new Button(resources.getString("chapters.button.edit"));
+        edit.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        edit.setOnAction(this::editChapter);
+        edit.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_edit")));
+
+        Button split = new Button(resources.getString("chapters.button.split"));
+        split.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        split.setOnAction(this::split);
+        split.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_split")));
+
+        Button combine = new Button(resources.getString("chapters.button.combine"));
+        combine.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        combine.setOnAction(this::combine);
+        combine.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_combine")));
+
+        Button subTracks = new Button(resources.getString("chapters.button.subtracks"));
+        subTracks.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        subTracks.setOnAction(this::subTracks);
+        subTracks.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_subtrack")));
+
+        Button startChapters = new Button(resources.getString("chapters.button.start"));
+        startChapters.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
+        startChapters.setOnAction(this::start);
+        startChapters.setStyle("-fx-font-size: 15;");
+        startChapters.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_start")));
+
+        chaptersBar.getItems().addAll(add, remove, new Separator(), clear, new Separator(), moveUp, moveDown, new Separator(),
+                edit, new Separator(), split, combine, new Separator(), subTracks, new Separator(), startChapters);
+
+        bookStructure.setPrefHeight(screen.getVisualBounds().getHeight() * 0.025);
+        VBox chaptersBox = new VBox(chaptersBar, bookStructure);
+        chaptersTab.setContent(chaptersBox);
+    }
+
     public void initialize() {
         addDragEvenHandlers(bookStructure);
         addDragEvenHandlers(fileList);
         addDragEvenHandlers(progressQueue);
+
+        mediaPlayerContainer.getChildren().add(new MediaPlayerController());
+        artworkContainer.getChildren().add(new ArtWorkController());
 
         Settings settings = Settings.loadSetting();
         AudiobookConverter.getContext().setPresetName(settings.getPresets().get(settings.getLastUsedPreset()).getName());
@@ -117,7 +408,7 @@ public class FilesController {
         ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> selectedMedia = context.getSelectedMedia();
 
-        selectedMedia.addListener((InvalidationListener) observable -> {
+        selectedMedia.addListener((InvalidationListener) _ -> {
             if (selectedMedia.isEmpty() || chaptersMode.get()) return;
             fileList.reselect();
         });
@@ -153,9 +444,9 @@ public class FilesController {
     private void initFileOpenMenu() {
         ResourceBundle bundle = Objects.requireNonNull(resources, "Resource bundle not initialized");
         MenuItem item1 = new MenuItem(bundle.getString("context.files"));
-        item1.setOnAction(e -> selectFiles());
+        item1.setOnAction(this::selectFiles);
         MenuItem item2 = new MenuItem(bundle.getString("context.folder"));
-        item2.setOnAction(e -> selectFolder());
+        item2.setOnAction(this::selectFolder);
         contextMenu.getItems().addAll(item1, item2);
     }
 
@@ -192,13 +483,12 @@ public class FilesController {
     }
 
 
-    @FXML
     protected void addFiles(ActionEvent event) {
         Button node = (Button) event.getSource();
         contextMenu.show(node, Side.RIGHT, 0, 0);
     }
 
-    public void selectFolder() {
+    public void selectFolder(ActionEvent actionEvent) {
         try {
             List<String> fileNames = DialogHelper.selectFolderDialog();
             if (fileNames != null) {
@@ -247,7 +537,7 @@ public class FilesController {
     }
 
 
-    public void selectFiles() {
+    public void selectFiles(ActionEvent actionEvent) {
         try {
             List<String> fileNames = DialogHelper.selectFilesDialog();
             if (fileNames != null) {
@@ -265,7 +555,6 @@ public class FilesController {
         }
     }
 
-    @FXML
     public void remove(ActionEvent event) {
         try {
             if (chaptersMode.get()) {
@@ -436,7 +725,6 @@ public class FilesController {
         }
     }
 
-    @FXML
     public void combine(ActionEvent event) {
         try {
             bookStructure.combineChapters(event);
@@ -446,7 +734,6 @@ public class FilesController {
         }
     }
 
-    @FXML
     public void split(ActionEvent event) {
         try {
             bookStructure.split(event);
@@ -457,7 +744,6 @@ public class FilesController {
     }
 
 
-    @FXML
     public void pause(ActionEvent actionEvent) {
         try {
             ConversionContext context = AudiobookConverter.getContext();
@@ -483,7 +769,6 @@ public class FilesController {
         }
     }
 
-    @FXML
     protected void openLink(ActionEvent event) {
         Hyperlink source = (Hyperlink) event.getSource();
         AudiobookConverter.getEnv().showDocument(source.getUserData().toString());
@@ -554,12 +839,14 @@ public class FilesController {
                 String partFormat = (String) r.get(SettingsDialog.PART_FORMAT);
                 String chapterFormat = (String) r.get(SettingsDialog.CHAPTER_FORMAT);
                 Boolean showHints = (Boolean) r.get(SettingsDialog.SHOW_HINTS);
+                String language = (String) r.get(SettingsDialog.LANGUAGE);
                 Settings settings = Settings.loadSetting();
                 settings.setDarkMode(darkMode);
                 settings.setFilenameFormat(filenameFormat);
                 settings.setPartFormat(partFormat);
                 settings.setChapterFormat(chapterFormat);
                 settings.setShowHints(showHints);
+                settings.setLanguage(language);
                 settings.save();
                 AudiobookConverter.getEnv().setDarkMode(darkMode);
             });

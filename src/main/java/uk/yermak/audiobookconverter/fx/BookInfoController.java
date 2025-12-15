@@ -4,13 +4,17 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
@@ -18,31 +22,75 @@ import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
+
+import static javafx.geometry.HPos.RIGHT;
 
 /**
  * Created by Yermak on 04-Feb-18.
  */
-public class BookInfoController {
+public class BookInfoController extends GridPane {
 
-    @FXML
-    private TextField title;
-    @FXML
-    private TextField writer;
-    @FXML
-    private TextField narrator;
-    @FXML
-    private ComboBox<String> genre;
-    @FXML
-    private TextField series;
-    @FXML
-    private TextField bookNo;
-    @FXML
-    private TextField year;
-    @FXML
-    private TextField comment;
+    private final TextField title;
+    private final TextField writer;
+    private final TextField narrator;
+    private final ComboBox<String> genre;
+    private final TextField series;
+    private final TextField bookNo;
+    private final TextField year;
+    private final TextField comment;
 
-    @FXML
+    public BookInfoController() {
+        ResourceBundle resources = AudiobookConverter.getBundle();
+        setPadding(new Insets(5, 5, 0, 5));
+        setHgap(5);
+        setVgap(5);
+
+        ColumnConstraints fixed = new ColumnConstraints();
+        fixed.setHalignment(RIGHT);
+        ColumnConstraints grow = new ColumnConstraints();
+        grow.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+        getColumnConstraints().addAll(fixed, grow, fixed, grow);
+
+        title = new TextField();
+        writer = new TextField();
+        narrator = new TextField();
+        genre = new ComboBox<>();
+        genre.setEditable(true);
+        series = new TextField();
+        bookNo = new TextField();
+        year = new TextField();
+        comment = new TextField();
+
+        addRow(0, label(resources.getString("bookinfo.label.title")), withTooltip(title, resources.getString("bookinfo.tooltip.title")),
+                label(resources.getString("bookinfo.label.series")), withTooltip(series, resources.getString("bookinfo.tooltip.series")));
+        addRow(1, label(resources.getString("bookinfo.label.writer")), withTooltip(writer, resources.getString("bookinfo.tooltip.author")),
+                label(resources.getString("bookinfo.label.bookno")), withTooltip(bookNo, resources.getString("bookinfo.tooltip.bookno")));
+        addRow(2, label(resources.getString("bookinfo.label.narrator")), withTooltip(narrator, resources.getString("bookinfo.tooltip.narrator")),
+                label(resources.getString("bookinfo.label.year")), withTooltip(year, resources.getString("bookinfo.tooltip.year")));
+        addRow(3, label(resources.getString("bookinfo.label.genre")), withTooltip(genre, resources.getString("bookinfo.tooltip.genre")),
+                label(resources.getString("bookinfo.label.comment")), withTooltip(comment, resources.getString("bookinfo.tooltip.comment")));
+
+        initialize();
+    }
+
+    private Label label(String text) {
+        Label label = new Label(text);
+        GridPane.setHalignment(label, RIGHT);
+        return label;
+    }
+
+    private <T extends Node> T withTooltip(T node, String text) {
+        Tooltip tooltip = new Tooltip(text);
+        if (node instanceof TextField textField) {
+            textField.setTooltip(tooltip);
+        } else if (node instanceof ComboBox<?> comboBox) {
+            comboBox.setTooltip(tooltip);
+        }
+        return node;
+    }
+
     private void initialize() {
 
         MenuItem menuItem = new MenuItem("Remove");

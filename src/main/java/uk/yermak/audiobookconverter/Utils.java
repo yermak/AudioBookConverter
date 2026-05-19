@@ -10,6 +10,7 @@ import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Chapter;
 import uk.yermak.audiobookconverter.book.Part;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -179,6 +180,35 @@ public class Utils {
         }
 
         return stringBuilder.toString();
+    }
+
+    public static void openOutputFolder(String outputPath) {
+        try {
+            File outputFile = new File(outputPath);
+            File folder = outputFile.isDirectory() ? outputFile : outputFile.getParentFile();
+            if (folder == null || !folder.exists()) {
+                logger.error("Output folder does not exist for path: {}", outputPath);
+                return;
+            }
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    desktop.open(folder);
+                    return;
+                }
+            }
+            String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+            if (os.contains("win")) {
+                Runtime.getRuntime().exec(new String[]{"explorer", folder.getAbsolutePath()});
+            } else if (os.contains("mac")) {
+                Runtime.getRuntime().exec(new String[]{"open", folder.getAbsolutePath()});
+            } else {
+                Runtime.getRuntime().exec(new String[]{"xdg-open", folder.getAbsolutePath()});
+            }
+        } catch (Exception e) {
+            logger.error("Failed to open output folder: {}", outputPath, e);
+            e.printStackTrace();
+        }
     }
 
     private static class DurationRender implements AttributeRenderer<Duration> {

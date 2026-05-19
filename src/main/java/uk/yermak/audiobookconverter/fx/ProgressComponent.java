@@ -9,6 +9,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
@@ -43,6 +44,8 @@ public class ProgressComponent extends GridPane {
     private final Button pauseButton;
 
     private final Button stopButton;
+
+    private final Button openOutputButton;
 
     private final ImageView imageView;
 
@@ -81,6 +84,10 @@ public class ProgressComponent extends GridPane {
         remainingTime = new Label("0:00:00");
         stopButton = new Button(resources.getString("progress.button.stop"));
         stopButton.setTooltip(new javafx.scene.control.Tooltip(resources.getString("progress.tooltip.stop")));
+        openOutputButton = new Button(resources.getString("progress.button.open_output_folder"));
+        openOutputButton.setTooltip(new javafx.scene.control.Tooltip(resources.getString("progress.tooltip.open_output_folder")));
+        openOutputButton.setDisable(true);
+        openOutputButton.setVisible(false);
 
         add(imageView, 0, 0, 1, 4);
         imageView.setPreserveRatio(true);
@@ -105,11 +112,15 @@ public class ProgressComponent extends GridPane {
         add(elapsedTime, 2, 3);
         add(remainingLabel, 3, 3);
         add(remainingTime, 4, 3);
-        add(stopButton, 5, 3);
+        HBox actionButtons = new HBox(5, openOutputButton, stopButton);
+        actionButtons.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        add(actionButtons, 5, 3);
         stopButton.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() * 0.05);
+        openOutputButton.setMinWidth(Screen.getPrimary().getVisualBounds().getWidth() * 0.08);
 
         pauseButton.setOnAction(event -> pause());
         stopButton.setOnAction(event -> stop());
+        openOutputButton.setOnAction(event -> Utils.openOutputFolder(conversionProgress.getConversionJob().getOutputDestination()));
 
         List<ArtWork> posters = conversionProgress.getConversionJob().getConversionGroup().getPosters();
         if (!posters.isEmpty()) {
@@ -129,6 +140,7 @@ public class ProgressComponent extends GridPane {
 
         assignListeners(conversionProgress);
         conversionProgress.getConversionJob().addStatusChangeListener((observable, oldValue, newValue) -> updateButtons(newValue));
+        updateButtons(conversionProgress.getConversionJob().getStatus());
     }
 
 
@@ -139,20 +151,33 @@ public class ProgressComponent extends GridPane {
                 case FINISHED -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
+                    showOpenOutputButton(true);
                 }
                 case CANCELLED -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
+                    showOpenOutputButton(false);
                 }
                 case IN_PROGRESS -> {
                     pauseButton.setText(resources.getString("progress.button.pause"));
                     pauseButton.setDisable(false);
                     stopButton.setDisable(false);
+                    showOpenOutputButton(false);
+                }
+                case ERROR -> {
+                    pauseButton.setDisable(true);
+                    stopButton.setDisable(true);
+                    showOpenOutputButton(true);
                 }
                 default -> {
                 }
             }
         });
+    }
+
+    private void showOpenOutputButton(boolean show) {
+        openOutputButton.setVisible(show);
+        openOutputButton.setDisable(!show);
     }
 
     private void stop() {
@@ -175,7 +200,15 @@ public class ProgressComponent extends GridPane {
         conversionProgress.size.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> estimatedSize.setText(Utils.formatSize(newValue.longValue()))));
         conversionProgress.elapsed.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> elapsedTime.setText(Utils.formatTime(newValue.longValue()))));
         conversionProgress.remaining.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> remainingTime.setText(Utils.formatTime(newValue.longValue()))));
-        conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue)));
+        conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
+            state.setText(newValue);
+            String completed = resources.getString("progress.state.completed");
+            if (completed.equals(newValue)) {
+                showOpenOutputButton(true);
+                pauseButton.setDisable(true);
+                stopButton.setDisable(true);
+            }
+        }));
     }
 
     public boolean isOver() {

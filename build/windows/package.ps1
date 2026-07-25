@@ -115,7 +115,7 @@ $ImageArgs = $BaseJPackageArgs + @(
     "--type", "app-image",
     "--input", $InputPath,
     "--dest", $TargetImageRoot,
-    "--java-options", "'--enable-preview'"
+    "--java-options", "'-XX:+UseAllWindowsProcessorGroups'"
 )
 
 & $JPackageExe $ImageArgs

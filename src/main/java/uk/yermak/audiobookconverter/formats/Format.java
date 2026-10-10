@@ -10,6 +10,7 @@ import uk.yermak.audiobookconverter.book.MediaInfo;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class Format {
 
@@ -49,7 +50,7 @@ public abstract class Format {
     }
 
     static String toFFMpegTime(long time) {
-        return (time / 1000) + "." + time % 1000;
+        return String.format(Locale.ROOT, "%d.%03d", time / 1000, time % 1000);
     }
 
     public List<Integer> channels() {

@@ -16,6 +16,7 @@ import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -234,6 +235,7 @@ public class OutputController extends GridPane {
             AudiobookConverter.getContext().setSpeed(Double.parseDouble(newValue));
         });
 
+        splitFileBox.getItems().addAll("parts", "chapters");
         splitFileBox.getSelectionModel().select(0);
         splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             switch (newValue) {
@@ -252,6 +254,7 @@ public class OutputController extends GridPane {
             }
         });
 
+        forceBox.getItems().addAll(Arrays.stream(OutputParameters.Force.values()).map(Enum::name).toList());
         forceBox.getSelectionModel().select(0);
         forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;

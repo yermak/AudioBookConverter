@@ -19,14 +19,18 @@ import java.util.Set;
 public class DurationVerifier {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName) throws IOException {
+    /**
+     * Stores the converted file's duration in source time: the file was sped up by {@code speed},
+     * and MediaInfo durations are kept in source time (the getters divide by the speed).
+     */
+    public static void ffMpegUpdateDuration(MediaInfo mediaInfo, String outputFileName, double speed) throws IOException {
         final Set<String> AUDIO_CODECS = ImmutableSet.of("mp3", "aac", "wmav2", "flac", "alac", "vorbis", "opus");
         FFprobe ffprobe = new FFprobe(Platform.FFPROBE);
         FFmpegProbeResult probe = ffprobe.probe(outputFileName);
         List<FFmpegStream> streams = probe.getStreams();
         for (FFmpegStream stream : streams) {
             if (AUDIO_CODECS.contains(stream.codec_name)) {
-                mediaInfo.setDuration(Math.round(stream.duration * 1000));
+                mediaInfo.setDuration(Math.round(stream.duration * 1000 * speed));
             }
         }
     }

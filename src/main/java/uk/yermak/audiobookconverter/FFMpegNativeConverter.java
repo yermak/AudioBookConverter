@@ -67,7 +67,7 @@ public class FFMpegNativeConverter implements Callable<String> {
                 logger.error("Converstion failed: " + err);
                 throw new RuntimeException("Converstion failed: " + err);
             } else {
-                DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
+                DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName, outputParameters.getSpeed());
             }
             return outputFileName;
         } catch (CancellationException ce) {

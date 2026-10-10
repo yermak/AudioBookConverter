@@ -35,14 +35,14 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
             new LocaleOption("it", "settings.language.it"),
             new LocaleOption("pt", "settings.language.pt"),
             new LocaleOption("ru", "settings.language.ru"),
-            new LocaleOption("ua", "settings.language.ua"),
+            new LocaleOption("uk", "settings.language.ua"),
             new LocaleOption("tr", "settings.language.tr"),
             new LocaleOption("ro", "settings.language.ro"),
             new LocaleOption("pl", "settings.language.pl"),
             new LocaleOption("bg", "settings.language.bg"),
-            new LocaleOption("by", "settings.language.by"),
-            new LocaleOption("kz", "settings.language.kz"),
-            new LocaleOption("gr", "settings.language.gr")
+            new LocaleOption("be", "settings.language.by"),
+            new LocaleOption("kk", "settings.language.kz"),
+            new LocaleOption("el", "settings.language.gr")
     );
 
     private final ResourceBundle resources;

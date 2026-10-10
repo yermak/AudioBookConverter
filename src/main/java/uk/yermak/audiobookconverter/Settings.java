@@ -186,7 +186,14 @@ public class Settings {
     }
 
     public String getLanguage() {
-        return language;
+        // older versions saved country codes instead of language codes for these
+        return switch (language) {
+            case "ua" -> "uk";
+            case "by" -> "be";
+            case "kz" -> "kk";
+            case "gr" -> "el";
+            case null, default -> language;
+        };
     }
 
     public Settings setLanguage(String language) {

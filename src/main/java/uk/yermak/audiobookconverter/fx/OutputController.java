@@ -163,8 +163,12 @@ public class OutputController extends GridPane {
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             Settings settings = Settings.loadSetting();
             Preset preset = currentPreset(settings);
+            // start-up and preset switch select the preset's own format: it already holds its values
+            if (newValue == preset.getFormat()) return;
             preset.setupFormat(newValue);
-
+            preset.setCbr(newValue.defaultCBR());
+            // save before the refreshes: each box listener below loads settings and saves its own field
+            settings.save();
 
             refreshFrequencies(newValue, newValue.defaultFrequency());
             refreshBitrates(newValue, newValue.defaultBitrate());
@@ -173,8 +177,6 @@ public class OutputController extends GridPane {
             refreshSpeeds(newValue, newValue.defaultSpeed());
             updateVbrQuality(newValue.defaultVbrQuality());
             updateCBR(newValue.defaultCBR());
-
-            settings.save();
         });
         outputFormatBox.getSelectionModel().select(currentPreset(Settings.loadSetting()).getFormat());
 

@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Window;
 import org.controlsfx.control.ToggleSwitch;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class SettingsDialog extends Dialog<Map<String, Object>> {
     private ComboBox<LocaleOption> language;
 
     public SettingsDialog(Window window) {
-        resources = ResourceBundle.getBundle("locales/messages");
+        resources = AudiobookConverter.getBundle();
         setTitle(resources.getString("dialog.settings.title"));
         setHeaderText(resources.getString("dialog.settings.header"));
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);

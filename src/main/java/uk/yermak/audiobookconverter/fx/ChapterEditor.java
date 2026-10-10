@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.Utils;
 import uk.yermak.audiobookconverter.book.Chapter;
@@ -26,7 +27,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 class ChapterEditor {
 
     private final Chapter chapter;
-    private final ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+    private final ResourceBundle resources = AudiobookConverter.getBundle();
 
     public ChapterEditor(Chapter chapter) {
         this.chapter = chapter;

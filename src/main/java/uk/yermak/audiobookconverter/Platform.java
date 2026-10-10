@@ -16,21 +16,25 @@ public enum Platform {
     },
 
     MAC {
-        protected String getAppPath() {
-            return /*com.apple.eio.FileManager.getPathToApplicationBundle() +*/ "/";
-        }
-
+        // path.properties holds absolute binary paths, so only the config file is resolved against the bundle
         @Override
         protected File getConfigFilePath() {
-            return new File(getAppPath(), "Contents/app/path.properties");
+            File launcherDir = launcherDir(); // <bundle>.app/Contents/MacOS
+            return launcherDir == null ? new File("/Contents/app/path.properties") : new File(launcherDir.getParentFile(), "app/path.properties");
         }
     },
 
     LINUX {
+        // path.properties and the binary paths in it are relative to the launcher's bin directory
+        @Override
+        protected String getAppPath() {
+            File launcherDir = launcherDir();
+            return launcherDir == null ? "" : launcherDir.getPath() + File.separator;
+        }
+
         @Override
         protected File getConfigFilePath() {
-            return new File("../lib/app/path.properties");
-
+            return new File(getAppPath() + "../lib/app/path.properties");
         }
     },
 
@@ -41,6 +45,9 @@ public enum Platform {
 
         }
     };
+    // declared before the static block, which logs
+    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     static Platform current;
     private static Properties properties = new Properties();
 
@@ -49,10 +56,12 @@ public enum Platform {
         if (MAC.isMac()) current = MAC;
         if (WINDOWS.isWindows()) current = WINDOWS;
         if (DEV.isDebug()) current = DEV;
+        if (current == null) {
+            logger.warn("Unknown os.name {}, using Linux paths", System.getProperty("os.name"));
+            current = LINUX;
+        }
         properties = current.loadAppProperties();
     }
-
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     public static final String FFPROBE = current.getPath("ffprobe");
@@ -91,6 +100,15 @@ public enum Platform {
         return new File("app/path.properties");
     }
 
+    /**
+     * Directory of the native launcher, from the property jpackage launchers set.
+     * Null when not started by a launcher (IDE, mvn): paths then stay relative to the working directory.
+     */
+    static File launcherDir() {
+        String appPath = System.getProperty("jpackage.app-path");
+        return appPath == null ? null : new File(appPath).getParentFile();
+    }
+
     synchronized Properties loadAppProperties() {
         if (properties.isEmpty()) {
             File file = getConfigFilePath();
@@ -102,7 +120,7 @@ public enum Platform {
                     logger.error("Error during loading properties", e);
                 }
             } else {
-                logger.error("Path properties is not found at: ", file.getPath());
+                logger.error("Path properties is not found at: {}", file.getAbsolutePath());
             }
         }
         return properties;

@@ -9,7 +9,6 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 04-Jan-18.
@@ -58,10 +57,7 @@ public class Mp4v2ArtBuilder {
             ByteArrayOutputStream err = new ByteArrayOutputStream();
             StreamCopier.copy(process.getErrorStream(), err);
 
-            boolean finished = false;
-            while (!conversionJob.getStatus().isOver() && !finished) {
-                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-            }
+            if (!Utils.waitFor(process, conversionJob)) return;
             logger.debug("mp4art out: {}", out);
             logger.warn("mp4art err: {}", err);
 

@@ -16,7 +16,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -69,10 +68,7 @@ public class FFMpegConcatenator {
             ByteArrayOutputStream err = new ByteArrayOutputStream();
             StreamCopier.copy(process.getErrorStream(), err);
 
-            boolean finished = false;
-            while (!conversionJob.getStatus().isOver() && !finished) {
-                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-            }
+            if (!Utils.waitFor(process, conversionJob)) return;
             logger.debug("Concat Out: {}", out);
             logger.error("Concat Error: {}", err);
 

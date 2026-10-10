@@ -49,6 +49,19 @@ public class Utils {
     }
 
     /**
+     * Waits for the process while the job is running. If the job ends first (cancelled or failed),
+     * kills the process and returns false. Killing it closes ffmpeg's progress connection,
+     * without which TcpProgressParser.close() blocks until ffmpeg exits on its own.
+     */
+    public static boolean waitFor(Process process, ConversionJob conversionJob) throws InterruptedException {
+        while (!conversionJob.getStatus().isOver()) {
+            if (process.waitFor(500, TimeUnit.MILLISECONDS)) return true;
+        }
+        process.destroyForcibly().waitFor();
+        return false;
+    }
+
+    /**
      * Invalid characters that cannot be used in filenames across most operating systems.
      */
     private static final char[] INVALID_FILENAME_CHARS = {':', '\\', '/', '>', '<', '|', '?', '*', '"'};

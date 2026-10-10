@@ -13,7 +13,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -60,10 +59,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             ByteArrayOutputStream err = new ByteArrayOutputStream();
             StreamCopier.copy(process.getErrorStream(), err);
 
-            boolean finished = false;
-            while (!conversionJob.getStatus().isOver() && !finished) {
-                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-            }
+            if (!Utils.waitFor(process, conversionJob)) return null;
             logger.debug("ffmpeg out: {}", out);
             logger.warn("ffmpeg err: {}", err);
 

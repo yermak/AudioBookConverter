@@ -62,6 +62,8 @@ public  class OutputParameters {
 
 
     public boolean needReencode(String codec) {
+        // a stream copy cannot apply atempo, and track durations are already divided by the speed
+        if (getSpeed() != 1.0) return true;
         return switch (force) {
             case Auto -> format.needsReencode(codec);
             case Always -> true;

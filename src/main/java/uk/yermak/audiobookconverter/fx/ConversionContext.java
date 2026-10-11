@@ -18,7 +18,6 @@ import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Book;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
-import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
@@ -48,7 +47,6 @@ public class ConversionContext {
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private FFMediaLoader mediaLoader;
     private Set<ArtWork> removedArtWorks = new HashSet<>();
     private String presetName;
     private SimpleDoubleProperty speed = new SimpleDoubleProperty(1.0);
@@ -94,9 +92,6 @@ public class ConversionContext {
     }
 
     public ConversionGroup detach() {
-        mediaLoader.detach();
-
-
         ConversionGroup conversionGroup = conversionGroupHolder.get();
         conversionGroup.setMedia(new ArrayList<>(media));
         conversionGroup.setPosters(new ArrayList<>(posters));
@@ -117,7 +112,6 @@ public class ConversionContext {
         posters.clear();
         media.clear();
         removedArtWorks.clear();
-        mediaLoader = null;
 
         return conversionGroup;
     }
@@ -202,9 +196,6 @@ public class ConversionContext {
         return book;
     }
 
-    public void setMediaLoader(FFMediaLoader mediaLoader) {
-        this.mediaLoader = mediaLoader;
-    }
 
     public void removeArtWork(ArtWork artWork) {
         removedArtWorks.add(artWork);

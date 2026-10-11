@@ -66,10 +66,6 @@ public class FFMediaLoader {
         }
     }
 
-    public void detach() {
-
-    }
-
 
     static Collection<File> findPictures(File dir) {
         try {

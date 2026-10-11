@@ -509,7 +509,6 @@ public class FilesController extends VBox {
 
     private void processFiles(List<String> fileNames) {
         FFMediaLoader mediaLoader = new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
-        AudiobookConverter.getContext().setMediaLoader(mediaLoader);
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
             AudiobookConverter.getContext().constructBook(addedMedia);

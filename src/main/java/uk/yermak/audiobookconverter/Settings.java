@@ -49,12 +49,47 @@ public class Settings {
     private String sourceFolder = System.getProperty("user.home");
     private String language = "";
 
+    // A Preferences value is limited to MAX_VALUE_LENGTH (8 KB), and presets and genres grow past it: a longer value
+    // is split over key, key.part1, key.part2, ... A value saved by an older version (one key) still reads the same.
+    static void write(Preferences node, String key, String value) {
+        int max = Preferences.MAX_VALUE_LENGTH;
+        int parts = Math.max(1, (value.length() + max - 1) / max);
+        for (int i = 0; i < parts; i++) {
+            node.put(partKey(key, i), value.substring(i * max, Math.min(value.length(), (i + 1) * max)));
+        }
+        removeParts(node, key, parts); // left over from a longer earlier value
+    }
+
+    static String read(Preferences node, String key) {
+        String first = node.get(key, null);
+        if (first == null) return null;
+        StringBuilder value = new StringBuilder(first);
+        for (int i = 1; node.get(partKey(key, i), null) != null; i++) {
+            value.append(node.get(partKey(key, i), null));
+        }
+        return value.toString();
+    }
+
+    static void remove(Preferences node, String key) {
+        removeParts(node, key, 0);
+    }
+
+    private static void removeParts(Preferences node, String key, int from) {
+        for (int i = from; i == 0 || node.get(partKey(key, i), null) != null; i++) {
+            node.remove(partKey(key, i));
+        }
+    }
+
+    private static String partKey(String key, int part) {
+        return part == 0 ? key : key + ".part" + part;
+    }
+
     public static void saveSetting(Settings settings) {
-        preferences.put(Version.getSettingsVersion(), gson.toJson(settings));
+        write(preferences, Version.getSettingsVersion(), gson.toJson(settings));
     }
 
     public static void clear() {
-        preferences.remove(Version.getSettingsVersion());
+        remove(preferences, Version.getSettingsVersion());
     }
 
     public void save() {
@@ -62,7 +97,7 @@ public class Settings {
     }
 
     public static Settings loadSetting() {
-        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
+        String settingsJson = read(preferences, Version.getSettingsVersion());
         if (settingsJson == null) {
             Settings settings = new Settings();
             settings.setPresets(Preset.defaultValues);
@@ -73,7 +108,7 @@ public class Settings {
     }
 
     public static String getRawData() {
-        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
+        String settingsJson = read(preferences, Version.getSettingsVersion());
         return settingsJson;
     }
 

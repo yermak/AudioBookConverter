@@ -37,10 +37,11 @@ public class ConversionGroup {
     private boolean detached;
     private long groupId = System.currentTimeMillis();
 
-    public ConversionProgress start(Convertable convertable, String outputDestination) {
+    public ConversionProgress start(Convertable convertable, String outputDestination, int number, int total) {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         ConversionJob conversionJob = new ConversionJob(this, convertable, progressCallbacks, outputDestination);
+        conversionJob.setPosition(number, total);
 
         ConversionProgress conversionProgress = new ConversionProgress(conversionJob);
 
@@ -154,7 +155,7 @@ public class ConversionGroup {
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
-                ConversionProgress conversionProgress = this.start(chapter, finalDesination);
+                ConversionProgress conversionProgress = this.start(chapter, finalDesination, i + 1, chapters.size());
                 Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
 
             }
@@ -166,7 +167,7 @@ public class ConversionGroup {
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
-                ConversionProgress conversionProgress = this.start(part, finalDesination);
+                ConversionProgress conversionProgress = this.start(part, finalDesination, i + 1, parts.size());
                 Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
             }
         }

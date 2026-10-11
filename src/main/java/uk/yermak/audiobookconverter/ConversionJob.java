@@ -45,6 +45,9 @@ public class ConversionJob implements Runnable {
     private final String outputDestination;
     private final SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
     private volatile String errorMessage;
+    // position among the output files of the book; a chapter's own number restarts in every part
+    private int number = 1;
+    private int total = 1;
 
 
     public ConversionJob(ConversionGroup conversionGroup, Convertable convertable, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
@@ -194,6 +197,20 @@ public class ConversionJob implements Runnable {
 
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    public void setPosition(int number, int total) {
+        this.number = number;
+        this.total = total;
+    }
+
+    /** 1-based number of this job's output file in the book, for tags. */
+    public int getNumber() {
+        return number;
+    }
+
+    public boolean isTheOnlyOne() {
+        return total == 1;
     }
 
     public void resume() {

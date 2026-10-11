@@ -128,7 +128,7 @@ public class MP3Format extends Format {
         options.add("-id3v2_version");
         options.add("4");
 
-        options.addAll(prepareId3v2Meta(convertable, conversionGroup.getBookInfo()));
+        options.addAll(prepareId3v2Meta(convertable, conversionJob.getNumber(), conversionGroup.getBookInfo()));
         options.add("-f");
         options.add(name);
         options.add("-progress");
@@ -139,7 +139,7 @@ public class MP3Format extends Format {
     }
 
 
-    private List<String> prepareId3v2Meta(Convertable convertable, AudioBookInfo bookInfo) {
+    private List<String> prepareId3v2Meta(Convertable convertable, int trackNumber, AudioBookInfo bookInfo) {
         List<String> meta = new ArrayList<>();
         if (StringUtils.isNotBlank(convertable.getDetails())) {
             meta.add("-metadata");
@@ -172,7 +172,7 @@ public class MP3Format extends Format {
             meta.add("comment=\"" + escapeQuotes(bookInfo.comment()) + "\"");
         }
         meta.add("-metadata");
-        meta.add("track=\"" + convertable.getNumber() + "\"");
+        meta.add("track=\"" + trackNumber + "\"");
         return meta;
     }
 

@@ -146,7 +146,7 @@ public class OGGFormat extends Format {
             metaData.add("compatible_brands=isomiso2");
 */
 
-            metaData.add("title=" + bookInfo.title() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
+            metaData.add("title=" + bookInfo.title() + (conversionJob.isTheOnlyOne() ? "" : ("-" + conversionJob.getNumber())));
 
             if (bookInfo.writer().isNotBlank()) {
                 metaData.add("artist=" + bookInfo.writer());

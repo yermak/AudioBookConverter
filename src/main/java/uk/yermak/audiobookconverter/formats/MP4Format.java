@@ -123,7 +123,7 @@ public class MP4Format extends Format {
             metaData.add("major_brand=M4A");
             metaData.add("minor_version=512");
             metaData.add("compatible_brands=isomiso2");
-            metaData.add("title=" + bookInfo.title() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
+            metaData.add("title=" + bookInfo.title() + (conversionJob.isTheOnlyOne() ? "" : ("-" + conversionJob.getNumber())));
             metaData.add("artist=" + bookInfo.writer());
             if (StringUtils.isNotBlank(bookInfo.series().get())) {
                 metaData.add("album=" + bookInfo.series());

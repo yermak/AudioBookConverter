@@ -22,6 +22,7 @@ import uk.yermak.audiobookconverter.formats.Format;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,7 +33,8 @@ public class ConversionContext {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final LinkedList<ConversionJob> conversionQueue = new LinkedList<>();
+    // jobs are added from launch threads while Stop all / Pause all iterate on the JavaFX thread
+    private final List<ConversionJob> conversionQueue = new CopyOnWriteArrayList<>();
     private final SimpleObjectProperty<ConversionGroup> conversionGroupHolder = new SimpleObjectProperty<>(new ConversionGroup());
     private boolean paused;
 
@@ -81,6 +83,10 @@ public class ConversionContext {
 
     public void addJob(ConversionJob conversionJob) {
         conversionQueue.add(conversionJob);
+        // drop finished, failed and cancelled jobs, so their book and decoded posters can be collected
+        conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.isOver()) conversionQueue.remove(conversionJob);
+        });
         executorService.execute(conversionJob);
     }
 

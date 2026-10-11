@@ -27,4 +27,13 @@ public class AudioBookInfoTest {
         assertEquals(bookInfo.bookNumber().toString(), "1");
         assertEquals(bookInfo.totalTracks().toString(), "436");
     }
+
+    @Test
+    public void testInstance_uppercase_Vorbis_comment_keys() {
+        AudioBookInfo bookInfo = AudioBookInfo.instance(Map.of("TITLE", "Dune", "ARTIST", "Herbert", "DATE", "1965", "TRACK", "2/6"));
+        assertEquals(bookInfo.title().toString(), "Dune");
+        assertEquals(bookInfo.writer().toString(), "Herbert");
+        assertEquals(bookInfo.year().toString(), "1965");
+        assertEquals(bookInfo.bookNumber().toString(), "2");
+    }
 }

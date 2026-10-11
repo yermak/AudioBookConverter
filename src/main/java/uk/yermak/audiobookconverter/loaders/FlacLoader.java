@@ -18,6 +18,9 @@ public class FlacLoader {
         String filename = mediaInfo.getFileName();
         File file = new File(FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename) + ".cue");
         if (file.exists()) {
+            // the sidecar wins over chapters ffmpeg made from an embedded CUESHEET block: those carry no titles,
+            // and keeping both would list (and convert) every track twice
+            mediaInfo.getBookInfo().tracks().clear();
             String cue = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             parseCue(mediaInfo, cue);
         }

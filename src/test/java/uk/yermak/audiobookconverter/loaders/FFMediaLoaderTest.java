@@ -85,6 +85,32 @@ public class FFMediaLoaderTest {
         assertEquals(track3.getWriter(), "DeAgostini Classica 3");
     }
 
+    @Test
+    public void sidecarCueReplacesEmbeddedChapters() throws IOException {
+        Path dir = Files.createTempDirectory("abc-cue");
+        Files.writeString(dir.resolve("album.cue"), """
+                TITLE "Album"
+                FILE "album.flac" WAVE
+                  TRACK 01 AUDIO
+                    TITLE "First"
+                    INDEX 01 00:00:00
+                  TRACK 02 AUDIO
+                    TITLE "Second"
+                    INDEX 01 01:00:00
+                """);
+        MediaInfoBean mediaInfo = new MediaInfoBean(dir.resolve("album.flac").toString());
+        AudioBookInfo bookInfo = AudioBookInfo.instance();
+        mediaInfo.setBookInfo(bookInfo);
+        mediaInfo.setDuration(120_000);
+        bookInfo.tracks().add(new Track("001")); // as added from the embedded CUESHEET chapters
+        bookInfo.tracks().add(new Track("002"));
+
+        FlacLoader.parseCueChapters(mediaInfo);
+
+        assertEquals(bookInfo.tracks().stream().map(Track::getTitle).toList(), List.of("First", "Second"));
+        assertEquals(bookInfo.title().get(), "Album");
+    }
+
     private static void touch(Path file) throws IOException {
         Files.createDirectories(file.getParent());
         Files.createFile(file);

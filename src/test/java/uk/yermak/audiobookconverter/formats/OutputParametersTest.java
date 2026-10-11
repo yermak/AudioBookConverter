@@ -49,6 +49,15 @@ public class OutputParametersTest {
     }
 
     @Test
+    public void autoCopiesSourceWithTargetCodec() {
+        // compares ffprobe codec names, not encoder names (libmp3lame, libopus)
+        assertFalse(Format.M4B.needsReencode("aac"));
+        assertFalse(Format.MP3.needsReencode("mp3"));
+        assertFalse(Format.OGG.needsReencode("opus"));
+        assertTrue(Format.MP3.needsReencode("aac"));
+    }
+
+    @Test
     public void speedForcesReencodeOfMatchingCodec() {
         OutputParameters parameters = new OutputParameters(Format.M4B, 128, 44100, 2, 0, true, 4, 1.0, OutputParameters.Force.Auto, false);
         assertFalse(parameters.needReencode("aac"));

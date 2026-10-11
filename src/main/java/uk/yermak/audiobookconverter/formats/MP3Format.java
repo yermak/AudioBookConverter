@@ -23,7 +23,7 @@ public class MP3Format extends Format {
     public static final List<Integer> BITRATES = List.of(32, 48, 64, 96, 112, 128, 160, 192, 224, 256, 320);
 
     MP3Format() {
-        super("mp3", "libmp3lame", "mp3");
+        super("mp3", "libmp3lame", "mp3", "mp3");
     }
 
     @Override

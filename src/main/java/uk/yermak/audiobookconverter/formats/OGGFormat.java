@@ -28,7 +28,7 @@ public class OGGFormat extends Format {
     public static final List<Integer> BITRATES = List.of(16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 160, 192, 224, 256, 320, 512);
 
     OGGFormat() {
-        super("ogg", "libopus", "ogg", "vorbis");
+        super("ogg", "libopus", "opus", "ogg", "vorbis");
     }
 
 

@@ -26,7 +26,7 @@ public class MP4Format extends Format {
     public static final List<Integer> BITRATES = List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 320);
 
     public MP4Format(String extension) {
-        super("ipod", "aac", extension, "alac");
+        super("ipod", "aac", "aac", extension, "alac");
     }
 
     @Override

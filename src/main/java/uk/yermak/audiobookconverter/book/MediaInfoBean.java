@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.book;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,7 +11,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
     private int bitrate;
     private long duration;
     private AudioBookInfo bookInfo;
-    private List<ArtWork> artWorks = new ArrayList<>();
     private String codec;
 
     public void setChannels(final int channels) {
@@ -82,14 +80,6 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
 
     public AudioBookInfo getBookInfo() {
         return this.bookInfo;
-    }
-
-//    public ArtWork getArtWork() {
-//        return this.artWork;
-//    }
-
-    public void addArtWork(final ArtWork artWork) {
-        this.artWorks.add(artWork);
     }
 
     public String getCodec() {

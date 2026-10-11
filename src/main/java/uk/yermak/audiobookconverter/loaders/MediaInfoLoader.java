@@ -77,9 +77,8 @@ class MediaInfoLoader implements Callable<MediaInfo> {
                 } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name) && !MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
                     FFMediaLoader.logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                     if (!conversionGroup.isDetached()) {
-                        Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 100, TimeUnit.MILLISECONDS);
-                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                        mediaInfo.addArtWork(artWork);
+                        // the extractor adds the poster to the context itself
+                        artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 100, TimeUnit.MILLISECONDS);
                     }
                 }
             }
@@ -88,9 +87,7 @@ class MediaInfoLoader implements Callable<MediaInfo> {
             if (MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase()) && !conversionGroup.isDetached()) {
                 List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
                 for (int j = 0; j < imageFormats.size(); j++) {
-                    Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
-                    ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                    mediaInfo.addArtWork(artWork);
+                    artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
                 }
             }
 

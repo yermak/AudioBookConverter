@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -41,8 +42,10 @@ public enum Platform {
     WINDOWS {
         @Override
         public Process createProcess(List<String> arguments) throws IOException {
-            return Runtime.getRuntime().exec( String.join(" ", arguments));
-
+            List<String> quoted = new ArrayList<>();
+            quoted.add(arguments.get(0)); // the executable path has no spaces on Windows (relative to the install dir)
+            arguments.stream().skip(1).map(Platform::quoteWindowsArgument).forEach(quoted::add);
+            return Runtime.getRuntime().exec(String.join(" ", quoted));
         }
     };
     // declared before the static block, which logs
@@ -124,6 +127,28 @@ public enum Platform {
             }
         }
         return properties;
+    }
+
+    /**
+     * Quotes an argument for the Windows command line (CommandLineToArgvW rules): whitespace needs quotes, a backslash run
+     * before a quote is doubled, and an embedded quote is escaped. Arguments already in quotes are left as they are.
+     */
+    // ponytail: Runtime.exec(String) splits at whitespace runs and rejoins with one space, so inside a quoted argument
+    // several spaces collapse to one and tabs/newlines become spaces; exec(String[]) would avoid it but hits JDK-8131908
+    static String quoteWindowsArgument(String arg) {
+        boolean needsQuotes = arg.isEmpty() || arg.chars().anyMatch(c -> Character.isWhitespace(c) || c == '"');
+        if (!needsQuotes || (arg.length() > 1 && arg.startsWith("\"") && arg.endsWith("\""))) return arg;
+        StringBuilder quoted = new StringBuilder("\"");
+        int backslashes = 0;
+        for (char c : arg.toCharArray()) {
+            if (c == '\\') {
+                backslashes++;
+                continue;
+            }
+            quoted.append("\\".repeat(c == '"' ? backslashes * 2 + 1 : backslashes)).append(c);
+            backslashes = 0;
+        }
+        return quoted.append("\\".repeat(backslashes * 2)).append('"').toString();
     }
 
     //IMPORTANT !!!

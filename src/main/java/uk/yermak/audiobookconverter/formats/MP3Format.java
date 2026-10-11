@@ -144,35 +144,35 @@ public class MP3Format extends Format {
         if (StringUtils.isNotBlank(convertable.getDetails())) {
             meta.add("-metadata");
 
-            meta.add("title=\"" + escapeQuotes(convertable.getDetails()) + "\"");
+            meta.add("title=" + escapeQuotes(convertable.getDetails()));
         }
 
         if (bookInfo.writer().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("artist=\"" + escapeQuotes(bookInfo.writer()) + "\"");
+            meta.add("artist=" + escapeQuotes(bookInfo.writer()));
         }
         if (bookInfo.title().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("album=\"" + escapeQuotes(bookInfo.title()) + "\"");
+            meta.add("album=" + escapeQuotes(bookInfo.title()));
         }
         if (bookInfo.genre().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("genre=\"" + escapeQuotes(bookInfo.genre()) + "\"");
+            meta.add("genre=" + escapeQuotes(bookInfo.genre()));
         }
         if (bookInfo.narrator().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("composer=\"" + escapeQuotes(bookInfo.narrator()) + "\"");
+            meta.add("composer=" + escapeQuotes(bookInfo.narrator()));
         }
         if (bookInfo.year().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("year=\"" + escapeQuotes(bookInfo.year()) + "\"");
+            meta.add("year=" + escapeQuotes(bookInfo.year()));
         }
         if (bookInfo.comment().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("comment=\"" + escapeQuotes(bookInfo.comment()) + "\"");
+            meta.add("comment=" + escapeQuotes(bookInfo.comment()));
         }
         meta.add("-metadata");
-        meta.add("track=\"" + trackNumber + "\"");
+        meta.add("track=" + trackNumber);
         return meta;
     }
 

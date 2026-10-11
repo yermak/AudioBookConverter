@@ -137,6 +137,10 @@ public class ConversionGroup {
             book = new Book(this.getBookInfo());
             book.construct(this.getMedia());
         }
+        if (cancelled) { // Stop on the placeholder while the book was being prepared
+            Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+            return;
+        }
 
         ObservableList<Part> parts = book.getParts();
         Format format = this.getOutputParameters().getFormat();

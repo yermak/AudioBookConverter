@@ -663,15 +663,25 @@ public class FilesController extends VBox {
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 */
 
-            ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+            ConversionJob placeHolderJob = new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination);
+            // Stop on the placeholder cancels the book while it is being prepared
+            placeHolderJob.addStatusChangeListener((observable, oldValue, newValue) -> {
+                if (newValue == ProgressStatus.CANCELLED) conversionGroup.cancel();
+            });
+            ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(placeHolderJob));
 
 
-            Executors.newSingleThreadExecutor().submit(() -> {
+            Executors.newSingleThreadExecutor().execute(() -> {
                 Platform.runLater(() -> {
                     progressQueue.getItems().add(0, placeHolderProgress);
                     filesChapters.getSelectionModel().select(queueTab);
                 });
-                conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
+                try {
+                    conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
+                } catch (Throwable t) {
+                    logger.error("Failed to start conversion of " + outputDestination, t);
+                    Platform.runLater(() -> progressQueue.getItems().remove(placeHolderProgress));
+                }
             });
             bookStructure.setRoot(null);
             filesChapters.getTabs().remove(filesTab);

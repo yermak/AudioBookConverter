@@ -46,6 +46,7 @@ import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
  */
 public class FilesController extends VBox {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // one thread, so book changes from quick successive adds do not run concurrently
+    private static final ExecutorService bookExecutor = Executors.newSingleThreadExecutor();
     public MenuItem removeMenu;
 
 
@@ -511,8 +514,18 @@ public class FilesController extends VBox {
         FFMediaLoader mediaLoader = new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
-            AudiobookConverter.getContext().constructBook(addedMedia);
-            bookStructure.updateBookStructure();
+            // constructBook waits for every probe: keep it off the JavaFX thread, and Start off until the book is complete
+            startButton.setDisable(true);
+            bookExecutor.submit(() -> {
+                try {
+                    AudiobookConverter.getContext().constructBook(addedMedia);
+                } finally {
+                    Platform.runLater(() -> {
+                        bookStructure.updateBookStructure();
+                        startButton.setDisable(false);
+                    });
+                }
+            });
         } else {
             AudiobookConverter.getContext().addNewMedia(addedMedia);
         }

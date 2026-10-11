@@ -65,7 +65,8 @@ class MediaInfoLoader implements Callable<MediaInfo> {
 
             for (int i = 0; i < streams.size(); i++) {
                 FFmpegStream ffMpegStream = streams.get(i);
-                if (AUDIO_CODECS.contains(ffMpegStream.codec_name) || ffMpegStream.codec_name.startsWith("pcm")) {
+                // codec_name is null for streams ffprobe does not know (e.g. unknown data or attachment streams)
+                if (AUDIO_CODECS.contains(ffMpegStream.codec_name) || StringUtils.startsWith(ffMpegStream.codec_name, "pcm")) {
                     FFMediaLoader.logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                     mediaInfo.setCodec(ffMpegStream.codec_name);
                     mediaInfo.setChannels(ffMpegStream.channels);

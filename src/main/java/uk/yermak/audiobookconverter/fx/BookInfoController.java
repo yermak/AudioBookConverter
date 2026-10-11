@@ -151,11 +151,12 @@ public class BookInfoController extends GridPane {
             if (clear) {
                 clearTags();
             } else {
+                int files = media.size();
                 Executors.newSingleThreadExecutor().submit(() -> {
                     //getBookInfo is proxied blocking method should be executed outside of UI thread,
                     // when info become available - scheduling update in UI thread.
                     AudioBookInfo info = media.get(0).getBookInfo();
-                    Platform.runLater(() -> copyTags(info));
+                    Platform.runLater(() -> copyTags(info, files));
 
                 });
             }
@@ -163,14 +164,23 @@ public class BookInfoController extends GridPane {
     }
 
 
-    private void copyTags(AudioBookInfo bookInfo) {
+    /**
+     * The book number is read from the track tag. Of a whole book it is the book number, as written by the m4b and ogg
+     * output, but of one of many chapter files it is that file's position: every chapter of the result showed track 1.
+     */
+    // ponytail: decided by the first batch only; a chapter file added alone first still fills it
+    static String bookNumber(AudioBookInfo first, int files) {
+        return files == 1 ? first.bookNumber().get() : "";
+    }
+
+    private void copyTags(AudioBookInfo bookInfo, int files) {
 
         title.setText(bookInfo.series().get());
         writer.setText(bookInfo.writer().get());
         narrator.setText(bookInfo.narrator().get());
         genre.getEditor().setText(bookInfo.genre().get());
         series.setText(bookInfo.series().get());
-        bookNo.setText(bookInfo.bookNumber().get());
+        bookNo.setText(bookNumber(bookInfo, files));
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());
     }

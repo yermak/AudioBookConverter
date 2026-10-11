@@ -9,6 +9,7 @@ import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.ProgressStatus;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
@@ -146,6 +147,9 @@ public class ConversionProgress implements Runnable {
         ResourceBundle resources = AudiobookConverter.getBundle();
         progress.set(1.0);
         remaining.set(0);
+        // the estimate scales by the probed duration, which is a guess for VBR mp3 without a Xing header
+        long actualSize = new File(conversionJob.getOutputDestination()).length();
+        if (actualSize > 0) size.set(actualSize);
         setState(resources.getString("progress.state.completed"));
     }
     private void error() {

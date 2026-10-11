@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter.fx;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
@@ -99,6 +100,29 @@ public class MediaPlayerController extends GridPane {
         setHalignment(totalTime, HPos.RIGHT);
         totalTime.setTooltip(new Tooltip(bundle.getString("mediaplayer.tooltip.totaltime")));
         add(totalTime, 3, 1);
+
+        // a player keeps its file open, so on Windows the file cannot be moved or deleted: let it go with the file
+        ConversionContext context = AudiobookConverter.getContext();
+        context.addContextDetachListener(observable -> Platform.runLater(this::release));
+        context.getMedia().addListener((ListChangeListener<MediaInfo>) change -> {
+            while (change.next()) {
+                if (change.getRemoved().contains(playingTrack)) Platform.runLater(this::release);
+            }
+        });
+    }
+
+    /** Stops and disposes the player: until then it keeps its file open. */
+    private void release() {
+        if (mediaPlayer == null) return;
+        executorService.shutdown();
+        mediaPlayer.volumeProperty().unbindBidirectional(volume.valueProperty());
+        mediaPlayer.stop();
+        mediaPlayer.dispose();
+        mediaPlayer = null;
+        playingTrack = null;
+        timelapse.setValue(0);
+        playTime.setText("00:00:00");
+        totalTime.setText("00:00:00");
     }
 
     private void disablePlayer(boolean disable) {
@@ -118,11 +142,7 @@ public class MediaPlayerController extends GridPane {
                 return;
             }
             if (playingTrack != selectedMedia.get(0)) {
-                executorService.shutdown();
-                mediaPlayer.stop();
-                mediaPlayer.dispose();
-                mediaPlayer = null;
-                playingTrack = null;
+                release();
                 playMedias(selectedMedia.get(0));
                 return;
             }
@@ -156,10 +176,15 @@ public class MediaPlayerController extends GridPane {
 
         Media m = new Media(new File(selected.getFileName()).toURI().toASCIIString());
         mediaPlayer = new MediaPlayer(m);
+        Duration[] window = window(selected);
+        if (window != null) {
+            mediaPlayer.setStartTime(window[0]);
+            mediaPlayer.setStopTime(window[1]);
+        }
         mediaPlayer.setAutoPlay(true);
         executorService = Executors.newSingleThreadScheduledExecutor();
         mediaPlayer.setOnReady(() -> {
-            Duration duration = mediaPlayer.getMedia().getDuration();
+            Duration duration = mediaPlayer.getCycleDuration();
             timelapse.setMax(duration.toSeconds());
             totalTime.setText(Utils.formatTime(duration.toMillis()));
             executorService.scheduleAtFixedRate(this::updateValues, 1, 1, TimeUnit.SECONDS);
@@ -179,7 +204,7 @@ public class MediaPlayerController extends GridPane {
                     mediaPlayer.pause();
                 }
                 playTime.setText(Utils.formatTime(timelapse.getValue() * 1000));
-                mediaPlayer.seek(Duration.seconds(timelapse.getValue()));
+                mediaPlayer.seek(mediaPlayer.getStartTime().add(Duration.seconds(timelapse.getValue())));
                 if (wasPlaying) {
                     mediaPlayer.play();
                 }
@@ -211,6 +236,13 @@ public class MediaPlayerController extends GridPane {
 
     }
 
+    /** A track (a chapter imported from an m4b, a cue track) is a part of its file: {start, stop}. A whole file: null. */
+    static Duration[] window(MediaInfo media) {
+        if (media.getOffset() < 0) return null;
+        Duration start = Duration.millis(media.getOffset());
+        return new Duration[]{start, start.add(Duration.millis(media.getDuration() * media.getSpeed()))};
+    }
+
     private MediaInfo findNext(MediaInfo selected) {
         ConversionContext context = AudiobookConverter.getContext();
         ObservableList<MediaInfo> media = context.getMedia();
@@ -225,7 +257,7 @@ public class MediaPlayerController extends GridPane {
     private void updateValues() {
         Platform.runLater(() -> {
             if (mediaPlayer == null) return; // ended or switched after this update was queued
-            Duration currentTime = mediaPlayer.getCurrentTime();
+            Duration currentTime = mediaPlayer.getCurrentTime().subtract(mediaPlayer.getStartTime());
             if (!timelapse.isValueChanging()) {
                 timelapse.setValue(currentTime.toSeconds());
                 playTime.setText(Utils.formatTime(currentTime.toMillis()));

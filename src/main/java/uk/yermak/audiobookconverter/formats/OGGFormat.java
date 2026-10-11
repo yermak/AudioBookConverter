@@ -28,7 +28,7 @@ public class OGGFormat extends Format {
     public static final List<Integer> BITRATES = List.of(16, 24, 32, 48, 56, 64, 96, 112, 128, 144, 160, 192, 224, 256, 320, 512);
 
     OGGFormat() {
-        super("ogg", "libopus", "ogg", "vorbis");
+        super("ogg", "libopus", "opus", "ogg", "vorbis");
     }
 
 
@@ -133,10 +133,9 @@ public class OGGFormat extends Format {
         AudioBookInfo bookInfo = conversionJob.getConversionGroup().getBookInfo();
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
         Convertable convertable = conversionJob.getConvertable();
-        long groupId = conversionJob.getConversionGroup().getGroupId();
 
         try {
-            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + groupId);
+            File metaFile = metaFile(conversionJob);
 
 
             List<String> metaData = new ArrayList<>();
@@ -147,7 +146,7 @@ public class OGGFormat extends Format {
             metaData.add("compatible_brands=isomiso2");
 */
 
-            metaData.add("title=" + bookInfo.title() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
+            metaData.add("title=" + bookInfo.title() + (conversionJob.isTheOnlyOne() ? "" : ("-" + conversionJob.getNumber())));
 
             if (bookInfo.writer().isNotBlank()) {
                 metaData.add("artist=" + bookInfo.writer());
@@ -179,7 +178,7 @@ public class OGGFormat extends Format {
             }
             metaData.addAll(convertable.getMetaData(bookInfo));
             logger.debug("Saving metadata:" + String.join("\n", metaData));
-            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            FileUtils.writeLines(metaFile, "UTF-8", escapeMetaData(metaData));
             return metaFile.getAbsolutePath();
         } catch (IOException e) {
             throw new ConversionException(e);

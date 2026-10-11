@@ -1,18 +1,18 @@
 package uk.yermak.audiobookconverter.formats;
 
 import javafx.scene.image.Image;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionException;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 
 public record FlacPicture(int type, String description, String mime, int width, int height, int depth, byte[] data) {
@@ -21,16 +21,19 @@ public record FlacPicture(int type, String description, String mime, int width, 
 
     public static FlacPicture load(String artWorkFile) {
         try {
-            FileInputStream inputstream = new FileInputStream(artWorkFile);
-            Image image = new Image(inputstream);
+            // read once and decode from memory: an unclosed file stream kept the poster locked on Windows
+            byte[] data = Files.readAllBytes(Path.of(artWorkFile));
+            Image image = new Image(new ByteArrayInputStream(data));
             String extension = FilenameUtils.getExtension(artWorkFile).toLowerCase();
-            String mime = null;
-            switch (extension) {
-                case "png" -> mime = "image/png";
-                case "jpg", "jfif", "jpeg" -> mime = "image/jpeg";
-                default -> logger.warn("Image format {} is not supported for OGG files", extension);
-            }
-            return new FlacPicture(3, "Cover", mime, ((int) image.getWidth()), ((int) image.getHeight()), 24, FileUtils.readFileToByteArray(new File(artWorkFile)));
+            String mime = switch (extension) {
+                case "png" -> "image/png";
+                case "jpg", "jfif", "jpeg" -> "image/jpeg";
+                default -> {
+                    logger.warn("Image format {} is not supported for OGG files", extension);
+                    yield "image/" + extension; // not null: write() needs a MIME string
+                }
+            };
+            return new FlacPicture(3, "Cover", mime, ((int) image.getWidth()), ((int) image.getHeight()), 24, data);
         } catch (IOException e) {
             logger.error("Failed to create FlacPicture from file", e);
             throw new ConversionException("Failed to create FlacPicture from file", e);

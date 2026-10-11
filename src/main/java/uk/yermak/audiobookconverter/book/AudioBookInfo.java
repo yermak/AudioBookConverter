@@ -10,6 +10,7 @@ import uk.yermak.audiobookconverter.fx.util.SmartStringProperty;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static org.apache.commons.lang3.StringUtils.firstNonBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
@@ -25,7 +26,10 @@ public record AudioBookInfo(SmartStringProperty title, SmartStringProperty write
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
-    public static AudioBookInfo instance(Map<String, String> tags) {
+    public static AudioBookInfo instance(Map<String, String> rawTags) {
+        // ffprobe keeps the stored key case: Vorbis comments (FLAC, OGG, Opus) are usually uppercase
+        Map<String, String> tags = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        tags.putAll(rawTags);
         long trackNumber = 0;
         long trackCount = 0;
         try {

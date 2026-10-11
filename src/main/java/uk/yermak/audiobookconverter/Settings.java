@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import com.google.gson.*;
+import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.formats.Format;
 
 import java.io.File;
@@ -48,12 +49,64 @@ public class Settings {
     private String sourceFolder = System.getProperty("user.home");
     private String language = "";
 
+    // A Preferences value is limited to MAX_VALUE_LENGTH (8 KB), and presets and genres grow past it: a longer value
+    // is split over key, key.part1, key.part2, ... A value saved by an older version (one key) still reads the same.
+    static void write(Preferences node, String key, String value) {
+        int max = Preferences.MAX_VALUE_LENGTH;
+        int parts = Math.max(1, (value.length() + max - 1) / max);
+        for (int i = 0; i < parts; i++) {
+            node.put(partKey(key, i), value.substring(i * max, Math.min(value.length(), (i + 1) * max)));
+        }
+        removeParts(node, key, parts); // left over from a longer earlier value
+    }
+
+    static String read(Preferences node, String key) {
+        String first = node.get(key, null);
+        if (first == null) return null;
+        StringBuilder value = new StringBuilder(first);
+        for (int i = 1; node.get(partKey(key, i), null) != null; i++) {
+            value.append(node.get(partKey(key, i), null));
+        }
+        return value.toString();
+    }
+
+    static void remove(Preferences node, String key) {
+        removeParts(node, key, 0);
+    }
+
+    private static void removeParts(Preferences node, String key, int from) {
+        for (int i = from; i == 0 || node.get(partKey(key, i), null) != null; i++) {
+            node.remove(partKey(key, i));
+        }
+    }
+
+    private static String partKey(String key, int part) {
+        return part == 0 ? key : key + ".part" + part;
+    }
+
     public static void saveSetting(Settings settings) {
-        preferences.put(Version.getSettingsVersion(), gson.toJson(settings));
+        write(preferences, Version.getSettingsVersion(), gson.toJson(settings));
+        current = null;
     }
 
     public static void clear() {
-        preferences.remove(Version.getSettingsVersion());
+        remove(preferences, Version.getSettingsVersion());
+        current = null;
+    }
+
+    private static volatile Settings current;
+
+    /**
+     * Settings for reading only, cached until the next save or clear: title and file name rendering asks for them for
+     * every chapter, and loadSetting() parses the stored JSON each time. Change settings on a loadSetting() copy.
+     */
+    public static Settings current() {
+        Settings settings = current;
+        if (settings == null) {
+            settings = loadSetting();
+            current = settings;
+        }
+        return settings;
     }
 
     public void save() {
@@ -61,7 +114,7 @@ public class Settings {
     }
 
     public static Settings loadSetting() {
-        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
+        String settingsJson = read(preferences, Version.getSettingsVersion());
         if (settingsJson == null) {
             Settings settings = new Settings();
             settings.setPresets(Preset.defaultValues);
@@ -72,7 +125,7 @@ public class Settings {
     }
 
     public static String getRawData() {
-        String settingsJson = preferences.get(Version.getSettingsVersion(), null);
+        String settingsJson = read(preferences, Version.getSettingsVersion());
         return settingsJson;
     }
 
@@ -154,14 +207,18 @@ public class Settings {
     }
 
     public File getOutputFolder() {
-        File output = new File(outputFolder);
-        if (output.exists()) {
-            return output;
-        } else if (output.getParentFile().exists()) {
-            return output.getParentFile();
-        } else {
-            return new File(System.getProperty("user.home"));
+        return existingFolder(outputFolder);
+    }
+
+    /** The folder, else its parent, else the home folder: a drive root (unplugged USB drive) has no parent. */
+    private static File existingFolder(String path) {
+        if (StringUtils.isNotBlank(path)) {
+            File folder = new File(path);
+            if (folder.exists()) return folder;
+            File parent = folder.getParentFile();
+            if (parent != null && parent.exists()) return parent;
         }
+        return new File(System.getProperty("user.home"));
     }
 
     public Settings setOutputFolder(String outputFolder) {
@@ -170,14 +227,7 @@ public class Settings {
     }
 
     public File getSourceFolder() {
-        File source = new File(sourceFolder);
-        if (source.exists()) {
-            return source;
-        } else if (source.getParentFile().exists()) {
-            return source.getParentFile();
-        } else {
-            return new File(System.getProperty("user.home"));
-        }
+        return existingFolder(sourceFolder);
     }
 
     public Settings setSourceFolder(String sourceFolder) {
@@ -186,7 +236,14 @@ public class Settings {
     }
 
     public String getLanguage() {
-        return language;
+        // older versions saved country codes instead of language codes for these
+        return switch (language) {
+            case "ua" -> "uk";
+            case "by" -> "be";
+            case "kz" -> "kk";
+            case "gr" -> "el";
+            case null, default -> language;
+        };
     }
 
     public Settings setLanguage(String language) {

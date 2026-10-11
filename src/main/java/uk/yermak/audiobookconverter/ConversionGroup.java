@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.book.*;
@@ -36,15 +37,19 @@ public class ConversionGroup {
     private boolean detached;
     private long groupId = System.currentTimeMillis();
 
-    public ConversionProgress start(Convertable convertable, String outputDestination) {
+    public ConversionProgress start(Convertable convertable, String outputDestination, int number, int total) {
 
         Map<String, ProgressCallback> progressCallbacks = new HashMap<>();
         ConversionJob conversionJob = new ConversionJob(this, convertable, progressCallbacks, outputDestination);
+        conversionJob.setPosition(number, total);
 
         ConversionProgress conversionProgress = new ConversionProgress(conversionJob);
 
         progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));
-        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, conversionProgress)));
+        for (int i = 0; i < convertable.getMedia().size(); i++) {
+            String key = ConversionJob.progressKey(i);
+            progressCallbacks.put(key, new ProgressCallback(key, conversionProgress));
+        }
 
         jobs.add(conversionJob);
         Executors.newSingleThreadExecutor().execute(conversionProgress);
@@ -90,15 +95,6 @@ public class ConversionGroup {
         return media;
     }
 
-    public boolean isRunning() {
-        for (ConversionJob job : jobs) {
-            if (!job.getStatus().isOver()) return false;
-        }
-
-        //TODO add running check to prevent images update
-        return false;
-    }
-
     public boolean isStarted() {
         for (ConversionJob job : jobs) {
             if (job.getStatus().isStarted()) return true;
@@ -130,7 +126,11 @@ public class ConversionGroup {
         Book book = this.getBook();
         if (book == null) {
             book = new Book(this.getBookInfo());
-            book.construct(this.getMedia());
+            AudiobookConverter.showSkippedFiles(book.construct(this.getMedia()));
+        }
+        if (cancelled) { // Stop on the placeholder while the book was being prepared
+            Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+            return;
         }
 
         ObservableList<Part> parts = book.getParts();
@@ -145,14 +145,12 @@ public class ConversionGroup {
 
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
-                String finalDesination = outputDestination;
-                if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) + "." + format);
-                }
+                String finalDesination = destination(outputDestination, format,
+                        chapters.size() > 1 ? ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) : "");
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
-                ConversionProgress conversionProgress = this.start(chapter, finalDesination);
+                ConversionProgress conversionProgress = this.start(chapter, finalDesination, i + 1, chapters.size());
                 Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
 
             }
@@ -160,19 +158,27 @@ public class ConversionGroup {
             logger.debug("Found {} parts in the book", parts.size());
             for (int i = 0; i < parts.size(); i++) {
                 Part part = parts.get(i);
-                String finalDesination = outputDestination;
-                if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format);
-                }
+                String finalDesination = destination(outputDestination, format, parts.size() > 1 ? ", Part " + (i + 1) : "");
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
-                ConversionProgress conversionProgress = this.start(part, finalDesination);
+                ConversionProgress conversionProgress = this.start(part, finalDesination, i + 1, parts.size());
                 Platform.runLater(() -> progressQueue.getItems().add(0, new ProgressComponent(conversionProgress)));
             }
         }
 
         Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+    }
+
+    /**
+     * Output path for one job: the chosen path with {@code suffix} (e.g. ", Part 2") before a lowercase format extension.
+     * Only an extension matching the format is replaced, in any case; other dots ("Dr. Who") stay in the name.
+     */
+    static String destination(String outputDestination, Format format, String suffix) {
+        String base = FilenameUtils.getExtension(outputDestination).equalsIgnoreCase(format.toString())
+                ? FilenameUtils.removeExtension(outputDestination)
+                : outputDestination;
+        return base + suffix + "." + format;
     }
 
     public void setDetached(boolean detached) {

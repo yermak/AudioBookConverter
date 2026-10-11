@@ -12,23 +12,38 @@ import uk.yermak.audiobookconverter.book.MediaInfoBean;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // one warning per folder, not one per cover of every file in it
+    private static final Set<String> READ_ONLY_WARNED = ConcurrentHashMap.newKeySet();
 
     private final MediaInfoBean mediaInfo;
-    private final String format;
     private final ConversionGroup conversionGroup;
     private int index;
 
-    public MP4v2ArtWorkExtractor(MediaInfoBean mediaInfo, String format, ConversionGroup conversionGroup, int index) {
+    public MP4v2ArtWorkExtractor(MediaInfoBean mediaInfo, ConversionGroup conversionGroup, int index) {
         this.mediaInfo = mediaInfo;
-        this.format = format;
         this.conversionGroup = conversionGroup;
         this.index = index;
+    }
+
+    /**
+     * The file mp4art --extract wrote for this cover: <base>.art[index].<ext>. The extension is the image type mp4art
+     * detects from the data, which for a cover --list reports as "implicit" is jpg or png, not the listed type.
+     */
+    static File extractedFile(String audioFile, int index) {
+        File dir = new File(audioFile).getAbsoluteFile().getParentFile();
+        String prefix = FilenameUtils.getBaseName(audioFile) + ".art[" + index + "].";
+        File[] found = dir.listFiles((d, name) -> name.startsWith(prefix));
+        return found == null || found.length == 0 ? null : found[0];
     }
 
     @Override
@@ -38,8 +53,6 @@ class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
         try {
             if (conversionGroup.isOver() || conversionGroup.isStarted() || conversionGroup.isDetached())
                 throw new InterruptedException("ArtWork loading was interrupted");
-            poster = new File(new File(mediaInfo.getFileName()).getParentFile(),
-                    FilenameUtils.getBaseName(mediaInfo.getFileName()) + ".art[" + index + "]." + format);
             ProcessBuilder pictureProcessBuilder = new ProcessBuilder(Platform.MP4ART,
                     "--art-index", String.valueOf(index),
                     "--extract", "-o",
@@ -59,6 +72,15 @@ class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
             FFMediaLoader.logger.debug("ArtWork Out: {}", out);
             FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
+            poster = extractedFile(mediaInfo.getFileName(), index);
+            if (poster == null) {
+                // mp4art writes the cover next to the audio file and cannot write anywhere else
+                File dir = new File(mediaInfo.getFileName()).getAbsoluteFile().getParentFile();
+                if (!Files.isWritable(dir.toPath()) && READ_ONLY_WARNED.add(dir.getPath())) {
+                    AudiobookConverter.showWarning(AudiobookConverter.getBundle().getString("dialog.readonly_folder.header"), dir.getPath());
+                }
+                throw new FileNotFoundException("mp4art extracted no file for art index " + index + " of " + mediaInfo.getFileName());
+            }
             try (var imageStream = new FileInputStream(poster)) {
                 ArtWork artWorkBean = new ArtWorkImage(new Image(imageStream));
 

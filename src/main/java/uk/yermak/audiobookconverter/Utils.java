@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
@@ -49,6 +50,25 @@ public class Utils {
     }
 
     /**
+     * Waits for the process while the job is running. If the job ends first (cancelled or failed),
+     * kills the process and returns false. Killing it closes ffmpeg's progress connection,
+     * without which TcpProgressParser.close() blocks until ffmpeg exits on its own.
+     * Closes stdin first, so a prompt such as ffmpeg's "Overwrite? [y/N]" reads end-of-input instead of waiting.
+     */
+    public static boolean waitFor(Process process, ConversionJob conversionJob) throws InterruptedException {
+        try {
+            process.getOutputStream().close();
+        } catch (IOException e) {
+            logger.warn("Failed to close process stdin", e);
+        }
+        while (!conversionJob.getStatus().isOver()) {
+            if (process.waitFor(500, TimeUnit.MILLISECONDS)) return true;
+        }
+        process.destroyForcibly().waitFor();
+        return false;
+    }
+
+    /**
      * Invalid characters that cannot be used in filenames across most operating systems.
      */
     private static final char[] INVALID_FILENAME_CHARS = {':', '\\', '/', '>', '<', '|', '?', '*', '"'};
@@ -81,29 +101,43 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        String chapterFormat = Settings.loadSetting().getChapterFormat();
+        return renderChapter(Settings.current().getChapterFormat(), chapter, context);
+    }
+
+    static String renderChapter(String chapterFormat, Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         ST chapterTemplate = createTemplate(chapterFormat);
 
         context.forEach((key, value) -> {
+            Object rendered = value.apply(chapter);
+            // ST's <if(X)> is true for any non-null value, even a blank one: leave blanks out
+            if (rendered == null || StringUtils.isBlank(rendered.toString())) return;
             if (key.contains("TAG")) {
-                chapterTemplate.add("TAG", value.apply(chapter));
+                chapterTemplate.add("TAG", rendered);
             } else {
-                chapterTemplate.add(key, value.apply(chapter));
+                chapterTemplate.add(key, rendered);
             }
         });
         return chapterTemplate.render();
     }
 
 
+    /** A digits-only value as a number, so a template format such as %,02d applies to it (formats need a Number renderer). */
+    public static Object numberOrText(String value) {
+        return NumberUtils.isDigits(value) && value.length() < 19 ? Long.valueOf(value) : value;
+    }
+
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        String filenameFormat = Settings.loadSetting().getFilenameFormat();
+        return getOuputFilenameSuggestion(Settings.current().getFilenameFormat(), bookInfo);
+    }
+
+    static String getOuputFilenameSuggestion(String filenameFormat, AudioBookInfo bookInfo) {
         ST filenameTemplate = createTemplate(filenameFormat);
 
         filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
         filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
-        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().trimToNull());
+        filenameTemplate.add("BOOK_NUMBER", numberOrText(bookInfo.bookNumber().trimToNull()));
         filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();
@@ -146,7 +180,7 @@ public class Utils {
     }
 
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
-        String partFormat = Settings.loadSetting().getPartFormat();
+        String partFormat = Settings.current().getPartFormat();
         ST partTemplate = createTemplate(partFormat);
 
         context.forEach((key, value) -> partTemplate.add(key, value.apply(part)));
@@ -188,7 +222,7 @@ public class Utils {
             if (format == null) {
                 format = "%02d:%02d:%02d";
             }
-            return String.format(format, duration.toHoursPart(),
+            return String.format(format, duration.toHours(), // total hours: toHoursPart() wraps at 24
                     duration.toMinutesPart(),
                     duration.toSecondsPart());
         }

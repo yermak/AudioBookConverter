@@ -12,6 +12,7 @@ public class MediaInfoProxy implements MediaInfo {
 
     private final String filename;
     private final Future<MediaInfo> futureLoad;
+    private volatile Double frozenSpeed;
 
     private MediaInfo getMediaInfo() {
         try {
@@ -44,7 +45,18 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     public long getDuration() {
-        return (long) (this.getMediaInfo().getDuration() / AudiobookConverter.getContext().getSpeed());
+        return (long) (this.getMediaInfo().getDuration() / getSpeed());
+    }
+
+    @Override
+    public double getSpeed() {
+        Double frozen = frozenSpeed;
+        return frozen != null ? frozen : AudiobookConverter.getContext().getSpeed();
+    }
+
+    @Override
+    public void freezeSpeed(double speed) {
+        frozenSpeed = speed;
     }
 
     @Override
@@ -109,7 +121,8 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public String getReference() {
-        return this.getMediaInfo().getReference();
+        // same as the loaded MediaInfoBean's reference, but known before probing ends, even if it fails
+        return filename;
     }
 
     @Override
@@ -138,7 +151,13 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public boolean equals(Object obj) {
-        return this.getMediaInfo().equals(obj);
+        if (this == obj) return true;
+        return obj instanceof MediaInfo other && getReference().equals(other.getReference());
+    }
+
+    @Override
+    public int hashCode() {
+        return getReference().hashCode();
     }
 }
 

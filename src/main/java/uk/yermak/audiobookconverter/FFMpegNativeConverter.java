@@ -13,7 +13,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Yermak on 29-Dec-17.
@@ -24,21 +23,23 @@ public class FFMpegNativeConverter implements Callable<String> {
     private final MediaInfo mediaInfo;
     private final String outputFileName;
     private final ProgressCallback callback;
+    private final boolean reencode;
     private Process process;
     private ProgressParser progressParser = null;
 
 
-    public FFMpegNativeConverter(ConversionJob conversionJob, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+    public FFMpegNativeConverter(ConversionJob conversionJob, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback, boolean reencode) {
         this.conversionJob = conversionJob;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
+        this.reencode = reencode;
     }
 
     @Override
     public String call() throws Exception {
         if (conversionJob.getStatus().isOver()) return null;
-        while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
+        // no pause wait here: ConversionJob submits only when not paused, so pool threads are never held by a paused job
 
         try (ProgressParser progressParser = new TcpProgressParser(this::progress)) {
             progressParser.start();
@@ -46,7 +47,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             ProcessBuilder ffmpegProcessBuilder;
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
 
-            if (outputParameters.needReencode(mediaInfo.getCodec())) {
+            if (reencode) {
                 logger.debug("Re-encoding to {} for {}", outputParameters.getFormat(), outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getFormat().getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
             } else {
@@ -60,10 +61,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             ByteArrayOutputStream err = new ByteArrayOutputStream();
             StreamCopier.copy(process.getErrorStream(), err);
 
-            boolean finished = false;
-            while (!conversionJob.getStatus().isOver() && !finished) {
-                finished = process.waitFor(500, TimeUnit.MILLISECONDS);
-            }
+            if (!Utils.waitFor(process, conversionJob)) return null;
             logger.debug("ffmpeg out: {}", out);
             logger.warn("ffmpeg err: {}", err);
 
@@ -71,7 +69,7 @@ public class FFMpegNativeConverter implements Callable<String> {
                 logger.error("Converstion failed: " + err);
                 throw new RuntimeException("Converstion failed: " + err);
             } else {
-                DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName);
+                DurationVerifier.ffMpegUpdateDuration(mediaInfo, outputFileName, outputParameters.getSpeed());
             }
             return outputFileName;
         } catch (CancellationException ce) {

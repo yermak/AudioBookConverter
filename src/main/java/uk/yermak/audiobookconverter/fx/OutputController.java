@@ -16,6 +16,7 @@ import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -56,6 +57,7 @@ public class OutputController extends GridPane {
         }
 
         presetBox = new ComboBox<>();
+        presetBox.setEditable(true); // typing a new name creates a preset (see initPresetBox)
         outputFormatBox = new ComboBox<>();
         splitFileBox = new ComboBox<>();
         speedBox = new ComboBox<>();
@@ -163,8 +165,12 @@ public class OutputController extends GridPane {
         outputFormatBox.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             Settings settings = Settings.loadSetting();
             Preset preset = currentPreset(settings);
+            // start-up and preset switch select the preset's own format: it already holds its values
+            if (newValue == preset.getFormat()) return;
             preset.setupFormat(newValue);
-
+            preset.setCbr(newValue.defaultCBR());
+            // save before the refreshes: each box listener below loads settings and saves its own field
+            settings.save();
 
             refreshFrequencies(newValue, newValue.defaultFrequency());
             refreshBitrates(newValue, newValue.defaultBitrate());
@@ -173,8 +179,6 @@ public class OutputController extends GridPane {
             refreshSpeeds(newValue, newValue.defaultSpeed());
             updateVbrQuality(newValue.defaultVbrQuality());
             updateCBR(newValue.defaultCBR());
-
-            settings.save();
         });
         outputFormatBox.getSelectionModel().select(currentPreset(Settings.loadSetting()).getFormat());
 
@@ -232,6 +236,7 @@ public class OutputController extends GridPane {
             AudiobookConverter.getContext().setSpeed(Double.parseDouble(newValue));
         });
 
+        splitFileBox.getItems().addAll("parts", "chapters");
         splitFileBox.getSelectionModel().select(0);
         splitFileBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             switch (newValue) {
@@ -250,6 +255,7 @@ public class OutputController extends GridPane {
             }
         });
 
+        forceBox.getItems().addAll(Arrays.stream(OutputParameters.Force.values()).map(Enum::name).toList());
         forceBox.getSelectionModel().select(0);
         forceBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == null) return;
@@ -361,13 +367,10 @@ public class OutputController extends GridPane {
         settings.setLastUsedPreset(0);
         settings.save();
 
-
-        Preset preset = settings.getPresets().get(0);
-        updateOutputSettingsFromPreset(preset);
-        AudiobookConverter.getContext().setPresetName(preset.getName());
-
+        // clear first: the control listeners save through presetBox's selected index, which must match the settings
+        presetBox.getSelectionModel().clearSelection();
         presetBox.getItems().remove(presetToRemove.getName());
-        presetBox.getSelectionModel().select(0);
+        presetBox.getSelectionModel().select(0); // the preset listener applies preset 0
     }
 
     private void updateForceSpeed(Preset preset) {

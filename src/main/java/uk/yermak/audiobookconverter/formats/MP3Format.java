@@ -23,7 +23,7 @@ public class MP3Format extends Format {
     public static final List<Integer> BITRATES = List.of(32, 48, 64, 96, 112, 128, 160, 192, 224, 256, 320);
 
     MP3Format() {
-        super("mp3", "libmp3lame", "mp3");
+        super("mp3", "libmp3lame", "mp3", "mp3");
     }
 
     @Override
@@ -128,7 +128,7 @@ public class MP3Format extends Format {
         options.add("-id3v2_version");
         options.add("4");
 
-        options.addAll(prepareId3v2Meta(convertable, conversionGroup.getBookInfo()));
+        options.addAll(prepareId3v2Meta(convertable, conversionJob.getNumber(), conversionGroup.getBookInfo()));
         options.add("-f");
         options.add(name);
         options.add("-progress");
@@ -139,40 +139,40 @@ public class MP3Format extends Format {
     }
 
 
-    private List<String> prepareId3v2Meta(Convertable convertable, AudioBookInfo bookInfo) {
+    private List<String> prepareId3v2Meta(Convertable convertable, int trackNumber, AudioBookInfo bookInfo) {
         List<String> meta = new ArrayList<>();
         if (StringUtils.isNotBlank(convertable.getDetails())) {
             meta.add("-metadata");
 
-            meta.add("title=\"" + escapeQuotes(convertable.getDetails()) + "\"");
+            meta.add("title=" + escapeQuotes(convertable.getDetails()));
         }
 
         if (bookInfo.writer().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("artist=\"" + escapeQuotes(bookInfo.writer()) + "\"");
+            meta.add("artist=" + escapeQuotes(bookInfo.writer()));
         }
         if (bookInfo.title().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("album=\"" + escapeQuotes(bookInfo.title()) + "\"");
+            meta.add("album=" + escapeQuotes(bookInfo.title()));
         }
         if (bookInfo.genre().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("genre=\"" + escapeQuotes(bookInfo.genre()) + "\"");
+            meta.add("genre=" + escapeQuotes(bookInfo.genre()));
         }
         if (bookInfo.narrator().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("composer=\"" + escapeQuotes(bookInfo.narrator()) + "\"");
+            meta.add("composer=" + escapeQuotes(bookInfo.narrator()));
         }
         if (bookInfo.year().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("year=\"" + escapeQuotes(bookInfo.year()) + "\"");
+            meta.add("year=" + escapeQuotes(bookInfo.year()));
         }
         if (bookInfo.comment().isNotBlank()) {
             meta.add("-metadata");
-            meta.add("comment=\"" + escapeQuotes(bookInfo.comment()) + "\"");
+            meta.add("comment=" + escapeQuotes(bookInfo.comment()));
         }
         meta.add("-metadata");
-        meta.add("track=\"" + convertable.getNumber() + "\"");
+        meta.add("track=" + trackNumber);
         return meta;
     }
 

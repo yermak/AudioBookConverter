@@ -1,7 +1,5 @@
 package uk.yermak.audiobookconverter.book;
 
-import uk.yermak.audiobookconverter.AudiobookConverter;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +48,17 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public long getDuration() {
-        return (long) (duration / AudiobookConverter.getContext().getSpeed());
+        return (long) (duration / getSpeed());
+    }
+
+    @Override
+    public double getSpeed() {
+        return mediaInfo.getSpeed();
+    }
+
+    @Override
+    public void freezeSpeed(double speed) {
+        mediaInfo.freezeSpeed(speed);
     }
 
     @Override
@@ -85,22 +93,18 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int getUID() {
-        return Objects.hash(mediaInfo.getFileName(), track.getTrackNo());
+        return Objects.hash(mediaInfo.getUID(), track.getTrackNo());
     }
 
+    // identity and offset chain through the wrapped media: it can itself be a track (sub-tracks of a cue or chapter track)
     @Override
     public String getReference() {
-        return getFileName() + "-" + track.getTrackNo();
+        return mediaInfo.getReference() + "-" + track.getTrackNo();
     }
 
     @Override
     public long getOffset() {
-        return track.getStart();
-    }
-
-    @Override
-    public int getTotalNumbers() {
-        return 0;
+        return Math.max(0, mediaInfo.getOffset()) + track.getStart(); // a whole file reports -1
     }
 
     @Override
@@ -109,5 +113,10 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         if (!(o instanceof MediaInfo)) return false;
         MediaInfo that = (MediaInfo) o;
         return getReference().equals(that.getReference());
+    }
+
+    @Override
+    public int hashCode() {
+        return getReference().hashCode();
     }
 }

@@ -26,7 +26,7 @@ public class MP4Format extends Format {
     public static final List<Integer> BITRATES = List.of(8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 320);
 
     public MP4Format(String extension) {
-        super("ipod", "aac", extension, "alac");
+        super("ipod", "aac", "aac", extension, "alac");
     }
 
     @Override
@@ -114,18 +114,16 @@ public class MP4Format extends Format {
 
     private String prepareMp4MetaFile(ConversionJob conversionJob) {
         AudioBookInfo bookInfo = conversionJob.getConversionGroup().getBookInfo();
-        long jobId = conversionJob.getConversionGroup().getGroupId();
         Convertable convertable = conversionJob.getConvertable();
 
         try {
-            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
-            metaFile.deleteOnExit();
+            File metaFile = metaFile(conversionJob);
             List<String> metaData = new ArrayList<>();
             metaData.add(";FFMETADATA1");
             metaData.add("major_brand=M4A");
             metaData.add("minor_version=512");
             metaData.add("compatible_brands=isomiso2");
-            metaData.add("title=" + bookInfo.title() + (convertable.isTheOnlyOne() ? "" : ("-" + convertable.getNumber())));
+            metaData.add("title=" + bookInfo.title() + (conversionJob.isTheOnlyOne() ? "" : ("-" + conversionJob.getNumber())));
             metaData.add("artist=" + bookInfo.writer());
             if (StringUtils.isNotBlank(bookInfo.series().get())) {
                 metaData.add("album=" + bookInfo.series());
@@ -140,7 +138,7 @@ public class MP4Format extends Format {
             metaData.add("genre=" + bookInfo.genre());
             metaData.addAll(convertable.getMetaData(bookInfo));
             logger.debug("Saving metadata:" + String.join("\n", metaData));
-            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            FileUtils.writeLines(metaFile, "UTF-8", escapeMetaData(metaData));
             return metaFile.getAbsolutePath();
         } catch (IOException e) {
             throw new ConversionException(e);

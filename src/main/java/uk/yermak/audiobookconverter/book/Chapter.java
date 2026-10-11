@@ -27,7 +27,7 @@ public class Chapter implements Organisable, Convertable {
     }
 
     private void initRenderMap() {
-        String[] contextArray = Settings.loadSetting().getChapterContext().split(":");
+        String[] contextArray = Settings.current().getChapterContext().split(":");
 
         Set<String> context = new HashSet<>(Arrays.asList(contextArray));
 
@@ -41,7 +41,7 @@ public class Chapter implements Organisable, Convertable {
             renderMap.put("DURATION", c -> Duration.ofMillis(c.getDuration()));
         }
         if (context.contains("BOOK_NUMBER")) {
-            renderMap.put("BOOK_NUMBER", c -> String.valueOf(c.getPart().getBook().getBookInfo().bookNumber()));
+            renderMap.put("BOOK_NUMBER", c -> Utils.numberOrText(c.getPart().getBook().getBookInfo().bookNumber().trimToNull()));
         }
         if (context.contains("BOOK_TITLE")) {
             renderMap.put("BOOK_TITLE", c -> c.getPart().getBook().getBookInfo().title());
@@ -71,7 +71,7 @@ public class Chapter implements Organisable, Convertable {
             renderMap.put("TAG.8", chapter -> FilenameUtils.getBaseName(chapter.getMedia().get(0).getFileName()));
         }
         if (context.contains("CUSTOM_TITLE")) {
-            this.setCustomTitle(Settings.loadSetting().getChapterCustomTitle());
+            this.setCustomTitle(Settings.current().getChapterCustomTitle());
             renderMap.put("CUSTOM_TITLE", chapter -> customTitle);
         }
     }

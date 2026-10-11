@@ -28,7 +28,8 @@ public class ArtWorkImage implements ArtWork {
         return this.logger;
     }
 
-    private ArtWork getBean() {
+    // synchronized: parallel jobs of one book ask for the file name at once, and must not both write the same PNG
+    private synchronized ArtWork getBean() {
         if (this.bean != null) {
             return this.bean;
         }
@@ -64,7 +65,12 @@ public class ArtWorkImage implements ArtWork {
         return getCrc32() == crc32;
     }
 
+    /**
+     * @throws IllegalArgumentException for an image JavaFX could not decode (CMYK JPEG, truncated or non-image file):
+     *                                  it cannot be written as a poster and would break every later CRC comparison
+     */
     public ArtWorkImage(final Image image) {
+        if (image.isError()) throw new IllegalArgumentException("Cannot decode image", image.getException());
         this.image = image;
         this.bean = null;
     }

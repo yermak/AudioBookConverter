@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter.fx;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -16,7 +17,7 @@ public class WizardDialog extends Dialog<Void> {
 
     public WizardDialog(List<String> hints) {
         this.hints = hints;
-        ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setTitle(resources.getString("dialog.tip.title"));
         initModality(Modality.APPLICATION_MODAL);
         hintsArea.setMinHeight(200);

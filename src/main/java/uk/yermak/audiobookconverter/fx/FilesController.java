@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -46,6 +47,7 @@ import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,10 @@ import java.util.stream.Collectors;
  */
 public class FilesController extends VBox {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // one thread, so book changes from quick successive adds do not run concurrently
+    private static final ExecutorService bookExecutor = Executors.newSingleThreadExecutor();
+    // book builds still running on bookExecutor (changed on the FX thread): every Start stays disabled until they finish
+    private final SimpleIntegerProperty pendingBookBuilds = new SimpleIntegerProperty(0);
     public MenuItem removeMenu;
 
 
@@ -145,6 +151,8 @@ public class FilesController extends VBox {
         durationColumn = new TreeTableColumn<>(resources.getString("column.chapter.duration"));
         detailsColumn = new TreeTableColumn<>(resources.getString("column.chapter.details"));
         bookStructure.getColumns().addAll(List.of(chapterColumn, durationColumn, detailsColumn));
+        // conversion follows the book model's order: a sorted display would show a different one
+        bookStructure.getColumns().forEach(column -> column.setSortable(false));
 
         mediaPlayerContainer = new StackPane();
         artworkContainer = new StackPane();
@@ -201,9 +209,9 @@ public class FilesController extends VBox {
                 new KeyCodeCombination(KeyCode.DELETE, KeyCombination.CONTROL_DOWN)));
         fileMenu.getItems().add(new SeparatorMenuItem());
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_up"), this::moveUp,
-                new KeyCodeCombination(KeyCode.UP)));
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN)));
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_down"), this::moveDown,
-                new KeyCodeCombination(KeyCode.DOWN)));
+                new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN)));
         fileMenu.getItems().add(new SeparatorMenuItem());
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.exit"), this::exit,
                 new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN)));
@@ -220,13 +228,15 @@ public class FilesController extends VBox {
                 new KeyCodeCombination(KeyCode.DIVIDE, KeyCombination.CONTROL_DOWN)));
         chapterMenu.getItems().add(new SeparatorMenuItem());
         chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_up"), this::moveUp,
-                new KeyCodeCombination(KeyCode.UP)));
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN)));
         chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_down"), this::moveDown,
-                new KeyCodeCombination(KeyCode.DOWN)));
+                new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN)));
 
         Menu convertMenu = new Menu(resources.getString("menu.convert"));
-        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.start"), this::start,
-                new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN)));
+        MenuItem startMenu = menuItem(resources.getString("menu.convert.start"), this::start,
+                new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN));
+        startMenu.disableProperty().bind(pendingBookBuilds.greaterThan(0));
+        convertMenu.getItems().add(startMenu);
         convertMenu.getItems().add(new SeparatorMenuItem());
         convertMenu.getItems().add(menuItem(resources.getString("menu.convert.pause_all"), this::pause,
                 new KeyCodeCombination(KeyCode.HOME, KeyCombination.CONTROL_DOWN)));
@@ -319,6 +329,7 @@ public class FilesController extends VBox {
 
         startButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
         startButton.setOnAction(this::start);
+        startButton.disableProperty().bind(pendingBookBuilds.greaterThan(0));
         startButton.setStyle("-fx-font-size: 15;");
         startButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_start")));
 
@@ -381,6 +392,7 @@ public class FilesController extends VBox {
         Button startChapters = new Button(resources.getString("chapters.button.start"));
         startChapters.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
         startChapters.setOnAction(this::start);
+        startChapters.disableProperty().bind(pendingBookBuilds.greaterThan(0));
         startChapters.setStyle("-fx-font-size: 15;");
         startChapters.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_start")));
 
@@ -509,11 +521,20 @@ public class FilesController extends VBox {
 
     private void processFiles(List<String> fileNames) {
         FFMediaLoader mediaLoader = new FFMediaLoader(fileNames, AudiobookConverter.getContext().getConversionGroup());
-        AudiobookConverter.getContext().setMediaLoader(mediaLoader);
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
-            AudiobookConverter.getContext().constructBook(addedMedia);
-            bookStructure.updateBookStructure();
+            // constructBook waits for every probe: keep it off the JavaFX thread, and Start off until the book is complete
+            pendingBookBuilds.set(pendingBookBuilds.get() + 1);
+            bookExecutor.submit(() -> {
+                try {
+                    AudiobookConverter.getContext().constructBook(addedMedia);
+                } finally {
+                    Platform.runLater(() -> {
+                        bookStructure.updateBookStructure();
+                        pendingBookBuilds.set(pendingBookBuilds.get() - 1);
+                    });
+                }
+            });
         } else {
             AudiobookConverter.getContext().addNewMedia(addedMedia);
         }
@@ -651,15 +672,25 @@ public class FilesController extends VBox {
         conversionGroup.setPosters(new ArrayList<>(context.getPosters()));
 */
 
-            ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination)));
+            ConversionJob placeHolderJob = new ConversionJob(conversionGroup, Convertable.EMPTY, Collections.emptyMap(), outputDestination);
+            // Stop on the placeholder cancels the book while it is being prepared
+            placeHolderJob.addStatusChangeListener((observable, oldValue, newValue) -> {
+                if (newValue == ProgressStatus.CANCELLED) conversionGroup.cancel();
+            });
+            ProgressComponent placeHolderProgress = new ProgressComponent(new ConversionProgress(placeHolderJob));
 
 
-            Executors.newSingleThreadExecutor().submit(() -> {
+            Executors.newSingleThreadExecutor().execute(() -> {
                 Platform.runLater(() -> {
                     progressQueue.getItems().add(0, placeHolderProgress);
                     filesChapters.getSelectionModel().select(queueTab);
                 });
-                conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
+                try {
+                    conversionGroup.launch(progressQueue, placeHolderProgress, outputDestination);
+                } catch (Throwable t) {
+                    logger.error("Failed to start conversion of " + outputDestination, t);
+                    Platform.runLater(() -> progressQueue.getItems().remove(placeHolderProgress));
+                }
             });
             bookStructure.setRoot(null);
             filesChapters.getTabs().remove(filesTab);
@@ -678,8 +709,6 @@ public class FilesController extends VBox {
             if (fileList.getItems().isEmpty()) {
                 return;
             }
-
-            startButton.setDisable(true);
 
             filesChapters.getTabs().add(chaptersTab);
             filesChapters.getTabs().remove(filesTab);
@@ -711,12 +740,16 @@ public class FilesController extends VBox {
                 }
             });
 
-            Executors.newSingleThreadExecutor().submit(() -> {
+            pendingBookBuilds.set(pendingBookBuilds.get() + 1); // right before submit, so its finally always undoes it
+            bookExecutor.submit(() -> {
                 try {
-                    book.construct(mediaInfos);
-                    bookStructure.updateBookStructure();
+                    AudiobookConverter.showSkippedFiles(book.construct(mediaInfos));
                 } finally {
-                    startButton.setDisable(false);
+                    // controls may only be changed on the JavaFX thread
+                    Platform.runLater(() -> {
+                        bookStructure.updateBookStructure();
+                        pendingBookBuilds.set(pendingBookBuilds.get() - 1);
+                    });
                 }
             });
         } catch (Exception e) {

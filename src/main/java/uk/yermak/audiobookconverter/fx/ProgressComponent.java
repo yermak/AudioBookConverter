@@ -6,6 +6,7 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -136,11 +137,7 @@ public class ProgressComponent extends GridPane {
         Platform.runLater(() -> {
             switch (newValue) {
                 case PAUSED -> pauseButton.setText(resources.getString("progress.button.resume"));
-                case FINISHED -> {
-                    pauseButton.setDisable(true);
-                    stopButton.setDisable(true);
-                }
-                case CANCELLED -> {
+                case FINISHED, CANCELLED, ERROR -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
                 }
@@ -176,6 +173,7 @@ public class ProgressComponent extends GridPane {
         conversionProgress.elapsed.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> elapsedTime.setText(Utils.formatTime(newValue.longValue()))));
         conversionProgress.remaining.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> remainingTime.setText(Utils.formatTime(newValue.longValue()))));
         conversionProgress.state.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setText(newValue)));
+        conversionProgress.errorMessage.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> state.setTooltip(newValue == null ? null : new Tooltip(newValue))));
     }
 
     public boolean isOver() {

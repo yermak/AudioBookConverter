@@ -12,6 +12,7 @@ import javafx.stage.Window;
 import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class SubTracksDialog extends Dialog<Map<String, Object>> {
     private ToggleSwitch splitOnceOrRepeat;
 
     public SubTracksDialog(Window window) {
-        ResourceBundle resources = ResourceBundle.getBundle("locales/messages");
+        ResourceBundle resources = AudiobookConverter.getBundle();
         setTitle(resources.getString("dialog.subtracks.title"));
         setHeaderText(resources.getString("dialog.subtracks.header"));
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);

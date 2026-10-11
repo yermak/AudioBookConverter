@@ -50,7 +50,7 @@ class MediaInfoLoader implements Callable<MediaInfo> {
     @Override
     public MediaInfo call() throws Exception {
         try {
-            if (conversionGroup.isOver() || conversionGroup.isRunning())
+            if (conversionGroup.isOver())
                 throw new InterruptedException("Media Info Loading was interrupted");
             FFmpegProbeResult probeResult = ffprobe.probe(filename);
             FFMediaLoader.logger.debug("Extracted ffprobe error: {}", probeResult.getError());
@@ -65,7 +65,8 @@ class MediaInfoLoader implements Callable<MediaInfo> {
 
             for (int i = 0; i < streams.size(); i++) {
                 FFmpegStream ffMpegStream = streams.get(i);
-                if (AUDIO_CODECS.contains(ffMpegStream.codec_name) || ffMpegStream.codec_name.startsWith("pcm")) {
+                // codec_name is null for streams ffprobe does not know (e.g. unknown data or attachment streams)
+                if (AUDIO_CODECS.contains(ffMpegStream.codec_name) || StringUtils.startsWith(ffMpegStream.codec_name, "pcm")) {
                     FFMediaLoader.logger.debug("Found {} audio stream in {}", ffMpegStream.codec_name, filename);
                     mediaInfo.setCodec(ffMpegStream.codec_name);
                     mediaInfo.setChannels(ffMpegStream.channels);
@@ -76,20 +77,22 @@ class MediaInfoLoader implements Callable<MediaInfo> {
                 } else if (ART_WORK_CODECS.containsKey(ffMpegStream.codec_name) && !MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
                     FFMediaLoader.logger.debug("Found {} image stream in {}", ffMpegStream.codec_name, filename);
                     if (!conversionGroup.isDetached()) {
-                        Future<ArtWork> futureLoad = artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 100, TimeUnit.MILLISECONDS);
-                        ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                        mediaInfo.addArtWork(artWork);
+                        // the extractor adds the poster to the context itself
+                        artExecutor.schedule(new FFmpegArtWorkExtractor(mediaInfo, ART_WORK_CODECS.get(ffMpegStream.codec_name), conversionGroup, i), 100, TimeUnit.MILLISECONDS);
                     }
-                } else if (ffMpegStream.codec_name.equals("bin_data") && MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
-                    if (!conversionGroup.isDetached()) {
-                        List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
-                        for (int j = 0; j < imageFormats.size(); j++) {
-                            String imageType = imageFormats.get(j);
-                            Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
-                            ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                            mediaInfo.addArtWork(artWork);
-                        }
+                }
+            }
+
+            // mp4 cover art (covr atoms) is extracted with mp4art, whether or not ffprobe shows it as a stream
+            if (MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase()) && !conversionGroup.isDetached()) {
+                try {
+                    List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
+                    for (int j = 0; j < imageFormats.size(); j++) {
+                        artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
                     }
+                } catch (Exception e) {
+                    // runs for every mp4 file now: a missing or failing mp4art must cost the cover, not the file
+                    logger.error("Failed to list cover art of {}", filename, e);
                 }
             }
 

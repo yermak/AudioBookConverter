@@ -20,11 +20,14 @@ import uk.yermak.audiobookconverter.fx.WizardDialog;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.net.URL;
+import java.net.URI;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 public class AudiobookConverter extends Application {
@@ -143,18 +146,26 @@ public class AudiobookConverter extends Application {
         return bundle;
     }
 
+    /** Downloads the hints in the background (a slow network must not freeze the window), then shows them. */
     public static void loadHints() throws IOException {
-        List<String> hints = readListFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/hints.txt");
-        if (!hints.isEmpty()) {
-            Collections.shuffle(hints);
-            WizardDialog wizardDialog = new WizardDialog(hints);
-            wizardDialog.show();
-        }
+        CompletableFuture.supplyAsync(() -> readListFromURL("https://raw.githubusercontent.com/yermak/AudioBookConverter/version/hints.txt"))
+                .thenAccept(hints -> {
+                    if (hints.isEmpty()) return;
+                    Collections.shuffle(hints);
+                    javafx.application.Platform.runLater(() -> new WizardDialog(hints).show());
+                });
     }
 
+    /** openStream() has no timeouts: a dropped connection would hang until the OS gives up, which can take minutes. */
+    private static InputStream openWithTimeouts(String requestURL) throws IOException {
+        URLConnection connection = URI.create(requestURL).toURL().openConnection();
+        connection.setConnectTimeout(10_000);
+        connection.setReadTimeout(10_000);
+        return connection.getInputStream();
+    }
 
     private static String readStringFromURL(String requestURL) throws IOException {
-        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+        try (Scanner scanner = new Scanner(openWithTimeouts(requestURL), StandardCharsets.UTF_8.toString())) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         }
@@ -176,9 +187,24 @@ public class AudiobookConverter extends Application {
                 .show();
     }
 
-    private static List<String> readListFromURL(String requestURL) throws IOException {
+    /** Warns, without blocking, that files were left out of a book because their media info failed to load. */
+    public static void showSkippedFiles(List<String> fileNames) {
+        if (fileNames.isEmpty()) return;
+        showWarning(getBundle().getString("dialog.files_skipped.header"), String.join("\n", fileNames));
+    }
+
+    /** Non-blocking warning, callable from any thread. */
+    public static void showWarning(String header, String content) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING, content);
+            alert.setHeaderText(header);
+            alert.show();
+        });
+    }
+
+    private static List<String> readListFromURL(String requestURL) {
         try {
-            try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+            try (Scanner scanner = new Scanner(openWithTimeouts(requestURL), StandardCharsets.UTF_8.toString())) {
                 scanner.useDelimiter("\\n");
                 List<String> result = new ArrayList<>();
                 while (scanner.hasNext()) {

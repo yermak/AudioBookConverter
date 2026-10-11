@@ -7,8 +7,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.ConversionGroup;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.Preset;
@@ -18,10 +20,10 @@ import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.Book;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.formats.Format;
-import uk.yermak.audiobookconverter.loaders.FFMediaLoader;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,7 +34,8 @@ public class ConversionContext {
 
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final LinkedList<ConversionJob> conversionQueue = new LinkedList<>();
+    // jobs are added from launch threads while Stop all / Pause all iterate on the JavaFX thread
+    private final List<ConversionJob> conversionQueue = new CopyOnWriteArrayList<>();
     private final SimpleObjectProperty<ConversionGroup> conversionGroupHolder = new SimpleObjectProperty<>(new ConversionGroup());
     private boolean paused;
 
@@ -48,7 +51,6 @@ public class ConversionContext {
 
     private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private FFMediaLoader mediaLoader;
     private Set<ArtWork> removedArtWorks = new HashSet<>();
     private String presetName;
     private SimpleDoubleProperty speed = new SimpleDoubleProperty(1.0);
@@ -82,6 +84,10 @@ public class ConversionContext {
 
     public void addJob(ConversionJob conversionJob) {
         conversionQueue.add(conversionJob);
+        // drop finished, failed and cancelled jobs, so their book and decoded posters can be collected
+        conversionJob.addStatusChangeListener((observable, oldValue, newValue) -> {
+            if (newValue.isOver()) conversionQueue.remove(conversionJob);
+        });
         executorService.execute(conversionJob);
     }
 
@@ -94,19 +100,20 @@ public class ConversionContext {
     }
 
     public ConversionGroup detach() {
-        mediaLoader.detach();
-
-
         ConversionGroup conversionGroup = conversionGroupHolder.get();
         conversionGroup.setMedia(new ArrayList<>(media));
         conversionGroup.setPosters(new ArrayList<>(posters));
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
         conversionGroup.setOutputParameters(Preset.copy(String.valueOf(conversionGroup.getGroupId()), Settings.loadSetting().findPreset(presetName)));
+        double speed = conversionGroup.getOutputParameters().getSpeed();
+        media.forEach(m -> m.freezeSpeed(speed));
         conversionGroup.setDetached(true);
         Settings settings = Settings.loadSetting();
 
-        settings.getGenres().add(bookInfo.get().genre().get());
+        String genre = bookInfo.get().genre().get();
+        if (StringUtils.isNotBlank(genre)) settings.getGenres().add(genre.trim());
+        settings.getGenres().removeIf(StringUtils::isBlank); // blank entries saved by older versions
         settings.save();
 
         ConversionGroup newConversionGroup = new ConversionGroup();
@@ -117,7 +124,6 @@ public class ConversionContext {
         posters.clear();
         media.clear();
         removedArtWorks.clear();
-        mediaLoader = null;
 
         return conversionGroup;
     }
@@ -197,14 +203,11 @@ public class ConversionContext {
 
     public Book constructBook(List<MediaInfo> addedMedia) {
         Book book = getBook();
-        book.construct(FXCollections.observableArrayList(addedMedia));
+        AudiobookConverter.showSkippedFiles(book.construct(FXCollections.observableArrayList(addedMedia)));
 //        detached = false;
         return book;
     }
 
-    public void setMediaLoader(FFMediaLoader mediaLoader) {
-        this.mediaLoader = mediaLoader;
-    }
 
     public void removeArtWork(ArtWork artWork) {
         removedArtWorks.add(artWork);

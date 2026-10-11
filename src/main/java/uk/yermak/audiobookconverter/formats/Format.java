@@ -7,9 +7,12 @@ import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.Platform;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public abstract class Format {
 
@@ -21,7 +24,8 @@ public abstract class Format {
     public static final List<Double> SPEEDS = List.of(0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0);
 
     protected String name;
-    protected String codec;
+    protected String codec; // the encoder passed to -codec:a, e.g. libmp3lame
+    private final String codecName; // the codec name ffprobe reports for it, e.g. mp3
     protected String extension;
     private final String[] compatibleCodecs;
 
@@ -30,9 +34,10 @@ public abstract class Format {
     public static Format MP3 = new MP3Format();
     public static Format OGG = new OGGFormat();
 
-    Format(String format, String codec, String extension, String... compatibleCodecs) {
+    Format(String format, String codec, String codecName, String extension, String... compatibleCodecs) {
         this.name = format;
         this.codec = codec;
+        this.codecName = codecName;
         this.extension = extension;
         this.compatibleCodecs = compatibleCodecs;
     }
@@ -49,7 +54,7 @@ public abstract class Format {
     }
 
     static String toFFMpegTime(long time) {
-        return (time / 1000) + "." + time % 1000;
+        return String.format(Locale.ROOT, "%d.%03d", time / 1000, time % 1000);
     }
 
     public List<Integer> channels() {
@@ -85,12 +90,33 @@ public abstract class Format {
     public abstract Boolean defaultCBR();
 
 
+    /**
+     * FFMETADATA needs '=', ';', '#', '\' and line breaks in values escaped with a backslash. Escapes the value
+     * (everything after the first '=') of each key=value line; ";FFMETADATA1" and "[CHAPTER]" lines are left as they are.
+     */
+    public static List<String> escapeMetaData(List<String> lines) {
+        return lines.stream().map(line -> {
+            int eq = line.indexOf('=');
+            if (eq < 0 || line.startsWith(";") || line.startsWith("[")) return line;
+            String value = line.substring(eq + 1)
+                    .replace("\\", "\\\\").replace("=", "\\=").replace(";", "\\;").replace("#", "\\#")
+                    .replace("\r", "").replace("\n", "\\\n");
+            return line.substring(0, eq + 1) + value;
+        }).toList();
+    }
+
+    /** The FFMETADATA file for one job: jobs of one book run in parallel, so the name includes the job's destination. */
+    public static File metaFile(ConversionJob conversionJob) {
+        return new File(System.getProperty("java.io.tmpdir"),
+                "FFMETADATAFILE" + conversionJob.getConversionGroup().getGroupId() + "_" + Objects.hash(conversionJob.getOutputDestination()));
+    }
+
     public abstract List<String> getConcatOptions(String fileListFileName, String outputFileName, String progressUri, ConversionJob conversionJob);
 
     protected abstract void setBitRateOptions(List<String> options, OutputParameters outputParameters);
 
     public boolean needsReencode(String codec) {
-        return !this.codec.equalsIgnoreCase(codec);
+        return !this.codecName.equalsIgnoreCase(codec);
     }
 
     @Override

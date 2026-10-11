@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
@@ -32,6 +31,7 @@ import static javafx.geometry.HPos.RIGHT;
  */
 public class BookInfoController extends GridPane {
 
+    private boolean hadMedia = false;
     private final TextField title;
     private final TextField writer;
     private final TextField narrator;
@@ -95,10 +95,11 @@ public class BookInfoController extends GridPane {
 
         MenuItem menuItem = new MenuItem("Remove");
 
-        Settings settings = Settings.loadSetting();
-        genre.setItems(FXCollections.observableArrayList(settings.getGenres()));
+        genre.setItems(FXCollections.observableArrayList(Settings.loadSetting().getGenres()));
         menuItem.setOnAction(event -> {
             String remove = genre.getItems().get(genre.getSelectionModel().getSelectedIndex());
+            // fresh copy: saving the one loaded at start-up would revert every setting changed since
+            Settings settings = Settings.loadSetting();
             settings.getGenres().remove(remove);
             settings.save();
             genre.getItems().remove(remove);
@@ -116,7 +117,11 @@ public class BookInfoController extends GridPane {
 
         ObservableList<MediaInfo> media = AudiobookConverter.getContext().getMedia();
 //        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
-        media.addListener((ListChangeListener<? super MediaInfo>) change -> updateTags(media, media.isEmpty()));
+        // fill from tags only when the first files arrive: adding, removing or moving files later keeps what the user typed
+        media.addListener((ListChangeListener<? super MediaInfo>) change -> {
+            if (media.isEmpty() || !hadMedia) updateTags(media, media.isEmpty());
+            hadMedia = !media.isEmpty();
+        });
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 
@@ -134,10 +139,7 @@ public class BookInfoController extends GridPane {
         genre.getEditor().textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
 
         series.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().series().set(series.getText()));
-        bookNo.textProperty().addListener(o -> {
-            if (StringUtils.isNotBlank(bookNo.getText()))
-                AudiobookConverter.getContext().getBookInfo().bookNumber().set(bookNo.getText());
-        });
+        bookNo.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().bookNumber().set(bookNo.getText()));
         year.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().year().set(year.getText()));
         comment.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().comment().set(comment.getText()));
 

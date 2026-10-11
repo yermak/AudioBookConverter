@@ -28,7 +28,8 @@ public class ArtWorkImage implements ArtWork {
         return this.logger;
     }
 
-    private ArtWork getBean() {
+    // synchronized: parallel jobs of one book ask for the file name at once, and must not both write the same PNG
+    private synchronized ArtWork getBean() {
         if (this.bean != null) {
             return this.bean;
         }

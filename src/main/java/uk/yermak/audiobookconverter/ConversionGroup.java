@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.book.*;
@@ -145,10 +146,8 @@ public class ConversionGroup {
 
             for (int i = 0; i < chapters.size(); i++) {
                 Chapter chapter = chapters.get(i);
-                String finalDesination = outputDestination;
-                if (chapters.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) + "." + format);
-                }
+                String finalDesination = destination(outputDestination, format,
+                        chapters.size() > 1 ? ", Chapter " + Utils.formatWithLeadingZeros(chapters.size(), (i + 1)) : "");
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for chapter {}", finalName);
 
@@ -160,10 +159,7 @@ public class ConversionGroup {
             logger.debug("Found {} parts in the book", parts.size());
             for (int i = 0; i < parts.size(); i++) {
                 Part part = parts.get(i);
-                String finalDesination = outputDestination;
-                if (parts.size() > 1) {
-                    finalDesination = finalDesination.replace("." + format.toString(), ", Part " + (i + 1) + "." + format);
-                }
+                String finalDesination = destination(outputDestination, format, parts.size() > 1 ? ", Part " + (i + 1) : "");
                 String finalName = new File(finalDesination).getName();
                 logger.debug("Adding conversion for part {}", finalName);
 
@@ -173,6 +169,17 @@ public class ConversionGroup {
         }
 
         Platform.runLater(() -> progressQueue.getItems().remove(progressComponent));
+    }
+
+    /**
+     * Output path for one job: the chosen path with {@code suffix} (e.g. ", Part 2") before a lowercase format extension.
+     * Only an extension matching the format is replaced, in any case; other dots ("Dr. Who") stay in the name.
+     */
+    static String destination(String outputDestination, Format format, String suffix) {
+        String base = FilenameUtils.getExtension(outputDestination).equalsIgnoreCase(format.toString())
+                ? FilenameUtils.removeExtension(outputDestination)
+                : outputDestination;
+        return base + suffix + "." + format;
     }
 
     public void setDetached(boolean detached) {

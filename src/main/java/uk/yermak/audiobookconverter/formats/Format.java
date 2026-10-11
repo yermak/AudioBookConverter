@@ -7,10 +7,12 @@ import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.Platform;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public abstract class Format {
 
@@ -85,6 +87,12 @@ public abstract class Format {
 
     public abstract Boolean defaultCBR();
 
+
+    /** The FFMETADATA file for one job: jobs of one book run in parallel, so the name includes the job's destination. */
+    public static File metaFile(ConversionJob conversionJob) {
+        return new File(System.getProperty("java.io.tmpdir"),
+                "FFMETADATAFILE" + conversionJob.getConversionGroup().getGroupId() + "_" + Objects.hash(conversionJob.getOutputDestination()));
+    }
 
     public abstract List<String> getConcatOptions(String fileListFileName, String outputFileName, String progressUri, ConversionJob conversionJob);
 

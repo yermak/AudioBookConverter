@@ -114,12 +114,10 @@ public class MP4Format extends Format {
 
     private String prepareMp4MetaFile(ConversionJob conversionJob) {
         AudioBookInfo bookInfo = conversionJob.getConversionGroup().getBookInfo();
-        long jobId = conversionJob.getConversionGroup().getGroupId();
         Convertable convertable = conversionJob.getConvertable();
 
         try {
-            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + jobId);
-            metaFile.deleteOnExit();
+            File metaFile = metaFile(conversionJob);
             List<String> metaData = new ArrayList<>();
             metaData.add(";FFMETADATA1");
             metaData.add("major_brand=M4A");

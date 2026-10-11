@@ -6,6 +6,7 @@ import net.bramp.ffmpeg.progress.TcpProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.formats.Format;
 import uk.yermak.audiobookconverter.formats.OutputParameters;
 
 import java.io.ByteArrayOutputStream;
@@ -88,6 +89,7 @@ public class FFMpegConcatenator {
             Utils.closeSilently(process);
             tempFiles.forEach(tempFile -> FileUtils.deleteQuietly(new File(tempFile)));
             FileUtils.deleteQuietly(new File(fileListFileName));
+            FileUtils.deleteQuietly(Format.metaFile(conversionJob));
         }
     }
 

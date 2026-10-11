@@ -133,10 +133,9 @@ public class OGGFormat extends Format {
         AudioBookInfo bookInfo = conversionJob.getConversionGroup().getBookInfo();
         List<ArtWork> posters = conversionJob.getConversionGroup().getPosters();
         Convertable convertable = conversionJob.getConvertable();
-        long groupId = conversionJob.getConversionGroup().getGroupId();
 
         try {
-            File metaFile = new File(System.getProperty("java.io.tmpdir"), "FFMETADATAFILE" + groupId);
+            File metaFile = metaFile(conversionJob);
 
 
             List<String> metaData = new ArrayList<>();

@@ -221,7 +221,8 @@ public class BookStructureComponent extends TreeTableView<Organisable> {
                 tracks.add(endTrack);
             }
         }
-
+        // nothing to split (interval not shorter than the media): replacing with no tracks would delete the media
+        if (tracks.isEmpty()) return;
 
         if (wrapWithChapters) {
             Part part = mediaInfo.getChapter().getPart();

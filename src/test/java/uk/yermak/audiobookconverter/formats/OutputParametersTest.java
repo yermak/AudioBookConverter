@@ -58,6 +58,16 @@ public class OutputParametersTest {
     }
 
     @Test
+    public void avoidCopiesTargetAndCompatibleCodecs() {
+        OutputParameters m4b = new OutputParameters(Format.M4B, 128, 44100, 2, 0, true, 4, 1.0, OutputParameters.Force.Avoid, false);
+        assertFalse(m4b.needReencode("aac"));
+        assertFalse(m4b.needReencode("alac"));
+        assertTrue(m4b.needReencode("mp3"));
+        OutputParameters mp3 = new OutputParameters(Format.MP3, 128, 44100, 2, 0, true, 4, 1.0, OutputParameters.Force.Avoid, false);
+        assertFalse(mp3.needReencode("mp3"));
+    }
+
+    @Test
     public void speedForcesReencodeOfMatchingCodec() {
         OutputParameters parameters = new OutputParameters(Format.M4B, 128, 44100, 2, 0, true, 4, 1.0, OutputParameters.Force.Auto, false);
         assertFalse(parameters.needReencode("aac"));

@@ -78,7 +78,8 @@ public  class OutputParameters {
         return switch (force) {
             case Auto -> format.needsReencode(codec);
             case Always -> true;
-            case Avoid -> !format.skipReedncode(codec);
+            // copy the target codec as Auto does, and also the codecs the format can hold as they are (alac, vorbis)
+            case Avoid -> format.needsReencode(codec) && !format.skipReedncode(codec);
         };
     }
 

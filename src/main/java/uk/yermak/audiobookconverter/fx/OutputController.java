@@ -57,6 +57,7 @@ public class OutputController extends GridPane {
         }
 
         presetBox = new ComboBox<>();
+        presetBox.setEditable(true); // typing a new name creates a preset (see initPresetBox)
         outputFormatBox = new ComboBox<>();
         splitFileBox = new ComboBox<>();
         speedBox = new ComboBox<>();

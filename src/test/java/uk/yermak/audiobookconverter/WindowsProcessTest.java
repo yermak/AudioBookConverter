@@ -29,10 +29,10 @@ public class WindowsProcessTest {
         String java = ProcessHandle.current().info().command().orElse("java");
 
         Process process = Platform.WINDOWS.createProcess(List.of(java, source.getAbsolutePath(),
-                "C:\\temp dir\\list.txt", "title=My Book", "comment=a b\\", "artist=Tom & Jerry", "track=3"));
+                "C:\\temp dir\\list.txt", "C:\\Users\\O'BRIE~1\\Temp\\list.txt", "title=My Book", "comment=a b\\", "artist=Tom & Jerry", "track=3"));
         String out = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         process.waitFor();
 
-        assertEquals(out, "[C:\\temp dir\\list.txt][title=My Book][comment=a b\\][artist=Tom & Jerry][track=3]");
+        assertEquals(out, "[C:\\temp dir\\list.txt][C:\\Users\\O'BRIE~1\\Temp\\list.txt][title=My Book][comment=a b\\][artist=Tom & Jerry][track=3]");
     }
 }

@@ -126,6 +126,9 @@ public class ArtWorkController extends GridPane {
         if (file != null) {
             try (var imageStream = new FileInputStream(file.getAbsolutePath())) {
                 imageList.getItems().add(new ArtWorkImage(new Image(imageStream)));
+            } catch (IllegalArgumentException e) {
+                logger.error("Cannot use art work from file: {}", file, e);
+                return;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -184,7 +187,7 @@ public class ArtWorkController extends GridPane {
 //                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
                         try (var imageStream = new FileInputStream(f)) {
                             AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
-                        } catch (IOException e) {
+                        } catch (IOException | IllegalArgumentException e) {
                             logger.error("failed to paste image", e);
                         }
                     });

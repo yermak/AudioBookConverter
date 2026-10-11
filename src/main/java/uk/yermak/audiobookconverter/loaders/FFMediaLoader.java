@@ -97,7 +97,7 @@ public class FFMediaLoader {
 //                context.addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(pictures.get(i).getPath())));
                 try (var imageStream = new FileInputStream(pictures.get(i).getPath())) {
                     context.addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));
-                } catch (IOException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     logger.error("Failed to add poster:", e);
 //                    throw new RuntimeException(e);
                 }

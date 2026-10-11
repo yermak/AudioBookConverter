@@ -52,8 +52,14 @@ public class Utils {
      * Waits for the process while the job is running. If the job ends first (cancelled or failed),
      * kills the process and returns false. Killing it closes ffmpeg's progress connection,
      * without which TcpProgressParser.close() blocks until ffmpeg exits on its own.
+     * Closes stdin first, so a prompt such as ffmpeg's "Overwrite? [y/N]" reads end-of-input instead of waiting.
      */
     public static boolean waitFor(Process process, ConversionJob conversionJob) throws InterruptedException {
+        try {
+            process.getOutputStream().close();
+        } catch (IOException e) {
+            logger.warn("Failed to close process stdin", e);
+        }
         while (!conversionJob.getStatus().isOver()) {
             if (process.waitFor(500, TimeUnit.MILLISECONDS)) return true;
         }

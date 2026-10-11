@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class UtilsWaitForTest {
 
@@ -41,5 +43,28 @@ public class UtilsWaitForTest {
             assertFalse(Utils.waitFor(process, job));
         }
         assertFalse(process.isAlive());
+    }
+
+    // A stand-in for ffmpeg asking "Overwrite? [y/N]": blocks reading stdin until end-of-input.
+    private static final String PROMPT = """
+            public class Prompt {
+                public static void main(String[] args) throws Exception {
+                    System.exit(System.in.read() == -1 ? 1 : 0);
+                }
+            }
+            """;
+
+    @Test(timeOut = 30_000)
+    public void promptReadsEndOfInputInsteadOfHanging() throws Exception {
+        File prompt = File.createTempFile("Prompt", ".java");
+        prompt.deleteOnExit();
+        Files.writeString(prompt.toPath(), PROMPT);
+        String java = ProcessHandle.current().info().command().orElse("java");
+
+        ConversionJob job = new ConversionJob(null, null, Map.of(), "out"); // READY: never over
+        Process process = new ProcessBuilder(java, prompt.getAbsolutePath()).start();
+
+        assertTrue(Utils.waitFor(process, job));
+        assertEquals(process.exitValue(), 1);
     }
 }

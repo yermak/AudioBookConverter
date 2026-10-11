@@ -14,12 +14,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.IntStream;
 
 import static uk.yermak.audiobookconverter.ProgressStatus.*;
 
@@ -27,6 +29,7 @@ public class ConversionJob implements Runnable {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final ExecutorService executorService = Executors.newWorkStealingPool();
+    private static final AtomicLong TEMP_IDS = new AtomicLong();
     private final ConversionGroup conversionGroup;
     private final Convertable convertable;
     private final Map<String, ProgressCallback> progressCallbacks;
@@ -56,12 +59,16 @@ public class ConversionJob implements Runnable {
         String tempFile = Utils.getTmp(conversionGroup.getGroupId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
 
         try {
-            List<MediaInfo> prioritizedMedia = prioritiseMedia();
+            List<MediaInfo> media = convertable.getMedia();
+            // a temp file per entry, not per file name: the same file can be added twice
+            List<String> tempOutputs = media.stream()
+                    .map(m -> Utils.getTmp(conversionGroup.getGroupId(), TEMP_IDS.incrementAndGet(), conversionGroup.getWorkfileExtension()))
+                    .toList();
 
-            for (MediaInfo mediaInfo : prioritizedMedia) {
-                String tempOutput = Utils.getTmp(conversionGroup.getGroupId(), mediaInfo.getUID(), conversionGroup.getWorkfileExtension());
+            for (int i : prioritiseMedia(media)) {
+                MediaInfo mediaInfo = media.get(i);
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
-                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutput, callback));
+                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback));
                 futures.add(converterFuture);
             }
 
@@ -72,7 +79,7 @@ public class ConversionJob implements Runnable {
             }
             if (status.get().isOver()) return;
 
-            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, convertable.getMedia(), progressCallbacks.get("output"));
+            FFMpegConcatenator concatenator = new FFMpegConcatenator(this, tempFile, tempOutputs, progressCallbacks.get("output"));
             concatenator.concat();
 
             if (status.get().isOver()) return;
@@ -109,8 +116,11 @@ public class ConversionJob implements Runnable {
         }
     }
 
-    private List<MediaInfo> prioritiseMedia() {
-        return convertable.getMedia().stream().sorted((o1, o2) -> (int) (o2.getDuration() - o1.getDuration())).collect(Collectors.toList());
+    /** Indexes into media, longest first. */
+    private static List<Integer> prioritiseMedia(List<MediaInfo> media) {
+        return IntStream.range(0, media.size()).boxed()
+                .sorted(Comparator.comparingLong((Integer i) -> media.get(i).getDuration()).reversed())
+                .toList();
     }
 
 

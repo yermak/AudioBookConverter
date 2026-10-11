@@ -45,6 +45,17 @@ public class SettingsTest {
     }
 
     @Test
+    public void savedPresetsLoadWithoutUnsafe() {
+        Settings settings = new Settings();
+        settings.setPresets(Preset.defaultValues);
+
+        Settings loaded = Settings.gson.fromJson(Settings.gson.toJson(settings), Settings.class);
+
+        assertEquals(loaded.getPresets(), Preset.defaultValues);
+        assertEquals(loaded.getPresets().get(5).getFormat().toString(), "mp3");
+    }
+
+    @Test
     public void unpluggedDriveRootFallsBackToHome() {
         if (!File.separator.equals("\\")) return; // drive roots are a Windows thing
         for (char drive = 'Z'; drive >= 'D'; drive--) {

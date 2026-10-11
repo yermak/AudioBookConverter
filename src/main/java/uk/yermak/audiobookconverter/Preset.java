@@ -35,6 +35,10 @@ public class Preset extends OutputParameters {
     }
 
 
+    // for Gson, which fills the fields from the saved settings
+    private Preset() {
+    }
+
     private Preset(String name) {
         this.name = name;
     }

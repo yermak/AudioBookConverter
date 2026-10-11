@@ -100,14 +100,20 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        String chapterFormat = Settings.loadSetting().getChapterFormat();
+        return renderChapter(Settings.loadSetting().getChapterFormat(), chapter, context);
+    }
+
+    static String renderChapter(String chapterFormat, Chapter chapter, Map<String, Function<Chapter, Object>> context) {
         ST chapterTemplate = createTemplate(chapterFormat);
 
         context.forEach((key, value) -> {
+            Object rendered = value.apply(chapter);
+            // ST's <if(X)> is true for any non-null value, even a blank one: leave blanks out
+            if (rendered == null || StringUtils.isBlank(rendered.toString())) return;
             if (key.contains("TAG")) {
-                chapterTemplate.add("TAG", value.apply(chapter));
+                chapterTemplate.add("TAG", rendered);
             } else {
-                chapterTemplate.add(key, value.apply(chapter));
+                chapterTemplate.add(key, rendered);
             }
         });
         return chapterTemplate.render();

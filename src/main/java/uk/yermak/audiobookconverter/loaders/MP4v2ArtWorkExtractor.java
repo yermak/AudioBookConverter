@@ -14,11 +14,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // one warning per folder, not one per cover of every file in it
+    private static final Set<String> READ_ONLY_WARNED = ConcurrentHashMap.newKeySet();
 
     private final MediaInfoBean mediaInfo;
     private final ConversionGroup conversionGroup;
@@ -68,7 +73,14 @@ class MP4v2ArtWorkExtractor implements Callable<ArtWork> {
             FFMediaLoader.logger.error("ArtWork Error: {}", err);
 
             poster = extractedFile(mediaInfo.getFileName(), index);
-            if (poster == null) throw new FileNotFoundException("mp4art extracted no file for art index " + index + " of " + mediaInfo.getFileName());
+            if (poster == null) {
+                // mp4art writes the cover next to the audio file and cannot write anywhere else
+                File dir = new File(mediaInfo.getFileName()).getAbsoluteFile().getParentFile();
+                if (!Files.isWritable(dir.toPath()) && READ_ONLY_WARNED.add(dir.getPath())) {
+                    AudiobookConverter.showWarning(AudiobookConverter.getBundle().getString("dialog.readonly_folder.header"), dir.getPath());
+                }
+                throw new FileNotFoundException("mp4art extracted no file for art index " + index + " of " + mediaInfo.getFileName());
+            }
             try (var imageStream = new FileInputStream(poster)) {
                 ArtWork artWorkBean = new ArtWorkImage(new Image(imageStream));
 

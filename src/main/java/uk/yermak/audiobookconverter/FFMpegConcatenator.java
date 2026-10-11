@@ -39,7 +39,8 @@ public class FFMpegConcatenator {
 
     protected static File prepareFiles(long jobId, List<String> tempFiles, String outputFileName) throws IOException {
         File fileListFile = new File(System.getProperty("java.io.tmpdir"), "filelist." + jobId +"_"+ Objects.hash(outputFileName)+ ".txt");
-        List<String> outFiles = tempFiles.stream().map(tempFile -> "file '" + tempFile + "'").collect(Collectors.toList());
+        // inside '...' only the quote itself needs escaping: close the quote, add \', reopen (O'Brien in a user folder)
+        List<String> outFiles = tempFiles.stream().map(tempFile -> "file '" + tempFile.replace("'", "'\\''") + "'").collect(Collectors.toList());
         FileUtils.writeLines(fileListFile, "UTF-8", outFiles);
         return fileListFile;
     }

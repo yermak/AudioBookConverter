@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
@@ -139,10 +138,7 @@ public class BookInfoController extends GridPane {
         genre.getEditor().textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().genre().set(genre.getEditor().getText()));
 
         series.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().series().set(series.getText()));
-        bookNo.textProperty().addListener(o -> {
-            if (StringUtils.isNotBlank(bookNo.getText()))
-                AudiobookConverter.getContext().getBookInfo().bookNumber().set(bookNo.getText());
-        });
+        bookNo.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().bookNumber().set(bookNo.getText()));
         year.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().year().set(year.getText()));
         comment.textProperty().addListener(o -> AudiobookConverter.getContext().getBookInfo().comment().set(comment.getText()));
 

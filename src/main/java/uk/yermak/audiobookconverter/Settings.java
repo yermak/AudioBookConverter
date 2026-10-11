@@ -16,7 +16,9 @@ import java.util.prefs.Preferences;
 public class Settings {
 
     private static final Preferences preferences = Preferences.userNodeForPackage(AudiobookConverter.class);
-    private static final Gson gson = new GsonBuilder()
+    // no Unsafe: the jlinked runtime has no jdk.unsupported, so every type read here needs a no-args constructor
+    static final Gson gson = new GsonBuilder()
+            .disableJdkUnsafe()
             .registerTypeAdapter(Format.class, (JsonDeserializer<Format>) (jsonElement, type, context) -> {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
                 JsonElement extension = jsonObject.get("extension");

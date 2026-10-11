@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Preset extends OutputParameters {
 
 
-    private final String name;
+    private String name;
 
 
     @Override
@@ -34,6 +34,10 @@ public class Preset extends OutputParameters {
         this.name = name;
     }
 
+
+    // for Gson, which fills the fields from the saved settings
+    private Preset() {
+    }
 
     private Preset(String name) {
         this.name = name;

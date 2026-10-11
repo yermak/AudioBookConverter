@@ -176,7 +176,8 @@ public class ConversionJob implements Runnable {
     }
 
     public void stop() {
-        if (!status.get().equals(FINISHED)) {
+        // a finished or failed job keeps its outcome (and a failed job its error)
+        if (!status.get().isOver()) {
             status.set(CANCELLED);
         }
     }

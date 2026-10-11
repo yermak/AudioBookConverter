@@ -137,11 +137,7 @@ public class ProgressComponent extends GridPane {
         Platform.runLater(() -> {
             switch (newValue) {
                 case PAUSED -> pauseButton.setText(resources.getString("progress.button.resume"));
-                case FINISHED -> {
-                    pauseButton.setDisable(true);
-                    stopButton.setDisable(true);
-                }
-                case CANCELLED -> {
+                case FINISHED, CANCELLED, ERROR -> {
                     pauseButton.setDisable(true);
                     stopButton.setDisable(true);
                 }

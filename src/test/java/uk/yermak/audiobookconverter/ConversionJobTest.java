@@ -10,6 +10,14 @@ import static org.testng.Assert.*;
 
 public class ConversionJobTest {
 
+    @Test
+    public void stopKeepsFailedJobFailed() {
+        ConversionJob job = new ConversionJob(null, null, java.util.Map.of(), "out");
+        job.error("disk full");
+        job.stop();
+        assertEquals(job.getStatus(), ProgressStatus.ERROR);
+    }
+
     @Test(timeOut = 20_000)
     public void pausedJobWaitsOnItsOwnThreadForASlot() throws Exception {
         int taken = ConversionJob.POOL_SLOTS.drainPermits(); // every pool thread busy

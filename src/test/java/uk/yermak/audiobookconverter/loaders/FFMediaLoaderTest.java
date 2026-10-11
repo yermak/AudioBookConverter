@@ -10,8 +10,11 @@ import uk.yermak.audiobookconverter.book.MediaInfoBean;
 import uk.yermak.audiobookconverter.book.Track;
 import uk.yermak.audiobookconverter.fx.ConversionContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -80,5 +83,25 @@ public class FFMediaLoaderTest {
         assertEquals(track3.getEnd(), 2305071);
         assertEquals(track3.getTitle(), "Фортепианный концерт ре минор соч. 15 - Rondo. Allegro ma non troppo");
         assertEquals(track3.getWriter(), "DeAgostini Classica 3");
+    }
+
+    private static void touch(Path file) throws IOException {
+        Files.createDirectories(file.getParent());
+        Files.createFile(file);
+    }
+
+    @Test
+    public void findsCoversCaseInsensitivelyInFolderAndOneLevelBelow() throws IOException {
+        Path dir = Files.createTempDirectory("abc-covers");
+        touch(dir.resolve("Scans/back.png"));
+        touch(dir.resolve("COVER.JPG"));
+        touch(dir.resolve("Scans/Other Book/cover.jpg"));
+        touch(dir.resolve("notes.txt"));
+
+        List<String> found = FFMediaLoader.findPictures(dir.toFile()).stream()
+                .map(f -> dir.relativize(f.toPath()).toString().replace(File.separatorChar, '/'))
+                .toList();
+
+        assertEquals(found, List.of("COVER.JPG", "Scans/back.png"));
     }
 }

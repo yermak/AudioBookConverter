@@ -20,7 +20,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import static uk.yermak.audiobookconverter.ProgressStatus.*;
@@ -28,7 +31,11 @@ import static uk.yermak.audiobookconverter.ProgressStatus.*;
 public class ConversionJob implements Runnable {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final ExecutorService executorService = Executors.newWorkStealingPool();
+    private static final int PARALLELISM = Runtime.getRuntime().availableProcessors();
+    private static final ExecutorService executorService = Executors.newWorkStealingPool(PARALLELISM);
+    // one permit per pool thread, shared by all jobs: a file is submitted only when it can start at once,
+    // so a paused job waits on its own thread and never holds a pool thread
+    static final Semaphore POOL_SLOTS = new Semaphore(PARALLELISM);
     private static final AtomicLong TEMP_IDS = new AtomicLong();
     private final ConversionGroup conversionGroup;
     private final Convertable convertable;
@@ -69,8 +76,20 @@ public class ConversionJob implements Runnable {
             for (int i : prioritiseMedia(media)) {
                 MediaInfo mediaInfo = media.get(i);
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
-                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback, reencode));
-                futures.add(converterFuture);
+                FFMpegNativeConverter converter = new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback, reencode);
+                if (!acquireSlot(status::get)) return;
+                try {
+                    futures.add(executorService.submit(() -> {
+                        try {
+                            return converter.call();
+                        } finally {
+                            POOL_SLOTS.release();
+                        }
+                    }));
+                } catch (RuntimeException e) {
+                    POOL_SLOTS.release();
+                    throw e;
+                }
             }
 
             for (Future<String> future : futures) {
@@ -114,6 +133,21 @@ public class ConversionJob implements Runnable {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             error(e.getMessage() + "; " + sw.getBuffer().toString());
+        }
+    }
+
+    /**
+     * Waits, on the job's own thread, until the job is not paused and a pool thread is free.
+     * @return true with a permit taken (release it when the task ends), false without one if the job is over
+     */
+    static boolean acquireSlot(Supplier<ProgressStatus> status) throws InterruptedException {
+        while (true) {
+            while (PAUSED.equals(status.get())) Thread.sleep(500);
+            if (status.get().isOver()) return false;
+            if (POOL_SLOTS.tryAcquire(500, TimeUnit.MILLISECONDS)) {
+                if (!PAUSED.equals(status.get()) && !status.get().isOver()) return true;
+                POOL_SLOTS.release(); // paused or stopped while waiting
+            }
         }
     }
 

@@ -39,7 +39,7 @@ public class FFMpegNativeConverter implements Callable<String> {
     @Override
     public String call() throws Exception {
         if (conversionJob.getStatus().isOver()) return null;
-        while (ProgressStatus.PAUSED.equals(conversionJob.getStatus())) Thread.sleep(1000);
+        // no pause wait here: ConversionJob submits only when not paused, so pool threads are never held by a paused job
 
         try (ProgressParser progressParser = new TcpProgressParser(this::progress)) {
             progressParser.start();

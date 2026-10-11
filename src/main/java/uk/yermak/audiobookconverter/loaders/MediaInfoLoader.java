@@ -87,8 +87,7 @@ class MediaInfoLoader implements Callable<MediaInfo> {
             if (MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase()) && !conversionGroup.isDetached()) {
                 List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
                 for (int j = 0; j < imageFormats.size(); j++) {
-                    String imageType = imageFormats.get(j);
-                    Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
+                    Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
                     ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                     mediaInfo.addArtWork(artWork);
                 }

@@ -111,6 +111,15 @@ public class FFMediaLoaderTest {
         assertEquals(bookInfo.title().get(), "Album");
     }
 
+    @Test
+    public void extractedCoverFoundWhateverItsExtension() throws IOException {
+        Path dir = Files.createTempDirectory("abc-mp4art");
+        touch(dir.resolve("book.art[0].jpg")); // listed as "implicit", written with the detected type
+        touch(dir.resolve("book.art[1].png"));
+
+        assertEquals(MP4v2ArtWorkExtractor.extractedFile(dir.resolve("book.m4b").toString(), 0), dir.resolve("book.art[0].jpg").toFile());
+    }
+
     private static void touch(Path file) throws IOException {
         Files.createDirectories(file.getParent());
         Files.createFile(file);

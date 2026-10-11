@@ -80,16 +80,17 @@ class MediaInfoLoader implements Callable<MediaInfo> {
                         ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
                         mediaInfo.addArtWork(artWork);
                     }
-                } else if (ffMpegStream.codec_name.equals("bin_data") && MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase())) {
-                    if (!conversionGroup.isDetached()) {
-                        List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
-                        for (int j = 0; j < imageFormats.size(); j++) {
-                            String imageType = imageFormats.get(j);
-                            Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
-                            ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
-                            mediaInfo.addArtWork(artWork);
-                        }
-                    }
+                }
+            }
+
+            // mp4 cover art (covr atoms) is extracted with mp4art, whether or not ffprobe shows it as a stream
+            if (MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase()) && !conversionGroup.isDetached()) {
+                List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
+                for (int j = 0; j < imageFormats.size(); j++) {
+                    String imageType = imageFormats.get(j);
+                    Future<ArtWork> futureLoad = artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, imageType, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
+                    ArtWorkProxy artWork = new ArtWorkProxy(futureLoad);
+                    mediaInfo.addArtWork(artWork);
                 }
             }
 

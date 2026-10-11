@@ -95,15 +95,6 @@ public class ConversionGroup {
         return media;
     }
 
-    public boolean isRunning() {
-        for (ConversionJob job : jobs) {
-            if (!job.getStatus().isOver()) return false;
-        }
-
-        //TODO add running check to prevent images update
-        return false;
-    }
-
     public boolean isStarted() {
         for (ConversionJob job : jobs) {
             if (job.getStatus().isStarted()) return true;

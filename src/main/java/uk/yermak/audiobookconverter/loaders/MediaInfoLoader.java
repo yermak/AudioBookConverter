@@ -50,7 +50,7 @@ class MediaInfoLoader implements Callable<MediaInfo> {
     @Override
     public MediaInfo call() throws Exception {
         try {
-            if (conversionGroup.isOver() || conversionGroup.isRunning())
+            if (conversionGroup.isOver())
                 throw new InterruptedException("Media Info Loading was interrupted");
             FFmpegProbeResult probeResult = ffprobe.probe(filename);
             FFMediaLoader.logger.debug("Extracted ffprobe error: {}", probeResult.getError());

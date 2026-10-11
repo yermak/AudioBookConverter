@@ -32,6 +32,7 @@ import static javafx.geometry.HPos.RIGHT;
  */
 public class BookInfoController extends GridPane {
 
+    private boolean hadMedia = false;
     private final TextField title;
     private final TextField writer;
     private final TextField narrator;
@@ -116,7 +117,11 @@ public class BookInfoController extends GridPane {
 
         ObservableList<MediaInfo> media = AudiobookConverter.getContext().getMedia();
 //        media.addListener((InvalidationListener) observable -> updateTags(media, media.isEmpty()));
-        media.addListener((ListChangeListener<? super MediaInfo>) change -> updateTags(media, media.isEmpty()));
+        // fill from tags only when the first files arrive: adding, removing or moving files later keeps what the user typed
+        media.addListener((ListChangeListener<? super MediaInfo>) change -> {
+            if (media.isEmpty() || !hadMedia) updateTags(media, media.isEmpty());
+            hadMedia = !media.isEmpty();
+        });
 
 //        ConverterApplication.getContext().addModeChangeListener((observable, oldValue, newValue) -> updateTags(media, ConversionMode.BATCH.equals(newValue)));
 

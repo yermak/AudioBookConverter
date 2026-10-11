@@ -138,7 +138,7 @@ public class MP4Format extends Format {
             metaData.add("genre=" + bookInfo.genre());
             metaData.addAll(convertable.getMetaData(bookInfo));
             logger.debug("Saving metadata:" + String.join("\n", metaData));
-            FileUtils.writeLines(metaFile, "UTF-8", metaData);
+            FileUtils.writeLines(metaFile, "UTF-8", escapeMetaData(metaData));
             return metaFile.getAbsolutePath();
         } catch (IOException e) {
             throw new ConversionException(e);

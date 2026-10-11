@@ -88,6 +88,21 @@ public abstract class Format {
     public abstract Boolean defaultCBR();
 
 
+    /**
+     * FFMETADATA needs '=', ';', '#', '\' and line breaks in values escaped with a backslash. Escapes the value
+     * (everything after the first '=') of each key=value line; ";FFMETADATA1" and "[CHAPTER]" lines are left as they are.
+     */
+    public static List<String> escapeMetaData(List<String> lines) {
+        return lines.stream().map(line -> {
+            int eq = line.indexOf('=');
+            if (eq < 0 || line.startsWith(";") || line.startsWith("[")) return line;
+            String value = line.substring(eq + 1)
+                    .replace("\\", "\\\\").replace("=", "\\=").replace(";", "\\;").replace("#", "\\#")
+                    .replace("\r", "").replace("\n", "\\\n");
+            return line.substring(0, eq + 1) + value;
+        }).toList();
+    }
+
     /** The FFMETADATA file for one job: jobs of one book run in parallel, so the name includes the job's destination. */
     public static File metaFile(ConversionJob conversionJob) {
         return new File(System.getProperty("java.io.tmpdir"),

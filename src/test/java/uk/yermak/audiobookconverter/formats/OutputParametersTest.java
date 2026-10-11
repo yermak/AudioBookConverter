@@ -21,6 +21,14 @@ public class OutputParametersTest {
         assertEquals(toFFMpegTime(60000), "60.000");
     }
 
+    @Test
+    public void metaDataValuesAreEscaped() {
+        assertEquals(Format.escapeMetaData(List.of(";FFMETADATA1", "[CHAPTER]", "TIMEBASE=1/1000",
+                        "comment=Line one\r\nLine = two; #3", "title=C:\\dir\\", "track=2")),
+                List.of(";FFMETADATA1", "[CHAPTER]", "TIMEBASE=1/1000",
+                        "comment=Line one\\\nLine \\= two\\; \\#3", "title=C:\\\\dir\\\\", "track=2"));
+    }
+
     private static MediaInfo media(String codec, int frequency, int channels) {
         MediaInfoBean media = new MediaInfoBean("file." + codec);
         media.setCodec(codec);

@@ -28,6 +28,7 @@ public class ConversionProgress implements Runnable {
     SimpleStringProperty filesCount = new SimpleStringProperty();
     SimpleDoubleProperty progress = new SimpleDoubleProperty();
     SimpleStringProperty state = new SimpleStringProperty("");
+    SimpleStringProperty errorMessage = new SimpleStringProperty(null);
 
     private long startTime;
     private boolean finished;
@@ -150,6 +151,7 @@ public class ConversionProgress implements Runnable {
     private void error() {
         finished = true;
         ResourceBundle resources = AudiobookConverter.getBundle();
+        errorMessage.set(conversionJob.getErrorMessage());
         setState(resources.getString("progress.state.error"));
     }
 

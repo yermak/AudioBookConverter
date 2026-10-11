@@ -4,14 +4,16 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.book.Convertable;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,6 +44,7 @@ public class ConversionJob implements Runnable {
     private final Map<String, ProgressCallback> progressCallbacks;
     private final String outputDestination;
     private final SimpleObjectProperty<ProgressStatus> status = new SimpleObjectProperty<>(this, "status", READY);
+    private volatile String errorMessage;
 
 
     public ConversionJob(ConversionGroup conversionGroup, Convertable convertable, Map<String, ProgressCallback> progressCallbacks, String outputDestination) {
@@ -111,28 +114,23 @@ public class ConversionJob implements Runnable {
 
             if (status.get().isOver()) return;
 
-            File destFile = new File(outputDestination);
-
-            if (getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
-                try {
-                    String optimisedOutput = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output"), AudiobookConverter.getBundle()).optimize();
-                    if (optimisedOutput == null) return;
-                    if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-                    FileUtils.moveFile(new File(optimisedOutput), destFile);
-                } finally {
-                    FileUtils.deleteQuietly(new File(tempFile));
+            String result = tempFile;
+            try {
+                if (getConversionGroup().getOutputParameters().getFormat().mp4Compatible()) {
+                    result = new FFMpegOptimizer(this, tempFile, outputDestination, progressCallbacks.get("output"), AudiobookConverter.getBundle()).optimize();
+                    if (result == null) return;
                 }
-            } else {
-                if (destFile.exists()) FileUtils.deleteQuietly(destFile);
-                FileUtils.moveFile(new File(tempFile), destFile);
+                // throws, with the reason, if the destination is locked (e.g. open in a player)
+                Files.move(Path.of(result), Path.of(outputDestination), StandardCopyOption.REPLACE_EXISTING);
+            } finally {
+                // no-ops after a successful move; otherwise the audiobook-sized temp files stay in %TEMP%
+                FileUtils.deleteQuietly(new File(tempFile));
+                if (result != null) FileUtils.deleteQuietly(new File(result));
             }
             finished();
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
-            e.printStackTrace();
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            error(e.getMessage() + "; " + sw.getBuffer().toString());
+            error(ExceptionUtils.getRootCauseMessage(e)); // full stack trace is in the log
         }
     }
 
@@ -185,7 +183,12 @@ public class ConversionJob implements Runnable {
     }
 
     public void error(String message) {
+        errorMessage = message; // before the status change, so its listeners can show it
         status.set(ERROR);
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public void resume() {

@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Preset extends OutputParameters {
 
 
-    private final String name;
+    private String name;
 
 
     @Override

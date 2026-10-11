@@ -17,7 +17,7 @@
         <compiler.generate.no.warnings>off</compiler.generate.no.warnings>
         <compiler.max.memory>700m</compiler.max.memory>
         <compiler.debug>on</compiler.debug>
-        <javafx.version>25.0.1</javafx.version>
+        <javafx.version>27</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

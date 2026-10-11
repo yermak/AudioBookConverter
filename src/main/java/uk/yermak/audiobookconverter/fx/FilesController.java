@@ -204,9 +204,9 @@ public class FilesController extends VBox {
                 new KeyCodeCombination(KeyCode.DELETE, KeyCombination.CONTROL_DOWN)));
         fileMenu.getItems().add(new SeparatorMenuItem());
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_up"), this::moveUp,
-                new KeyCodeCombination(KeyCode.UP)));
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN)));
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.move_down"), this::moveDown,
-                new KeyCodeCombination(KeyCode.DOWN)));
+                new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN)));
         fileMenu.getItems().add(new SeparatorMenuItem());
         fileMenu.getItems().add(menuItem(resources.getString("menu.file.exit"), this::exit,
                 new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN)));
@@ -223,9 +223,9 @@ public class FilesController extends VBox {
                 new KeyCodeCombination(KeyCode.DIVIDE, KeyCombination.CONTROL_DOWN)));
         chapterMenu.getItems().add(new SeparatorMenuItem());
         chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_up"), this::moveUp,
-                new KeyCodeCombination(KeyCode.UP)));
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN)));
         chapterMenu.getItems().add(menuItem(resources.getString("menu.chapter.move_down"), this::moveDown,
-                new KeyCodeCombination(KeyCode.DOWN)));
+                new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN)));
 
         Menu convertMenu = new Menu(resources.getString("menu.convert"));
         convertMenu.getItems().add(menuItem(resources.getString("menu.convert.start"), this::start,

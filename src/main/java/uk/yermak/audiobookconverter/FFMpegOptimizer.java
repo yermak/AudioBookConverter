@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.formats.MP4Format;
 
 import java.io.ByteArrayOutputStream;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -62,7 +64,10 @@ public class FFMpegOptimizer {
             ByteArrayOutputStream err = new ByteArrayOutputStream();
             StreamCopier.copy(process.getErrorStream(), err);
 
-            if (!Utils.waitFor(process, conversionJob)) return null;
+            if (!Utils.waitFor(process, conversionJob)) {
+                FileUtils.deleteQuietly(new File(optimizedFile)); // partial output of the killed ffmpeg
+                return null;
+            }
             logger.debug("Optimize Out: {}", out);
             logger.error("Optimize Error: {}", err);
 

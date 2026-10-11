@@ -70,13 +70,12 @@ public class ConversionJob implements Runnable {
         List<Future<String>> futures = new ArrayList<>();
 
         String tempFile = Utils.getTmp(conversionGroup.getGroupId(), outputDestination.hashCode(), conversionGroup.getWorkfileExtension());
+        List<String> tempOutputs = new ArrayList<>();
 
         try {
             List<MediaInfo> media = convertable.getMedia();
             // a temp file per entry, not per file name: the same file can be added twice
-            List<String> tempOutputs = media.stream()
-                    .map(m -> Utils.getTmp(conversionGroup.getGroupId(), TEMP_IDS.incrementAndGet(), conversionGroup.getWorkfileExtension()))
-                    .toList();
+            media.forEach(m -> tempOutputs.add(Utils.getTmp(conversionGroup.getGroupId(), TEMP_IDS.incrementAndGet(), conversionGroup.getWorkfileExtension())));
             boolean reencode = conversionGroup.getOutputParameters().needReencode(media);
 
             for (int i : prioritiseMedia(media)) {
@@ -134,6 +133,18 @@ public class ConversionJob implements Runnable {
         } catch (Exception e) {
             logger.error("Error during parallel conversion", e);
             error(ExceptionUtils.getRootCauseMessage(e)); // full stack trace is in the log
+        } finally {
+            // a stopped or failed job must not leave audiobook-sized temp files behind. The status is over here, so
+            // running encodes kill their ffmpeg and end; wait for them, as Windows cannot delete a file still open.
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                } catch (Exception ignored) {
+                    // already reported, or the job was stopped
+                }
+            }
+            tempOutputs.forEach(tempOutput -> FileUtils.deleteQuietly(new File(tempOutput)));
+            FileUtils.deleteQuietly(new File(tempFile));
         }
     }
 

@@ -36,7 +36,15 @@ public class Part implements Organisable, Convertable {
     public void replaceMediaChapterByTracksChapters(MediaInfo mediaInfo, List<Track> tracks) {
         List<Chapter> chapters = tracks.stream().map(t -> t.toChapter(this, mediaInfo)).collect(Collectors.toList());
         Chapter chapter = mediaInfo.getChapter();
-        int position = this.getChapters().indexOf(chapter);
+        // media after the split one move to a chapter behind the new chapters, so the audio order is kept
+        List<MediaInfo> media = chapter.getMedia();
+        List<MediaInfo> after = media.subList(media.indexOf(mediaInfo) + 1, media.size());
+        if (!after.isEmpty()) {
+            List<MediaInfo> moved = new ArrayList<>(after);
+            after.clear();
+            chapter.createNextChapter(moved);
+        }
+        int position = this.getChapters().indexOf(chapter) + 1;
         //ORDER of next 2 lines is important see issue 269, if only one file is added, chapter and parts are removed and there is no place to add sub-tracks. So, sub-tracks should be added first.
         this.getChapters().addAll(position, chapters);
         mediaInfo.remove();

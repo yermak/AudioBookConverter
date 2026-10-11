@@ -85,9 +85,14 @@ class MediaInfoLoader implements Callable<MediaInfo> {
 
             // mp4 cover art (covr atoms) is extracted with mp4art, whether or not ffprobe shows it as a stream
             if (MP4_FILES.contains(FilenameUtils.getExtension(filename).toLowerCase()) && !conversionGroup.isDetached()) {
-                List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
-                for (int j = 0; j < imageFormats.size(); j++) {
-                    artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
+                try {
+                    List<String> imageFormats = new MP4v2ArtWorkChecker(conversionGroup, mediaInfo.getFileName()).list();
+                    for (int j = 0; j < imageFormats.size(); j++) {
+                        artExecutor.schedule(new MP4v2ArtWorkExtractor(mediaInfo, conversionGroup, j), 1 * j, TimeUnit.MILLISECONDS);
+                    }
+                } catch (Exception e) {
+                    // runs for every mp4 file now: a missing or failing mp4art must cost the cover, not the file
+                    logger.error("Failed to list cover art of {}", filename, e);
                 }
             }
 

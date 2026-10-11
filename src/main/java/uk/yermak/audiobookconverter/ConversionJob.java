@@ -78,7 +78,7 @@ public class ConversionJob implements Runnable {
 
             for (int i : prioritiseMedia(media)) {
                 MediaInfo mediaInfo = media.get(i);
-                ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
+                ProgressCallback callback = progressCallbacks.get(progressKey(i));
                 FFMpegNativeConverter converter = new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback, reencode);
                 if (!acquireSlot(status::get)) return;
                 try {
@@ -147,6 +147,11 @@ public class ConversionJob implements Runnable {
                 POOL_SLOTS.release(); // paused or stopped while waiting
             }
         }
+    }
+
+    /** Progress callback key of the i-th media entry: position, not file name and duration, which equal-length tracks share. */
+    static String progressKey(int i) {
+        return "media-" + i;
     }
 
     /** Indexes into media, longest first. */

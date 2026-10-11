@@ -45,7 +45,10 @@ public class ConversionGroup {
         ConversionProgress conversionProgress = new ConversionProgress(conversionJob);
 
         progressCallbacks.put("output", new ProgressCallback("output", conversionProgress));
-        convertable.getMedia().stream().map(m -> (m.getFileName() + "-" + m.getDuration())).forEach(key -> progressCallbacks.put(key, new ProgressCallback(key, conversionProgress)));
+        for (int i = 0; i < convertable.getMedia().size(); i++) {
+            String key = ConversionJob.progressKey(i);
+            progressCallbacks.put(key, new ProgressCallback(key, conversionProgress));
+        }
 
         jobs.add(conversionJob);
         Executors.newSingleThreadExecutor().execute(conversionProgress);

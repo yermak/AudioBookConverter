@@ -41,7 +41,7 @@ public class Chapter implements Organisable, Convertable {
             renderMap.put("DURATION", c -> Duration.ofMillis(c.getDuration()));
         }
         if (context.contains("BOOK_NUMBER")) {
-            renderMap.put("BOOK_NUMBER", c -> String.valueOf(c.getPart().getBook().getBookInfo().bookNumber()));
+            renderMap.put("BOOK_NUMBER", c -> Utils.numberOrText(c.getPart().getBook().getBookInfo().bookNumber().trimToNull()));
         }
         if (context.contains("BOOK_TITLE")) {
             renderMap.put("BOOK_TITLE", c -> c.getPart().getBook().getBookInfo().title());

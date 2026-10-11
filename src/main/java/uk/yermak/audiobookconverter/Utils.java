@@ -3,6 +3,7 @@ package uk.yermak.audiobookconverter;
 import net.bramp.ffmpeg.progress.ProgressParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.*;
@@ -120,15 +121,23 @@ public class Utils {
     }
 
 
+    /** A digits-only value as a number, so a template format such as %,02d applies to it (formats need a Number renderer). */
+    public static Object numberOrText(String value) {
+        return NumberUtils.isDigits(value) && value.length() < 19 ? Long.valueOf(value) : value;
+    }
+
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        String filenameFormat = Settings.loadSetting().getFilenameFormat();
+        return getOuputFilenameSuggestion(Settings.loadSetting().getFilenameFormat(), bookInfo);
+    }
+
+    static String getOuputFilenameSuggestion(String filenameFormat, AudioBookInfo bookInfo) {
         ST filenameTemplate = createTemplate(filenameFormat);
 
         filenameTemplate.add("WRITER", bookInfo.writer().trimToNull());
         filenameTemplate.add("TITLE", bookInfo.title().trimToNull());
         filenameTemplate.add("SERIES", bookInfo.series().trimToNull());
         filenameTemplate.add("NARRATOR", bookInfo.narrator().trimToNull());
-        filenameTemplate.add("BOOK_NUMBER", bookInfo.bookNumber().trimToNull());
+        filenameTemplate.add("BOOK_NUMBER", numberOrText(bookInfo.bookNumber().trimToNull()));
         filenameTemplate.add("YEAR", bookInfo.year().trimToNull());
 
         String result = filenameTemplate.render();

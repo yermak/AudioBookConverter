@@ -1,6 +1,7 @@
 package uk.yermak.audiobookconverter;
 
 import com.google.gson.*;
+import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.formats.Format;
 
 import java.io.File;
@@ -154,14 +155,18 @@ public class Settings {
     }
 
     public File getOutputFolder() {
-        File output = new File(outputFolder);
-        if (output.exists()) {
-            return output;
-        } else if (output.getParentFile().exists()) {
-            return output.getParentFile();
-        } else {
-            return new File(System.getProperty("user.home"));
+        return existingFolder(outputFolder);
+    }
+
+    /** The folder, else its parent, else the home folder: a drive root (unplugged USB drive) has no parent. */
+    private static File existingFolder(String path) {
+        if (StringUtils.isNotBlank(path)) {
+            File folder = new File(path);
+            if (folder.exists()) return folder;
+            File parent = folder.getParentFile();
+            if (parent != null && parent.exists()) return parent;
         }
+        return new File(System.getProperty("user.home"));
     }
 
     public Settings setOutputFolder(String outputFolder) {
@@ -170,14 +175,7 @@ public class Settings {
     }
 
     public File getSourceFolder() {
-        File source = new File(sourceFolder);
-        if (source.exists()) {
-            return source;
-        } else if (source.getParentFile().exists()) {
-            return source.getParentFile();
-        } else {
-            return new File(System.getProperty("user.home"));
-        }
+        return existingFolder(sourceFolder);
     }
 
     public Settings setSourceFolder(String sourceFolder) {

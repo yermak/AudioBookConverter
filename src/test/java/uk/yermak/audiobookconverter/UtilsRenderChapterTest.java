@@ -29,4 +29,10 @@ public class UtilsRenderChapterTest {
 
         assertEquals(Utils.renderChapter(format, null, context), "Chapter");
     }
+
+    @Test
+    public void durationsPast24HoursDoNotWrap() {
+        Map<String, Function<Chapter, Object>> context = Map.of("DURATION", c -> java.time.Duration.ofHours(25).plusMinutes(3).plusSeconds(4));
+        assertEquals(Utils.renderChapter("<DURATION>", null, context), "25:03:04");
+    }
 }

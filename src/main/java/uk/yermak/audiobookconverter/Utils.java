@@ -213,7 +213,7 @@ public class Utils {
             if (format == null) {
                 format = "%02d:%02d:%02d";
             }
-            return String.format(format, duration.toHoursPart(),
+            return String.format(format, duration.toHours(), // total hours: toHoursPart() wraps at 24
                     duration.toMinutesPart(),
                     duration.toSecondsPart());
         }

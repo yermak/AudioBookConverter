@@ -105,6 +105,8 @@ public class ConversionContext {
         conversionGroup.setBook(book.get());
         conversionGroup.setBookInfo(bookInfo.get());
         conversionGroup.setOutputParameters(Preset.copy(String.valueOf(conversionGroup.getGroupId()), Settings.loadSetting().findPreset(presetName)));
+        double speed = conversionGroup.getOutputParameters().getSpeed();
+        media.forEach(m -> m.freezeSpeed(speed));
         conversionGroup.setDetached(true);
         Settings settings = Settings.loadSetting();
 

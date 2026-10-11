@@ -12,6 +12,7 @@ public class MediaInfoProxy implements MediaInfo {
 
     private final String filename;
     private final Future<MediaInfo> futureLoad;
+    private volatile Double frozenSpeed;
 
     private MediaInfo getMediaInfo() {
         try {
@@ -44,7 +45,18 @@ public class MediaInfoProxy implements MediaInfo {
     }
 
     public long getDuration() {
-        return (long) (this.getMediaInfo().getDuration() / AudiobookConverter.getContext().getSpeed());
+        return (long) (this.getMediaInfo().getDuration() / getSpeed());
+    }
+
+    @Override
+    public double getSpeed() {
+        Double frozen = frozenSpeed;
+        return frozen != null ? frozen : AudiobookConverter.getContext().getSpeed();
+    }
+
+    @Override
+    public void freezeSpeed(double speed) {
+        frozenSpeed = speed;
     }
 
     @Override

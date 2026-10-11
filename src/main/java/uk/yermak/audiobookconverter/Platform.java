@@ -68,9 +68,9 @@ public enum Platform {
 
 
     public static final String FFPROBE = current.getPath("ffprobe");
-    public static final String MP4INFO = current.getPath("mp4info").replaceAll(" ", "\\ ");
-    public static final String MP4ART = current.getPath("mp4art").replaceAll(" ", "\\ ");
-    public final static String FFMPEG = current.getPath("ffmpeg").replaceAll(" ", "\\ ");
+    public static final String MP4INFO = current.getPath("mp4info");
+    public static final String MP4ART = current.getPath("mp4art");
+    public final static String FFMPEG = current.getPath("ffmpeg");
 
 
     private boolean isDebug() {

@@ -723,12 +723,15 @@ public class FilesController extends VBox {
                 }
             });
 
-            Executors.newSingleThreadExecutor().submit(() -> {
+            bookExecutor.submit(() -> {
                 try {
                     book.construct(mediaInfos);
-                    bookStructure.updateBookStructure();
                 } finally {
-                    startButton.setDisable(false);
+                    // controls may only be changed on the JavaFX thread
+                    Platform.runLater(() -> {
+                        bookStructure.updateBookStructure();
+                        startButton.setDisable(false);
+                    });
                 }
             });
         } catch (Exception e) {

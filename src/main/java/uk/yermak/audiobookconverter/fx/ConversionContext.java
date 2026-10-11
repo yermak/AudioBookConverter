@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.yermak.audiobookconverter.ConversionGroup;
@@ -101,7 +102,9 @@ public class ConversionContext {
         conversionGroup.setDetached(true);
         Settings settings = Settings.loadSetting();
 
-        settings.getGenres().add(bookInfo.get().genre().get());
+        String genre = bookInfo.get().genre().get();
+        if (StringUtils.isNotBlank(genre)) settings.getGenres().add(genre.trim());
+        settings.getGenres().removeIf(StringUtils::isBlank); // blank entries saved by older versions
         settings.save();
 
         ConversionGroup newConversionGroup = new ConversionGroup();

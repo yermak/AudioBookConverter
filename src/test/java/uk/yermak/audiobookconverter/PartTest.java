@@ -23,6 +23,40 @@ public class PartTest {
         return track;
     }
 
+    private static Book book(String... files) {
+        List<MediaInfo> media = java.util.Arrays.stream(files).map(f -> {
+            MediaInfoBean m = new MediaInfoBean(f);
+            m.setBookInfo(AudioBookInfo.instance());
+            return (MediaInfo) m;
+        }).toList();
+        Book book = new Book(AudioBookInfo.instance());
+        book.construct(FXCollections.observableArrayList(media));
+        return book;
+    }
+
+    @Test
+    public void partsMoveUpAndDown() {
+        Book book = book("A.mp3", "B.mp3");
+        book.getParts().get(0).getChapters().get(1).split(); // B into a second part
+        Part a = book.getParts().get(0);
+        Part b = book.getParts().get(1);
+
+        b.moveUp();
+        assertEquals(book.getParts(), List.of(b, a));
+        b.moveDown();
+        assertEquals(book.getParts(), List.of(a, b));
+    }
+
+    @Test
+    public void tracksCountTheirSiblings() {
+        Book book = book("A.mp3");
+        Chapter chapter = book.getParts().get(0).getChapters().get(0);
+        chapter.replaceMediaWithTracks(chapter.getMedia().get(0), List.of(track("1", 0, 1000), track("2", 1000, 2000)));
+        chapter.getMedia().forEach(m -> m.setChapter(chapter));
+
+        assertEquals(((Organisable) chapter.getMedia().get(1)).getTotalNumbers(), 2);
+    }
+
     @Test
     public void subTrackChaptersKeepAudioOrder() {
         List<MediaInfo> files = List.of(new MediaInfoBean("A.mp3"), new MediaInfoBean("B.mp3"), new MediaInfoBean("C.mp3"));

@@ -6,6 +6,7 @@ import uk.yermak.audiobookconverter.Utils;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,12 +97,14 @@ public class Part implements Organisable, Convertable {
 
     @Override
     public void moveUp() {
-
+        if (getNumber() < 2) return;
+        Collections.swap(book.getParts(), getNumber() - 1, getNumber() - 2);
     }
 
     @Override
     public void moveDown() {
-
+        if (getNumber() >= book.getParts().size()) return;
+        Collections.swap(book.getParts(), getNumber() - 1, getNumber());
     }
 
     public ObservableList<Chapter> getChapters() {

@@ -100,11 +100,6 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
     }
 
     @Override
-    public int getTotalNumbers() {
-        return 0;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MediaInfo)) return false;

@@ -122,5 +122,10 @@ public class MediaInfoBean extends MediaInfoOrganiser implements MediaInfo {
         return getReference().equals(that.getReference());
     }
 
+    @Override
+    public int hashCode() {
+        return getReference().hashCode();
+    }
+
 }
 

@@ -109,7 +109,8 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public String getReference() {
-        return this.getMediaInfo().getReference();
+        // same as the loaded MediaInfoBean's reference, but known before probing ends, even if it fails
+        return filename;
     }
 
     @Override
@@ -138,7 +139,13 @@ public class MediaInfoProxy implements MediaInfo {
 
     @Override
     public boolean equals(Object obj) {
-        return this.getMediaInfo().equals(obj);
+        if (this == obj) return true;
+        return obj instanceof MediaInfo other && getReference().equals(other.getReference());
+    }
+
+    @Override
+    public int hashCode() {
+        return getReference().hashCode();
     }
 }
 

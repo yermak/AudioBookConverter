@@ -64,11 +64,12 @@ public class ConversionJob implements Runnable {
             List<String> tempOutputs = media.stream()
                     .map(m -> Utils.getTmp(conversionGroup.getGroupId(), TEMP_IDS.incrementAndGet(), conversionGroup.getWorkfileExtension()))
                     .toList();
+            boolean reencode = conversionGroup.getOutputParameters().needReencode(media);
 
             for (int i : prioritiseMedia(media)) {
                 MediaInfo mediaInfo = media.get(i);
                 ProgressCallback callback = progressCallbacks.get(mediaInfo.getFileName() + "-" + mediaInfo.getDuration());
-                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback));
+                Future<String> converterFuture = executorService.submit(new FFMpegNativeConverter(this, mediaInfo, tempOutputs.get(i), callback, reencode));
                 futures.add(converterFuture);
             }
 

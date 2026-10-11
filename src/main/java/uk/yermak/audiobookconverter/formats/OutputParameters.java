@@ -61,6 +61,17 @@ public  class OutputParameters {
     }
 
 
+    /**
+     * Decides for a whole job: the concat step stream-copies the pieces, so they all need the same codec parameters.
+     * Copy only when every input can be copied and all share sample rate and channel count.
+     */
+    // ponytail: AAC profile (LC vs HE) is not probed, so mixed-profile AAC inputs are still copied together
+    public boolean needReencode(List<MediaInfo> media) {
+        return media.stream().anyMatch(m -> needReencode(m.getCodec()))
+                || media.stream().map(MediaInfo::getFrequency).distinct().count() > 1
+                || media.stream().map(MediaInfo::getChannels).distinct().count() > 1;
+    }
+
     public boolean needReencode(String codec) {
         // a stream copy cannot apply atempo, and track durations are already divided by the speed
         if (getSpeed() != 1.0) return true;

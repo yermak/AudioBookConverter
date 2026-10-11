@@ -23,15 +23,17 @@ public class FFMpegNativeConverter implements Callable<String> {
     private final MediaInfo mediaInfo;
     private final String outputFileName;
     private final ProgressCallback callback;
+    private final boolean reencode;
     private Process process;
     private ProgressParser progressParser = null;
 
 
-    public FFMpegNativeConverter(ConversionJob conversionJob, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback) {
+    public FFMpegNativeConverter(ConversionJob conversionJob, MediaInfo mediaInfo, String outputFileName, ProgressCallback callback, boolean reencode) {
         this.conversionJob = conversionJob;
         this.mediaInfo = mediaInfo;
         this.outputFileName = outputFileName;
         this.callback = callback;
+        this.reencode = reencode;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class FFMpegNativeConverter implements Callable<String> {
             ProcessBuilder ffmpegProcessBuilder;
             OutputParameters outputParameters = conversionJob.getConversionGroup().getOutputParameters();
 
-            if (outputParameters.needReencode(mediaInfo.getCodec())) {
+            if (reencode) {
                 logger.debug("Re-encoding to {} for {}", outputParameters.getFormat(), outputFileName);
                 ffmpegProcessBuilder = new ProcessBuilder(outputParameters.getFormat().getReencodingOptions(mediaInfo, progressParser.getUri().toString(), outputFileName, outputParameters));
             } else {

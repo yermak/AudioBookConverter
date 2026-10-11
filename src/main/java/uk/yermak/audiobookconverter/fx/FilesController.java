@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -57,6 +58,8 @@ public class FilesController extends VBox {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // one thread, so book changes from quick successive adds do not run concurrently
     private static final ExecutorService bookExecutor = Executors.newSingleThreadExecutor();
+    // book builds still running on bookExecutor (changed on the FX thread): every Start stays disabled until they finish
+    private final SimpleIntegerProperty pendingBookBuilds = new SimpleIntegerProperty(0);
     public MenuItem removeMenu;
 
 
@@ -230,8 +233,10 @@ public class FilesController extends VBox {
                 new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN)));
 
         Menu convertMenu = new Menu(resources.getString("menu.convert"));
-        convertMenu.getItems().add(menuItem(resources.getString("menu.convert.start"), this::start,
-                new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN)));
+        MenuItem startMenu = menuItem(resources.getString("menu.convert.start"), this::start,
+                new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN));
+        startMenu.disableProperty().bind(pendingBookBuilds.greaterThan(0));
+        convertMenu.getItems().add(startMenu);
         convertMenu.getItems().add(new SeparatorMenuItem());
         convertMenu.getItems().add(menuItem(resources.getString("menu.convert.pause_all"), this::pause,
                 new KeyCodeCombination(KeyCode.HOME, KeyCombination.CONTROL_DOWN)));
@@ -324,6 +329,7 @@ public class FilesController extends VBox {
 
         startButton.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
         startButton.setOnAction(this::start);
+        startButton.disableProperty().bind(pendingBookBuilds.greaterThan(0));
         startButton.setStyle("-fx-font-size: 15;");
         startButton.setTooltip(new Tooltip(resources.getString("files.tooltip.button_start")));
 
@@ -386,6 +392,7 @@ public class FilesController extends VBox {
         Button startChapters = new Button(resources.getString("chapters.button.start"));
         startChapters.setMinWidth(screen.getVisualBounds().getWidth() * 0.04);
         startChapters.setOnAction(this::start);
+        startChapters.disableProperty().bind(pendingBookBuilds.greaterThan(0));
         startChapters.setStyle("-fx-font-size: 15;");
         startChapters.setTooltip(new Tooltip(resources.getString("chapters.tooltip.button_start")));
 
@@ -517,14 +524,14 @@ public class FilesController extends VBox {
         List<MediaInfo> addedMedia = mediaLoader.loadMediaInfo();
         if (chaptersMode.get()) {
             // constructBook waits for every probe: keep it off the JavaFX thread, and Start off until the book is complete
-            startButton.setDisable(true);
+            pendingBookBuilds.set(pendingBookBuilds.get() + 1);
             bookExecutor.submit(() -> {
                 try {
                     AudiobookConverter.getContext().constructBook(addedMedia);
                 } finally {
                     Platform.runLater(() -> {
                         bookStructure.updateBookStructure();
-                        startButton.setDisable(false);
+                        pendingBookBuilds.set(pendingBookBuilds.get() - 1);
                     });
                 }
             });
@@ -703,8 +710,6 @@ public class FilesController extends VBox {
                 return;
             }
 
-            startButton.setDisable(true);
-
             filesChapters.getTabs().add(chaptersTab);
             filesChapters.getTabs().remove(filesTab);
 
@@ -735,6 +740,7 @@ public class FilesController extends VBox {
                 }
             });
 
+            pendingBookBuilds.set(pendingBookBuilds.get() + 1); // right before submit, so its finally always undoes it
             bookExecutor.submit(() -> {
                 try {
                     book.construct(mediaInfos);
@@ -742,7 +748,7 @@ public class FilesController extends VBox {
                     // controls may only be changed on the JavaFX thread
                     Platform.runLater(() -> {
                         bookStructure.updateBookStructure();
-                        startButton.setDisable(false);
+                        pendingBookBuilds.set(pendingBookBuilds.get() - 1);
                     });
                 }
             });

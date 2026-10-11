@@ -95,10 +95,11 @@ public class BookInfoController extends GridPane {
 
         MenuItem menuItem = new MenuItem("Remove");
 
-        Settings settings = Settings.loadSetting();
-        genre.setItems(FXCollections.observableArrayList(settings.getGenres()));
+        genre.setItems(FXCollections.observableArrayList(Settings.loadSetting().getGenres()));
         menuItem.setOnAction(event -> {
             String remove = genre.getItems().get(genre.getSelectionModel().getSelectedIndex());
+            // fresh copy: saving the one loaded at start-up would revert every setting changed since
+            Settings settings = Settings.loadSetting();
             settings.getGenres().remove(remove);
             settings.save();
             genre.getItems().remove(remove);

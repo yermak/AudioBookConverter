@@ -1,6 +1,5 @@
 package uk.yermak.audiobookconverter.loaders;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.yermak.audiobookconverter.Utils;
@@ -10,7 +9,12 @@ import uk.yermak.audiobookconverter.book.Track;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
 
 public class FlacLoader {
 
@@ -21,38 +25,53 @@ public class FlacLoader {
             // the sidecar wins over chapters ffmpeg made from an embedded CUESHEET block: those carry no titles,
             // and keeping both would list (and convert) every track twice
             mediaInfo.getBookInfo().tracks().clear();
-            String cue = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-            parseCue(mediaInfo, cue);
+            parseCue(mediaInfo, readCue(file));
+        }
+    }
+
+    /** UTF-8 when the file decodes as UTF-8; otherwise the system's ANSI code page, which older rippers write in. */
+    static String readCue(File file) throws IOException {
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        try {
+            return StringUtils.removeStart(StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(bytes)).toString(), "﻿");
+        } catch (CharacterCodingException e) {
+            // ponytail: a cue made under another code page (cp1251 cue on a cp1252 system) still comes out garbled
+            return new String(bytes, Charset.forName(System.getProperty("native.encoding"), StandardCharsets.UTF_8));
         }
     }
 
     static void parseCue(MediaInfoBean mediaInfo, String cue) {
         AudioBookInfo bookInfo = mediaInfo.getBookInfo();
-        String[] split = StringUtils.split(cue, "\n");
-        for (String line : split) {
-            int i = -1;
-            if (bookInfo.tracks().isEmpty()) {
-                if ((i = line.indexOf("GENRE")) != -1) bookInfo.genre().set(Utils.cleanText(line.substring(i + 5)));
-                if ((i = line.indexOf("TITLE")) != -1) bookInfo.title().set(Utils.cleanText(line.substring(i + 5)));
-                if ((i = line.indexOf("DATE")) != -1) bookInfo.year().set(Utils.cleanText(line.substring(i + 4)));
-                if ((i = line.indexOf("PERFORMER")) != -1)
-                    bookInfo.narrator().set(Utils.cleanText(line.substring(i + 9)));
-            } else {
-                Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 1);
-                if ((i = line.indexOf("TITLE")) != -1) track.setTitle(Utils.cleanText(line.substring(i + 5)));
-                if ((i = line.indexOf("PERFORMER")) != -1) track.setWriter(Utils.cleanText(line.substring(i + 9)));
-            }
-            if ((i = line.indexOf("TRACK")) != -1) {
-                bookInfo.tracks().add(new Track(Utils.cleanText(line.substring(i + 5))));
-            } else {
-                if ((i = line.indexOf("INDEX 01")) != -1) {
-                    long time = parseCueTime(line.substring(i + 8));
-                    if (bookInfo.tracks().size() > 1) {
-                        Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 2);
-                        track.setEnd(time);
+        List<Track> tracks = bookInfo.tracks();
+        for (String line : StringUtils.split(cue, "\n")) {
+            // the keyword is the first word ("REM GENRE" counts as GENRE): "Back on TRACK" in a title is not a new track
+            String command = StringUtils.removeStart(line.trim(), "REM ").trim();
+            String keyword = StringUtils.substringBefore(command, " ");
+            String value = Utils.cleanText(StringUtils.substringAfter(command, " "));
+            switch (keyword) {
+                case "GENRE" -> {
+                    if (tracks.isEmpty()) bookInfo.genre().set(value);
+                }
+                case "DATE" -> {
+                    if (tracks.isEmpty()) bookInfo.year().set(value);
+                }
+                case "TITLE" -> {
+                    if (tracks.isEmpty()) bookInfo.title().set(value);
+                    else tracks.getLast().setTitle(value);
+                }
+                case "PERFORMER" -> {
+                    if (tracks.isEmpty()) bookInfo.narrator().set(value);
+                    else tracks.getLast().setWriter(value);
+                }
+                case "TRACK" -> tracks.add(new Track(value));
+                case "INDEX" -> {
+                    if (value.startsWith("01 ") && !tracks.isEmpty()) {
+                        long time = parseCueTime(value.substring(3));
+                        if (tracks.size() > 1) tracks.get(tracks.size() - 2).setEnd(time);
+                        tracks.getLast().setStart(time);
                     }
-                    Track track = bookInfo.tracks().get(bookInfo.tracks().size() - 1);
-                    track.setStart(time);
+                }
+                default -> {
                 }
             }
         }

@@ -13,6 +13,7 @@ import uk.yermak.audiobookconverter.fx.ConversionContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -109,6 +110,39 @@ public class FFMediaLoaderTest {
 
         assertEquals(bookInfo.tracks().stream().map(Track::getTitle).toList(), List.of("First", "Second"));
         assertEquals(bookInfo.title().get(), "Album");
+    }
+
+    @Test
+    public void keywordInsideATitleIsNoKeyword() {
+        MediaInfoBean mediaInfo = new MediaInfoBean("test");
+        AudioBookInfo bookInfo = AudioBookInfo.instance();
+        mediaInfo.setBookInfo(bookInfo);
+        mediaInfo.setDuration(120_000);
+
+        FlacLoader.parseCue(mediaInfo, """
+                TITLE "Back on TRACK"
+                  TRACK 01 AUDIO
+                    TITLE "The DATE of PERFORMER"
+                    INDEX 01 00:00:00
+                """);
+
+        assertEquals(bookInfo.title().get(), "Back on TRACK");
+        assertEquals(bookInfo.tracks().size(), 1);
+        assertEquals(bookInfo.tracks().get(0).getTitle(), "The DATE of PERFORMER");
+        assertNull(bookInfo.tracks().get(0).getWriter());
+    }
+
+    @Test
+    public void cueReadAsUtf8OrElseAnsi() throws IOException {
+        Path dir = Files.createTempDirectory("abc-cue");
+        Path utf8 = dir.resolve("utf8.cue");
+        Files.write(utf8, ("﻿TITLE \"Брамс\"").getBytes(StandardCharsets.UTF_8));
+        Path ansi = dir.resolve("ansi.cue");
+        byte[] ansiBytes = "TITLE \"Брамс\"".getBytes(java.nio.charset.Charset.forName("cp1251")); // not valid UTF-8
+        Files.write(ansi, ansiBytes);
+
+        assertEquals(FlacLoader.readCue(utf8.toFile()), "TITLE \"Брамс\"");
+        assertEquals(FlacLoader.readCue(ansi.toFile()), new String(ansiBytes, java.nio.charset.Charset.forName(System.getProperty("native.encoding"))));
     }
 
     @Test

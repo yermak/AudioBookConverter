@@ -85,17 +85,18 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
 
     @Override
     public int getUID() {
-        return Objects.hash(mediaInfo.getFileName(), track.getTrackNo());
+        return Objects.hash(mediaInfo.getUID(), track.getTrackNo());
     }
 
+    // identity and offset chain through the wrapped media: it can itself be a track (sub-tracks of a cue or chapter track)
     @Override
     public String getReference() {
-        return getFileName() + "-" + track.getTrackNo();
+        return mediaInfo.getReference() + "-" + track.getTrackNo();
     }
 
     @Override
     public long getOffset() {
-        return track.getStart();
+        return Math.max(0, mediaInfo.getOffset()) + track.getStart(); // a whole file reports -1
     }
 
     @Override
@@ -109,5 +110,10 @@ public class MediaTrackAdaptor extends MediaInfoOrganiser implements MediaInfo {
         if (!(o instanceof MediaInfo)) return false;
         MediaInfo that = (MediaInfo) o;
         return getReference().equals(that.getReference());
+    }
+
+    @Override
+    public int hashCode() {
+        return getReference().hashCode();
     }
 }

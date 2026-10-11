@@ -148,6 +148,8 @@ public class FilesController extends VBox {
         durationColumn = new TreeTableColumn<>(resources.getString("column.chapter.duration"));
         detailsColumn = new TreeTableColumn<>(resources.getString("column.chapter.details"));
         bookStructure.getColumns().addAll(List.of(chapterColumn, durationColumn, detailsColumn));
+        // conversion follows the book model's order: a sorted display would show a different one
+        bookStructure.getColumns().forEach(column -> column.setSortable(false));
 
         mediaPlayerContainer = new StackPane();
         artworkContainer = new StackPane();

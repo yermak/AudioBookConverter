@@ -367,13 +367,10 @@ public class OutputController extends GridPane {
         settings.setLastUsedPreset(0);
         settings.save();
 
-
-        Preset preset = settings.getPresets().get(0);
-        updateOutputSettingsFromPreset(preset);
-        AudiobookConverter.getContext().setPresetName(preset.getName());
-
+        // clear first: the control listeners save through presetBox's selected index, which must match the settings
+        presetBox.getSelectionModel().clearSelection();
         presetBox.getItems().remove(presetToRemove.getName());
-        presetBox.getSelectionModel().select(0);
+        presetBox.getSelectionModel().select(0); // the preset listener applies preset 0
     }
 
     private void updateForceSpeed(Preset preset) {

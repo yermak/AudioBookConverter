@@ -101,7 +101,7 @@ public class Utils {
     }
 
     public static String renderChapter(Chapter chapter, Map<String, Function<Chapter, Object>> context) {
-        return renderChapter(Settings.loadSetting().getChapterFormat(), chapter, context);
+        return renderChapter(Settings.current().getChapterFormat(), chapter, context);
     }
 
     static String renderChapter(String chapterFormat, Chapter chapter, Map<String, Function<Chapter, Object>> context) {
@@ -127,7 +127,7 @@ public class Utils {
     }
 
     public static String getOuputFilenameSuggestion(AudioBookInfo bookInfo) {
-        return getOuputFilenameSuggestion(Settings.loadSetting().getFilenameFormat(), bookInfo);
+        return getOuputFilenameSuggestion(Settings.current().getFilenameFormat(), bookInfo);
     }
 
     static String getOuputFilenameSuggestion(String filenameFormat, AudioBookInfo bookInfo) {
@@ -180,7 +180,7 @@ public class Utils {
     }
 
     public static String renderPart(Part part, Map<String, Function<Part, Object>> context) {
-        String partFormat = Settings.loadSetting().getPartFormat();
+        String partFormat = Settings.current().getPartFormat();
         ST partTemplate = createTemplate(partFormat);
 
         context.forEach((key, value) -> partTemplate.add(key, value.apply(part)));

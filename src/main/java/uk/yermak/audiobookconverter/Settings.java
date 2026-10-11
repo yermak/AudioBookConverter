@@ -86,10 +86,27 @@ public class Settings {
 
     public static void saveSetting(Settings settings) {
         write(preferences, Version.getSettingsVersion(), gson.toJson(settings));
+        current = null;
     }
 
     public static void clear() {
         remove(preferences, Version.getSettingsVersion());
+        current = null;
+    }
+
+    private static volatile Settings current;
+
+    /**
+     * Settings for reading only, cached until the next save or clear: title and file name rendering asks for them for
+     * every chapter, and loadSetting() parses the stored JSON each time. Change settings on a loadSetting() copy.
+     */
+    public static Settings current() {
+        Settings settings = current;
+        if (settings == null) {
+            settings = loadSetting();
+            current = settings;
+        }
+        return settings;
     }
 
     public void save() {

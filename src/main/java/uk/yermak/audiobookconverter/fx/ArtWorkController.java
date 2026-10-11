@@ -181,9 +181,10 @@ public class ArtWorkController extends GridPane {
                     Image fimage = awtImageToFX(image);
                     AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(fimage));
                 } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    java.util.List<String> artFiles = (java.util.List<String>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    // AWT delivers this flavor as a List of java.io.File
+                    java.util.List<File> artFiles = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
-                    artFiles.stream().filter(s -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(s))).forEach(f -> {
+                    artFiles.stream().filter(f -> ArrayUtils.contains(ArtWork.IMAGE_EXTENSIONS, FilenameUtils.getExtension(f.getName()).toLowerCase())).forEach(f -> {
 //                        AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkBean(Utils.tempCopy(f)));
                         try (var imageStream = new FileInputStream(f)) {
                             AudiobookConverter.getContext().addPosterIfMissingWithDelay(new ArtWorkImage(new Image(imageStream)));

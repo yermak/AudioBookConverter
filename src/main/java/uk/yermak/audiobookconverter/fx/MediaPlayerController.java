@@ -196,6 +196,11 @@ public class MediaPlayerController extends GridPane {
             playTime.setText("00:00:00");
 
             MediaInfo next = findNext(selected);
+            if (next == null) { // last file, or chapters mode (the file list is empty there)
+                playingTrack = null;
+                timelapse.setValue(0);
+                return;
+            }
 
             context.getSelectedMedia().clear();
             context.getSelectedMedia().add(next);
@@ -219,6 +224,7 @@ public class MediaPlayerController extends GridPane {
 
     private void updateValues() {
         Platform.runLater(() -> {
+            if (mediaPlayer == null) return; // ended or switched after this update was queued
             Duration currentTime = mediaPlayer.getCurrentTime();
             if (!timelapse.isValueChanging()) {
                 timelapse.setValue(currentTime.toSeconds());

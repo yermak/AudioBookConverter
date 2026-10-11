@@ -22,7 +22,7 @@ public class Part implements Organisable, Convertable {
     public Part(Book book) {
         this.book = book;
         chapters.addListener(book);
-        renderMap.put("BOOK_NUMBER", part -> part.getBook().getBookInfo().series().trimToNull());
+        renderMap.put("BOOK_NUMBER", part -> part.getBook().getBookInfo().bookNumber().trimToNull());
         renderMap.put("SERIES", part -> part.getBook().getBookInfo().series().trimToNull());
         renderMap.put("TITLE", part -> part.getBook().getBookInfo().title().trimToNull());
         renderMap.put("WRITER", part -> part.getBook().getBookInfo().writer().trimToNull());

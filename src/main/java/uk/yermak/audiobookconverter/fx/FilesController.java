@@ -743,7 +743,7 @@ public class FilesController extends VBox {
             pendingBookBuilds.set(pendingBookBuilds.get() + 1); // right before submit, so its finally always undoes it
             bookExecutor.submit(() -> {
                 try {
-                    book.construct(mediaInfos);
+                    AudiobookConverter.showSkippedFiles(book.construct(mediaInfos));
                 } finally {
                     // controls may only be changed on the JavaFX thread
                     Platform.runLater(() -> {

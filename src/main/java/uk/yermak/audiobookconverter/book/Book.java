@@ -26,25 +26,32 @@ public class Book implements Organisable, InvalidationListener {
         this.audioBookInfo = audioBookInfo;
     }
 
-    public void construct(List<MediaInfo> items) {
-        try {
-            Part part = new Part(this);
-            for (MediaInfo item : items) {
-                if (item.getBookInfo().tracks().isEmpty()) {
-                    Chapter chapter = new Chapter(part, Collections.singletonList(item));
-                    part.getChapters().add(chapter);
-                } else {
-                    List<Track> tracks = item.getBookInfo().tracks();
-                    for (Track track : tracks) {
-                        Chapter chapter = track.toChapter(part, item);
-                        part.getChapters().add(chapter);
-                    }
+    /**
+     * Adds the items as a new part. An item whose media info failed to load is left out, not the whole part.
+     * @return file names of the items left out, for a warning
+     */
+    public List<String> construct(List<MediaInfo> items) {
+        List<String> skipped = new ArrayList<>();
+        Part part = new Part(this);
+        for (MediaInfo item : items) {
+            List<Track> tracks;
+            try {
+                tracks = item.getBookInfo().tracks(); // throws if the probe failed
+            } catch (Exception e) {
+                logger.error("Leaving {} out of the book, its media info failed to load", item.getFileName(), e);
+                skipped.add(item.getFileName());
+                continue;
+            }
+            if (tracks.isEmpty()) {
+                part.getChapters().add(new Chapter(part, Collections.singletonList(item)));
+            } else {
+                for (Track track : tracks) {
+                    part.getChapters().add(track.toChapter(part, item));
                 }
             }
-            parts.add(part);
-        } catch (Throwable e) {
-            logger.error("Error constructing book:", e);
         }
+        if (!part.getChapters().isEmpty()) parts.add(part);
+        return skipped;
     }
 
 

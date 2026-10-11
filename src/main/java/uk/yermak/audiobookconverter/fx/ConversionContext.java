@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.ConversionGroup;
 import uk.yermak.audiobookconverter.ConversionJob;
 import uk.yermak.audiobookconverter.Preset;
@@ -202,7 +203,7 @@ public class ConversionContext {
 
     public Book constructBook(List<MediaInfo> addedMedia) {
         Book book = getBook();
-        book.construct(FXCollections.observableArrayList(addedMedia));
+        AudiobookConverter.showSkippedFiles(book.construct(FXCollections.observableArrayList(addedMedia)));
 //        detached = false;
         return book;
     }

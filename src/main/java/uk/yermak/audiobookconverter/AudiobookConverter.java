@@ -187,6 +187,16 @@ public class AudiobookConverter extends Application {
                 .show();
     }
 
+    /** Warns, without blocking, that files were left out of a book because their media info failed to load. */
+    public static void showSkippedFiles(List<String> fileNames) {
+        if (fileNames.isEmpty()) return;
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING, String.join("\n", fileNames));
+            alert.setHeaderText(getBundle().getString("dialog.files_skipped.header"));
+            alert.show();
+        });
+    }
+
     private static List<String> readListFromURL(String requestURL) {
         try {
             try (Scanner scanner = new Scanner(openWithTimeouts(requestURL), StandardCharsets.UTF_8.toString())) {

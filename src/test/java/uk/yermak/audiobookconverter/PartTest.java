@@ -72,4 +72,26 @@ public class PartTest {
         assertEquals(part.getChapters().stream().map(c -> c.getMedia().stream().map(MediaInfo::getReference).toList()).toList(),
                 List.of(List.of("A.mp3"), List.of("B.mp3-1"), List.of("B.mp3-2"), List.of("C.mp3")));
     }
+
+    @Test
+    public void unreadableFileIsLeftOutNotTheBook() {
+        MediaInfoBean good = new MediaInfoBean("A.mp3");
+        good.setBookInfo(AudioBookInfo.instance());
+        MediaInfo bad = new MediaInfoBean("B.mp3") {
+            @Override
+            public AudioBookInfo getBookInfo() {
+                throw new RuntimeException("ffprobe failed"); // as MediaInfoProxy does for a failed probe
+            }
+        };
+        Book book = new Book(AudioBookInfo.instance());
+
+        assertEquals(book.construct(FXCollections.observableArrayList(List.of(bad, good))), List.of("B.mp3"));
+        assertEquals(book.getParts().size(), 1);
+        assertEquals(book.getParts().get(0).getChapters().size(), 1);
+
+        // nothing readable: no empty part for a job to choke on
+        Book none = new Book(AudioBookInfo.instance());
+        assertEquals(none.construct(FXCollections.observableArrayList(List.of(bad))), List.of("B.mp3"));
+        assertEquals(none.getParts().size(), 0);
+    }
 }

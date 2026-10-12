@@ -130,7 +130,7 @@ public class ConversionJob implements Runnable {
                 if (result != null) FileUtils.deleteQuietly(new File(result));
             }
             finished();
-        } catch (Exception e) {
+        } catch (Exception | Error e) { // an Error killed the thread and left the job IN_PROGRESS, its row stuck (#737)
             logger.error("Error during parallel conversion", e);
             error(ExceptionUtils.getRootCauseMessage(e)); // full stack trace is in the log
         } finally {

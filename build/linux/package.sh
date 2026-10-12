@@ -1,31 +1,28 @@
+#!/bin/bash
+# usage: package.sh JAVA_HOME APP_VERSION  -- run after 'mvn package', builds target/release/AudioBookConverter-static-binaries-APP_VERSION.tar.gz
+set -euo pipefail
 JAVA_HOME=$1
-JAVAFX_JMODS=$2
-APP_VERSION=$3
+APP_VERSION=$2
 
-rm -rf target/release
-mkdir target/release
+rm -rf target/release target/jmods target/fx-jre target/image
+mkdir -p target/release target/jmods
 
-rm -rf target/fx-jre
-$JAVA_HOME/bin/jlink --module-path $JAVA_HOME/jmods:$JAVAFX_JMODS \
+"$JAVA_HOME/bin/jar" --extract --file javafx/jmods/openjfx-*_linux-x64_bin-jmods.zip --dir target/jmods
+JAVAFX_JMODS=$(dirname "$(find target/jmods -name 'javafx.base.jmod' | head -1)")
+
+# a JDK without jmods links from its own runtime image (JEP 493)
+MODULE_PATH=$JAVAFX_JMODS
+if [ -d "$JAVA_HOME/jmods" ]; then MODULE_PATH=$JAVA_HOME/jmods:$MODULE_PATH; fi
+
+# --strip-debug would also strip native libraries and needs objcopy, which the build agent lacks
+"$JAVA_HOME/bin/jlink" --module-path "$MODULE_PATH" \
 --add-modules java.base,java.sql,java.management,javafx.controls,javafx.fxml,javafx.media,javafx.base,javafx.swing,javafx.graphics \
---strip-native-commands --strip-debug --no-man-pages --no-header-files --exclude-files=**.md \
+--strip-native-commands --strip-java-debug-attributes --no-man-pages --no-header-files '--exclude-files=**.md' \
 --output target/fx-jre
 
-rm -rf target/image
-$JAVA_HOME/bin/jpackage --app-version $APP_VERSION  -t app-image --icon AudioBookConverter.png --name AudioBookConverter --vendor Recoupler \
---input target/package/audiobookconverter-$APP_VERSION-linux-installer/audiobookconverter-$APP_VERSION/app \
---main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre \
---dest target/image --java-options '--enable-preview'
-strip target/image/AudioBookConverter/bin/AudioBookConverter
+"$JAVA_HOME/bin/jpackage" --app-version "$APP_VERSION" -t app-image --icon AudioBookConverter.png --name AudioBookConverter --vendor Recoupler \
+--input "target/package/audiobookconverter-$APP_VERSION-linux-installer/audiobookconverter-$APP_VERSION/app" \
+--main-jar "lib/audiobookconverter-$APP_VERSION.jar" --runtime-image target/fx-jre \
+--dest target/image
 
-cd target/image
-tar -czf ../release/AudioBookConverter-static-binaries-$APP_VERSION.tar.gz AudioBookConverter
-cd ../..
-
-#$JAVA_HOME/bin/jpackage --app-version $APP_VERSION  --license-file LICENSE --icon AudioBookConverter.png \
-#-t deb --name AudioBookConverter --vendor Recoupler \
-#--linux-menu-group AudioBookConverter --linux-shortcut \
-#--input target/package/audiobookconverter-$APP_VERSION-linux-nodeps-installer/audiobookconverter-$APP_VERSION/app \
-#--main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre --java-options '--enable-preview'
-
-#mv audiobookconverter_$APP_VERSION-1_amd64.deb target/release/
+tar -C target/image -czf "target/release/AudioBookConverter-static-binaries-$APP_VERSION.tar.gz" AudioBookConverter

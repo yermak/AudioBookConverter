@@ -184,6 +184,9 @@ public class FilesController extends VBox {
         tabs.getTabs().addAll(bookInfoTab, artTab, qualityTab);
 
         mediaPlayerContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        // on a short window the list above gives way: the player and the settings tabs keep their full height
+        mediaPlayerContainer.setMinHeight(Region.USE_PREF_SIZE);
+        tabs.setMinHeight(Region.USE_PREF_SIZE);
 
         getChildren().addAll(menuBar, filesChapters, mediaPlayerContainer, tabs);
 

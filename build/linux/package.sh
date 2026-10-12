@@ -25,4 +25,15 @@ if [ -d "$JAVA_HOME/jmods" ]; then MODULE_PATH=$JAVA_HOME/jmods:$MODULE_PATH; fi
 --main-jar "lib/audiobookconverter-$APP_VERSION.jar" --runtime-image target/fx-jre \
 --dest target/image
 
+# static ffmpeg from BtbN: its binaries are too big for the repository, and month-end autobuilds are kept long-term
+FFMPEG=ffmpeg-n8.1.3-9-g29e619e767-linux64-gpl-8.1
+FFMPEG_SHA256=97ce978979194b5cf7e06a5e68020dbdaa7a4f3294c5452b6a1bc347100dbb79
+CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/audiobookconverter-build
+mkdir -p "$CACHE"
+if ! echo "$FFMPEG_SHA256  $CACHE/$FFMPEG.tar.xz" | sha256sum -c --status - 2>/dev/null; then
+  curl -fsSL "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/$FFMPEG.tar.xz" -o "$CACHE/$FFMPEG.tar.xz"
+  echo "$FFMPEG_SHA256  $CACHE/$FFMPEG.tar.xz" | sha256sum -c -
+fi
+tar -xJf "$CACHE/$FFMPEG.tar.xz" -C target/image/AudioBookConverter/lib/app/external --strip-components=2 "$FFMPEG/bin/ffmpeg" "$FFMPEG/bin/ffprobe"
+
 tar -C target/image -czf "target/release/AudioBookConverter-static-binaries-$APP_VERSION.tar.gz" AudioBookConverter

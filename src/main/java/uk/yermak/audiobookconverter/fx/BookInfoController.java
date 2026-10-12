@@ -15,12 +15,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import org.apache.commons.lang3.math.NumberUtils;
 import uk.yermak.audiobookconverter.AudiobookConverter;
 import uk.yermak.audiobookconverter.Settings;
 import uk.yermak.audiobookconverter.book.AudioBookInfo;
 import uk.yermak.audiobookconverter.book.MediaInfo;
 import uk.yermak.audiobookconverter.fx.util.TextFieldValidator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 
@@ -151,13 +154,20 @@ public class BookInfoController extends GridPane {
             if (clear) {
                 clearTags();
             } else {
-                int files = media.size();
+                List<MediaInfo> batch = List.copyOf(media);
                 Executors.newSingleThreadExecutor().submit(() -> {
                     //getBookInfo is proxied blocking method should be executed outside of UI thread,
                     // when info become available - scheduling update in UI thread.
-                    AudioBookInfo info = media.get(0).getBookInfo();
-                    Platform.runLater(() -> copyTags(info, files));
-
+                    List<AudioBookInfo> infos = new ArrayList<>();
+                    for (MediaInfo file : batch) {
+                        try {
+                            infos.add(file.getBookInfo());
+                        } catch (Exception e) {
+                            // failed to load: already logged, and left out of the book with a warning
+                        }
+                    }
+                    if (infos.isEmpty()) return;
+                    Platform.runLater(() -> copyTags(infos.getFirst(), bookNumber(infos)));
                 });
             }
         }
@@ -165,22 +175,24 @@ public class BookInfoController extends GridPane {
 
 
     /**
-     * The book number is read from the track tag. Of a whole book it is the book number, as written by the m4b and ogg
-     * output, but of one of many chapter files it is that file's position: every chapter of the result showed track 1.
+     * The book number is read from the track tag. The m4b and ogg output write the book number there, without a total,
+     * so a whole book, or every part of one, carries the same number. Chapter files carry their position instead
+     * (1, 2, 3 or 1/32): taken as the book number, every chapter of the result showed track 1.
      */
-    // ponytail: decided by the first batch only; a chapter file added alone first still fills it
-    static String bookNumber(AudioBookInfo first, int files) {
-        return files == 1 ? first.bookNumber().get() : "";
+    static String bookNumber(List<AudioBookInfo> files) {
+        if (files.stream().anyMatch(f -> NumberUtils.toInt(f.totalTracks().get()) > 1)) return "";
+        List<String> numbers = files.stream().map(f -> f.bookNumber().get()).distinct().toList();
+        return numbers.size() == 1 ? numbers.getFirst() : "";
     }
 
-    private void copyTags(AudioBookInfo bookInfo, int files) {
+    private void copyTags(AudioBookInfo bookInfo, String bookNumber) {
 
         title.setText(bookInfo.series().get());
         writer.setText(bookInfo.writer().get());
         narrator.setText(bookInfo.narrator().get());
         genre.getEditor().setText(bookInfo.genre().get());
         series.setText(bookInfo.series().get());
-        bookNo.setText(bookNumber(bookInfo, files));
+        bookNo.setText(bookNumber);
         year.setText(bookInfo.year().get());
         comment.setText(bookInfo.comment().get());
     }

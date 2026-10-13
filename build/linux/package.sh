@@ -17,6 +17,7 @@ $JAVA_HOME/bin/jpackage --app-version $APP_VERSION  -t app-image --icon AudioBoo
 --main-jar lib/audiobookconverter-$APP_VERSION.jar --runtime-image target/fx-jre \
 --dest target/image --java-options '--enable-preview'
 strip target/image/AudioBookConverter/bin/AudioBookConverter
+sh build/linux/install-utf8-launcher.sh target/image/AudioBookConverter
 
 cd target/image
 tar -czf ../release/AudioBookConverter-static-binaries-$APP_VERSION.tar.gz AudioBookConverter

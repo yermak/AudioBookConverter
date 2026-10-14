@@ -24,6 +24,7 @@ if [ -d "$JAVA_HOME/jmods" ]; then MODULE_PATH=$JAVA_HOME/jmods:$MODULE_PATH; fi
 --input "target/package/audiobookconverter-$APP_VERSION-linux-installer/audiobookconverter-$APP_VERSION/app" \
 --main-jar "lib/audiobookconverter-$APP_VERSION.jar" --runtime-image target/fx-jre \
 --dest target/image
+sh build/linux/install-utf8-launcher.sh target/image/AudioBookConverter
 
 # static ffmpeg from BtbN: its binaries are too big for the repository, and month-end autobuilds are kept long-term
 FFMPEG=ffmpeg-n8.1.3-9-g29e619e767-linux64-gpl-8.1

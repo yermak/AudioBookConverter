@@ -27,6 +27,8 @@ import java.util.ResourceBundle;
 public class OutputController extends GridPane {
     final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String DISABLED = "Disabled";
+    static final List<String> SPLIT_OPTIONS = List.of("parts", "chapters");
+    static final List<String> FORCE_OPTIONS = Arrays.stream(OutputParameters.Force.values()).map(Enum::name).toList();
 
     public final ComboBox<Format> outputFormatBox;
     public final ComboBox<String> presetBox;
@@ -65,6 +67,8 @@ public class OutputController extends GridPane {
         channelsBox = new ComboBox<>();
         cutoffBox = new ComboBox<>();
         forceBox = new ComboBox<>();
+        splitFileBox.getItems().addAll(SPLIT_OPTIONS);
+        forceBox.getItems().addAll(FORCE_OPTIONS);
         cbrRadio = new RadioButton(resources.getString("output.radio.cbr"));
         bitRateBox = new ComboBox<>();
         vbrRadio = new RadioButton(resources.getString("output.radio.vbr"));
@@ -426,5 +430,4 @@ public class OutputController extends GridPane {
         }
     }
 }
-
 
